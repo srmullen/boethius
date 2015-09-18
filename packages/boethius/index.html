@@ -1,0 +1,227 @@
+<!doctype html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+<head>
+    <meta charset="UTF-8">
+    <title>Scored</title>
+    <link rel="stylesheet" href="/styles/index.css">
+    <!-- // <script src="../bower_components/modernizr/modernizr.js"></script> -->
+    <script src="../bower_components/jquery/dist/jquery.min.js"></script>
+</head>
+<body>
+    <div class="header">
+        <span class="mlm">Scored</span>
+        <div class="float-right mrm">
+            <span><input class="js-score-name" type="text" /></span>
+            <button onclick="loadScore()">Load</button>
+            <button onclick="displayLayout()">Layout</button>
+            <button onclick="displayMusic()">Music</button>
+            <button onclick="save()">Save</button>
+        </div>
+    </div>
+    <div class="music"></div>
+    <div class="flex-container">
+        <div class="js-layout palate-wrapper-left">
+            <div id="codemirror-layout" class="layout-code"></div>
+        </div>
+         <div class="js-music palate-wrapper-left">
+            <div id="codemirror-music" class="layout-code"></div>
+        </div>
+    </div>
+
+    <!-- ES6 polyfill -->
+    <!-- <script src="../polyfill/browser-polyfill.js" type="text/javascript" charset="utf-8"></script> -->
+
+    <script type="text/javascript" src="/bower_components/lodash/lodash.min.js"></script>
+    <script type="text/javascript" src="/bower_components/paper/dist/paper-core.js"></script>
+    <script type="text/javascript" src="/bower_components/flocking/dist/flocking-no-jquery.js"></script>
+    <script type="text/javascript" src="/bower_components/fraction.js/fraction.js"></script>
+    <script type="text/javascript" src="/bower_components/teoria/dist/teoria.js"></script>
+    <script type="text/javascript" src="/scripts/vendor/FontLoader.js"></script>
+
+    <!-- CodeMirror  -->
+    <script type="text/javascript" src="/bower_components/codemirror/lib/codemirror.js"></script>
+    <link rel="stylesheet" type="text/css" href="/bower_components/codemirror/lib/codemirror.css">
+    <script type="text/javascript" src="/bower_components/codemirror/mode/javascript/javascript.js"></script>
+    <link rel="stylesheet" type="text/css" href="/bower_components/codemirror/theme/monokai.css">
+    <link rel="stylesheet" type="text/css" href="/bower_components/codemirror/theme/neo.css">
+    <script type="text/javascript" src="/bower_components/codemirror/addon/selection/active-line.js"></script>
+    <script type="text/javascript" src="/bower_components/codemirror/addon/edit/matchbrackets.js"></script>
+
+
+    <!-- Scored -->
+    <script type="text/javascript" src="/dist/bundle.js"></script>
+
+    <script type="text/javascript">
+    var scored, layoutmirror, musicmirror;
+
+    function createMirror (el) {
+        return CodeMirror(document.getElementById('codemirror-layout'), {
+            mode: 'application/json',
+            theme: 'neo',
+            lineNumbers: true,
+            styleActiveLine: true,
+            matchbrackets:true
+        });
+    }
+    
+    function composing (scoreName) {
+
+        layoutmirror = createMirror(document.getElementById('codemirror-layout'));
+        musicmirror = createMirror(document.getElementById('codemirror-music'));
+
+        if (scoreName) {
+            $.when($.getJSON("/layout/" + scoreName), $.getJSON("/music/" + scoreName)).done(function (layoutJSON, musicJSON) {
+                var layoutDoc = window.layoutDoc = layoutJSON[0].rows[0].value,
+                    musicDoc =  window.musicDoc = musicJSON[0].rows[0].value;
+
+                layoutmirror.setValue(JSON.stringify(layoutDoc.layout, null, 2));
+                musicmirror.setValue(JSON.stringify(musicDoc.music, null, 2));
+
+                scored = renderScore(layoutDoc.layout);
+
+                onProcessEventsClick();
+            });
+        } else {
+
+        }
+
+        layoutmirror.on("change", function () {
+            layoutmirror.changed = true;
+        });
+
+        musicmirror.on("change", function () {
+            musicmirror.changed = true;
+        });
+    };
+
+    function renderScore (data, scored) {
+        var scored = scored || new Scored();
+
+        scored.render(data);
+
+        return scored;
+    };
+
+    function start (cb) {
+        var fontLoader = new FontLoader(['gonville', "gonvillealpha"], {
+            fontsLoaded: cb
+        });
+        fontLoader.loadFonts();
+    }
+
+    function onProcessEventsClick () {
+         // get data from codeMirror
+        var music = JSON.parse(musicmirror.getValue()),
+            data = JSON.parse(layoutmirror.getValue()),
+            layoutEvents = scored.createEvents({}, [], data),
+            events = scored.createEvents({}, [], music);
+
+        scored.renderEvents(events, layoutEvents);
+    }
+
+    function loadScore () {
+        var scoreName = $(".js-score-name").val();
+        if (scoreName) {
+            scored.destroy();
+            composing(scoreName);
+        }
+    }
+
+    function drawCircle (point, radius, color) {
+        radius = radius || 10;
+        var circ = new paper.Path.Circle(point, radius);
+        circ.fillColor = color || "red";
+        return circ;
+    }
+
+    /*
+     * @param $el {jQuery} - element to append the canvas to.
+     */
+    function createCanvas ($el) {
+        var width = $(window).width(),
+            height = $(window).height(),
+            $canvas;
+
+        $el.append('<canvas class="scored-canvas sheet"><canvas>');
+
+        $canvas = $(".scored-canvas");
+             
+        $canvas.width(850);
+        $canvas.height(1100);
+
+        Scored.init($canvas[0]);
+    }
+
+    function displayLayout () {
+        var $layout = $(".js-layout");
+        if ($layout.hasClass("display-none")) {
+            $layout.removeClass("display-none");
+        } else {
+            $layout.addClass("display-none");
+        }
+    }
+
+    function displayMusic () {
+        var $music = $(".js-music");
+        if ($music.hasClass("display-none")) {
+            $music.removeClass("display-none");
+        } else {
+            $music.addClass("display-none");
+        }
+    }
+
+    function save () {
+        var layoutJSON, musicJSON;
+
+        if (layoutmirror.changed) {
+            console.log("saving layout");
+            if (layoutObj = parseJSON(layoutmirror.getValue())) {
+                layoutDoc.layout = layoutObj;
+                insertDoc(layoutDoc);
+            } else {
+                console.error("Invalid layout JSON");
+            }
+            layoutmirror.changed = false;
+        }
+
+        if (musicmirror.changed) {
+            console.log("saving music");
+            if (musicObj = parseJSON(musicmirror.getValue())) {
+                musicDoc.music = musicObj;
+                insertDoc(musicDoc);
+            } else {
+                console.error("Invalid music JSON");
+            }
+            musicmirror.changed = false;
+        }
+    }
+
+    function parseJSON (json) {
+        try {
+            return JSON.parse(json);
+        } catch (e) {
+            return false;
+        }
+    }
+
+    function insertDoc (doc) {
+        return $.ajax({
+            url: "/insert",
+            contentType: "application/json",
+            type: "PUT",
+            data: JSON.stringify(doc)
+        }); 
+    }
+
+    createCanvas($(".music"));
+
+    var hash = window.location.hash ? window.location.hash.split("#")[1] : null;
+    start(_.partial(composing, hash));
+        
+    </script>
+
+</body>
+</html>

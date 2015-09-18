@@ -1,0 +1,82 @@
+<!doctype html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+<head>
+    <meta charset="UTF-8">
+    <title>Multiple Projects</title>
+    <link rel="stylesheet" href="/styles/index.css">
+    <script src="../bower_components/jquery/dist/jquery.min.js"></script>
+</head>
+<body>
+    <div class="header">
+        <span class="mlm">Scored</span>
+    </div>
+    <div class="project-1" style="margin: 20px">
+        <canvas id="canvas-1" class="border"></canvas>
+    </div>
+    <div class="project-2" style="margin: 20px">
+        <canvas id="canvas-2" class="border"></canvas>
+    </div>
+
+    <script type="text/javascript" src="/bower_components/lodash/lodash.min.js"></script>
+    <script type="text/javascript" src="/bower_components/paper/dist/paper-core.js"></script>
+    <script type="text/javascript" src="/bower_components/flocking/dist/flocking-no-jquery.js"></script>
+    <script type="text/javascript" src="/bower_components/fraction.js/fraction.js"></script>
+    <script type="text/javascript" src="/bower_components/teoria/dist/teoria.js"></script>
+    <script type="text/javascript" src="/scripts/vendor/FontLoader.js"></script>
+
+    <!-- CodeMirror  -->
+    <script type="text/javascript" src="/bower_components/codemirror/lib/codemirror.js"></script>
+    <link rel="stylesheet" type="text/css" href="/bower_components/codemirror/lib/codemirror.css">
+    <script type="text/javascript" src="/bower_components/codemirror/mode/javascript/javascript.js"></script>
+    <link rel="stylesheet" type="text/css" href="/bower_components/codemirror/theme/monokai.css">
+    <link rel="stylesheet" type="text/css" href="/bower_components/codemirror/theme/neo.css">
+    <script type="text/javascript" src="/bower_components/codemirror/addon/selection/active-line.js"></script>
+    <script type="text/javascript" src="/bower_components/codemirror/addon/edit/matchbrackets.js"></script>
+
+
+    <!-- Scored -->
+    <script type="text/javascript" src="/dist/Scored.js"></script>
+
+    <script type="text/javascript">
+    var Note = Scored.Note,
+        scored;
+
+    function start (cb) {
+        var fontLoader = new FontLoader(['gonville', "gonvillealpha"], {
+            fontsLoaded: cb
+        });
+        fontLoader.loadFonts();
+    }
+
+    function drawCircle (point, radius, color) {
+        radius = radius || 10;
+        var circ = new paper.Path.Circle(point, radius);
+        circ.fillColor = color || "red";
+        return circ;
+    }
+
+    function run () {
+        var scored1 = new Scored({canvas: document.getElementById("canvas-1")}),
+            scored2 = new Scored({canvas: document.getElementById("canvas-2")});
+
+        scored1.project.activate();
+        var note1 = new Note({type: 1});
+        note1.render([10, 10]);
+
+        scored2.project.activate();
+        var note2 = new Note({type: 4});
+        note2.render([20, 10]);
+    }
+
+    start(function () {
+        run();
+        paper.view.update();
+    });
+
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,63 @@
+<!doctype html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+<head>
+    <meta charset="UTF-8">
+    <title>Parnassus</title>
+    <link rel="stylesheet" href="/styles/index.css">
+    <script src="../bower_components/jquery/dist/jquery.min.js"></script>
+</head>
+<body>
+    <div class="header">
+        <span class="mlm">Scored</span>
+    </div>
+    <div class="music"></div>
+
+    <script type="text/javascript" src="/bower_components/lodash/lodash.min.js"></script>
+    <script type="text/javascript" src="/bower_components/paper/dist/paper-core.js"></script>
+    <script type="text/javascript" src="/bower_components/fraction.js/fraction.js"></script>
+    <script type="text/javascript" src="/bower_components/teoria/dist/teoria.js"></script>
+    <script type="text/javascript" src="/scripts/vendor/FontLoader.js"></script>
+
+    <!-- Scored -->
+    <script type="text/javascript" src="/dist/Scored.js"></script>
+    <script type="text/javascript" src="/examples/parnassus.js"></script>
+    <script type="text/javascript">
+    var scored;
+
+    function start (cb) {
+        var fontLoader = new FontLoader(['gonville', "gonvillealpha"], {
+            fontsLoaded: cb
+        });
+        fontLoader.loadFonts();
+    }
+
+    function drawCircle (point, radius, color) {
+        radius = radius || 10;
+        var circ = new paper.Path.Circle(point, radius);
+        circ.fillColor = color || "red";
+        return circ;
+    }
+
+    /*
+     * @param $el {jQuery} - element to append the canvas to.
+     */
+    function createCanvas ($el) {
+        $el.append('<canvas class="scored-canvas parnassus"><canvas>');
+
+        return $(".scored-canvas");
+    }
+
+    start(function () {
+        var $canvas = createCanvas($(".music"));
+        scored = new Scored({canvas: $canvas[0]});
+        run();
+        paper.view.update();
+    });
+
+    </script>
+
+</body>
+</html>

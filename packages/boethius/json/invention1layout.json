@@ -1,0 +1,17 @@
+["staff",
+	{"timeSig": "3/4"},
+  [["line", 
+    {"lineWidth": 1200, "clef": "treble", "key": "C", "voices": 1, "line": 0}, 
+    [["clef", {"value": "bass", "measure": 2}],
+     ["key", {"value": "c", "measure": 2}],
+     ["timeSig", {"value": "5/4", "measure": 3}]]],
+
+   ["line", 
+    {"lineWidth": 1200, "clef": "bass", "key": "C", "voices": 1, "line": 1}, 
+    [["key", {"value": "G", "measure": 2, "beat": 2}],
+     ["key", {"value": "C", "measure": 2, "beat": 3}]]],
+
+   ["line", 
+    {"lineWidth": 1200, "clef": "bass", "key": "C", "voices": 1, "line": 2},
+    [["key", {"value": "G", "measure": 2, "beat": 2}],
+     ["key", {"value": "C", "measure": 2, "beat": 3}]]]]]

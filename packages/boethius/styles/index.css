@@ -1,0 +1,72 @@
+@import "score.css";
+@import "fonts.css";
+
+.layout-code {
+	border: 1px solid #000;
+}
+
+.border {
+  border: 1px solid #000;
+}
+
+.float-right {
+  float: right;
+}
+
+.display-none {
+	display: none;
+}
+
+/* Header bar */
+.header {
+  /*position: fixed;*/
+  background-color: #3E2723;
+  color: #FFF;
+  width: 100%;
+  padding: 10px 0px 10px 0px;
+}
+
+.palate-wrapper {
+	width: 50%;
+	/*height: 300px;*/
+}
+
+.mirror-height {
+	height: 300px;
+}
+
+.output-structure {
+	width: 100%;
+	height: 50%;
+}
+
+.palate-wrapper-left {
+  /*position: relative;*/
+  left: -45%;
+  top: 0px;
+  width: 50%;
+  height: 100%;
+}
+
+.palate-wrapper-right {
+  /*position: relative;*/
+  /*top: 0px;*/
+  right: -45%;
+  width: 50%;
+}
+
+.mrs {
+	margin-right: 10px;
+}
+
+.mrm {
+	margin-right: 20px;
+}
+
+.mls {
+	margin-left: 10px;
+}
+
+.mlm {
+	margin-left: 20px;
+}

@@ -1,0 +1,49 @@
+<!doctype html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+<head>
+    <meta charset="UTF-8">
+    <title>Renderer</title>
+    <link rel="stylesheet" href="/styles/index.css">
+    <script src="../bower_components/jquery/dist/jquery.min.js"></script>
+</head>
+<body>
+    <div class="flex-container">
+        <div class="palate-wrapper border">
+            <div class="codemirror-layout"></div>
+        </div>
+         <div class="palate-wrapper border">
+            <div class="codemirror-music"></div>
+        </div>
+    </div>
+     <div class="border mirror-height">
+        <div class="codemirror-composition"></div>
+    </div>
+    <div class="output-structure border">
+        <canvas class="full-screen"></canvas>
+    </div>
+
+    <script type="text/javascript" src="/bower_components/lodash/lodash.min.js"></script>
+    <script type="text/javascript" src="/bower_components/paper/dist/paper-core.js"></script>
+    <script type="text/javascript" src="/bower_components/fraction.js/fraction.js"></script>
+    <script type="text/javascript" src="/bower_components/teoria/dist/teoria.js"></script>
+    <script type="text/javascript" src="/bower_components/rxjs/dist/rx.all.js"></script>
+    <script type="text/javascript" src="/scripts/vendor/FontLoader.js"></script>
+
+    <!-- CodeMirror  -->
+    <script type="text/javascript" src="/bower_components/codemirror/lib/codemirror.js"></script>
+    <link rel="stylesheet" type="text/css" href="/bower_components/codemirror/lib/codemirror.css">
+    <script type="text/javascript" src="/bower_components/codemirror/mode/javascript/javascript.js"></script>
+    <link rel="stylesheet" type="text/css" href="/bower_components/codemirror/theme/monokai.css">
+    <link rel="stylesheet" type="text/css" href="/bower_components/codemirror/theme/neo.css">
+    <script type="text/javascript" src="/bower_components/codemirror/addon/selection/active-line.js"></script>
+    <script type="text/javascript" src="/bower_components/codemirror/addon/edit/matchbrackets.js"></script>
+
+    <!-- Scored -->
+    <script type="text/javascript" src="/dist/Scored.js"></script>
+    <script type="text/javascript" src="/examples/renderer.js"></script>
+
+</body>
+</html>

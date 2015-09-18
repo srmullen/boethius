@@ -1,0 +1,19 @@
+{
+  "name": "boethius",
+  "version": "1.0.0",
+  "authors": [
+    "Sean Mullen <srmullen13@gmail.com>"
+  ],
+  "description": "Music Notation",
+  "license": "Sean Mullen",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "paper": "~0.9.24"
+  }
+}

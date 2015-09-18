@@ -1,0 +1,14 @@
+@font-face {
+	font-family: 'gonville';
+	src: url('fonts/gonvillepart1.ttf') format('truetype');
+}
+
+@font-face {
+	font-family: 'gonvillealpha';
+	src: url('fonts/gonvillealpha11.ttf') format('truetype');
+}
+
+p {
+	font-family: 'gonville';
+	font-size: 2em;
+}

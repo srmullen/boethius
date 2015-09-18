@@ -1,0 +1,291 @@
+var up = {}, down = {}, beamed = {};
+
+function run () {
+	pageOne();
+	// pageTwo();
+}
+
+function pageOne () {
+	up.whole = scored.note({type: 1}),
+	up.half = scored.note({type: 2}),
+	up.quarter = scored.note({type: 4}),
+	up.eighth = scored.note({type: 8}),
+	up.sixteenth = scored.note({type: 16}),
+	up.thirtysecond = scored.note({type: 32}),
+	up.sixtyfourth = scored.note({type: 64}),
+	up.onetwentyeighth = scored.note({type: 128});
+	up.sharp = scored.note({pitch: "a#"});
+	up.flat = scored.note({pitch: "ab"});
+	up.doubleSharp = scored.note({pitch: "ax"});
+	up.doubleFlat = scored.note({pitch: "abb"});
+	up.oneDot = scored.note({dots: 1});
+	up.twoDot = scored.note({dots: 2})
+
+	renderNotes(up, 50);
+
+	down.whole = scored.note({type: 1, stemDirection: "down"}),
+	down.half = scored.note({type: 2, stemDirection: "down"}),
+	down.quarter = scored.note({type: 4, stemDirection: "down"}),
+	down.eighth = scored.note({type: 8, stemDirection: "down"}),
+	down.sixteenth = scored.note({type: 16, stemDirection: "down"}),
+	down.thirtysecond = scored.note({type: 32, stemDirection: "down"}),
+	down.sixtyfourth = scored.note({type: 64, stemDirection: "down"}),
+	down.onetwentyeighth = scored.note({type: 128, stemDirection: "down"});
+	down.sharp = scored.note({pitch: "a#", stemDirection: "down"});
+	down.flat = scored.note({pitch: "ab", stemDirection: "down"});
+	down.doublesharp = scored.note({pitch: "ax", stemDirection: "down"});
+	down.doubleflat = scored.note({pitch: "abb", stemDirection: "down"});
+	down.oneDot = scored.note({dots: 1, stemDirection: "down"});
+	down.twoDot = scored.note({dots: 2, stemDirection: "down"});
+
+	renderNotes(down, 100);
+
+	// beamedEigthsUp();
+	simpleBeam(8, 250);
+	simpleBeam(16, 300);
+	simpleBeam(32, 350);
+
+	var stemDirection;
+	// stemDirection = "down";
+	testBeaming(8, 16, 350, stemDirection);
+	testBeaming(16, 32, 450, stemDirection);
+	testBeaming(32, 64, 550, stemDirection);
+	testBeaming(64, 128, 650, stemDirection);
+	testBeaming(128, 256, 750, stemDirection);
+
+	testBeaming(8, 32, 350, stemDirection);
+
+	drawRests();
+
+	createClefs();
+	createTimeSigs();
+	createKeys();
+}
+var path;
+function pageTwo () {
+	var note1 = scored.note({type: 4}),
+		note2 = scored.note({type: 4}),
+		note3 = scored.note({type: 4}),
+		note4 = scored.note({type: 4, stemDirection: "down"}),
+		note5 = scored.note({type: 4, stemDirection: "down"}),
+		note6 = scored.note({type: 4, stemDirection: "down"}),
+		note7 = scored.note({type: 4, stemDirection: "down"}),
+		note8 = scored.note({type: 4});
+
+	// renderNotes({note1: note1, note2: note2}, 100);
+	renderNote(note1, 100, 100);
+	renderNote(note2, 125, 100);
+	Scored.utils.note.slur([note1, note2]);
+
+	renderNote(note3, 175, 100);
+	renderNote(note4, 200, 100);
+	Scored.utils.note.slur([note3, note4]);
+
+	renderNote(note5, 250, 100);
+	renderNote(note6, 275, 100);
+	Scored.utils.note.slur([note5, note6]);
+
+	renderNote(note7, 325, 100);
+	renderNote(note8, 350, 100);
+	Scored.utils.note.slur([note7, note8]);
+}
+
+function beamedEigthsUp () {
+	var n1 = scored.note({type: 8}),
+		n2 = scored.note({type: 8}),
+		n3 = scored.note({type: 8}),
+		n4 = scored.note({type: 8});
+
+	n1.render([50, 200]);
+	n2.render([75, 200]);
+	n3.render([100, 225]);
+	n4.render([125, 180]);
+
+	Scored.utils.note.beam([n1, n2, n3, n4], new paper.Point(150, 150), new paper.Point(100, -15));
+}
+
+function beamedEigthsDown () {
+	var n1 = scored.note({type: 8, stemDirection: "down"}),
+		n2 = scored.note({type: 8}),
+		n3 = scored.note({type: 8}),
+		n4 = scored.note({type: 8});
+
+	n1.render([200, 200]);
+	n2.render([225, 200]);
+	n3.render([250, 260]);
+	n4.render([275, 180]);
+
+	Scored.utils.note.beam([n1, n2, n3, n4]);
+}
+
+function simpleBeam (type, yPos) {
+	var n1 = scored.note({type: type})
+		n2 = scored.note({type: type}),
+		n3 = scored.note({type: type, stemDirection: "down"}),
+		n4 = scored.note({type: type});
+
+	n1.render([550, yPos]);
+	n2.render([575, yPos]);
+
+	n3.render([625, yPos - 25]);
+	n4.render([650, yPos - 25]);
+
+	Scored.utils.note.beam([n1, n2], null, new paper.Point(100, 15));
+	Scored.utils.note.beam([n3, n4]);
+}
+
+function testBeaming (d1, d2, yPos, stemDirection) {
+	stemDirection = stemDirection || "up";
+
+	var n1 = scored.note({type: d1, stemDirection: stemDirection})
+		n2 = scored.note({type: d2}),
+		n3 = scored.note({type: d2}),
+		n4 = scored.note({type: d1}),
+
+		n5 = scored.note({type: d2, stemDirection: stemDirection}),
+		n6 = scored.note({type: d1}),
+		n7 = scored.note({type: d1}),
+		n8 = scored.note({type: d2}),
+		n9 = scored.note({type: d2}),
+
+		n10 = scored.note({type: d1, stemDirection: stemDirection}),
+		n11 = scored.note({type: d2}),
+
+		n12 = scored.note({type: d2, stemDirection: stemDirection}),
+		n13 = scored.note({type: d1});
+
+
+	n1.render([100, yPos]);
+	n2.render([125, yPos]);
+	n3.render([150, yPos]);
+	n4.render([175, yPos]);
+
+	n5.render([225, yPos]);
+	n6.render([250, yPos]);
+	n7.render([275, yPos]);
+	n8.render([300, yPos]);
+	n9.render([325, yPos]);
+
+	n10.render([375, yPos]);
+	n11.render([400, yPos]);
+
+	n12.render([450, yPos]);
+	n13.render([475, yPos]);
+
+	Scored.utils.note.beam([n1, n2, n3, n4]);
+	Scored.utils.note.beam([n5, n6, n7, n8, n9], null, new paper.Point(100, -15));
+	Scored.utils.note.beam([n10, n11], null, new paper.Point(100, 25));
+	Scored.utils.note.beam([n12, n13], null, new paper.Point(100, 25));
+}
+
+function renderNote (note, xPos, yPos) {
+	note.render([xPos, yPos]);
+	if (note.note.duration.value >= 2) {
+		stemDirection = Scored.utils.note.getStemDirection(note);
+		stemPoint = Scored.utils.note.defaultStemPoint(note, Scored.utils.note.getStemLength(note), stemDirection);
+		note.drawStem(stemPoint, stemDirection);
+		note.drawFlag();
+	}
+}
+
+function renderNotes (notes, yPos) {
+	var xPos = 50, note, stemPoint, stemDirection;
+
+	if (notes instanceof Array) {
+		for (var i = 0; i < notes.length; i++) {
+			renderNotes(notes, xPos, yPos);
+		}
+	} else {
+		for (key in notes) {
+			renderNote(notes[key], xPos, yPos);
+			xPos = xPos + 50;
+		}
+	}
+}
+
+function drawRests () {
+	var r1 = scored.rest({type: 1}),
+		r2 = scored.rest({type: 2}),
+		r3 = scored.rest({type: 4}),
+		r4 = scored.rest({type: 8}),
+		r5 = scored.rest({type: 16}),
+		r6 = scored.rest({type: 32}),
+		r7 = scored.rest({type: 64}),
+		r8 = scored.rest({type: 128}),
+		r9 = scored.rest({type: 256});
+
+	r1.render([100, 200]);
+	r2.render([125, 200]);
+	r3.render([150, 200]);
+	r4.render([175, 200]);
+	r5.render([200, 200]);
+	r6.render([225, 200]);
+	r7.render([250, 200]);
+	r8.render([275, 200]);
+	r9.render([300, 200]);
+}
+
+function createClefs () {
+	var treble = scored.clef({value: "treble"}),
+		bass = scored.clef({value: "bass"}),
+		alto = scored.clef({value: "alto"}),
+		tenor = scored.clef({value: "tenor"});
+
+	treble.render([550, 400]);
+	bass.render([600, 400]);
+	alto.render([650, 400]);
+	tenor.render([700, 400]);
+
+	window.treble = treble;
+}
+
+function createTimeSigs () {
+	var common = scored.timeSignature({value: "c"}),
+		half = scored.timeSignature({value: "h"}),
+		fourfour = scored.timeSignature({value: "4/4"}),
+		sixeight = scored.timeSignature({value: "6/8"}),
+		twelveeight = scored.timeSignature({value: "12/8"});
+
+
+	common.render([550, 500]);
+	half.render([600, 500]);
+	fourfour.render([650, 500]);
+	sixeight.render([700, 500]);
+	twelveeight.render([750, 500]);
+}
+
+function createKeys () {
+	var c = scored.key({value: "C"}),
+		g = scored.key({value: "G"}),
+		d = scored.key({value: "D"}),
+		a = scored.key({value: "A"}),
+		e = scored.key({value: "E"}),
+		b = scored.key({value: "B"}),
+		fs = scored.key({value: "F#"}),
+		cs = scored.key({value: "C#"}),
+		f = scored.key({value: "F"}),
+		bb = scored.key({value: "Bb"}),
+		eb = scored.key({value: "Eb"}),
+		ab = scored.key({value: "Ab"}),
+		db = scored.key({value: "Db"}),
+		gb = scored.key({value: "Gb"}),
+		cb = scored.key({value: "Cb"});
+
+	c.render([100, 800]);
+	// sharps
+	g.render([150, 800]);
+	d.render([200, 800]);
+	a.render([250, 800]);
+	e.render([300, 800]);
+	b.render([375, 800]);
+	fs.render([450, 800]);
+	cs.render([525, 800]);
+	// flats
+	f.render([150, 850]);
+	bb.render([200, 850]);
+	eb.render([250, 850]);
+	ab.render([300, 850]);
+	db.render([375, 850]);
+	gb.render([450, 850]);
+	cb.render([525, 850]);
+}

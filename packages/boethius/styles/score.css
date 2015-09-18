@@ -1,0 +1,51 @@
+/*
+ * Material Brown theme
+ *  50 - #EFEBE9
+ * 100 - #D7CCC8
+ * 200 - #BCAAA4
+ * 300 - #A1887F
+ * 400 - #8D6E63
+ * 500 - #795548
+ * 600 - #6D4C41
+ * 700 - 5D4037
+ * 800 - #4E342E
+ * 900 - #3E2723
+ */
+
+body {
+  padding: 0px;
+  margin: 0px;
+}
+
+canvas.full-screen {
+  width: 100%;
+  height: 100%; 
+}
+
+.sheet {
+  position: relative;
+  width: 902px;
+  height: 1167px;
+  border: 1px solid #000;
+  top: 50px;
+  left: 150px;
+}
+
+.parnassus {
+  position: relative;
+  width: 1300px;
+  height: 1167px;
+  border: 1px solid #000;
+  top: 50px;
+  left: 50px; 
+}
+
+.flex-container {
+  display: flex;
+}
+
+.toolbar-container {
+  display: block;
+  width: 100%;
+  height: 45px; 
+}

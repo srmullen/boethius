@@ -1,0 +1,11 @@
+["staff",
+	{"timeSig": "4/4", "measures": 10},
+    [["line", 
+      {"lineWidth": 1200, "clef": "treble", "key": "C", "voices": 1, "line": 0},
+      [["clef", {"value": "treble"}],
+       ["timeSig", {"value": "4/4"}]]],
+
+     ["line", 
+      {"lineWidth": 1200, "clef": "bass", "key": "C", "voices": 1, "line": 1},
+      [["clef", {"value": "bass"}],
+       ["timeSig", {"value": "4/4"}]]]]]
