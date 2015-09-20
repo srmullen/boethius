@@ -51,15 +51,15 @@ Note.prototype.render = function (position) {
 		this.group.addChild(dots);
 	}
 
-	if (this.context.stacato) {
-		let stacato = engraver.drawStacato();
-		this.group.addChild(stacato);
-	}
-
-	if (this.context.legato) {
-		let legato = engraver.drawLegato();
-		this.group.addChild(legato);
-	}
+	// if (this.context.stacato) {
+	// 	let stacato = engraver.drawStacato();
+	// 	this.group.addChild(stacato);
+	// }
+	//
+	// if (this.context.legato) {
+	// 	let legato = engraver.drawLegato();
+	// 	this.group.addChild(legato);
+	// }
 
 	if (this.note.accidental()) {
 		var accidentalSymbol = engraver.drawAccidental(this.note.accidental());

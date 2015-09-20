@@ -6,14 +6,14 @@ function run () {
 }
 
 function pageOne () {
-	up.whole = scored.note({type: 1}),
-	up.half = scored.note({type: 2}),
-	up.quarter = scored.note({type: 4}),
-	up.eighth = scored.note({type: 8}),
-	up.sixteenth = scored.note({type: 16}),
-	up.thirtysecond = scored.note({type: 32}),
-	up.sixtyfourth = scored.note({type: 64}),
-	up.onetwentyeighth = scored.note({type: 128});
+	up.whole = scored.note({value: 1}),
+	up.half = scored.note({value: 2}),
+	up.quarter = scored.note({value: 4}),
+	up.eighth = scored.note({value: 8}),
+	up.sixteenth = scored.note({value: 16}),
+	up.thirtysecond = scored.note({value: 32}),
+	up.sixtyfourth = scored.note({value: 64}),
+	up.onetwentyeighth = scored.note({value: 128});
 	up.sharp = scored.note({pitch: "a#"});
 	up.flat = scored.note({pitch: "ab"});
 	up.doubleSharp = scored.note({pitch: "ax"});
@@ -23,14 +23,14 @@ function pageOne () {
 
 	renderNotes(up, 50);
 
-	down.whole = scored.note({type: 1, stemDirection: "down"}),
-	down.half = scored.note({type: 2, stemDirection: "down"}),
-	down.quarter = scored.note({type: 4, stemDirection: "down"}),
-	down.eighth = scored.note({type: 8, stemDirection: "down"}),
-	down.sixteenth = scored.note({type: 16, stemDirection: "down"}),
-	down.thirtysecond = scored.note({type: 32, stemDirection: "down"}),
-	down.sixtyfourth = scored.note({type: 64, stemDirection: "down"}),
-	down.onetwentyeighth = scored.note({type: 128, stemDirection: "down"});
+	down.whole = scored.note({value: 1, stemDirection: "down"}),
+	down.half = scored.note({value: 2, stemDirection: "down"}),
+	down.quarter = scored.note({value: 4, stemDirection: "down"}),
+	down.eighth = scored.note({value: 8, stemDirection: "down"}),
+	down.sixteenth = scored.note({value: 16, stemDirection: "down"}),
+	down.thirtysecond = scored.note({value: 32, stemDirection: "down"}),
+	down.sixtyfourth = scored.note({value: 64, stemDirection: "down"}),
+	down.onetwentyeighth = scored.note({value: 128, stemDirection: "down"});
 	down.sharp = scored.note({pitch: "a#", stemDirection: "down"});
 	down.flat = scored.note({pitch: "ab", stemDirection: "down"});
 	down.doublesharp = scored.note({pitch: "ax", stemDirection: "down"});
@@ -63,14 +63,14 @@ function pageOne () {
 }
 var path;
 function pageTwo () {
-	var note1 = scored.note({type: 4}),
-		note2 = scored.note({type: 4}),
-		note3 = scored.note({type: 4}),
-		note4 = scored.note({type: 4, stemDirection: "down"}),
-		note5 = scored.note({type: 4, stemDirection: "down"}),
-		note6 = scored.note({type: 4, stemDirection: "down"}),
-		note7 = scored.note({type: 4, stemDirection: "down"}),
-		note8 = scored.note({type: 4});
+	var note1 = scored.note({value: 4}),
+		note2 = scored.note({value: 4}),
+		note3 = scored.note({value: 4}),
+		note4 = scored.note({value: 4, stemDirection: "down"}),
+		note5 = scored.note({value: 4, stemDirection: "down"}),
+		note6 = scored.note({value: 4, stemDirection: "down"}),
+		note7 = scored.note({value: 4, stemDirection: "down"}),
+		note8 = scored.note({value: 4});
 
 	// renderNotes({note1: note1, note2: note2}, 100);
 	renderNote(note1, 100, 100);
@@ -91,10 +91,10 @@ function pageTwo () {
 }
 
 function beamedEigthsUp () {
-	var n1 = scored.note({type: 8}),
-		n2 = scored.note({type: 8}),
-		n3 = scored.note({type: 8}),
-		n4 = scored.note({type: 8});
+	var n1 = scored.note({value: 8}),
+		n2 = scored.note({value: 8}),
+		n3 = scored.note({value: 8}),
+		n4 = scored.note({value: 8});
 
 	n1.render([50, 200]);
 	n2.render([75, 200]);
@@ -105,10 +105,10 @@ function beamedEigthsUp () {
 }
 
 function beamedEigthsDown () {
-	var n1 = scored.note({type: 8, stemDirection: "down"}),
-		n2 = scored.note({type: 8}),
-		n3 = scored.note({type: 8}),
-		n4 = scored.note({type: 8});
+	var n1 = scored.note({value: 8, stemDirection: "down"}),
+		n2 = scored.note({value: 8}),
+		n3 = scored.note({value: 8}),
+		n4 = scored.note({value: 8});
 
 	n1.render([200, 200]);
 	n2.render([225, 200]);
@@ -119,10 +119,10 @@ function beamedEigthsDown () {
 }
 
 function simpleBeam (type, yPos) {
-	var n1 = scored.note({type: type})
-		n2 = scored.note({type: type}),
-		n3 = scored.note({type: type, stemDirection: "down"}),
-		n4 = scored.note({type: type});
+	var n1 = scored.note({value: type})
+		n2 = scored.note({value: type}),
+		n3 = scored.note({value: type, stemDirection: "down"}),
+		n4 = scored.note({value: type});
 
 	n1.render([550, yPos]);
 	n2.render([575, yPos]);
@@ -137,22 +137,22 @@ function simpleBeam (type, yPos) {
 function testBeaming (d1, d2, yPos, stemDirection) {
 	stemDirection = stemDirection || "up";
 
-	var n1 = scored.note({type: d1, stemDirection: stemDirection})
-		n2 = scored.note({type: d2}),
-		n3 = scored.note({type: d2}),
-		n4 = scored.note({type: d1}),
+	var n1 = scored.note({value: d1, stemDirection: stemDirection})
+		n2 = scored.note({value: d2}),
+		n3 = scored.note({value: d2}),
+		n4 = scored.note({value: d1}),
 
-		n5 = scored.note({type: d2, stemDirection: stemDirection}),
-		n6 = scored.note({type: d1}),
-		n7 = scored.note({type: d1}),
-		n8 = scored.note({type: d2}),
-		n9 = scored.note({type: d2}),
+		n5 = scored.note({value: d2, stemDirection: stemDirection}),
+		n6 = scored.note({value: d1}),
+		n7 = scored.note({value: d1}),
+		n8 = scored.note({value: d2}),
+		n9 = scored.note({value: d2}),
 
-		n10 = scored.note({type: d1, stemDirection: stemDirection}),
-		n11 = scored.note({type: d2}),
+		n10 = scored.note({value: d1, stemDirection: stemDirection}),
+		n11 = scored.note({value: d2}),
 
-		n12 = scored.note({type: d2, stemDirection: stemDirection}),
-		n13 = scored.note({type: d1});
+		n12 = scored.note({value: d2, stemDirection: stemDirection}),
+		n13 = scored.note({value: d1});
 
 
 	n1.render([100, yPos]);
@@ -204,15 +204,15 @@ function renderNotes (notes, yPos) {
 }
 
 function drawRests () {
-	var r1 = scored.rest({type: 1}),
-		r2 = scored.rest({type: 2}),
-		r3 = scored.rest({type: 4}),
-		r4 = scored.rest({type: 8}),
-		r5 = scored.rest({type: 16}),
-		r6 = scored.rest({type: 32}),
-		r7 = scored.rest({type: 64}),
-		r8 = scored.rest({type: 128}),
-		r9 = scored.rest({type: 256});
+	var r1 = scored.rest({value: 1}),
+		r2 = scored.rest({value: 2}),
+		r3 = scored.rest({value: 4}),
+		r4 = scored.rest({value: 8}),
+		r5 = scored.rest({value: 16}),
+		r6 = scored.rest({value: 32}),
+		r7 = scored.rest({value: 64}),
+		r8 = scored.rest({value: 128}),
+		r9 = scored.rest({value: 256});
 
 	r1.render([100, 200]);
 	r2.render([125, 200]);
@@ -240,11 +240,11 @@ function createClefs () {
 }
 
 function createTimeSigs () {
-	var common = scored.timeSignature({value: "c"}),
-		half = scored.timeSignature({value: "h"}),
-		fourfour = scored.timeSignature({value: "4/4"}),
-		sixeight = scored.timeSignature({value: "6/8"}),
-		twelveeight = scored.timeSignature({value: "12/8"});
+	var common = scored.timeSig({value: "c"}),
+		half = scored.timeSig({value: "h"}),
+		fourfour = scored.timeSig({value: "4/4"}),
+		sixeight = scored.timeSig({value: "6/8"}),
+		twelveeight = scored.timeSig({value: "12/8"});
 
 
 	common.render([550, 500]);

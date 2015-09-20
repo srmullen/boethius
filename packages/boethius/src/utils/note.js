@@ -1,12 +1,13 @@
-var common = require("../utils/common"),
-	placement = require("../utils/placement");
+import common from "../utils/common";
+import placement from "../utils/placement";
+import _ from "lodash";
 
 /*
  * @param bline - y position of the bline
  */
 function getStemDirection (note, bline) {
-	if (note.context.stemDirection) {
-		return note.context.stemDirection;
+	if (note.stemDirection) {
+		return note.stemDirection;
 	} else if (!_.isUndefined(bline)) {
 		return "down"; // FIXME: figure out when adding notes to lines
 	} else {
@@ -101,11 +102,11 @@ function beam (notes, fulcrum, vector) {
 	vector = vector || new paper.Point(1, 0); // defaults to a flat line
 	fulcrum = fulcrum || defaultStemPoint(notes[0], getStemLength(notes[0]), getStemDirection(notes[0]));
 
-	var numBars = durationToBars[_.max(_.map(notes, note => note.note.duration.value))],
+	let numBars = durationToBars[_.max(_.map(notes, note => note.note.duration.value))];
 		// bars is an array of arrays of segments, bars[0] are eighth segments, bars[1] sixteenths, etc.
-		bars = common.doTimes(numBars, () => [[]]),
+	let bars = common.doTimes(numBars, () => [[]]),
 		segments = _.reduce(notes, (acc, note, i) => {
-			var {point, direction, duration} = _.last(acc),
+			let {point, direction, duration} = _.last(acc),
 				current = _.last(acc),
 				previous = acc[i-1],
 				nextNote = notes[i+1],
@@ -189,12 +190,12 @@ function getSlurPoint (note, incoming, stemDirection) {
 }
 
 function getSlurHandle (stemDirection) {
-	var yVec = stemDirection === "up" ? 10 : -10;
+	let yVec = stemDirection === "up" ? 10 : -10;
 	return new paper.Point([0, yVec]);
 }
 
 function slur (notes) {
-	var firstNote = notes[0],
+	let firstNote = notes[0],
 		lastNote = _.last(notes),
 		firstStem = getStemDirection(firstNote),
 		begin = getSlurPoint(firstNote, null, firstStem),
@@ -202,7 +203,7 @@ function slur (notes) {
 		end = getSlurPoint(lastNote, handle),
 		center = begin.add(end.subtract(begin).divide(2)).add([0, 4]);
 
-	var path = new paper.Path({
+	let path = new paper.Path({
 		segments: [begin, end],
 		strokeColor: "black",
 		strokeWidth: 2
@@ -212,17 +213,12 @@ function slur (notes) {
 	path.segments[1].handleIn = handle;
 }
 
-function serialize (note) {
-	return note.context;
-}
-
-module.exports = {
-	beam: beam,
-	getDuration: getDuration,
-	getStemDirection: getStemDirection,
-	getStemLength: getStemLength,
-	getStemPoint: getStemPoint,
-	defaultStemPoint: defaultStemPoint,
-	slur: slur,
-	serialize: serialize
+export {
+	beam,
+	getDuration,
+	getStemDirection,
+	getStemLength,
+	getStemPoint,
+	defaultStemPoint,
+	slur
 };

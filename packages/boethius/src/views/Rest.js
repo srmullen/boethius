@@ -21,8 +21,8 @@ Rest.prototype.render = function (position) {
 
 	common.addEvents(this);
 
-	this.symbol = engraver.drawRest(this.context.type);
-
+	// this.symbol = engraver.drawRest(this.context.type);
+	this.symbol = engraver.drawRest(this.value);
 
 	this.group.removeChildren();
 
@@ -49,8 +49,8 @@ Rest.prototype.translate = function (vector) {
 	this.group.translate(vector);
 };
 
-Rest.prototype.serialize = function () {
-	return this.context;
-}
+// Rest.prototype.serialize = function () {
+// 	return this.context;
+// }
 
 module.exports = Rest;

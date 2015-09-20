@@ -7,7 +7,7 @@ function run () {
 			["line", {measures: 12, line: 0}, [["clef", {value: "treble"}]]],
 			["line", {measures: 12, line: 1}, [["clef", {value: "treble"}]]]
 		]],
-		notes = _.map(Scored.melody.phrase([1, 1, 1, 1], ["c4", "d4", "e4", "f4"]), function (n) {
+		notes = Scored.melody.phrase([1, 1, 1, 1], ["c4", "d4", "e4", "f4"]).map(function (n) {
 			return ["note", n];
 		}),
 		cantusFirmus = ["voice", {value: 1, readOnly: true}, notes];
