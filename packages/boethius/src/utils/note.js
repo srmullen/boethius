@@ -1,5 +1,5 @@
-import common from "../utils/common";
-import placement from "../utils/placement";
+import * as common from "../utils/common";
+import * as placement from "../utils/placement";
 import _ from "lodash";
 
 /*

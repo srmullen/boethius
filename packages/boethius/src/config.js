@@ -1,5 +1,4 @@
-// var _ = require("../bower_components/lodash/lodash.min");
-var _ = require("lodash");
+import _ from "lodash";
 
 var Config = (function () {
 	var FONT_SIZE = 32,
@@ -72,4 +71,4 @@ var Config = (function () {
 	return Config;
 })();
 
-module.exports = Config;
+export default Config;

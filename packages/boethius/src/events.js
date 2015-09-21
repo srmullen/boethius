@@ -1,10 +1,8 @@
-// let _ = require("../bower_components/lodash/lodash.min"),
-let _ = require("lodash"),
-
-	common = require("./utils/common"),
-	timeUtils = require("./utils/timeUtils"),
-	Note = require("./views/Note"),
-	Rest = require("./views/Rest");
+import _ from "lodash";
+import * as common from  "./utils/common";
+import * as timeUtils from "./utils/timeUtils";
+import {Note} from "./views/Note";
+import {Rest} from "./views/Rest";
 
 let attachAt = _.compose(attach, at);
 
@@ -127,7 +125,7 @@ function at (fn) {
 	}
 }
 
-module.exports = {
-	createEvents: createEvents,
-	contextEvents: contextEvents
+export {
+	createEvents,
+	contextEvents
 };

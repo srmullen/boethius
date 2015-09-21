@@ -1,6 +1,6 @@
-let engraver = require("../engraver"),
-	common = require("../utils/common"),
-	constants = require("../constants");
+import engraver from "../engraver";
+import * as common from "../utils/common";
+import constants from "../constants";
 
 const TYPE = constants.type.rest;
 
@@ -49,8 +49,4 @@ Rest.prototype.translate = function (vector) {
 	this.group.translate(vector);
 };
 
-// Rest.prototype.serialize = function () {
-// 	return this.context;
-// }
-
-module.exports = Rest;
+export default Rest;

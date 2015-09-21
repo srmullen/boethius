@@ -4,6 +4,6 @@ function getMarkingLength (measure) {
 	}, 0);
 }
 
-module.exports = {
-	getMarkingLength: getMarkingLength
+export {
+	getMarkingLength
 }

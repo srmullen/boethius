@@ -1,11 +1,10 @@
-var constants = require("../constants"),
-	engraver = require("../engraver"),
-	timeUtils = require("../utils/timeUtils"),
-	placement = require("../utils/placement"),
-	lineUtils = require("../utils/line"),
-	common = require("../utils/common"),
-	// _ = require("../../bower_components/lodash/lodash.min");
-	_ = require("lodash");
+import constants from "../constants";
+import engraver from "../engraver";
+import * as timeUtils from "../utils/timeUtils";
+import * as placement from "../utils/placement";
+import * as lineUtils from "../utils/line";
+import * as common from "../utils/common";
+import _ from "lodash";
 
 const DEFAULT_LENGTH = constants.measure.defaultLength,
 	TYPE = constants.type.measure;
@@ -146,4 +145,4 @@ Measure.addGroupEvents = function (group) {
 	});
 }
 
-module.exports = Measure;
+export default Measure;

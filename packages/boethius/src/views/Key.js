@@ -1,8 +1,11 @@
-let engraver = require("../engraver"),
-	placement = require("../utils/placement"),
-	// _ = require("../../bower_components/lodash/lodash.min"),
-	_ = require("lodash"),
-	constants = require("../constants");
+// let engraver = require("../engraver"),
+// 	placement = require("../utils/placement"),
+// 	_ = require("lodash"),
+// 	constants = require("../constants");
+import engraver from "../engraver";
+import * as placement from "../utils/placement";
+import _ from "lodash";
+import constants from "../constants";
 
 "use strict";
 
@@ -158,4 +161,4 @@ Key.prototype.render = function (position, clef) {
 // 	return this.context;
 // }
 
-module.exports = Key;
+export default Key;

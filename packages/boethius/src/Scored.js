@@ -1,24 +1,24 @@
-const Config = require("./config"),
-	  Context = require("./base/Context"),
-	  events = require("./events"),
-	  processor = require("./Processor"),
-	  midi = require("./midi"),
-	  MoveTool = require("./tools/MoveTool"),
+import Config from "./config";
+import Context from "./base/Context";
+import * as events from "./events";
+import processor from "./Processor";
+import midi from "./midi";
+import MoveTool from "./tools/MoveTool";
 
-	  Staff = require("./views/Staff"),
-	  Line = require("./views/Line"),
-	  Measure = require("./views/Measure"),
-	  Note = require("./views/Note"),
-	  Rest = require("./views/Rest"),
-	  Clef = require("./views/Clef"),
-	  Key = require("./views/Key"),
-	  TimeSignature = require("./views/TimeSignature"),
+import Note from "./views/Note";
+import Rest from "./views/Rest";
+import Staff from "./views/Staff";
+import Line from "./views/Line";
+import Measure from "./views/Measure";
+import Clef from "./views/Clef";
+import Key from "./views/Key";
+import TimeSignature from "./views/TimeSignature";
 
-	  lineUtils = require("./utils/line"),
-	  noteUtils = require("./utils/note"),
-	  common = require("./utils/common"),
-	  constants = require("./constants"),
-	  _ = require("lodash");
+import * as lineUtils from "./utils/line";
+import * as noteUtils from "./utils/note";
+import * as common from "./utils/common";
+import constants from "./constants";
+import _ from "lodash";
 
 const Scored = function (options={}) {
 	Scored.config = new Config(options.config);
@@ -120,7 +120,7 @@ function parse (parentContext={}, [type, context={}, elements=[]]) {
 
 Scored.parseMidi = midi.parseMidi;
 
-module.exports = Scored;
+export {Scored};
 
 if (typeof window === "object") {
 	window.Scored = Scored;

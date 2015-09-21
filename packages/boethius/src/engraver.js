@@ -1,9 +1,13 @@
-let paperUtils = require("./utils/paperUtils"),
-	constants = require("./constants"),
-	placement = require("./utils/placement"),
-	lineUtils = require("./utils/line"),
-	// _ = require("../bower_components/lodash/lodash");
-	_ = require("lodash");
+// let paperUtils = require("./utils/paperUtils"),
+// 	constants = require("./constants"),
+// 	placement = require("./utils/placement"),
+// 	lineUtils = require("./utils/line"),
+// 	_ = require("lodash");
+import * as paperUtils from "./utils/paperUtils";
+import constants from "./constants";
+import * as placement from "./utils/placement";
+import * as lineUtils from "./utils/line";
+import _ from "lodash";
 
 
 //////////////////////
@@ -356,19 +360,19 @@ var drawRest = _.memoize(function (type) {
 	return new paper.Symbol(rest);
 });
 
-module.exports = {
-	drawLegerLines: drawLegerLines,
-	drawBarline: drawBarline,
-	drawLine: drawLine,
-	drawStaffBar: drawStaffBar,
-	drawClef: drawClef,
-	drawTimeSig: drawTimeSig,
-	drawHead: drawHead,
-	drawDots: drawDots,
-	drawStacatoLegato: drawStacato,
-	drawLegato: drawLegato,
-	drawAccidental: drawAccidental,
-	drawFlag: drawFlag,
-	getFlagOffset: getFlagOffset,
-	drawRest: drawRest
+export default {
+	drawLegerLines,
+	drawBarline,
+	drawLine,
+	drawStaffBar,
+	drawClef,
+	drawTimeSig,
+	drawHead,
+	drawDots,
+	drawStacato,
+	drawLegato,
+	drawAccidental,
+	drawFlag,
+	getFlagOffset,
+	drawRest
 };

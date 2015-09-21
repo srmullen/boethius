@@ -14,7 +14,7 @@ function HighlightTool (options) {
 		this.removeHighlight(toHighlight);
 	}, this);
 
-	// The view to highlight on hover. 
+	// The view to highlight on hover.
 	// Color is optional.
 	var addView = function (view, color) {
 		var decoratedView = this.decorateView(view, color);
@@ -76,4 +76,4 @@ HighlightTool.views = {};
 HighlightTool.highlighted = {};
 HighlightTool.tool = new paper.Tool();
 
-module.exports = HighlightTool;
+export {HighlightTool};

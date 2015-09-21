@@ -1,5 +1,5 @@
-let note = require("../utils/note"),
-	constants = require("../constants");
+import note "../utils/note";
+import constants from "../constants";
 
 const TYPE = constants.type.chord;
 
@@ -12,3 +12,5 @@ Chord.prototype.type = TYPE;
 Chord.prototype.render = function () {
 
 }
+
+export default Chord;

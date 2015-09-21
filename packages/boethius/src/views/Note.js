@@ -1,10 +1,9 @@
-let engraver = require("../engraver"),
-	common = require("../utils/common"),
-	placement = require("../utils/placement"),
-	noteUtils = require("../utils/note"),
-	// teoria = require("../../bower_components/teoria/dist/teoria"),
-	teoria = require("teoria"),
-	constants = require("../constants");
+import engraver from "../engraver";
+import * as common from "../utils/common";
+import * as placement from "../utils/placement";
+import * as noteUtils from "../utils/note";
+import teoria from "teoria";
+import constants from "../constants";
 
 const TYPE = constants.type.note;
 
@@ -142,8 +141,4 @@ Note.prototype.translate = function (vector) {
 	return this;
 };
 
-// Note.prototype.serialize = function () {
-// 	return this.context;
-// }
-
-module.exports = Note;
+export default Note;

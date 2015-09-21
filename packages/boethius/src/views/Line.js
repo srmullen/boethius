@@ -1,16 +1,15 @@
-var constants = require("../constants"),
-	engraver = require("../engraver"),
-	Measure = require("../views/Measure"),
-	timeUtils = require("../utils/timeUtils"),
-	placement = require("../utils/placement"),
-	common = require("../utils/common"),
-	noteUtils = require("../utils/note"),
-	line = require("../utils/line"),
-	Note = require("../views/Note"),
-	Rest = require("../views/Rest"),
-	measureUtils = require("../utils/measure"),
-	// _ = require("../../bower_components/lodash/lodash.min");
-	_ = require("lodash");
+import constants from "../constants";
+import engraver from "../engraver";
+import Measure from "../views/Measure";
+import * as timeUtils from "../utils/timeUtils";
+import * as placement from "../utils/placement";
+import * as common from "../utils/common";
+import noteUtils from "../utils/note";
+import line from "../utils/line";
+import Note from "../views/Note";
+import Rest from "../views/Rest";
+import measureUtils from "../utils/measure";
+import _ from "lodash";
 
 const TYPE = constants.type.line;
 
@@ -243,4 +242,4 @@ Line.prototype.addToMeasure = function (measure, item) {
 	}
 };
 
-module.exports = Line;
+export default Line;

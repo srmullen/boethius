@@ -1,7 +1,7 @@
-const paperUtils = require("../utils/paperUtils"),
-	  timeUtils = require("../utils/timeUtils"),
-	  engraver = require("../engraver"),
-	  constants = require("../constants");
+import * as paperUtils from "../utils/paperUtils";
+import * as timeUtils from "../utils/timeUtils";
+import * as engraver from "../engraver";
+import * as constants from "../constants";
 
 const TYPE = constants.type.staff;
 
@@ -234,4 +234,4 @@ Staff.prototype.translate = function (vector) {
  */
 
 
-module.exports = Staff;
+export default Staff;

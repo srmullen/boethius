@@ -1,6 +1,6 @@
-var engraver = require("../engraver"),
-	common = require("../utils/common"),
-	constants = require("../constants");
+import engraver from "../engraver";
+import common from "../utils/common";
+import constants from "../constants";
 
 "use strict";
 
@@ -48,4 +48,4 @@ Clef.prototype.serialize = function () {
 	return this.context;
 }
 
-module.exports = Clef;
+export default Clef;

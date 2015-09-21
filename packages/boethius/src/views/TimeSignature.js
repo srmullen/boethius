@@ -1,5 +1,5 @@
-var engraver = require("../engraver"),
-	constants = require("../constants");
+import engraver from "../engraver";
+import constants from "../constants";
 
 "use strict";
 
@@ -45,4 +45,4 @@ TimeSignature.prototype.serialize = function () {
 	return this.context;
 }
 
-module.exports = TimeSignature;
+export default TimeSignature;

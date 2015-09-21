@@ -1,6 +1,7 @@
-// let _ = require("../../bower_components/lodash/lodash.min"),
-let _ = require("lodash"),
-	constants = require("../constants");
+// let _ = require("lodash"),
+// 	constants = require("../constants");
+import _ from "lodash";
+import constants from "../constants";
 
 const debugEvents = {
 	onMouseEnter: () => {
@@ -79,10 +80,10 @@ function serialize (item) {
 	return _.filter([item.type, item, _.map(item.children, serialize)], v => _.size(v));
 }
 
-module.exports = {
-	concat: concat,
-	doTimes: doTimes,
-	addEvents: addEvents,
-	debugGroupEvents: debugGroupEvents,
-	serialize: serialize
+export {
+	concat,
+	doTimes,
+	addEvents,
+	debugGroupEvents,
+	serialize
 }

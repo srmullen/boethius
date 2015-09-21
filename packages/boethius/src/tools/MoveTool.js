@@ -4,7 +4,7 @@ function MoveTool () {
 		downPoint = null;
 
 	tool.activate();
-	
+
 	tool.onMouseDown = function (event) {
 		downPoint = event.point;
 	}
@@ -19,4 +19,4 @@ function MoveTool () {
 	}
 }
 
-module.exports = MoveTool;
+export default MoveTool;

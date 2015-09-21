@@ -131,13 +131,13 @@ function getYOffset (item, position) {
 	return position.add(0, offsets[item.type](item));
 }
 
-module.exports = {
-	calculateNoteYpos: calculateNoteYpos,
-	calculateAccidentalYpos: calculateAccidentalYpos,
-	getNoteHeadOffset: getNoteHeadOffset,
-	getNoteHeadCenter: getNoteHeadCenter,
-	getClefBase: getClefBase,
-	getLineNames: getLineNames,
-	lineup: lineup,
-	getYOffset: getYOffset
+export {
+	calculateNoteYpos,
+	calculateAccidentalYpos,
+	getNoteHeadOffset,
+	getNoteHeadCenter,
+	getClefBase,
+	getLineNames,
+	lineup,
+	getYOffset
 }

@@ -1,7 +1,5 @@
-// let _ = require("../../bower_components/lodash/lodash"),
-// 	F = require("../../bower_components/fraction.js/fraction.min");
-let _ = require("lodash"),
-	F = require("fraction.js");
+import _ from "lodash";
+import F from "fraction.js";
 
 /*
  * @param sig {String} - ex. "4/4", "h"
@@ -138,7 +136,7 @@ function sortByKey (obj) {
 	});
 }
 
-module.exports = {
+export {
 	getTime,
 	getMeasure,
 	getBeat,
