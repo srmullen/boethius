@@ -1,3 +1,5 @@
+import _ from "lodash";
+
 function extractGroups (views) {
 	views = _.isArray(views) ? views : [views];
 	return _.map(views, function (view) {

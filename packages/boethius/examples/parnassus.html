@@ -15,6 +15,7 @@
     </div>
     <div class="music"></div>
 
+    <script type="text/javascript" src="../node_modules/palestrina.js/dist/palestrina.js"></script>
     <script type="text/javascript" src="../bower_components/paper/dist/paper-core.js"></script>
     <script type="text/javascript" src="../src/vendor/FontLoader.js"></script>
 
@@ -49,7 +50,8 @@
 
     start(function () {
         var $canvas = createCanvas($(".music"));
-        scored = new Scored({canvas: $canvas[0]});
+        scored = new Scored();
+        scored.setup($canvas[0]);
         run();
         paper.view.update();
     });

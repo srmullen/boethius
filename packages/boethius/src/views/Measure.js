@@ -50,7 +50,8 @@ Measure.prototype.render = function (staves, leftBarline, width=DEFAULT_LENGTH, 
 
 	let childGroups = _.map(this.children, (child) => {
 		let pos = placement.getYOffset(child, lineUtils.b(staves[stave])),
-			childGroup = child.render(pos.add([leftBarline.position.x + 15, 0]));
+			yPos = child.type === "note" ? placement.calculateNoteYpos(child, Scored.config.lineSpacing/2, placement.getClefBase("treble")) : 0,
+			childGroup = child.render(pos.add([leftBarline.position.x + 15, yPos]));
 
 		common.addEvents(childGroup);
 		return childGroup;
@@ -58,9 +59,10 @@ Measure.prototype.render = function (staves, leftBarline, width=DEFAULT_LENGTH, 
 
 	group.addChildren(childGroups);
 
-	placement.lineup(this.children);
+	// placement.lineup(this.children);
+	placement.lineup(childGroups);
 
-	// this.barlines = [leftBarline, rightBarline];
+	this.barlines = [leftBarline, rightBarline];
 
 	return group;
 };

@@ -1,8 +1,3 @@
-// let paperUtils = require("./utils/paperUtils"),
-// 	constants = require("./constants"),
-// 	placement = require("./utils/placement"),
-// 	lineUtils = require("./utils/line"),
-// 	_ = require("lodash");
 import * as paperUtils from "./utils/paperUtils";
 import constants from "./constants";
 import * as placement from "./utils/placement";
@@ -89,24 +84,26 @@ function drawBarline (staves, xPos=0) {
 ///////////////////
 
 function drawLine (width) {
-	var line,
+	let line,
 		lineArray = [],
 		lineNames = ["F", "D", "B", "G", "E"];
 
-	for (var i = 0; i < 5; i++) {
+	for (let i = 0; i < 5; i++) {
 		line = new paper.Path.Line(new paper.Point(0, i * Scored.config.lineSpacing), new paper.Point(width, i * Scored.config.lineSpacing));
 		line.name = lineNames[i];
 		line.strokeColor = "black";
 		lineArray.push(line);
 	}
 
-	var rectangle = new paper.Rectangle(lineArray[0].firstSegment.point, lineArray[4].lastSegment.point);
+	let rectangle = new paper.Rectangle(lineArray[0].firstSegment.point, lineArray[4].lastSegment.point);
 	rectangle = new paper.Path.Rectangle(rectangle);
 	rectangle.fillColor = "#FFFFFF"; // create a fill so the center can be clicked
 	rectangle.opacity = 0; // make the rectangle invisible
 	rectangle.name = "bounds";
 
-	return new paper.Group(_.flatten([rectangle, lineArray]));
+	let stave = new paper.Group(_.flatten([rectangle, lineArray]));
+	stave.name = "stave";
+	return stave;
 	// return new paper.Group(lineArray);
 }
 

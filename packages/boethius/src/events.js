@@ -1,8 +1,8 @@
 import _ from "lodash";
 import * as common from  "./utils/common";
 import * as timeUtils from "./utils/timeUtils";
-import {Note} from "./views/Note";
-import {Rest} from "./views/Rest";
+import Note from "./views/Note";
+import Rest from "./views/Rest";
 
 let attachAt = _.compose(attach, at);
 

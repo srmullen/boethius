@@ -63,14 +63,15 @@ function calculateAccidentalYpos (degree, step) {
 }
 
 /*
- * @param note {Teoria note}
+ * @param note {Note}
+ * @param set {Number} - distance between each note
  */
 function calculateNoteYpos (note, step, clefBase) {
-	var octave = note.note.octave(),
+	let octave = note.note.octave(),
 		degree = noteNameToDegree(note.note.name());
 	// 4 is the offset (number of steps) of the center line.
 	// the clefBase offset it subtracted to normalize to the centerline, since the note is rendered from the centerLine.
-	var diffY = (clefBase.degree + (clefBase.octave * 7)) - (degree + (octave * 7)) - (4 - clefBase.offset);
+	let diffY = (clefBase.degree + (clefBase.octave * 7)) - (degree + (octave * 7)) - (4 - clefBase.offset);
 	return diffY * step;
 }
 
@@ -99,10 +100,10 @@ function lineup (items) {
 	// items needs to have at least two items.
 	for (var i = 1; i < items.length; i++) {
 		left = items[i-1]; right = items[i];
-		offset = (right.group.bounds.center.x - right.group.bounds.left) +
-				 (left.group.bounds.right - left.group.bounds.center.x);
+		offset = (right.bounds.center.x - right.bounds.left) +
+				 (left.bounds.right - left.bounds.center.x);
 		// right.setPosition(left.group.position.add([offset, 0]));
-		right.group.position.x = left.group.position.x + offset;
+		right.position.x = left.position.x + offset;
 	}
 }
 
@@ -128,7 +129,8 @@ var offsets = {
 }
 
 function getYOffset (item, position) {
-	return position.add(0, offsets[item.type](item));
+	let offsetFn = offsets[item.type] || () => 0;
+	return position.add(0, offsetFn(item));
 }
 
 export {

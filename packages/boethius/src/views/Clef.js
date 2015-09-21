@@ -44,8 +44,8 @@ Clef.prototype.render = function (position) {
 // 	return this.symbol.definition.bounds.width;
 // }
 
-Clef.prototype.serialize = function () {
-	return this.context;
-}
+// Clef.prototype.serialize = function () {
+// 	return this.context;
+// }
 
 export default Clef;

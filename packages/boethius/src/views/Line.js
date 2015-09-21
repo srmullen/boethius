@@ -51,13 +51,15 @@ function parseChildren (children, numMeasures) {
 	return measures;
 }
 
-function Line ({measures=0, voices=1, staves=1, lineLength=1000}, children=[]) {
+function Line ({measures=0, voices=1, staves=1, lineLength=1000, measureLength=200}, children=[]) {
 
 	this.children = parseChildren(children, measures);
 
 	this.staves = staves;
 
 	this.lineLength = lineLength;
+
+	this.measureLength = measureLength;
 
 	this.voices = voices;
 
@@ -87,7 +89,7 @@ Line.prototype.render = function (position) {
 
 	let measureGroups = _.reduce(this.children, (groups, measure, i, children) => {
 		var // markingLength = measureUtils.getMarkingLength(measure),
-			measureLength = measure.measureLength || constants.measure.defaultLength, // + markingLength,
+			measureLength = measure.measureLength || this.measureLength || constants.measure.defaultLength, // + markingLength,
 			previousGroup = _.last(groups),
 			newStave = false,
 			leftBarline;
@@ -125,14 +127,14 @@ Line.prototype.drawStaves = function (numStaves=1) {
 };
 
 Line.prototype.note = function (note) {
-	let measure = _.find(line.children, measure => note.time >= measure.startsAt);
+	let measure = _.find(this.children, measure => note.time >= measure.startsAt);
 	if (measure) {
 		measure.note(note);
 	}
 }
 
 Line.prototype.rest = function (rest) {
-	let measure = _.find(line.children, measure => note.time >= measure.startsAt);
+	let measure = _.find(this.children, measure => note.time >= measure.startsAt);
 	if (measure) {
 		measure.rest(rest);
 	}
@@ -212,14 +214,14 @@ Line.prototype.setLength = function (length) {
  * @param length {number} - the new length of the measure
  */
 Line.prototype.setMeasureLength = function (index, length) {
-	var measure = this.measures[index],
+	var measure = this.children[index],
 		oldLength = measure.getLength(),
 		lengthDiff = length - oldLength;
 
 	if (lengthDiff) { // no need to do anything if there's no differnece in the length
 		measure.setLength(length);
-		for (var i = index + 1; i < this.measures.length; i++) {
-			this.measures[i].translate([lengthDiff, 0]);
+		for (var i = index + 1; i < this.children.length; i++) {
+			this.children[i].translate([lengthDiff, 0]);
 		}
 	}
 };

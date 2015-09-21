@@ -1,14 +1,17 @@
 import * as paperUtils from "../utils/paperUtils";
 import * as timeUtils from "../utils/timeUtils";
-import * as engraver from "../engraver";
-import * as constants from "../constants";
+import engraver from "../engraver";
+import constants from "../constants";
+import _ from "lodash";
+
 
 const TYPE = constants.type.staff;
 
 function adjustMeasures (lines, measures) {
 	var maxLength;
 	for (var i = 0; i < measures; i++) {
-		maxLength = _.max(_.map(lines, line => line.measures[i].getLength()));
+		// maxLength = _.max(_.map(lines, line => line.measures[i].getLength()));
+		maxLength = _.max(_.map(lines, line => line.children[i].getLength()));
 		_.each(lines, line => line.setMeasureLength(i, maxLength));
 	}
 }
@@ -75,14 +78,12 @@ function getTime ([[e, ctx]]) {
 	if (ctx) {return ctx.time;}
 }
 
-function Staff (context={}, children=[]) {
-	context.timeSig = context.timeSig || "4/4"
-	this.context = context;
-	this.children = children;
+function Staff ({staves=1, timeSig="4/4", measures, lineLength, measureLength}, children=[]) {
+	this.staves = staves;
+	this.timeSig = timeSig;
+	this.measures = measures;
 
-	this.group = new paper.Group({
-		name: TYPE
-	});
+	this.children = children;
 
 	var self = {
 		time: 0,
@@ -94,7 +95,7 @@ function Staff (context={}, children=[]) {
 
 	// setup voiceMap
 	for (let i = 0, lineNum = 0; i < children.length; i++) {
-		let voices = children[i].context.voices || 1;
+		let voices = children[i].voices || 1;
 		for (let j = 0; j < voices; j++) {
 			self.voiceMap.set(lineNum, children[i]);
 			lineNum++;
@@ -135,29 +136,41 @@ Staff.prototype.type = TYPE;
 
 Staff.prototype.render = function (position) {
 
-	adjustMeasures(this.children, this.context.measures);
+	const group = this.group = new paper.Group({
+		name: TYPE
+	});
+
+	let childGroups = this.children.map((child) => child.render([0,0]));
+
+	adjustMeasures(this.children, this.measures);
 
 	this.group.addChildren(paperUtils.extractGroups(this.children));
 
-	var numStaves = this.children[0].staves.length,
-		staveYPos = 0;
-	for (let i = 0; i < numStaves; i++) {
-		_.each(children, (line, j) => {
-			line.staves[i].translate([0, staveYPos + 120 * j]);
-			paper.view.update();
+	// let numStaves = this.children[0].staves.length,
+	// 	staveYPos = 0;
+	// for (let i = 0; i < numStaves; i++) {
+	// 	_.each(children, (line, j) => {
+	// 		line.staves[i].translate([0, staveYPos + 120 * j]);
+	// 	});
+	// 	staveYPos = staveYPos + 400;
+	// }
+	let staveYPos = 0;
+	for (let i = 0; i < this.staves; i++) {
+		_.each(childGroups, (lineGroup, j) => {
+			lineGroup.children["stave"].translate([0, staveYPos + 120 * j]);
 		});
 		staveYPos = staveYPos + 400;
 	}
 
 	this.group.addChildren(engraver.drawStaffBar(this.children));
 
-	this.translate(50, 50);
+	return group;
 };
 
 Staff.prototype.processEvents = function (events) {
 
 	var currentTime = getTime(events) || 0,
-		splitTimeSig = this.context.timeSig.split("/"),
+		splitTimeSig = this.timeSig.split("/"),
 		currentMeasure = timeUtils.getMeasure(currentTime, splitTimeSig);
 
 	/* Get the position for drawing items */
@@ -204,13 +217,13 @@ Staff.rest = function (staff, rest) {
 // 	return line.rest(rest, cursor);
 // };
 
-Staff.prototype.setPosition = function (position) {
-	this.group.setPosition(position);
-};
-
-Staff.prototype.translate = function (vector) {
-	this.group.translate(vector);
-};
+// Staff.prototype.setPosition = function (position) {
+// 	this.group.setPosition(position);
+// };
+//
+// Staff.prototype.translate = function (vector) {
+// 	this.group.translate(vector);
+// };
 
 // Staff.prototype.clef = function (clef, lineCursor) {
 // 	var line = this.getLine(clef.line);

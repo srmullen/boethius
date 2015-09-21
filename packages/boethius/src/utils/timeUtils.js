@@ -121,7 +121,7 @@ function calculateDuration (ctx) {
 		dur = dur.mul(tuplet);
 	}
 
-	return dur.toNumber();
+	return dur.valueOf();
 }
 
 function sortByKey (obj) {

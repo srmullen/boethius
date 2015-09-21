@@ -26,7 +26,7 @@ function Note ({pitch="a4", voice=0, value=4, dots=0, tuplet, time}) {
 Note.prototype.type = TYPE;
 
 Note.prototype.render = function (position) {
-	this.group = new paper.Group({
+	const group = this.group = new paper.Group({
 		name: TYPE
 	});
 
@@ -69,7 +69,8 @@ Note.prototype.render = function (position) {
 
 	this.drawGroupBounds();
 
-	return this;
+	// return this;
+	return this.group;
 };
 
 Note.prototype.drawLegerLines = function (centerLine, lineSpacing) {
