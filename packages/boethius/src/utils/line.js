@@ -1,3 +1,5 @@
+import _ from "lodash";
+
 function lineGetter (name) {
 	return function (lineGroup) {
 		if (lineGroup instanceof paper.PlacedSymbol) {
@@ -37,12 +39,12 @@ function getMeasure (line) {
 	}
 }
 
-module.exports = {
-	f: f,
-	d: d,
-	b: b,
-	g: g,
-	e: e,
+export {
+	f,
+	d,
+	b,
+	g,
+	e,
 	getClosestLine,
 	getMeasure
 }

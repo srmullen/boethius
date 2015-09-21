@@ -72,7 +72,7 @@ Line.prototype.type = TYPE;
 // }
 
 Line.prototype.render = function (position) {
-	const group = new paper.Group({
+	const group = this.group = new paper.Group({
 		name: TYPE
 	});
 
