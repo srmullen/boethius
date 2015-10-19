@@ -127,14 +127,20 @@ Line.prototype.drawStaves = function (numStaves=1) {
 };
 
 Line.prototype.note = function (note) {
-	let measure = _.find(this.children, measure => note.time >= measure.startsAt);
+	let measure = _.find(this.children, (measure) => {
+		let measureEndsAt = measure.startsAt + timeUtils.getMeasureDuration(measure);
+		return note.time >= measure.startsAt && note.time < measureEndsAt;
+	});
 	if (measure) {
 		measure.note(note);
 	}
 }
 
 Line.prototype.rest = function (rest) {
-	let measure = _.find(this.children, measure => note.time >= measure.startsAt);
+	let measure = _.find(this.children, (measure) => {
+		let measureEndsAt = measure.startsAt + timeUtils.getMeasureDuration(measure);
+		return note.time >= measure.startsAt && note.time < measureEndsAt;
+	});
 	if (measure) {
 		measure.rest(rest);
 	}

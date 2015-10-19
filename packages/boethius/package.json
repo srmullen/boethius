@@ -21,7 +21,10 @@
   "devDependencies": {
     "babel": "^5.8.23",
     "babelify": "^6.3.0",
-    "jquery": "^2.1.4"
+    "chai": "^3.3.0",
+    "jquery": "^2.1.4",
+    "mocha": "^2.3.3",
+    "palestrina.js": "^1.3.2"
   },
   "dependencies": {
     "fontloader": "^1.2.1",

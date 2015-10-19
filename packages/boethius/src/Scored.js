@@ -120,7 +120,7 @@ function parse (parentContext={}, [type, context={}, elements=[]]) {
 
 Scored.parseMidi = midi.parseMidi;
 
-export {Scored};
+export default Scored;
 
 if (typeof window === "object") {
 	window.Scored = Scored;

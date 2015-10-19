@@ -199,23 +199,23 @@ Staff.prototype.processEvents = function (events) {
 				t => t.time);
 };
 
-Staff.note = function (staff, note) {
-	console.log("adding note to staff");
-};
-
-Staff.rest = function (staff, rest) {
-	console.log("adding rest to staff");
-};
-
-// Staff.prototype.note = function (note, cursor) {
-// 	var line = this.getLine(note.voice);
-// 	return line.note(note, cursor);
+// Staff.note = function (staff, note) {
+// 	console.log("adding note to staff");
 // };
 //
-// Staff.prototype.rest = function (rest, cursor) {
-// 	var line = this.getLine(rest.voice);
-// 	return line.rest(rest, cursor);
+// Staff.rest = function (staff, rest) {
+// 	console.log("adding rest to staff");
 // };
+
+Staff.prototype.note = function (note, cursor) {
+	var line = this.getLine(note.voice);
+	return line.note(note, cursor);
+};
+
+Staff.prototype.rest = function (rest, cursor) {
+	var line = this.getLine(rest.voice);
+	return line.rest(rest, cursor);
+};
 
 // Staff.prototype.setPosition = function (position) {
 // 	this.group.setPosition(position);
