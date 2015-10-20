@@ -2,25 +2,7 @@ import {expect} from "chai";
 import _ from "lodash";
 import * as common from "../src/utils/common";
 import Scored from "../src/Scored";
-
-// describe("Scored", () => {
-//     const scored = new Scored();
-//
-//     it("should be defined", () => {
-//         expect(Scored).to.be.ok;
-//     });
-//
-//     describe("Scored#layout", () => {
-//         it("should exist", () => {
-//             expect(scored.layout).to.be.ok;
-//         });
-//
-//         it("should return a layout object", () => {
-//             var layout = scored.layout(["staff"]);
-//             expect(layout).to.be.ok;
-//         });
-//     });
-// });
+import Score from "../src/views/Score";
 
 describe("Scored", () => {
 	let scored = new Scored();
@@ -224,6 +206,30 @@ describe("Scored", () => {
             });
         });
 
+        describe("Score", () => {
+            it("should have no staves or lines by default", () => {
+                let score = scored.score();
+                expect(score.lines).to.eql([]);
+                expect(score.staves).to.eql([]);
+            });
+            it("should add Line children to the staves array", () => {
+                let score = scored.score({}, [scored.line()]);
+                expect(score.lines.length).to.equal(1);
+            });
+            it("should add Staff children to the staves array", () => {
+                let score = scored.score({}, [scored.staff(), scored.staff()]);
+                expect(score.staves.length).to.equal(2);
+            });
+            it("should index lines and staves in the order they are in in the children array", () => {
+                let children = [scored.line({voices: 10}), scored.staff({measures: 3}),
+                                scored.line({voices: 11}), scored.line({voices: 12}),
+                                scored.staff({measures: 4}), scored.staff({measures: 5})];
+                let score = scored.score({}, children);
+                expect(score.lines.map(line => line.voices)).to.eql([10, 11, 12]);
+                expect(score.staves.map(staff => staff.measures)).to.eql([3, 4, 5]);
+            });
+        });
+
 		describe("composing layout and music", () => {
 			let voice = ["voice", {value: 0}, [["note"]]];
 			describe("line with no measures", () => {
@@ -282,11 +288,4 @@ describe("Scored", () => {
 		});
 	});
 
-	// describe("render", () => {
-	// 	scored.setup();
-	// 	it("should return a paperjs Group", () => {
-	// 		let line = scored.line();
-	// 		scored.render(line);
-	// 	});
-	// });
 });

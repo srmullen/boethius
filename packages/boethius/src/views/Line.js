@@ -55,9 +55,9 @@ function Line ({measures=0, voices=1, staves=1, lineLength=1000, measureLength=2
 
 	this.children = parseChildren(children, measures);
 
-	this.staves = staves;
+	this.staves = staves; // shouldn't be tracked here anymore
 
-	this.lineLength = lineLength;
+	this.lineLength = lineLength; // should be property of Staff.
 
 	this.measureLength = measureLength;
 
@@ -71,6 +71,15 @@ Line.prototype.type = TYPE;
 // 	// let voices = _.groupBy(events, e => e.voice);
 // 	_.each(events)
 // }
+
+/*
+ * @param staves - the number of staves
+ * @param lineLength - the length of each line
+ * @param measures - the number of measures
+ */
+Line.calculateAverageMeasureLength = function (staves, lineLength, measures) {
+	return lineLength * (staves / measures);
+}
 
 Line.prototype.render = function (position) {
 	const group = this.group = new paper.Group({

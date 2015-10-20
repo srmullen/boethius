@@ -78,7 +78,7 @@ function getTime ([[e, ctx]]) {
 	if (ctx) {return ctx.time;}
 }
 
-function Staff ({staves=1, timeSig="4/4", measures=1, lineLength, measureLength}, children=[]) {
+function Staff ({staves=1, timeSig="4/4", measures=1, lineLength}, children=[]) {
 	this.staves = staves;
 	this.timeSig = timeSig;
 	this.measures = measures;

@@ -13,6 +13,7 @@ import Measure from "./views/Measure";
 import Clef from "./views/Clef";
 import Key from "./views/Key";
 import TimeSignature from "./views/TimeSignature";
+import Score from "./views/Score";
 
 import * as lineUtils from "./utils/line";
 import * as noteUtils from "./utils/note";
@@ -37,12 +38,8 @@ Scored.prototype.layout = function (layout) {
 };
 
 Scored.prototype.compose = function (layout, music) {
-	// return processor.run(layout, music);
-	// if (layout.type === constants.type.line) {
-	// 	_.map(music, e => Line[e.type](layout, e));
-	// } else if (layout.type === constants.type.staff) {
-	// 	_.map(music, e => Staff[e.type](layout, e));
-	// }
+	// When layout is a Score it needs to be responsible for putting music events into the correct line.
+	// Staff is currently handling this so that functionality needs to be ported.
 	_.map(music, e => layout[e.type](e));
 
 	return layout;
@@ -103,6 +100,10 @@ Scored.prototype.line = function line (context={}, children) {
 
 Scored.prototype.staff = function staff (context={}, children) {
 	return new Staff(context, children);
+}
+
+Scored.prototype.score = function score (context={}, children) {
+	return new Score(context, children);
 }
 
 function parse (parentContext={}, [type, context={}, elements=[]]) {
