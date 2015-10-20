@@ -78,18 +78,20 @@ function getTime ([[e, ctx]]) {
 	if (ctx) {return ctx.time;}
 }
 
-function Staff ({staves=1, timeSig="4/4", measures, lineLength, measureLength}, children=[]) {
+function Staff ({staves=1, timeSig="4/4", measures=1, lineLength, measureLength}, children=[]) {
 	this.staves = staves;
 	this.timeSig = timeSig;
 	this.measures = measures;
 
 	this.children = children;
 
+	this.voices = new Map();
+
 	var self = {
 		time: 0,
 		measure: 0,
 		beat: 0,
-		voiceMap: new Map(), // voice => line
+		// voiceMap: new Map(), // voice => line
 		previousTime: undefined
 	};
 
@@ -97,42 +99,32 @@ function Staff ({staves=1, timeSig="4/4", measures, lineLength, measureLength}, 
 	for (let i = 0, lineNum = 0; i < children.length; i++) {
 		let voices = children[i].voices || 1;
 		for (let j = 0; j < voices; j++) {
-			self.voiceMap.set(lineNum, children[i]);
+			// self.voiceMap.set(lineNum, children[i]);
+			this.voices.set(lineNum, children[i]);
 			lineNum++;
 		}
 	}
 
-	this.setTime = function ({time: lineTime, measure: lineMeasure, beat: lineBeat}) {
-		self.time = lineTime;
-		self.measure = lineMeasure;
-		self.beat = lineBeat;
-	};
-
-	/*
-	 * returns an object containing the current time, measure, and beat.
-	 */
-	// this.at = function () {
-	// 	return {
-	// 		time: self.time,
-	// 		measure: self.measure,
-	// 		beat: self.beat
-	// 	};
+	// this.setTime = function ({time: lineTime, measure: lineMeasure, beat: lineBeat}) {
+	// 	self.time = lineTime;
+	// 	self.measure = lineMeasure;
+	// 	self.beat = lineBeat;
 	// };
 
-	this.getLine = function (voice) {
-		return self.voiceMap.get(voice) || this.children[0];
-	};
-
-	// Used in more than one class. Should be moved to a prototype.
-	this.getTotalHeight = function (views) {
-		var ans =  _.reduce(views, function (x, y) {
-			return x + y.height;
-		}, 0);
-		return ans;
-	};
+	// // Used in more than one class. Should be moved to a prototype.
+	// this.getTotalHeight = function (views) {
+	// 	var ans =  _.reduce(views, function (x, y) {
+	// 		return x + y.height;
+	// 	}, 0);
+	// 	return ans;
+	// };
 }
 
 Staff.prototype.type = TYPE;
+
+Staff.prototype.getLine = function (voice) {
+	return this.voices.get(voice) || this.children[0];
+}
 
 Staff.prototype.render = function (position) {
 
@@ -239,12 +231,5 @@ Staff.prototype.rest = function (rest, cursor) {
 // 	var line = this.getLine(key.line);
 // 	return line.key(key, lineCursor);
 // }
-
-/*
- * Set all measures to be of equal length
- * @param lines {LineView[]} - collection of lineViews
- * @param measures {number} - measures the staff has
- */
-
 
 export default Staff;

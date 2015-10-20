@@ -216,6 +216,14 @@ describe("Scored", () => {
 				expect(line.children[0].children[0]).to.eql(scored.clef());
 			});
 		});
+
+        describe("staff", () => {
+            it("should layout", () => {
+                let staff = scored.layout(["staff"]);
+                expect(staff).to.eql(scored.staff());
+            });
+        });
+
 		describe("composing layout and music", () => {
 			let voice = ["voice", {value: 0}, [["note"]]];
 			describe("line with no measures", () => {
