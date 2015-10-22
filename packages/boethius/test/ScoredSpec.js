@@ -87,14 +87,12 @@ describe("Scored", () => {
 			let line = scored.line();
 			expect(line.type).to.equal("line");
 			expect(line.children).to.be.empty;
-			expect(line.voices).to.equal(1);
+			expect(line.voices).to.eql([]);
 			expect(line.staves).to.equal(1);
-			expect(line.lineLength).to.equal(1000);
 
-			line = scored.line({voices: 2, staves: 3, lineLength: 500});
+			line = scored.line({voices: 2, staves: 3});
 			expect(line.voices).to.equal(2);
 			expect(line.staves).to.equal(3);
-			expect(line.lineLength).to.equal(500);
 		});
 		it("should set up its measures", () => {
 			let line = scored.line({measures: 4});
@@ -239,6 +237,20 @@ describe("Scored", () => {
 					expect(score.children).to.be.empty;
 				});
 			});
+
+            describe("composing with Score view", () => {
+                it("should add events to the correct line", () => {
+                    let score = scored.score({}, [scored.line({voices: ["alto"]}), scored.line({voices: ["bass"]})]),
+                        events = scored.createEvents([
+                            ["voice", {value: "alto"}, [["note", {pitch: "a5"}],["note", {pitch: "b5"}],["note", {pitch: "c5"}]]],
+                            ["voice", {value: "bass"}, [["note", {pitch: "c3"}],["note", {pitch: "d3"}],["note", {pitch: "e3"}]]]
+                        ]);
+                    let composition = scored.compose(score, events);
+                    let altoLine = Score.getLineByVoice("alto", composition.lines),
+                        bassLine = Score.getLineByVoice("alto", composition.lines);
+                    // expect something!
+                });
+            });
 		});
     });
 	describe("createEvents", () => {

@@ -2,6 +2,9 @@ import _ from "lodash";
 
 import Line from "./Line";
 import Staff from "./Staff";
+import constants from "../constants";
+
+const TYPE = constants.type.score;
 
 /*
  * Class for managing Staves and Lines.
@@ -15,8 +18,47 @@ function Score (context={}, children=[]) {
      */
     const types = _.groupBy(children, child => child.type);
 
-    this.staves = types.staff || [];
     this.lines = types.line || [];
+    this.staves = types.staff || [];
 }
+
+Score.prototype.type = TYPE;
+
+Score.prototype.note = function (note) {
+    let line = getLineByVoice(note.voice, this.lines);
+    line.note(note);
+    console.log(note);
+}
+
+Score.prototype.rest = function (rest) {
+    let line = getLineByVoice(rest.voice, this.lines);
+    line.rest(rest);
+    console.log(rest);
+}
+
+Score.prototype.render = function () {
+    const group = new paper.Group({
+        name: TYPE
+    });
+
+    let staves = _.map(this.staves, (staff) => {
+        return staff.render(this.lines, 0, 4);
+    });
+
+    group.addChildren(staves);
+
+    console.log(this.staves);
+    console.log(this.lines);
+
+    return group;
+}
+
+function getLineByVoice (voice, lines) {
+    return _.find(lines, (line) => {
+        return _.indexOf(line.voices, voice) !== -1;
+    });
+}
+
+Score.getLineByVoice = getLineByVoice;
 
 export default Score;

@@ -1,14 +1,14 @@
 var line;
 function run () {
 	/* page 1 */
-	// clefLines();
-	// timeSigLines();
-	// keyLines();
-	// line = fourBars();
+	clefLines();
+	timeSigLines();
+	keyLines();
+	line = fourBars();
 
 	/* page 2 */
-	createMeasures();
-	interaction();
+	// createMeasures();
+	// interaction();
 }
 
 function createMeasures () {
@@ -22,8 +22,7 @@ function createMeasures () {
 
 	line = scored.line({lineLength: 800}, [treble, measure2]);
 
-	line.render();
-	line.translate(50);
+	line.render(750).translate(50);
 }
 
 function interaction () {
@@ -36,13 +35,11 @@ function interaction () {
 		tenor = scored.clef({value: "tenor", measure: 2})
 		bass = scored.clef({value: "bass", measure: 3})
 		line = scored.line({
-			lineLength: lineLength,
 			measureLength: measureLength,
 			measures: measures
 		}, [treble, alto, tenor, bass]);
 
-	line.render();
-	line.translate([50, 150]);
+	line.render(lineLength).translate([50, 150]);
 
 	// line needs to be rendered first because that's when the measures are created.
 	getMeasureFn = Scored.utils.line.getMeasure(line);
@@ -58,43 +55,36 @@ function clefLines () {
 	var	bass = scored.clef({value: "bass", measure: 0});
 	var	alto = scored.clef({value: "alto", measure: 0});
 	var	tenor = scored.clef({value: "tenor", measure: 0});
-	var	trebleLine = scored.line({lineLength: 150}, [treble]);
-	var	bassLine = scored.line({lineLength: 150}, [bass]);
-	var	altoLine = scored.line({lineLength: 150}, [alto]);
-	var	tenorLine = scored.line({lineLength: 150}, [tenor]);
+	var	trebleLine = scored.line({}, [treble]);
+	var	bassLine = scored.line({}, [bass]);
+	var	altoLine = scored.line({}, [alto]);
+	var	tenorLine = scored.line({}, [tenor]);
+	var lineLength = 150;
 
-	trebleLine.render();
-	bassLine.render();
-	altoLine.render();
-	tenorLine.render();
-	trebleLine.translate([20, 20]);
-	bassLine.translate([200, 20]);
-	altoLine.translate([400, 20]);
-	tenorLine.translate([600, 20]);
+	trebleLine.render(lineLength).translate([20, 20]);
+	bassLine.render(lineLength).translate([200, 20]);
+	altoLine.render(lineLength).translate([400, 20]);
+	tenorLine.render(lineLength).translate([600, 20]);
 }
 
 function timeSigLines () {
-	var common = scored.timeSignature({value: "c", measure: 0}),
-		half = scored.timeSignature({value: "h", measure: 0}),
-		fourfour = scored.timeSignature({value: "4/4", measure: 0}),
-		sixeight = scored.timeSignature({value: "6/8", measure: 0}),
-		twelveeight = scored.timeSignature({value: "12/8", measure: 0}),
+	var common = scored.timeSig({value: "c", measure: 0}),
+		half = scored.timeSig({value: "h", measure: 0}),
+		fourfour = scored.timeSig({value: "4/4", measure: 0}),
+		sixeight = scored.timeSig({value: "6/8", measure: 0}),
+		twelveeight = scored.timeSig({value: "12/8", measure: 0}),
 		commonLine = scored.line({lineLength: 150}, [common]),
 		halfLine = scored.line({lineLength: 150}, [half]),
 		fourfourLine = scored.line({lineLength: 150}, [fourfour]),
 		sixeightLine = scored.line({lineLength: 150}, [sixeight]),
 		twelveeightLine = scored.line({lineLength: 150}, [twelveeight]);
+	var lineLength = 150;
 
-	commonLine.render();
-	halfLine.render();
-	fourfourLine.render();
-	sixeightLine.render();
-	twelveeightLine.render();
-	commonLine.translate([20, 100]);
-	halfLine.translate([200, 100]);
-	fourfourLine.translate([400, 100]);
-	sixeightLine.translate([600, 100]);
-	twelveeightLine.translate([800, 100]);
+	commonLine.render(lineLength).translate([20, 100]);
+	halfLine.render(lineLength).translate([200, 100]);
+	fourfourLine.render(lineLength).translate([400, 100]);
+	sixeightLine.render(lineLength).translate([600, 100]);
+	twelveeightLine.render(lineLength).translate([800, 100]);
 }
 
 function keyLines () {
@@ -128,55 +118,38 @@ function keyLines () {
 		gb = scored.key({value: "Gb", measure: 0}),
 		cb = scored.key({value: "Cb", measure: 0}),
 
-		cLine = scored.line({lineLength: 100}, [c]),
-		gLine = scored.line({lineLength: 100}, [treb1, g]),
-		dLine = scored.line({lineLength: 100}, [treb2, d]),
-		aLine = scored.line({lineLength: 100}, [treb3, a]),
-		eLine = scored.line({lineLength: 100}, [treb4, e]),
-		bLine = scored.line({lineLength: 100}, [bass5, b]),
-		fsLine = scored.line({lineLength: 100}, [bass6, fs]),
-		csLine = scored.line({lineLength: 100}, [bass7, cs]),
-		fLine = scored.line({lineLength: 100}, [bass1, f]),
-		bbLine = scored.line({lineLength: 100}, [bass2, bb]),
-		ebLine = scored.line({lineLength: 100}, [bass3, eb]),
-		abLine = scored.line({lineLength: 100}, [bass4, ab]),
-		dbLine = scored.line({lineLength: 100}, [treb5, db]),
-		gbLine = scored.line({lineLength: 100}, [treb6, gb]),
-		cbLine = scored.line({lineLength: 100}, [treb7, cb]);
+		cLine = scored.line({}, [c]),
+		gLine = scored.line({}, [treb1, g]),
+		dLine = scored.line({}, [treb2, d]),
+		aLine = scored.line({}, [treb3, a]),
+		eLine = scored.line({}, [treb4, e]),
+		bLine = scored.line({}, [bass5, b]),
+		fsLine = scored.line({}, [bass6, fs]),
+		csLine = scored.line({}, [bass7, cs]),
+		fLine = scored.line({}, [bass1, f]),
+		bbLine = scored.line({}, [bass2, bb]),
+		ebLine = scored.line({}, [bass3, eb]),
+		abLine = scored.line({}, [bass4, ab]),
+		dbLine = scored.line({}, [treb5, db]),
+		gbLine = scored.line({}, [treb6, gb]),
+		cbLine = scored.line({}, [treb7, cb]);
 
-	// cLine.render();
-	// cLine.translate([20, 200]);
+	var linelength = 100;
 
-	gLine.render();
-	dLine.render();
-	aLine.render();
-	eLine.render();
-	bLine.render();
-	fsLine.render();
-	csLine.render();
-	fLine.render();
-	bbLine.render();
-	ebLine.render();
-	abLine.render();
-	dbLine.render();
-	gbLine.render();
-	cbLine.render();
-
-
-	gLine.translate([20, 200]);
-	dLine.translate([150, 200]);
-	aLine.translate([300, 200]);
-	eLine.translate([450, 200]);
-	bLine.translate([600, 200]);
-	fsLine.translate([750, 200]);
-	csLine.translate([900, 200]);
-	fLine.translate([20, 300]);
-	bbLine.translate([150, 300]);
-	ebLine.translate([300, 300]);
-	abLine.translate([450, 300]);
-	dbLine.translate([600, 300]);
-	gbLine.translate([750, 300]);
-	cbLine.translate([900, 300]);
+	gLine.render(linelength).translate([20, 200]);
+	dLine.render(linelength).translate([150, 200]);
+	aLine.render(linelength).translate([300, 200]);
+	eLine.render(linelength).translate([450, 200]);
+	bLine.render(linelength).translate([600, 200]);
+	fsLine.render(linelength).translate([750, 200]);
+	csLine.render(linelength).translate([900, 200]);
+	fLine.render(linelength).translate([20, 300]);
+	bbLine.render(linelength).translate([150, 300]);
+	ebLine.render(linelength).translate([300, 300]);
+	abLine.render(linelength).translate([450, 300]);
+	dbLine.render(linelength).translate([600, 300]);
+	gbLine.render(linelength).translate([750, 300]);
+	cbLine.render(linelength).translate([900, 300]);
 }
 
 function fourBars () {
@@ -184,9 +157,8 @@ function fourBars () {
 		bass = scored.clef({value: "bass", measure: 1}),
 		alto = scored.clef({value: "alto", measure: 2}),
 		tenor = scored.clef({value: "tenor", measure: 3}),
-		line = scored.line({lineLength: 1000, measures: 4}, [treble, bass, alto, tenor]);
+		line = scored.line({measures: 4}, [treble, bass, alto, tenor]);
 
-	line.render()
-	line.translate([20, 400]);
+	line.render(1000).translate([20, 400]);
 	return line;
 }

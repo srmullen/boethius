@@ -77,11 +77,17 @@ function drawTimeBounds (items, children) {
 function getTime ([[e, ctx]]) {
 	if (ctx) {return ctx.time;}
 }
-
-function Staff ({staves=1, timeSig="4/4", measures=1, lineLength}, children=[]) {
-	this.staves = staves;
+/*
+ * @measures - the number of measures on the staff.
+ * @startMeasure - the index of the first measure on the stave.
+ */
+ // TODO: What are the children of a staff now? It's more of a view onto the lines, rather than something with children in it's own right.
+function Staff ({timeSig="4/4", startMeasure=0, measures, lineLength}, children=[]) {
+	// this.staves = staves;
 	this.timeSig = timeSig;
 	this.measures = measures;
+
+	this.lineLength = lineLength;
 
 	this.children = children;
 
@@ -126,35 +132,58 @@ Staff.prototype.getLine = function (voice) {
 	return this.voices.get(voice) || this.children[0];
 }
 
-Staff.prototype.render = function (position) {
+// Staff.prototype.render = function (lines, startMeasure, endMeasure) {
+//
+// 	const group = this.group = new paper.Group({
+// 		name: TYPE
+// 	});
+//
+// 	let childGroups = this.children.map((child) => child.render([0,0]));
+//
+// 	adjustMeasures(this.children, this.measures);
+//
+// 	this.group.addChildren(paperUtils.extractGroups(this.children));
+//
+// 	// let numStaves = this.children[0].staves.length,
+// 	// 	staveYPos = 0;
+// 	// for (let i = 0; i < numStaves; i++) {
+// 	// 	_.each(children, (line, j) => {
+// 	// 		line.staves[i].translate([0, staveYPos + 120 * j]);
+// 	// 	});
+// 	// 	staveYPos = staveYPos + 400;
+// 	// }
+// 	let staveYPos = 0;
+// 	for (let i = 0; i < this.staves; i++) { // FIXME: this.staves is no longer a property of Staff
+// 		_.each(childGroups, (lineGroup, j) => {
+// 			lineGroup.children["stave"].translate([0, staveYPos + 120 * j]);
+// 		});
+// 		staveYPos = staveYPos + 400;
+// 	}
+//
+// 	this.group.addChildren(engraver.drawStaffBar(this.children));
+//
+// 	return group;
+// };
+
+Staff.prototype.render = function (lines, startMeasure, endMeasure) {
 
 	const group = this.group = new paper.Group({
 		name: TYPE
 	});
 
-	let childGroups = this.children.map((child) => child.render([0,0]));
+	// draw each line
+	let lineGroups = lines.map((child) => child.render(this.lineLength));
 
-	adjustMeasures(this.children, this.measures);
+	// adjustMeasures(this.children, this.measures);
 
-	this.group.addChildren(paperUtils.extractGroups(this.children));
+	// this.group.addChildren(paperUtils.extractGroups(this.children));
+	group.addChildren(lineGroups);
 
-	// let numStaves = this.children[0].staves.length,
-	// 	staveYPos = 0;
-	// for (let i = 0; i < numStaves; i++) {
-	// 	_.each(children, (line, j) => {
-	// 		line.staves[i].translate([0, staveYPos + 120 * j]);
-	// 	});
-	// 	staveYPos = staveYPos + 400;
-	// }
-	let staveYPos = 0;
-	for (let i = 0; i < this.staves; i++) {
-		_.each(childGroups, (lineGroup, j) => {
-			lineGroup.children["stave"].translate([0, staveYPos + 120 * j]);
-		});
-		staveYPos = staveYPos + 400;
-	}
+	_.each(lineGroups, (lineGroup, j) => {
+		lineGroup.translate([0, 120 * j]);
+	});
 
-	this.group.addChildren(engraver.drawStaffBar(this.children));
+	group.addChild(engraver.drawStaffBar(lineGroups));
 
 	return group;
 };
@@ -190,14 +219,6 @@ Staff.prototype.processEvents = function (events) {
 					line => line.at()),
 				t => t.time);
 };
-
-// Staff.note = function (staff, note) {
-// 	console.log("adding note to staff");
-// };
-//
-// Staff.rest = function (staff, rest) {
-// 	console.log("adding rest to staff");
-// };
 
 Staff.prototype.note = function (note, cursor) {
 	var line = this.getLine(note.voice);

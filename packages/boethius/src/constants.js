@@ -2,6 +2,7 @@
 
 let constants = {
 	type: {
+		score: "score",
 		staff: "staff",
 		line: "line",
 		measure: "measure",

@@ -55,11 +55,11 @@ function drawLegerLines (noteHead, centerLine, lineSpacing) {
 }
 
 function drawBarline (staves, xPos=0) {
-	var firstLine = staves[0],
+	let firstLine = staves[0],
 		lastLine = staves[staves.length - 1],
 		margin = 2,
-		barGroup = new paper.Group({name: "barline"}),
-		bar = new paper.Path.Line(lineUtils.f(firstLine[0]).add(xPos, 0), lineUtils.e(lastLine[0]).add(xPos, 0));
+		barGroup = new paper.Group({name: "barline"});
+	let bar = new paper.Path.Line(lineUtils.f(firstLine).add(xPos, 0), lineUtils.e(lastLine).add(xPos, 0));
 
 	// draw the bar line
 	barGroup.addChild(bar);
@@ -67,7 +67,7 @@ function drawBarline (staves, xPos=0) {
 	bar.strokeWidth = 1;
 
 	// draw the bounds
-	var bounds = new paper.Path.Rectangle(bar.bounds.topLeft.subtract([margin, 0]), bar.bounds.bottomRight.add([margin, 0]));
+	let bounds = new paper.Path.Rectangle(bar.bounds.topLeft.subtract([margin, 0]), bar.bounds.bottomRight.add([margin, 0]));
 
 	bounds.fillColor = "#FFFFFF";
 	bounds.opacity = 0;
@@ -101,10 +101,7 @@ function drawLine (width) {
 	rectangle.opacity = 0; // make the rectangle invisible
 	rectangle.name = "bounds";
 
-	let stave = new paper.Group(_.flatten([rectangle, lineArray]));
-	stave.name = "stave";
-	return stave;
-	// return new paper.Group(lineArray);
+	return new paper.Group(_.flatten([rectangle, lineArray]));
 }
 
 // var drawLine = _.memoize(function (width) {
@@ -129,18 +126,13 @@ function drawLine (width) {
 
 function drawStaffBar (lines) {
 	var firstLine = lines[0],
-		lastLine = lines[lines.length - 1],
-		numStaves = firstLine.staves.length,
-		bars = [];
+		lastLine = lines[lines.length - 1];
 
-	for (let i = 0; i < numStaves; i++) {
-		let bar = new paper.Path.Line(lineUtils.f(firstLine.staves[i]), lineUtils.e(lastLine.staves[i]));
-		bar.strokeColor = "black";
-		bar.strokeWidth = 2;
-		bars.push(bar);
-	}
+	let bar = new paper.Path.Line(lineUtils.f(firstLine), lineUtils.e(lastLine));
+	bar.strokeColor = "black";
+	bar.strokeWidth = 2;
 
-	return bars;
+	return bar;
 }
 
 //////////////////////

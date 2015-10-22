@@ -16,10 +16,10 @@ function run () {
 	// 		["line", {line: 0}, [["clef", {value: "treble"}]]],
 	// 		["line", {line: 1}, [["clef", {value: "bass"}]]]
 	// 	]]);
-	var layout = scored.layout(["score", {}, [
+	var layout = scored.layout(["score", {measures: 12}, [
 		["staff", {staves: 3, timeSig: "4/4", key: "C", measures: measures, lineLength: lineLength}],
-		["line", {}, [["clef", {value: "treble"}]]],
-		["line", {}, [["clef", {value: "bass"}]]]
+		["line", {voices: [0]}, [["clef", {value: "treble"}]]],
+		["line", {voices: [1]}, [["clef", {value: "bass"}]]]
 	]]);
 
 	// var layout = scored.layout(["line", {measures: 4}, [["clef"]]]);
@@ -28,7 +28,4 @@ function run () {
 
 
 	scored.render(score).translate(50, 50);
-	console.log(events);
-	console.log(notes);
-	console.log(score);
 }

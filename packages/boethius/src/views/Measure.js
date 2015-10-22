@@ -34,22 +34,21 @@ Measure.prototype.chord = function (chord) {
 	this.children.push(chord);
 };
 
-Measure.prototype.render = function (staves, leftBarline, width=DEFAULT_LENGTH, stave=0) {
+Measure.prototype.render = function (line, leftBarline, width=DEFAULT_LENGTH, stave=0) {
 	const group = new paper.Group({
 		name: TYPE
 	});
 
-	// width = (this.context.lineLength < width) ? this.context.lineLength : width;
 	width = (this.lineLength < width) ? this.lineLength : width;
-	leftBarline = leftBarline || engraver.drawBarline([staves]);
+	leftBarline = leftBarline || engraver.drawBarline([line]);
 	let previousBarlinePosition = leftBarline.position.x,
-		rightBarline = engraver.drawBarline([staves], previousBarlinePosition + width),
+		rightBarline = engraver.drawBarline([line], previousBarlinePosition + width),
 		bounds = this.drawGroupBounds(previousBarlinePosition, rightBarline);
 
 	group.addChildren([bounds, leftBarline, rightBarline]);
 
 	let childGroups = _.map(this.children, (child) => {
-		let pos = placement.getYOffset(child, lineUtils.b(staves[stave])),
+		let pos = placement.getYOffset(child, lineUtils.b(line)),
 			yPos = child.type === "note" ? placement.calculateNoteYpos(child, Scored.config.lineSpacing/2, placement.getClefBase("treble")) : 0,
 			childGroup = child.render(pos.add([leftBarline.position.x + 15, yPos]));
 
@@ -59,7 +58,6 @@ Measure.prototype.render = function (staves, leftBarline, width=DEFAULT_LENGTH, 
 
 	group.addChildren(childGroups);
 
-	// placement.lineup(this.children);
 	placement.lineup(childGroups);
 
 	this.barlines = [leftBarline, rightBarline];
