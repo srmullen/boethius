@@ -34,7 +34,7 @@ Measure.prototype.chord = function (chord) {
 	this.children.push(chord);
 };
 
-Measure.prototype.render = function (line, leftBarline, width=DEFAULT_LENGTH, stave=0) {
+Measure.prototype.render = function (line, leftBarline, width) {
 	const group = new paper.Group({
 		name: TYPE
 	});

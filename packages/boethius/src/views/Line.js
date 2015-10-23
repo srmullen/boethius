@@ -1,6 +1,6 @@
 import constants from "../constants";
 import engraver from "../engraver";
-import Measure from "../views/Measure";
+import Measure from "./Measure";
 import * as timeUtils from "../utils/timeUtils";
 import * as placement from "../utils/placement";
 import * as common from "../utils/common";
@@ -51,7 +51,7 @@ function parseChildren (children, numMeasures) {
 	return measures;
 }
 
-function Line ({measures=0, voices=[], staves=1, measureLength=200}, children=[]) {
+function Line ({measures=0, voices=[], staves=1}, children=[]) {
 
 	this.children = parseChildren(children, measures);
 
@@ -59,7 +59,7 @@ function Line ({measures=0, voices=[], staves=1, measureLength=200}, children=[]
 
 	// this.lineLength = lineLength; // should be property of Staff.
 
-	this.measureLength = measureLength;
+	// this.measureLength = measureLength;
 
 	this.voices = voices;
 
@@ -127,49 +127,33 @@ Line.calculateAverageMeasureLength = function (staves, lineLength, measures) {
 // };
 
 Line.prototype.render = function (length) {
-	// const group = this.group = new paper.Group({
-	// 	name: TYPE
-	// });
 
 	// Was this.staves. Now this.staves is the number of staves. staves is an arry of staves.
 	// let staves = this.drawStaves(this.staves);
 	const group = engraver.drawLine(length);
 	group.name = TYPE;
-	// group.addChild(line);
 	// group.strokeColor = "black";
+	return group;
+}
 
-	// let stave = 0,
-	// 	remainingLength = this.lineLength;
-
+/*
+ * @param lineGroup - the group returned by line.render
+ */
+Line.prototype.renderMeasures = function (lineGroup) {
 	let measureGroups = _.reduce(this.children, (groups, measure, i, children) => {
-		let measureLength = measure.measureLength || this.measureLength || constants.measure.defaultLength, // + markingLength,
+		// let measureLength = measure.measureLength || constants.measure.defaultLength, // + markingLength,
+		let measureLength = 75,
 			previousGroup = _.last(groups),
-			// newStave = false,
 			leftBarline;
 
-		// if (staves[stave]) {
 		leftBarline = previousGroup ? previousGroup.children.barline : null; //{position: line.b(staves[stave])};
-		// let measureGroup = measure.render(staves, leftBarline, measureLength, stave);
-		let measureGroup = measure.render(group, leftBarline, measureLength);
+		let measureGroup = measure.render(lineGroup, leftBarline, measureLength);
 		Measure.addGroupEvents(measureGroup);
 		groups.push(measureGroup);
-		// staves[stave].addChild(group);
-		group.addChild(measureGroup); // add the measure to the line
-		// }
+		lineGroup.addChild(measureGroup); // add the measure to the line
 		return groups;
 	}, []);
-
-	return group;
-};
-
-// Line.prototype.drawStaves = function (numStaves=1) {
-// 	var staves = [],
-// 		i = 0;
-// 	for (; i < numStaves; i++) {
-// 		staves.push(engraver.drawLine(this.lineLength));
-// 	}
-// 	return staves;
-// };
+}
 
 Line.prototype.note = function (note) {
 	let measure = _.find(this.children, (measure) => {

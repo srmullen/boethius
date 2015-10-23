@@ -2,6 +2,7 @@ import * as paperUtils from "../utils/paperUtils";
 import * as timeUtils from "../utils/timeUtils";
 import engraver from "../engraver";
 import constants from "../constants";
+import Measure from "./Measure";
 import _ from "lodash";
 
 
@@ -82,9 +83,13 @@ function getTime ([[e, ctx]]) {
  * @startMeasure - the index of the first measure on the stave.
  */
  // TODO: What are the children of a staff now? It's more of a view onto the lines, rather than something with children in it's own right.
+ // TODO: Should Staff implement lilypond types such as StaffGroup, ChoirStaff, GrandStaff, and PianoStaff?
 function Staff ({timeSig="4/4", startMeasure=0, measures, lineLength}, children=[]) {
 	// this.staves = staves;
 	this.timeSig = timeSig;
+
+	this.startMeasure = startMeasure;
+
 	this.measures = measures;
 
 	this.lineLength = lineLength;
@@ -93,11 +98,11 @@ function Staff ({timeSig="4/4", startMeasure=0, measures, lineLength}, children=
 
 	this.voices = new Map();
 
+
 	var self = {
 		time: 0,
 		measure: 0,
 		beat: 0,
-		// voiceMap: new Map(), // voice => line
 		previousTime: undefined
 	};
 
@@ -105,17 +110,10 @@ function Staff ({timeSig="4/4", startMeasure=0, measures, lineLength}, children=
 	for (let i = 0, lineNum = 0; i < children.length; i++) {
 		let voices = children[i].voices || 1;
 		for (let j = 0; j < voices; j++) {
-			// self.voiceMap.set(lineNum, children[i]);
 			this.voices.set(lineNum, children[i]);
 			lineNum++;
 		}
 	}
-
-	// this.setTime = function ({time: lineTime, measure: lineMeasure, beat: lineBeat}) {
-	// 	self.time = lineTime;
-	// 	self.measure = lineMeasure;
-	// 	self.beat = lineBeat;
-	// };
 
 	// // Used in more than one class. Should be moved to a prototype.
 	// this.getTotalHeight = function (views) {
@@ -132,51 +130,18 @@ Staff.prototype.getLine = function (voice) {
 	return this.voices.get(voice) || this.children[0];
 }
 
-// Staff.prototype.render = function (lines, startMeasure, endMeasure) {
-//
-// 	const group = this.group = new paper.Group({
-// 		name: TYPE
-// 	});
-//
-// 	let childGroups = this.children.map((child) => child.render([0,0]));
-//
-// 	adjustMeasures(this.children, this.measures);
-//
-// 	this.group.addChildren(paperUtils.extractGroups(this.children));
-//
-// 	// let numStaves = this.children[0].staves.length,
-// 	// 	staveYPos = 0;
-// 	// for (let i = 0; i < numStaves; i++) {
-// 	// 	_.each(children, (line, j) => {
-// 	// 		line.staves[i].translate([0, staveYPos + 120 * j]);
-// 	// 	});
-// 	// 	staveYPos = staveYPos + 400;
-// 	// }
-// 	let staveYPos = 0;
-// 	for (let i = 0; i < this.staves; i++) { // FIXME: this.staves is no longer a property of Staff
-// 		_.each(childGroups, (lineGroup, j) => {
-// 			lineGroup.children["stave"].translate([0, staveYPos + 120 * j]);
-// 		});
-// 		staveYPos = staveYPos + 400;
-// 	}
-//
-// 	this.group.addChildren(engraver.drawStaffBar(this.children));
-//
-// 	return group;
-// };
-
-Staff.prototype.render = function (lines, startMeasure, endMeasure) {
-
+Staff.prototype.render = function (lines, startMeasure=0, numMeasures) {
 	const group = this.group = new paper.Group({
 		name: TYPE
 	});
 
 	// draw each line
-	let lineGroups = lines.map((child) => child.render(this.lineLength));
+	let lineGroups = lines.map((child) => {
+		return child.render(this.lineLength);
+	});
 
-	// adjustMeasures(this.children, this.measures);
+	// this.renderMeasures(lines, lineGroups, startMeasure, numMeasures);
 
-	// this.group.addChildren(paperUtils.extractGroups(this.children));
 	group.addChildren(lineGroups);
 
 	_.each(lineGroups, (lineGroup, j) => {
@@ -187,6 +152,25 @@ Staff.prototype.render = function (lines, startMeasure, endMeasure) {
 
 	return group;
 };
+
+Staff.prototype.renderMeasures = function (lines, lineGroups, startMeasure, numMeasures) {
+	const measureLength = this.lineLength / numMeasures,
+		  measureGroups = [];
+	for (let i = startMeasure; i < startMeasure + numMeasures; i++) {
+		console.log("measure: " + i);
+		// get the measure from each line
+		let measures = _.map(lines, line => line.children[i]);
+
+		// render each measure
+		measureGroups.push(_.map(measures, (measure, j) => {
+			let lineGroup = lineGroups[j],
+				leftBarline = _.last(measureGroups) ? _.last(measureGroups)[j].children.barline : null,
+				measureGroup = measure.render(lineGroup, leftBarline, measureLength);
+			lineGroup.addChild(measureGroup);
+			return measureGroup;
+		}));
+	}
+}
 
 Staff.prototype.processEvents = function (events) {
 
@@ -229,14 +213,6 @@ Staff.prototype.rest = function (rest, cursor) {
 	var line = this.getLine(rest.voice);
 	return line.rest(rest, cursor);
 };
-
-// Staff.prototype.setPosition = function (position) {
-// 	this.group.setPosition(position);
-// };
-//
-// Staff.prototype.translate = function (vector) {
-// 	this.group.translate(vector);
-// };
 
 // Staff.prototype.clef = function (clef, lineCursor) {
 // 	var line = this.getLine(clef.line);

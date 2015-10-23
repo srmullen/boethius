@@ -27,13 +27,11 @@ Score.prototype.type = TYPE;
 Score.prototype.note = function (note) {
     let line = getLineByVoice(note.voice, this.lines);
     line.note(note);
-    console.log(note);
 }
 
 Score.prototype.rest = function (rest) {
     let line = getLineByVoice(rest.voice, this.lines);
     line.rest(rest);
-    console.log(rest);
 }
 
 Score.prototype.render = function () {
@@ -42,8 +40,12 @@ Score.prototype.render = function () {
     });
 
     let staves = _.map(this.staves, (staff) => {
-        return staff.render(this.lines, 0, 4);
+        let group = staff.render(this.lines, staff.startMeasure, staff.measures);
+        staff.renderMeasures(this.lines, group.children, staff.startMeasure, staff.measures);
+        return group;
     });
+
+    staves.map((staff, i) => staff.translate(0, i * 300));
 
     group.addChildren(staves);
 
