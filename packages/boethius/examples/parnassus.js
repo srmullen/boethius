@@ -8,18 +8,22 @@ function run () {
 		n.value = val;
 		delete n.duration;
 		return ["note", n];
-	};
+	},
+		createVoice = function (notes) {
+			return palestrina.melody.phrase(
+				_.fill(new Array(notes.length), 1),
+				dorianCpt
+			).map(noteFormat);
+		};
 
-	var dorianCpt = palestrina.melody.phrase(
-			[1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1],
-			["a4", "a4", "g4", "a4", "b4", "c5", "c5", "b4", "d5", "c#5", "d5"]
-		).map(noteFormat),
-		dorianCantus= palestrina.melody.phrase(
-			[1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1],
-			["d4", "f4", "e4", "d4", "g4", "f4", "a4", "g4", "f4", "e4", "d4"]
-		).map(noteFormat),
-		counterpoint = ["voice", {value: 0}, dorianCpt],
-		cantusFirmus = ["voice", {value: 1}, dorianCantus];
+	var dorianCpt = ["a4", "a4", "g4", "a4", "b4", "c5", "c5", "b4", "d5", "c#5", "d5"];
+
+	var dorianCantus = ["d4", "f4", "e4", "d4", "g4", "f4", "a4", "g4", "f4", "e4", "d4"];
+
+	var dorianCptPhrase = createVoice(dorianCpt),
+		dorianCantusPhrase = createVoice(dorianCantus),
+		counterpoint = ["voice", {value: 0}, dorianCptPhrase],
+		cantusFirmus = ["voice", {value: 1}, dorianCantusPhrase];
 
 
 	var layout = scored.layout(["score", {measures: measures}, [

@@ -1,14 +1,14 @@
 var line;
 function run () {
 	/* page 1 */
-	clefLines();
-	timeSigLines();
-	keyLines();
-	line = fourBars();
+	// clefLines();
+	// timeSigLines();
+	// keyLines();
+	// line = fourBars();
 
 	/* page 2 */
-	// createMeasures();
-	// interaction();
+	createMeasures();
+	interaction();
 }
 
 function createMeasures () {
@@ -22,7 +22,7 @@ function createMeasures () {
 
 	line = scored.line({lineLength: 800}, [treble, measure2]);
 
-	line.render(750).translate(50);
+	line.renderMeasures(line.render(750).translate(50));
 }
 
 function interaction () {
