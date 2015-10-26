@@ -44,15 +44,9 @@
      * @param $el {jQuery} - element to append the canvas to.
      */
     function createCanvas ($el) {
-        var width = $(window).width(),
-            height = $(window).height(),
-            $canvas;
+        $el.append('<canvas class="scored-canvas parnassus"><canvas>');
 
-        $el.append('<canvas class="scored-canvas sheet"><canvas>');
-
-        $canvas = $(".scored-canvas");
-
-        return $canvas;
+        return $(".scored-canvas");
     }
 
     start(function () {

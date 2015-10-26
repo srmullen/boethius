@@ -2,8 +2,6 @@ import engraver from "../engraver";
 import common from "../utils/common";
 import constants from "../constants";
 
-"use strict";
-
 const TYPE = constants.type.clef;
 
 function Clef ({value="treble", measure}) {
@@ -27,8 +25,6 @@ Clef.prototype.render = function (position) {
 
 	const symbol = engraver.drawClef(this.value, margin);
 
-	// this.group.removeChildren();
-
 	group.addChild(symbol.place(position));
 
 	// common.debugGroupEvents(this.group);
@@ -36,16 +32,8 @@ Clef.prototype.render = function (position) {
 	return group;
 }
 
-// Clef.prototype.setPosition = function (position) {
-// 	this.group.setPosition(position);
-// }
-//
 // Clef.prototype.getWidth = function () {
 // 	return this.symbol.definition.bounds.width;
-// }
-
-// Clef.prototype.serialize = function () {
-// 	return this.context;
 // }
 
 export default Clef;

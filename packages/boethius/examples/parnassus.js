@@ -18,9 +18,9 @@ function run () {
 				bottom = ["voice", {value: 1}, bottomPhrase];
 
 			var layout = scored.layout(["score", {measures: topVoice.length}, [
-				["staff", {timeSig: "4/4", key: "C", measures: topVoice.length, lineLength: 750}],
-				["line", {voices: [0]}, [["clef", {value: "treble"}]]],
-				["line", {voices: [1]}, [["clef", {value: "bass"}]]]
+				["staff", {key: "C", measures: topVoice.length, lineLength: 750}],
+				["line", {timeSig: "3/4", voices: [0]}, [["clef", {value: "treble"}]]],
+				["line", {timeSig: "3/4", voices: [1]}, [["clef", {value: "bass"}]]]
 			]]);
 
 			var events = scored.createEvents([top, bottom]);

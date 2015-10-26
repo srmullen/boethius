@@ -45,8 +45,32 @@ Scored.prototype.compose = function (layout, music) {
 	return layout;
 };
 
-Scored.prototype.render = function (composition) {
-	var view = composition.render();
+/*
+ * TODO: Should probably choose between static vs instance render.
+ */
+// Scored.render = function (view, ...args) {
+// 	switch (view.type) {
+// 		case "line":
+// 			return Line.render(view, ...args);
+// 	}
+// }
+
+Scored.prototype.render = function (composition, ...args) {
+	var view;
+	// return view;
+	switch (composition.type) {
+		case constants.type.line:
+			view = Line.render(composition, ...args);
+			break;
+
+		case constants.type.staff:
+			console.log("Staff.render not implemented");
+			break;
+
+		case constants.type.score:
+			view = Score.render(composition, ...args);
+			break;
+	}
 	paper.view.update();
 	return view;
 };

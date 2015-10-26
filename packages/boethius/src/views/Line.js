@@ -51,22 +51,15 @@ function parseChildren (children, numMeasures) {
 	return measures;
 }
 
-function Line ({measures=0, voices=[]}, children=[]) {
+function Line ({measures=1, voices=[]}, children=[]) {
 
 	this.children = parseChildren(children, measures);
-
-	// this.lineLength = lineLength; // should be property of Staff.
 
 	this.voices = voices;
 
 }
 
 Line.prototype.type = TYPE;
-
-// Line.prototype.processEvents = function (events) {
-// 	// let voices = _.groupBy(events, e => e.voice);
-// 	_.each(events)
-// }
 
 /*
  * @param staves - the number of staves
@@ -77,13 +70,22 @@ Line.calculateAverageMeasureLength = function (staves, lineLength, measures) {
 	return lineLength * (staves / measures);
 }
 
+/*
+ * Static render is a self-contained render method. Handles all render method calls but provids less flexability.
+ * @param line - instance of Line.
+ * @param length - the length of the line.
+ */
+Line.render = function (line, length) {
+	let lineGroup = line.render(length),
+		measureGroups = line.renderMeasures(lineGroup);
+	return lineGroup;
+}
+
 Line.prototype.render = function (length) {
 
-	// Was this.staves. Now this.staves is the number of staves. staves is an arry of staves.
-	// let staves = this.drawStaves(this.staves);
 	const group = engraver.drawLine(length);
 	group.name = TYPE;
-	// group.strokeColor = "black";
+	group.strokeColor = "black";
 	return group;
 }
 
@@ -180,20 +182,20 @@ Line.prototype.contextAt = function (time) {
 	return {timeSig, clef: clef.value, key: key.value};
 };
 
-Line.prototype.setLength = function (length) {
-	var lineNames = ["F", "D", "B", "G", "E"],
-		p1, p2;
-	_.each(this.staves, (staff) => {
-		var lines = _.filter(staff.children, child => _.contains(lineNames, child.name));
-		for (var i = 0; i < lines.length; i++) {
-			p1 = lines[i].segments[0].point;
-			p2 = lines[i].segments[1].point;
-			p2.x = p1.x + length;
-		}
-	});
-
-	paper.view.update();
-};
+// Line.prototype.setLength = function (length) {
+// 	var lineNames = ["F", "D", "B", "G", "E"],
+// 		p1, p2;
+// 	_.each(this.staves, (staff) => {
+// 		var lines = _.filter(staff.children, child => _.contains(lineNames, child.name));
+// 		for (var i = 0; i < lines.length; i++) {
+// 			p1 = lines[i].segments[0].point;
+// 			p2 = lines[i].segments[1].point;
+// 			p2.x = p1.x + length;
+// 		}
+// 	});
+//
+// 	paper.view.update();
+// };
 
 /*
  * @param index {number} - the measure to be adjusted

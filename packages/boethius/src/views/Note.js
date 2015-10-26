@@ -35,42 +35,41 @@ Note.prototype.render = function (position) {
 	common.addEvents(this);
 
 	// If the note has already been rendered remove any children so it is ready to be rendered again.
-	this.group.removeChildren();
+	group.removeChildren();
 
 	// xPos and yPos are the center of the font item, not the noteHead. placement will take care of handling the offset for now.
 	var offset = placement.getNoteHeadOffset(position),
 		noteHead = this.noteHead = this.symbol.place(offset);
 
-	this.group.addChild(noteHead);
+	group.addChild(noteHead);
 
 	// this.drawLegerLines(barLine, lineSpacing);
 
 	if (this.note.duration.dots) {
 		let dots = engraver.drawDots(noteHead, this.note.duration.dots);
-		this.group.addChild(dots);
+		group.addChild(dots);
 	}
 
 	// if (this.context.stacato) {
 	// 	let stacato = engraver.drawStacato();
-	// 	this.group.addChild(stacato);
+	// 	group.addChild(stacato);
 	// }
 	//
 	// if (this.context.legato) {
 	// 	let legato = engraver.drawLegato();
-	// 	this.group.addChild(legato);
+	// 	group.addChild(legato);
 	// }
 
 	if (this.note.accidental()) {
 		var accidentalSymbol = engraver.drawAccidental(this.note.accidental());
 		let position = placement.getNoteHeadCenter(noteHead.bounds.center)
 								.add(-Scored.config.note.accidental.xOffset, Scored.config.note.accidental.yOffset);
-		this.group.addChild(accidentalSymbol.place(position));
+		group.addChild(accidentalSymbol.place(position));
 	}
 
 	this.drawGroupBounds();
 
-	// return this;
-	return this.group;
+	return group;
 };
 
 Note.prototype.drawLegerLines = function (centerLine, lineSpacing) {
@@ -135,11 +134,6 @@ Note.prototype.drawFlag = function (point) {
 	}
 
 	return flag;
-};
-
-Note.prototype.translate = function (vector) {
-	this.group.translate(vector);
-	return this;
 };
 
 export default Note;

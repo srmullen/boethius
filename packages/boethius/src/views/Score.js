@@ -34,6 +34,10 @@ Score.prototype.rest = function (rest) {
     line.rest(rest);
 }
 
+Score.render = function (score) {
+    return score.render();
+}
+
 Score.prototype.render = function () {
     const group = new paper.Group({
         name: TYPE
@@ -48,9 +52,6 @@ Score.prototype.render = function () {
     staves.map((staff, i) => staff.translate(0, i * 300));
 
     group.addChildren(staves);
-
-    console.log(this.staves);
-    console.log(this.lines);
 
     return group;
 }

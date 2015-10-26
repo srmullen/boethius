@@ -86,7 +86,7 @@ describe("Scored", () => {
 		it("should return a Line object", () => {
 			let line = scored.line();
 			expect(line.type).to.equal("line");
-			expect(line.children).to.be.empty;
+			expect(line.children.length).to.equal(1);
 			expect(line.voices).to.eql([]);
 
 			line = scored.line({voices: 2});
@@ -230,9 +230,9 @@ describe("Scored", () => {
 			let voice = ["voice", {value: 0}, [["note"]]];
 			describe("line with no measures", () => {
 				it("should have nothing added to it", () => {
-					let score = scored.compose(scored.layout(["line"]), scored.createEvents(voice));
-					expect(score.type).to.equal("line");
-					expect(score.children).to.be.empty;
+					let line = scored.compose(scored.layout(["line"]), scored.createEvents(voice));
+					expect(line.type).to.equal("line");
+					expect(line.children.length).to.equal(1);
 				});
 			});
 

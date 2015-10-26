@@ -6,17 +6,12 @@ import * as lineUtils from "../utils/line";
 import * as common from "../utils/common";
 import _ from "lodash";
 
-const DEFAULT_LENGTH = constants.measure.defaultLength,
-	TYPE = constants.type.measure;
+const TYPE = constants.type.measure;
 
 function Measure ({timeSig="4/4", startsAt=0}, children=[]) {
 	this.timeSig = timeSig;
 	this.startsAt = startsAt;
 	this.children = children;
-
-	// this.duration = timeUtils.getMeasureDuration(timeSig);
-	// this.eventsList = [];
-	// this.layoutList = [];
 }
 
 Measure.prototype.type = TYPE;
@@ -30,7 +25,6 @@ Measure.prototype.rest = function (rest) {
 }
 
 Measure.prototype.chord = function (chord) {
-	// this.eventsList.push(chord);
 	this.children.push(chord);
 };
 
@@ -39,7 +33,6 @@ Measure.prototype.render = function (line, leftBarline, width) {
 		name: TYPE
 	});
 
-	width = (this.lineLength < width) ? this.lineLength : width;
 	leftBarline = leftBarline || engraver.drawBarline([line]);
 	let previousBarlinePosition = leftBarline.position.x,
 		rightBarline = engraver.drawBarline([line], previousBarlinePosition + width),
