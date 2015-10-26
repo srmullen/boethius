@@ -46,17 +46,16 @@ Scored.prototype.compose = function (layout, music) {
 };
 
 Scored.prototype.render = function (composition) {
-	this.destroy();
-	this.view = composition.render();
+	var view = composition.render();
 	paper.view.update();
-	return this.view;
+	return view;
 };
 
-Scored.prototype.destroy = function () {
-	this.project.activate();
-	if (this.view) this.view.remove();
-	paper.view.update();
-};
+// Scored.prototype.destroy = function () {
+// 	this.project.activate();
+// 	if (this.view) this.view.remove();
+// 	paper.view.update();
+// };
 
 /*
  * @param music - hierarchical description of music.

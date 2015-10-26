@@ -34,6 +34,7 @@ function run () {
 	var dorianCantus = ["d4", "f4", "e4", "d4", "g4", "f4", "a4", "g4", "f4", "e4", "d4"];
 
 	renderPhrases(dorianCptU, dorianCantus).translate(50, 50);
+	renderPhrases(dorianCantus, dorianCptL).translate(50, 300);
 
 	var phrygianCantus = ["e4", "c4", "d4", "c4", "a3", "a4", "g4", "e4", "f4", "e4"];
 

@@ -157,7 +157,6 @@ Staff.prototype.renderMeasures = function (lines, lineGroups, startMeasure, numM
 	const measureLength = this.lineLength / numMeasures,
 		  measureGroups = [];
 	for (let i = startMeasure; i < startMeasure + numMeasures; i++) {
-		console.log("measure: " + i);
 		// get the measure from each line
 		let measures = _.map(lines, line => line.children[i]);
 
