@@ -18,7 +18,7 @@ function run () {
 				bottom = ["voice", {value: 1}, bottomPhrase];
 
 			var layout = scored.layout(["score", {measures: topVoice.length}, [
-				["staff", {timeSig: "4/4", key: "C", measures: 11, lineLength: 750}],
+				["staff", {timeSig: "4/4", key: "C", measures: topVoice.length, lineLength: 750}],
 				["line", {voices: [0]}, [["clef", {value: "treble"}]]],
 				["line", {voices: [1]}, [["clef", {value: "bass"}]]]
 			]]);
@@ -37,6 +37,11 @@ function run () {
 	renderPhrases(dorianCantus, dorianCptL).translate(50, 300);
 
 	var phrygianCantus = ["e4", "c4", "d4", "c4", "a3", "a4", "g4", "e4", "f4", "e4"];
+	var phrygianCptU =   ["b4", "c5", "f4", "g4", "a4", "c5", "b4", "e5", "d5", "e4"];
+	var phrygianCptL =   ["e3", "a3", "d3", "e3", "f3", "f3", "c4", "c4", "d4", "e4"];
+
+	renderPhrases(phrygianCptU, phrygianCantus).translate(50, 550);
+	renderPhrases(phrygianCantus, phrygianCptL).translate(50, 800);
 
 	// Example with two staves.
 	// var layout = scored.layout(["score", {measures: measures}, [
