@@ -53,7 +53,14 @@ function parseChildren (children, numMeasures) {
 
 function Line ({measures=1, voices=[]}, children=[]) {
 
+	const types = _.groupBy(children, child => child.type);
+
 	this.children = parseChildren(children, measures);
+
+	// collect all marking arrays into one and sort them by time
+	this.markings = _.sortByAll(_.reduce(_.omit(types, constants.type.measure), (arr, v) => {
+		return arr.concat(v);
+	}, []), "measure", (marking) => marking.beat ? marking.beat : 0); // if no beat on the marking then default to 0
 
 	this.voices = voices;
 
@@ -168,33 +175,28 @@ Line.prototype.rest = function (rest) {
  * returns the clef, time signature and accidentals at the given time.
  */
 Line.prototype.contextAt = function (time) {
-	// get the measure that contains the time
-	var measure = _.find(this.measures, (measure) => measure.context.startsAt + timeUtils.getMeasureDuration(measure) > time),
-		measureIndex = _.indexOf(this.measures, measure),
-		// get the timeSig of the measure. All measures must have a timeSig that doesn't change throughout its duration.
-		timeSig = measure.context.timeSig,
-		beat = timeUtils.getBeat(time - measure.context.startsAt, timeUtils.sigToNums(timeSig)),
-		// doesn't take into account beats, assumes children in sorted by time.
-		possibleItems = _.filter(this.children, (item) => item.context.measure <= measureIndex),
-		clef = _.max(_.filter(possibleItems, (item) => item.type === "clef"), (item) => item.context.measure),
-		key = _.max(_.filter(possibleItems, (item) => item.type === "key"), (item) => item.context.measure);
+	let measure = this.children[time.measure];
 
-	return {timeSig, clef: clef.value, key: key.value};
-};
+	if (!measure) return null;
 
-// Line.prototype.setLength = function (length) {
-// 	var lineNames = ["F", "D", "B", "G", "E"],
-// 		p1, p2;
-// 	_.each(this.staves, (staff) => {
-// 		var lines = _.filter(staff.children, child => _.contains(lineNames, child.name));
-// 		for (var i = 0; i < lines.length; i++) {
-// 			p1 = lines[i].segments[0].point;
-// 			p2 = lines[i].segments[1].point;
-// 			p2.x = p1.x + length;
-// 		}
-// 	});
+	let [beats,] = timeUtils.sigToNums(measure.timeSig);
+
+	return {clef: "treble", timeSig: "4/4", key: "C"};
+}
+
+// Line.prototype.contextAt = function (time) {
+// 	// get the measure that contains the time
+// 	var measure = _.find(this.measures, (measure) => measure.context.startsAt + timeUtils.getMeasureDuration(measure) > time),
+// 		measureIndex = _.indexOf(this.measures, measure),
+// 		// get the timeSig of the measure. All measures must have a timeSig that doesn't change throughout its duration.
+// 		timeSig = measure.context.timeSig,
+// 		beat = timeUtils.getBeat(time - measure.context.startsAt, timeUtils.sigToNums(timeSig)),
+// 		// doesn't take into account beats, assumes children in sorted by time.
+// 		possibleItems = _.filter(this.children, (item) => item.context.measure <= measureIndex),
+// 		clef = _.max(_.filter(possibleItems, (item) => item.type === "clef"), (item) => item.context.measure),
+// 		key = _.max(_.filter(possibleItems, (item) => item.type === "key"), (item) => item.context.measure);
 //
-// 	paper.view.update();
+// 	return {timeSig, clef: clef.value, key: key.value};
 // };
 
 /*

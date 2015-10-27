@@ -33,10 +33,6 @@ TimeSignature.prototype.render = function (position, cursor) {
 	return group;
 }
 
-// TimeSignature.prototype.setPosition = function (position) {
-// 	this.group.setPosition(position);
-// }
-
 // TimeSignature.prototype.getWidth = function () {
 // 	return this.symbol.definition.bounds.width;
 // }

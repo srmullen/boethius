@@ -4,9 +4,10 @@ import constants from "../constants";
 
 const TYPE = constants.type.clef;
 
-function Clef ({value="treble", measure}) {
+function Clef ({value="treble", measure, beat}) {
 	this.value = value;
 	this.measure = measure;
+	this.beat = beat;
 }
 
 Clef.prototype.type = TYPE;

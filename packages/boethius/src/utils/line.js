@@ -32,11 +32,9 @@ function getClosestLine (line) {
  * getClosestLine :: line -> (point -> measure)
  */
 function getMeasure (line) {
-	// const positions = _.map(line.measures, measure => measure.barlines[0].position);
 	const positions = _.map(line.children, measure => measure.barlines[0].position);
 	return function (point) {
 		let diffs = _.map(positions, p => point.x - p.x);
-		// return line.measures[_.indexOf(diffs, _.min(_.filter(diffs, diff => diff >= 0)))];
 		return line.children[_.indexOf(diffs, _.min(_.filter(diffs, diff => diff >= 0)))];
 	}
 }

@@ -1,7 +1,3 @@
-// let engraver = require("../engraver"),
-// 	placement = require("../utils/placement"),
-// 	_ = require("lodash"),
-// 	constants = require("../constants");
 import engraver from "../engraver";
 import * as placement from "../utils/placement";
 import _ from "lodash";
@@ -106,9 +102,10 @@ const TYPE = constants.type.key,
 		"ab": [flatSteps[7], FLAT]
 	}
 
-function Key ({value="C", measure}) {
+function Key ({value="C", measure, beat}) {
 	this.value = value;
 	this.measure = measure;
+	this.beat = beat;
 }
 
 Key.prototype.type = TYPE;
@@ -149,16 +146,8 @@ Key.prototype.render = function (position, clef) {
 	return group;
 }
 
-// Key.prototype.setPosition = function (position) {
-// 	this.group.setPosition(position);
-// }
-
 // Key.prototype.getWidth = function () {
 // 	return this.group.bounds.width;
-// }
-
-// Key.prototype.serialize = function () {
-// 	return this.context;
 // }
 
 export default Key;
