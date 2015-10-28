@@ -34,6 +34,11 @@ Score.prototype.rest = function (rest) {
     line.rest(rest);
 }
 
+Score.prototype.voice = function (voice) {
+    let line = getLineByVoice(voice.value, this.lines);
+    voice.children.map((note) => line.note(note));
+}
+
 Score.render = function (score) {
     return score.render();
 }

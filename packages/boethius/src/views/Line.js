@@ -179,25 +179,21 @@ Line.prototype.contextAt = function (time) {
 
 	if (!measure) return null;
 
-	let [beats,] = timeUtils.sigToNums(measure.timeSig);
+	// let [beats,] = timeUtils.sigToNums(measure.timeSig);
 
-	return {clef: "treble", timeSig: "4/4", key: "C"};
+	const getMarking = _.curry((time, marking) => marking.measure <= time.measure && (marking.beat || 0) <= (time.beat || 0));
+	const getMarkingAtTime = (markings, type, time) => {
+		// Reverse mutates the array. Filtering first give a new array so no need to worry about mutating markings.
+		let markingsOfType = _.filter(markings, (marking) => marking.type === type).reverse();
+		return _.find(markingsOfType, getMarking(time));
+	}
+
+	let clef = getMarkingAtTime(this.markings, constants.type.clef, time),
+		timeSig = getMarkingAtTime(this.markings, constants.type.timeSig, time),
+		key = getMarkingAtTime(this.markings, constants.type.key, time);
+
+	return {clef: clef.value, timeSig: timeSig.value, key: key.value};
 }
-
-// Line.prototype.contextAt = function (time) {
-// 	// get the measure that contains the time
-// 	var measure = _.find(this.measures, (measure) => measure.context.startsAt + timeUtils.getMeasureDuration(measure) > time),
-// 		measureIndex = _.indexOf(this.measures, measure),
-// 		// get the timeSig of the measure. All measures must have a timeSig that doesn't change throughout its duration.
-// 		timeSig = measure.context.timeSig,
-// 		beat = timeUtils.getBeat(time - measure.context.startsAt, timeUtils.sigToNums(timeSig)),
-// 		// doesn't take into account beats, assumes children in sorted by time.
-// 		possibleItems = _.filter(this.children, (item) => item.context.measure <= measureIndex),
-// 		clef = _.max(_.filter(possibleItems, (item) => item.type === "clef"), (item) => item.context.measure),
-// 		key = _.max(_.filter(possibleItems, (item) => item.type === "key"), (item) => item.context.measure);
-//
-// 	return {timeSig, clef: clef.value, key: key.value};
-// };
 
 /*
  * @param index {number} - the measure to be adjusted

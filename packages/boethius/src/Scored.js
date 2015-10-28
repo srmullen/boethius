@@ -5,6 +5,7 @@ import processor from "./Processor";
 import midi from "./midi";
 import MoveTool from "./tools/MoveTool";
 
+import Voice from "./views/Voice";
 import Note from "./views/Note";
 import Rest from "./views/Rest";
 import Staff from "./views/Staff";
@@ -45,16 +46,6 @@ Scored.prototype.compose = function (layout, music) {
 	return layout;
 };
 
-/*
- * TODO: Should probably choose between static vs instance render.
- */
-// Scored.render = function (view, ...args) {
-// 	switch (view.type) {
-// 		case "line":
-// 			return Line.render(view, ...args);
-// 	}
-// }
-
 Scored.prototype.render = function (composition, ...args) {
 	var view;
 	// return view;
@@ -74,12 +65,6 @@ Scored.prototype.render = function (composition, ...args) {
 	paper.view.update();
 	return view;
 };
-
-// Scored.prototype.destroy = function () {
-// 	this.project.activate();
-// 	if (this.view) this.view.remove();
-// 	paper.view.update();
-// };
 
 /*
  * @param music - hierarchical description of music.
@@ -111,6 +96,10 @@ Scored.prototype.key = function key (context={}) {
 
 Scored.prototype.timeSig = function timeSignature (context={}) {
 	return new TimeSignature(context);
+}
+
+Scored.prototype.voice = function voice (context={}, children=[]) {
+	return new Voice(context, children);
 }
 
 Scored.prototype.measure = function measure (context={}, children) {

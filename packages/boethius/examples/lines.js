@@ -1,12 +1,13 @@
 var line;
 function run () {
-	clefLines();
-	timeSigLines();
-	keyLines();
-	line = fourBars();
+	// clefLines();
+	// timeSigLines();
+	// keyLines();
+	// line = fourBars();
+	// createMeasures();
+	// interaction();
 
-	createMeasures();
-	interaction();
+	renderingNotesOnLine();
 }
 
 function createMeasures () {
@@ -156,4 +157,9 @@ function fourBars () {
 
 	scored.render(line, 1000).translate(20, 400);
 	return line;
+}
+
+function renderingNotesOnLine () {
+	var trebleLine = scored.line({measures: 1}, [scored.clef({measure: 0})]);
+	scored.render(trebleLine, 400).translate(50);
 }

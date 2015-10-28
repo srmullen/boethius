@@ -114,14 +114,6 @@ function Staff ({timeSig="4/4", startMeasure=0, measures, lineLength}, children=
 			lineNum++;
 		}
 	}
-
-	// // Used in more than one class. Should be moved to a prototype.
-	// this.getTotalHeight = function (views) {
-	// 	var ans =  _.reduce(views, function (x, y) {
-	// 		return x + y.height;
-	// 	}, 0);
-	// 	return ans;
-	// };
 }
 
 Staff.prototype.type = TYPE;
@@ -139,8 +131,6 @@ Staff.prototype.render = function (lines, startMeasure=0, numMeasures) {
 	let lineGroups = lines.map((child) => {
 		return child.render(this.lineLength);
 	});
-
-	// this.renderMeasures(lines, lineGroups, startMeasure, numMeasures);
 
 	group.addChildren(lineGroups);
 

@@ -5,6 +5,7 @@ let constants = {
 		score: "score",
 		staff: "staff",
 		line: "line",
+		voice: "voice",
 		measure: "measure",
 		note: "note",
 		rest: "rest",

@@ -60,8 +60,36 @@ describe("Line", () => {
 
     describe("contextAt", () => {
         it("should return an object with key, timeSig, and clef properties", () => {
-            let line = scored.line({measures: 1}, [scored.clef({value: "bass"}), scored.timeSig({value: "2/4"}), scored.key({value: "d#"})]);
+            let line = scored.line({measures: 1}, [scored.clef({value: "bass", measure: 0}),
+                                                   scored.timeSig({value: "2/4", measure: 0}),
+                                                   scored.key({value: "d#", measure: 0})]);
             expect(line.contextAt({measure: 0})).to.eql({clef: "bass", timeSig: "2/4", key: "d#"});
+        });
+
+        it("should have the most recent values for the given measure", () => {
+            let line = scored.line({measures: 4}, [scored.clef({value: "bass", measure: 0}),
+                                                   scored.timeSig({value: "2/4", measure: 0}),
+                                                   scored.key({value: "d#", measure: 0}),
+                                                   scored.clef({value: "alto", measure: 1}),
+                                                   scored.timeSig({value: "3/8", measure: 2}),
+                                                   scored.key({value: "gb", measure: 3})]);
+            expect(line.contextAt({measure: 0})).to.eql({clef: "bass", timeSig: "2/4", key: "d#"});
+            expect(line.contextAt({measure: 1})).to.eql({clef: "alto", timeSig: "2/4", key: "d#"});
+            expect(line.contextAt({measure: 2})).to.eql({clef: "alto", timeSig: "3/8", key: "d#"});
+            expect(line.contextAt({measure: 3})).to.eql({clef: "alto", timeSig: "3/8", key: "gb"});
+        });
+
+        it("should have the most recent value for the given beat", () => {
+            let line = scored.line({measures: 3}, [scored.clef({value: "bass", measure: 0}),
+                                                   scored.timeSig({value: "2/4", measure: 0}),
+                                                   scored.key({value: "d#", measure: 0}),
+                                                   scored.clef({value: "alto", measure: 0, beat: 1}),
+                                                   scored.timeSig({value: "5/8", measure: 1}),
+                                                   scored.key({value: "gb", measure: 1, beat: 3})]);
+            expect(line.contextAt({measure: 0})).to.eql({clef: "bass", timeSig: "2/4", key: "d#"});
+            expect(line.contextAt({measure: 0, beat: 1})).to.eql({clef: "alto", timeSig: "2/4", key: "d#"});
+            expect(line.contextAt({measure: 1, beat: 2})).to.eql({clef: "alto", timeSig: "5/8", key: "d#"});
+            expect(line.contextAt({measure: 1, beat: 4})).to.eql({clef: "alto", timeSig: "5/8", key: "gb"});
         });
 
         it("should return null if the given measure doesn't exist on the line", () => {

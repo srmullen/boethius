@@ -10,7 +10,7 @@ describe("Scored", () => {
 		it("should return a Note object", () => {
 			let note = scored.note();
 			expect(note.type).to.equal("note");
-			expect(note.voice).to.equal(0);
+			expect(note.voice).not.to.be.defined;
 			expect(note.value).to.equal(4);
 			expect(note.pitch).to.equal("a4");
 			expect(note.dots).to.equal(0);

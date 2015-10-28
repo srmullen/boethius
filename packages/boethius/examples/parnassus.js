@@ -3,30 +3,28 @@ function run () {
 			var val = n.duration; // replace duration with value
 			n.value = val;
 			delete n.duration;
-			return ["note", n];
+			return scored.note(n);
 		},
-		createVoice = function (notes) {
-			return palestrina.melody.phrase(
-				_.fill(new Array(notes.length), 1),
-				notes
-			).map(noteFormat);
+		createVoice = function (pitches) {
+			return pitches.map((p) => scored.note({pitch: p, value: 1}));
 		},
 		renderPhrases = function (topVoice, bottomVoice) {
 			var topPhrase = createVoice(topVoice),
 				bottomPhrase = createVoice(bottomVoice),
-				top = ["voice", {value: 0}, topPhrase],
-				bottom = ["voice", {value: 1}, bottomPhrase];
+				top = scored.voice({value: 0}, topPhrase),
+				bottom = scored.voice({value: 1}, bottomPhrase);
 
-			var layout = scored.layout(["score", {measures: topVoice.length}, [
-				["staff", {key: "C", measures: topVoice.length, lineLength: 750}],
-				["line", {timeSig: "3/4", voices: [0]}, [["clef", {value: "treble"}]]],
-				["line", {timeSig: "3/4", voices: [1]}, [["clef", {value: "bass"}]]]
-			]]);
+			var layout = scored.score({measures: topVoice.length}, [
+					scored.staff({key: "C", measures: topVoice.length, lineLength: 750}),
+					scored.line({timeSig: "3/4", voices: [0], measures: topVoice.length},
+								[scored.clef({value: "treble"}), scored.timeSig({value: "4/4"})]),
+					scored.line({timeSig: "3/4", voices: [1], measures: topVoice.length},
+								[scored.clef({value: "bass"}), scored.timeSig({value: "3/4"})])
+				]);
 
-			var events = scored.createEvents([top, bottom]);
-			var score = scored.compose(layout, events);
+			var composition = scored.compose(layout, [top, bottom]);
 
-			return scored.render(score);
+			return scored.render(composition);
 		};
 
 	var dorianCptU = ["a4", "a4", "g4", "a4", "b4", "c5", "c5", "b4", "d5", "c#5", "d5"];

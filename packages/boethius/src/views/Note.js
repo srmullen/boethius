@@ -12,12 +12,12 @@ const TYPE = constants.type.note;
  * Only items on the context will be saved back to the music json.
  * All other properties on the view will need to be calculated at runtime.
  */
-function Note ({pitch="a4", voice=0, value=4, dots=0, tuplet, time}) {
+function Note ({pitch="a4", value=4, dots=0, tuplet, time, voice}) {
 
 	this.note = teoria.note(pitch || "a4", {value: value, dots: dots});
 	this.value = value;
 	this.pitch = pitch;
-	this.voice = voice;
+	this.voice = voice; // Should this be here since a voice object has been created?
 	this.dots = dots;
 	this.tuplet = tuplet;
 	this.time = time;
