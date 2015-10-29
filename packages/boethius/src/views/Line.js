@@ -102,13 +102,18 @@ Line.prototype.render = function (length) {
 Line.prototype.renderMeasures = function (lineGroup) {
 	let measureGroups = _.reduce(this.children, (groups, measure, i, children) => {
 		// let measureLength = measure.measureLength || constants.measure.defaultLength, // + markingLength,
-		let measureLength = 75,
+		let measureLength = 100,
 			previousGroup = _.last(groups),
 			leftBarline;
 
 		leftBarline = previousGroup ? previousGroup.children.barline : null; //{position: line.b(staves[stave])};
 		let measureGroup = measure.render(lineGroup, leftBarline, measureLength);
-		Measure.addGroupEvents(measureGroup);
+
+		let childGroups = measure.renderChildren(lineGroup, measure.barlines[0]);
+
+		lineGroup.addChildren(childGroups);
+
+		// Measure.addGroupEvents(measureGroup);
 		groups.push(measureGroup);
 		lineGroup.addChild(measureGroup); // add the measure to the line
 		return groups;
@@ -133,6 +138,10 @@ Line.prototype.rest = function (rest) {
 	if (measure) {
 		measure.rest(rest);
 	}
+}
+
+Line.prototype.voice = function (voice) {
+	voice.children.map(note => this.note(note));
 }
 
 // Line.prototype.note = function (context, xPos) {

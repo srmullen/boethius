@@ -154,8 +154,11 @@ Staff.prototype.renderMeasures = function (lines, lineGroups, startMeasure, numM
 		measureGroups.push(_.map(measures, (measure, j) => {
 			let lineGroup = lineGroups[j],
 				leftBarline = _.last(measureGroups) ? _.last(measureGroups)[j].children.barline : null,
-				measureGroup = measure.render(lineGroup, leftBarline, measureLength);
+				measureGroup = measure.render(lineGroup, leftBarline, measureLength),
+				childGroups = measure.renderChildren(lineGroup, measure.barlines[0]);
+
 			lineGroup.addChild(measureGroup);
+			lineGroup.addChildren(childGroups);
 			return measureGroup;
 		}));
 	}
@@ -202,20 +205,5 @@ Staff.prototype.rest = function (rest, cursor) {
 	var line = this.getLine(rest.voice);
 	return line.rest(rest, cursor);
 };
-
-// Staff.prototype.clef = function (clef, lineCursor) {
-// 	var line = this.getLine(clef.line);
-// 	return line.clef(clef, lineCursor);
-// }
-
-// Staff.prototype.timeSig = function (timeSig, lineCursor) {
-// 	var line = this.getLine(timeSig.line);
-// 	return line.timeSig(timeSig, lineCursor);
-// }
-
-// Staff.prototype.key = function (key, lineCursor) {
-// 	var line = this.getLine(key.line);
-// 	return line.key(key, lineCursor);
-// }
 
 export default Staff;

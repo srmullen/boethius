@@ -1,3 +1,5 @@
+import _ from "lodash";
+
 import constants from "../constants";
 import {concat} from "../utils/common";
 import {calculateDuration} from "../utils/timeUtils";

@@ -40,23 +40,30 @@ Measure.prototype.render = function (line, leftBarline, width) {
 
 	group.addChildren([bounds, leftBarline, rightBarline]);
 
+	// let childGroups = this.renderChildren(line, leftBarline);
+
+	// group.addChildren(childGroups);
+
+	this.barlines = [leftBarline, rightBarline]; // FIXME: paper groups shouldn't be on boethius objects
+
+	return group;
+};
+
+Measure.prototype.renderChildren = function (line, leftBarline) {
 	let childGroups = _.map(this.children, (child) => {
 		let pos = placement.getYOffset(child, lineUtils.b(line)),
-			yPos = child.type === "note" ? placement.calculateNoteYpos(child, Scored.config.lineSpacing/2, placement.getClefBase("treble")) : 0,
+			yPos = child.type === "note" ?
+				placement.calculateNoteYpos(child, Scored.config.lineSpacing/2, placement.getClefBase("treble")) : 0,
 			childGroup = child.render(pos.add([leftBarline.position.x + 15, yPos]));
 
 		common.addEvents(childGroup);
 		return childGroup;
 	});
 
-	group.addChildren(childGroups);
-
 	placement.lineup(childGroups);
 
-	this.barlines = [leftBarline, rightBarline];
-
-	return group;
-};
+	return childGroups;
+}
 
 Measure.prototype.drawGroupBounds = function (previousBarlinePosition, barline) {
 	var rectangle = new paper.Path.Rectangle({
@@ -66,7 +73,7 @@ Measure.prototype.drawGroupBounds = function (previousBarlinePosition, barline) 
 	});
 	// rectangle.fillColor = paperUtils.randomColor(); // create a fill so the center can be clicked
 	rectangle.fillColor = "#FFF";
-	rectangle.opacity = 0.2;
+	rectangle.opacity = 0.0;
 	return rectangle;
 };
 
@@ -86,14 +93,6 @@ Measure.prototype.getEventsDuration = function () {
 	});
 };
 
-Measure.prototype.setPosition = function (position) {
-	this.group.setPosition(position);
-};
-
-Measure.prototype.translate = function (vector) {
-	this.group.translate(vector);
-};
-
 Measure.prototype.getEventsListWidth = function () {
 	var lastEvent = _.last(this.eventsList);
 
@@ -110,10 +109,6 @@ Measure.prototype.getLayoutListWidth = function () {
 	return _.reduce(this.layoutList,  (acc, item) => {
 		return acc + item.group.bounds.width;
 	}, 0);
-};
-
-Measure.canAdd = function (measure, item) {
-
 };
 
 Measure.addGroupEvents = function (group) {
