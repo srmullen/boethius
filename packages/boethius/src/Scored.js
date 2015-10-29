@@ -50,6 +50,9 @@ Scored.prototype.render = function (composition, ...args) {
 	var view;
 	// return view;
 	switch (composition.type) {
+		case constants.type.note:
+			view = Note.render(composition, ...args);
+			break;
 		case constants.type.line:
 			view = Line.render(composition, ...args);
 			break;

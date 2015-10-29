@@ -2,6 +2,8 @@ import _ from "lodash";
 
 import constants from "../constants";
 import {concat} from "../utils/common";
+import * as placement from "../utils/placement";
+import * as lineUtils from "../utils/line";
 import {calculateDuration} from "../utils/timeUtils";
 
 function Voice ({value}, children=[]) {
@@ -20,5 +22,11 @@ function Voice ({value}, children=[]) {
 }
 
 Voice.prototype.type = constants.type.voice;
+
+Voice.prototype.renderChildren = function () {
+    return this.children.map((child, i) => {
+        return child.render();
+    });
+}
 
 export default Voice;

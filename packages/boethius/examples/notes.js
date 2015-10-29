@@ -72,21 +72,20 @@ function pageTwo () {
 		note7 = scored.note({value: 4, stemDirection: "down"}),
 		note8 = scored.note({value: 4});
 
-	// renderNotes({note1: note1, note2: note2}, 100);
-	renderNote(note1, 100, 100);
-	renderNote(note2, 125, 100);
+	scored.render(note1, [100, 100]);
+	scored.render(note2, [125, 100]);
 	Scored.utils.note.slur([note1, note2]);
 
-	renderNote(note3, 175, 100);
-	renderNote(note4, 200, 100);
+	scored.render(note3, [175, 100]);
+	scored.render(note4, [200, 100]);
 	Scored.utils.note.slur([note3, note4]);
 
-	renderNote(note5, 250, 100);
-	renderNote(note6, 275, 100);
+	scored.render(note5, [250, 100]);
+	scored.render(note6, [275, 100]);
 	Scored.utils.note.slur([note5, note6]);
 
-	renderNote(note7, 325, 100);
-	renderNote(note8, 350, 100);
+	scored.render(note7, [325, 100]);
+	scored.render(note8, [350, 100]);
 	Scored.utils.note.slur([note7, note8]);
 }
 
@@ -96,10 +95,10 @@ function beamedEigthsUp () {
 		n3 = scored.note({value: 8}),
 		n4 = scored.note({value: 8});
 
-	n1.render([50, 200]);
-	n2.render([75, 200]);
-	n3.render([100, 225]);
-	n4.render([125, 180]);
+	n1.render().translate([50, 200]);
+	n2.render().translate([75, 200]);
+	n3.render().translate([100, 225])
+	n4.render().translate([125, 180]);
 
 	Scored.utils.note.beam([n1, n2, n3, n4], new paper.Point(150, 150), new paper.Point(100, -15));
 }
@@ -124,11 +123,11 @@ function simpleBeam (type, yPos) {
 		n3 = scored.note({value: type, stemDirection: "down"}),
 		n4 = scored.note({value: type});
 
-	n1.render([550, yPos]);
-	n2.render([575, yPos]);
+	n1.render().translate([550, yPos]);
+	n2.render().translate([575, yPos]);
 
-	n3.render([625, yPos - 25]);
-	n4.render([650, yPos - 25]);
+	n3.render().translate([625, yPos - 25]);
+	n4.render().translate([650, yPos - 25]);
 
 	Scored.utils.note.beam([n1, n2], null, new paper.Point(100, 15));
 	Scored.utils.note.beam([n3, n4]);
@@ -155,22 +154,22 @@ function testBeaming (d1, d2, yPos, stemDirection) {
 		n13 = scored.note({value: d1});
 
 
-	n1.render([100, yPos]);
-	n2.render([125, yPos]);
-	n3.render([150, yPos]);
-	n4.render([175, yPos]);
+	n1.render().translate([100, yPos]);
+	n2.render().translate([125, yPos]);
+	n3.render().translate([150, yPos]);
+	n4.render().translate([175, yPos]);
 
-	n5.render([225, yPos]);
-	n6.render([250, yPos]);
-	n7.render([275, yPos]);
-	n8.render([300, yPos]);
-	n9.render([325, yPos]);
+	n5.render().translate([225, yPos]);
+	n6.render().translate([250, yPos]);
+	n7.render().translate([275, yPos]);
+	n8.render().translate([300, yPos]);
+	n9.render().translate([325, yPos]);
 
-	n10.render([375, yPos]);
-	n11.render([400, yPos]);
+	n10.render().translate([375, yPos]);
+	n11.render().translate([400, yPos]);
 
-	n12.render([450, yPos]);
-	n13.render([475, yPos]);
+	n12.render().translate([450, yPos]);
+	n13.render().translate([475, yPos]);
 
 	Scored.utils.note.beam([n1, n2, n3, n4]);
 	Scored.utils.note.beam([n5, n6, n7, n8, n9], null, new paper.Point(100, -15));
@@ -179,13 +178,7 @@ function testBeaming (d1, d2, yPos, stemDirection) {
 }
 
 function renderNote (note, xPos, yPos) {
-	note.render([xPos, yPos]);
-	if (note.note.duration.value >= 2) {
-		stemDirection = Scored.utils.note.getStemDirection(note);
-		stemPoint = Scored.utils.note.defaultStemPoint(note, Scored.utils.note.getStemLength(note), stemDirection);
-		note.drawStem(stemPoint, stemDirection);
-		note.drawFlag();
-	}
+	scored.render(note, [xPos, yPos]);
 }
 
 function renderNotes (notes, yPos) {
@@ -197,7 +190,8 @@ function renderNotes (notes, yPos) {
 		}
 	} else {
 		for (key in notes) {
-			renderNote(notes[key], xPos, yPos);
+			// renderNote(notes[key], xPos, yPos);
+			scored.render(notes[key], [xPos, yPos]);
 			xPos = xPos + 50;
 		}
 	}

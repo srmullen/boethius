@@ -14,8 +14,8 @@ function Rest ({voice=0, value=4, dots=0, tuplet, time}) {
 
 Rest.prototype.type = TYPE;
 
-Rest.prototype.render = function (position) {
-	this.group = new paper.Group({
+Rest.prototype.render = function () {
+	const group = this.group = new paper.Group({
 		name: TYPE
 	});
 
@@ -24,29 +24,23 @@ Rest.prototype.render = function (position) {
 	// this.symbol = engraver.drawRest(this.context.type);
 	this.symbol = engraver.drawRest(this.value);
 
-	this.group.removeChildren();
+	group.removeChildren();
 
-	this.group.addChild(this.symbol.place(position));
+	group.addChild(this.symbol.place());
 
-	this.drawGroupBounds();
+	this.drawGroupBounds(group);
+
+	return group;
 };
 
-Rest.prototype.drawGroupBounds = function () {
-	var rectangle = new paper.Rectangle(this.group.bounds);
+Rest.prototype.drawGroupBounds = function (group) {
+	var rectangle = new paper.Rectangle(group.bounds);
 
 	rectangle = new paper.Path.Rectangle(rectangle);
 	rectangle.name = "bounds";
 	// rectangle.fillColor = "blue"; // create a fill so the center can be clicked
 	// rectangle.opacity = 0.2;
-	this.group.insertChild(0, rectangle);
-};
-
-Rest.prototype.setPosition = function (position) {
-	this.group.setPosition(position);
-};
-
-Rest.prototype.translate = function (vector) {
-	this.group.translate(vector);
+	group.insertChild(0, rectangle);
 };
 
 export default Rest;

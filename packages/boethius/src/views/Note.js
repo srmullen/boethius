@@ -25,7 +25,18 @@ function Note ({pitch="a4", value=4, dots=0, tuplet, time, voice}) {
 
 Note.prototype.type = TYPE;
 
-Note.prototype.render = function (position) {
+Note.render = function (note, position) {
+	let group = note.render().translate(position);
+	if (note.note.duration.value >= 2) {
+		let stemDirection = noteUtils.getStemDirection(note),
+			stemPoint = noteUtils.defaultStemPoint(note, Scored.utils.note.getStemLength(note), stemDirection);
+		note.drawStem(stemPoint, stemDirection);
+		note.drawFlag();
+	}
+	return group;
+}
+
+Note.prototype.render = function () {
 	const group = this.group = new paper.Group({
 		name: TYPE
 	});
@@ -38,7 +49,7 @@ Note.prototype.render = function (position) {
 	group.removeChildren();
 
 	// xPos and yPos are the center of the font item, not the noteHead. placement will take care of handling the offset for now.
-	var offset = placement.getNoteHeadOffset(position),
+	var offset = placement.getNoteHeadOffset([0, 0]),
 		noteHead = this.noteHead = this.symbol.place(offset);
 
 	group.addChild(noteHead);

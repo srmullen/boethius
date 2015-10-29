@@ -40,10 +40,6 @@ Measure.prototype.render = function (line, leftBarline, width) {
 
 	group.addChildren([bounds, leftBarline, rightBarline]);
 
-	// let childGroups = this.renderChildren(line, leftBarline);
-
-	// group.addChildren(childGroups);
-
 	this.barlines = [leftBarline, rightBarline]; // FIXME: paper groups shouldn't be on boethius objects
 
 	return group;

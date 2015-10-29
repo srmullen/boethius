@@ -162,7 +162,8 @@ function fourBars () {
 function renderingNotesOnLine () {
 	var trebleLine = scored.line({measures: 2}, [scored.clef({measure: 0}), scored.clef({value: "bass", measure: 1})]);
 	var voice = scored.voice({}, [scored.note({pitch: "c4", value: 2}), scored.note({pitch: "d4", value: 2}),
-								  scored.note({pitch: "c4", value: 2}), scored.note({pitch: "d4", value: 2})]);
-	var composition = scored.compose(trebleLine, [voice]);
-	scored.render(composition, 400).translate(50);
+								  scored.note({pitch: "c4", value: 2}), scored.note({pitch: "d4", value: 4}), scored.rest({value: 4})]);
+	// var composition = scored.compose(trebleLine, [voice]);
+
+	scored.render(trebleLine, 400, [voice]).translate(50);
 }

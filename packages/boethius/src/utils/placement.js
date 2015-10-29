@@ -133,6 +133,13 @@ function getYOffset (item, position) {
 	return position.add(0, offsetFn(item));
 }
 
+// The most common shortest duration is determined as follows: in every measure, the shortest duration is determined.
+// The most common shortest duration is taken as the basis for the spacing, with the stipulation that this shortest
+// duration should always be equal to or shorter than an 8th note.
+function commonShortestDuration (notes) {
+
+}
+
 export {
 	calculateNoteYpos,
 	calculateAccidentalYpos,
@@ -141,5 +148,6 @@ export {
 	getClefBase,
 	getLineNames,
 	lineup,
-	getYOffset
+	getYOffset,
+	commonShortestDuration
 }

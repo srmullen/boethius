@@ -82,9 +82,13 @@ Line.calculateAverageMeasureLength = function (staves, lineLength, measures) {
  * @param line - instance of Line.
  * @param length - the length of the line.
  */
-Line.render = function (line, length) {
+Line.render = function (line, length, voices) {
 	let lineGroup = line.render(length),
-		measureGroups = line.renderMeasures(lineGroup);
+		// measureGroups = line.renderMeasures(lineGroup, length);
+		voiceGroups = line.renderVoices(voices);
+
+	_.each(voiceGroups, voiceItemGroup => lineGroup.addChildren(voiceItemGroup));
+
 	return lineGroup;
 }
 
@@ -96,13 +100,25 @@ Line.prototype.render = function (length) {
 	return group;
 }
 
+Line.prototype.renderVoices = function (voices) {
+	const noteHeadWidth = Scored.config.note.head.width;
+	let voiceGroups = [];
+	_.each(voices, (voice) => {
+		let childGroups = voice.renderChildren();
+		voiceGroups.push(childGroups);
+		childGroups.map((group, i) => group.translate([noteHeadWidth * i, 0]));
+	});
+
+	return voiceGroups;
+}
+
 /*
  * @param lineGroup - the group returned by line.render
  */
-Line.prototype.renderMeasures = function (lineGroup) {
+Line.prototype.renderMeasures = function (lineGroup, lineLength) {
 	let measureGroups = _.reduce(this.children, (groups, measure, i, children) => {
 		// let measureLength = measure.measureLength || constants.measure.defaultLength, // + markingLength,
-		let measureLength = 100,
+		let measureLength = Line.calculateAverageMeasureLength(1, lineLength, this.children.length),
 			previousGroup = _.last(groups),
 			leftBarline;
 
