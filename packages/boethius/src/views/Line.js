@@ -5,7 +5,7 @@ import * as timeUtils from "../utils/timeUtils";
 import * as placement from "../utils/placement";
 import * as common from "../utils/common";
 import noteUtils from "../utils/note";
-import line from "../utils/line";
+import * as lineUtils from "../utils/line";
 import Note from "../views/Note";
 import Rest from "../views/Rest";
 import measureUtils from "../utils/measure";
@@ -87,6 +87,20 @@ Line.render = function (line, length, voices) {
 		// measureGroups = line.renderMeasures(lineGroup, length);
 		voiceGroups = line.renderVoices(voices);
 
+	// position voice children
+	const noteHeadWidth = Scored.config.note.head.width,
+		b = lineUtils.b(lineGroup);
+
+	// This would be easier with a clojure-like map function. map : (fn -> ...items) -> ...collections -> collection
+	// That would eliminate the need for i and j variables
+	_.each(voiceGroups, (voiceGroup, i) => voiceGroup.map((group, j) => {
+		let pos = placement.getYOffset(group, b),
+			item = voices[i].children[j],
+			yPos = item.type === "note" ?
+				placement.calculateNoteYpos(item, Scored.config.lineSpacing/2, placement.getClefBase("treble")) : 0;
+		group.translate(pos.add([noteHeadWidth * j, yPos]));
+	}));
+
 	_.each(voiceGroups, voiceItemGroup => lineGroup.addChildren(voiceItemGroup));
 
 	return lineGroup;
@@ -101,12 +115,10 @@ Line.prototype.render = function (length) {
 }
 
 Line.prototype.renderVoices = function (voices) {
-	const noteHeadWidth = Scored.config.note.head.width;
 	let voiceGroups = [];
 	_.each(voices, (voice) => {
 		let childGroups = voice.renderChildren();
 		voiceGroups.push(childGroups);
-		childGroups.map((group, i) => group.translate([noteHeadWidth * i, 0]));
 	});
 
 	return voiceGroups;
