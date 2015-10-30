@@ -208,15 +208,15 @@ function drawRests () {
 		r8 = scored.rest({value: 128}),
 		r9 = scored.rest({value: 256});
 
-	r1.render([100, 200]);
-	r2.render([125, 200]);
-	r3.render([150, 200]);
-	r4.render([175, 200]);
-	r5.render([200, 200]);
-	r6.render([225, 200]);
-	r7.render([250, 200]);
-	r8.render([275, 200]);
-	r9.render([300, 200]);
+	r1.render().translate([100, 200]);
+	r2.render().translate([125, 200]);
+	r3.render().translate([150, 200]);
+	r4.render().translate([175, 200]);
+	r5.render().translate([200, 200]);
+	r6.render().translate([225, 200]);
+	r7.render().translate([250, 200]);
+	r8.render().translate([275, 200]);
+	r9.render().translate([300, 200]);
 }
 
 function createClefs () {
