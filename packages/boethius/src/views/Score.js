@@ -3,6 +3,7 @@ import _ from "lodash";
 import Line from "./Line";
 import Staff from "./Staff";
 import constants from "../constants";
+import Measure from "./Measure";
 
 const TYPE = constants.type.score;
 
@@ -10,7 +11,7 @@ const TYPE = constants.type.score;
  * Class for managing Staves and Lines.
  * Meta data such as title/composer could also be attached here.
  */
-function Score (context={}, children=[]) {
+function Score ({measures=1}, children=[]) {
     /*
      * A score should have both staves and lines.
      * A line represents all measures from 0 to the end of the score. It is one-dimentional.
@@ -18,25 +19,27 @@ function Score (context={}, children=[]) {
      */
     const types = _.groupBy(children, child => child.type);
 
+    this.measures = Measure.createMeasures(measures);
     this.lines = types.line || [];
     this.staves = types.staff || [];
+    _.each(this.lines, line => line.children = this.measures);
 }
 
 Score.prototype.type = TYPE;
 
 Score.prototype.note = function (note) {
     let line = getLineByVoice(note.voice, this.lines);
-    line.note(note);
+    line.note(note, this.measures);
 }
 
 Score.prototype.rest = function (rest) {
     let line = getLineByVoice(rest.voice, this.lines);
-    line.rest(rest);
+    line.rest(rest, this.measures);
 }
 
 Score.prototype.voice = function (voice) {
     let line = getLineByVoice(voice.value, this.lines);
-    voice.children.map((note) => line.note(note));
+    voice.children.map((note) => line.note(note, this.measures));
 }
 
 Score.render = function (score) {
@@ -44,7 +47,7 @@ Score.render = function (score) {
 }
 
 Score.prototype.render = function () {
-    const group = new paper.Group({
+    const group = this.group = new paper.Group({
         name: TYPE
     });
 

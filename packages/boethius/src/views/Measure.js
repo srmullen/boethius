@@ -29,7 +29,7 @@ Measure.prototype.chord = function (chord) {
 };
 
 Measure.prototype.render = function (line, leftBarline, width) {
-	const group = new paper.Group({
+	const group = this.group = new paper.Group({
 		name: TYPE
 	});
 
@@ -40,7 +40,7 @@ Measure.prototype.render = function (line, leftBarline, width) {
 
 	group.addChildren([bounds, leftBarline, rightBarline]);
 
-	this.barlines = [leftBarline, rightBarline]; // FIXME: paper groups shouldn't be on boethius objects
+	this.barlines = [leftBarline, rightBarline];
 
 	return group;
 };
@@ -106,6 +106,68 @@ Measure.prototype.getLayoutListWidth = function () {
 		return acc + item.group.bounds.width;
 	}, 0);
 };
+
+// originally in Line
+/*
+ * @param numMeasures - the number of measures to create.
+ * @param children - Measures or Markings
+ */
+Measure.createMeasures = function (numMeasures, children) {
+	let measures = new Array(numMeasures);
+
+	// get the Measures from children and add them to the measures array
+	let [explicitMeasures, markings] = _.partition(_.filter(children, c => !!c), (child) => child.type === constants.type.measure),
+		// measureMarkings = _.groupBy(markings, marking => marking.context.measure || 0);
+		measureMarkings = _.groupBy(markings, marking => marking.measure || 0);
+
+	{ // Put each measure in the right position in the measures array.
+	  // If a measure does not have an index property put it in the next available location.
+		let cur = 0;
+		_.each(explicitMeasures, (measure) => {
+			if (_.isNumber(measure.index)) {
+				measures[measure.index] = measure;
+				cur = measure.index + 1;
+			} else {
+				measures[cur] = measure;
+				cur++;
+			}
+		});
+	}
+
+	_.each(measures, (measure, i) => {
+		var previousMeasure = measures[i-1],
+			startsAt = previousMeasure ? previousMeasure.startsAt + timeUtils.getMeasureDuration(previousMeasure) : 0;
+
+		if (!measure) {
+			measure = new Measure(_.extend({}, {startsAt: startsAt}), measureMarkings[i]);
+		} else {
+			measure.startsAt = startsAt;
+		}
+
+		measures[i] = measure;
+	});
+
+	return measures;
+}
+
+/*
+ * @param measures - array of measures.
+ * @param time - number representing time of event.
+ */
+Measure.getMeasureNumber = function (measures, time) {
+	return _.findIndex(measures, (measure) => {
+		let measureEndsAt = measure.startsAt + timeUtils.getMeasureDuration(measure);
+		return time >= measure.startsAt && time < measureEndsAt;
+	});
+}
+
+/*
+ * @param measures - array of measures.
+ * @param time - number representing time of event.
+ */
+Measure.getByTime = function (measures, time) {
+	return measures[Measure.getMeasureNumber(measures, time)];
+}
 
 Measure.addGroupEvents = function (group) {
 	_.extend(group, {

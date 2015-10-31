@@ -86,13 +86,13 @@ describe("Scored", () => {
 		it("should return a Line object", () => {
 			let line = scored.line();
 			expect(line.type).to.equal("line");
-			expect(line.children.length).to.equal(1);
+			expect(line.children.length).to.equal(0);
 			expect(line.voices).to.eql([]);
 
 			line = scored.line({voices: 2});
 			expect(line.voices).to.equal(2);
 		});
-		it("should set up its measures", () => {
+		xit("should no longer set up its measures. Measure.createMeasures does that.", () => {
 			let line = scored.line({measures: 4});
 			expect(line.children.length).to.equal(4);
 			expect(_.map(line.children, m => m.startsAt)).to.eql([0, 1, 2, 3]);
@@ -189,7 +189,7 @@ describe("Scored", () => {
 				let line = scored.layout(["line", {measures: 2}, [["clef"]]]);
 				expect(line).to.eql(scored.line({measures: 2}, [scored.clef()]));
 			});
-			it("should place a clef in the correct mesure", () => {
+			xit("should place a clef in the correct mesure", () => { // now the responsibillity of Measure.createMeasures
 				let line = scored.layout(["line", {"measures": 2}, [["clef"]]]);
 				expect(line.children[0].children[0]).to.eql(scored.clef());
 			});
@@ -229,10 +229,10 @@ describe("Scored", () => {
 		describe("composing layout and music", () => {
 			let voice = ["voice", {value: 0}, [["note"]]];
 			describe("line with no measures", () => {
-				it("should have nothing added to it", () => {
+				xit("should have nothing added to it", () => {
 					let line = scored.compose(scored.layout(["line"]), scored.createEvents(voice));
 					expect(line.type).to.equal("line");
-					expect(line.children.length).to.equal(1);
+					expect(line.children.length).to.equal(0);
 				});
 			});
 

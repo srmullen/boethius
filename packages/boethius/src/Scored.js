@@ -41,7 +41,7 @@ Scored.prototype.layout = function (layout) {
 Scored.prototype.compose = function (layout, music) {
 	// When layout is a Score it needs to be responsible for putting music events into the correct line.
 	// Staff is currently handling this so that functionality needs to be ported.
-	_.map(music, e => layout[e.type](e));
+	_.map(music, e => layout[e.type](e)); // FIXME: line.note now requires measures
 
 	return layout;
 };

@@ -4,58 +4,19 @@ import Measure from "./Measure";
 import * as timeUtils from "../utils/timeUtils";
 import * as placement from "../utils/placement";
 import * as common from "../utils/common";
-import noteUtils from "../utils/note";
 import * as lineUtils from "../utils/line";
 import Note from "../views/Note";
 import Rest from "../views/Rest";
-import measureUtils from "../utils/measure";
 import _ from "lodash";
 
 const TYPE = constants.type.line;
 
-function parseChildren (children, numMeasures) {
-	let measures = new Array(numMeasures);
-
-	// get the Measures from children and add them to the measures array
-	let [explicitMeasures, markings] = _.partition(_.filter(children, c => !!c), (child) => child.type === constants.type.measure),
-		// measureMarkings = _.groupBy(markings, marking => marking.context.measure || 0);
-		measureMarkings = _.groupBy(markings, marking => marking.measure || 0);
-
-	{ // Put each measure in the right position in the measures array.
-	  // If a measure does not have an index property put it in the next available location.
-		let cur = 0;
-		_.each(explicitMeasures, (measure) => {
-			if (_.isNumber(measure.index)) {
-				measures[measure.index] = measure;
-				cur = measure.index + 1;
-			} else {
-				measures[cur] = measure;
-				cur++;
-			}
-		});
-	}
-
-	_.each(measures, (measure, i) => {
-		var previousMeasure = measures[i-1],
-			startsAt = previousMeasure ? previousMeasure.startsAt + timeUtils.getMeasureDuration(previousMeasure) : 0;
-
-		if (!measure) {
-			measure = new Measure(_.extend({}, {startsAt: startsAt}), measureMarkings[i]);
-		} else {
-			measure.startsAt = startsAt;
-		}
-
-		measures[i] = measure;
-	});
-
-	return measures;
-}
-
-function Line ({measures=1, voices=[]}, children=[]) {
+function Line ({voices=[]}, children=[]) {
 
 	const types = _.groupBy(children, child => child.type);
 
-	this.children = parseChildren(children, measures);
+	// this.children = parseChildren(children, measures);
+	this.children = children;
 
 	// collect all marking arrays into one and sort them by time
 	this.markings = _.sortByAll(_.reduce(_.omit(types, constants.type.measure), (arr, v) => {
@@ -82,23 +43,24 @@ Line.calculateAverageMeasureLength = function (staves, lineLength, measures) {
  * @param line - instance of Line.
  * @param length - the length of the line.
  */
-Line.render = function (line, length, voices) {
-	let lineGroup = line.render(length),
-		// measureGroups = line.renderMeasures(lineGroup, length);
-		voiceGroups = line.renderVoices(voices);
+Line.render = function (line, length, voices, numMeasures=1) {
+	let lineGroup = line.render(length), // draw the line
+		voiceGroups = line.renderVoices(voices),
+		// create the measures
+		measures = Measure.createMeasures(numMeasures, this.children),
+		measureGroups = line.renderMeasures(measures, lineGroup, length);
 
 	// position voice children
 	const noteHeadWidth = Scored.config.note.head.width,
 		b = lineUtils.b(lineGroup);
 
-	// This would be easier with a clojure-like map function. map : (fn -> ...items) -> ...collections -> collection
-	// That would eliminate the need for i and j variables
-	_.each(voiceGroups, (voiceGroup, i) => voiceGroup.map((group, j) => {
-		let pos = placement.getYOffset(group, b),
-			item = voices[i].children[j],
+	_.each(voices, (voice, i) => voice.children.map((item, j) => {
+		let pos = placement.getYOffset(item.group, b),
+			measureNumber = Measure.getMeasureNumber(measures, item.time), //get the measure the item belongs to
+			context = line.contextAt({measure: measureNumber}),
 			yPos = item.type === "note" ?
-				placement.calculateNoteYpos(item, Scored.config.lineSpacing/2, placement.getClefBase("treble")) : 0;
-		group.translate(pos.add([noteHeadWidth * j, yPos]));
+				placement.calculateNoteYpos(item, Scored.config.lineSpacing/2, placement.getClefBase(context.clef)) : 0;
+		item.group.translate(pos.add([noteHeadWidth * j, yPos]));
 	}));
 
 	_.each(voiceGroups, voiceItemGroup => lineGroup.addChildren(voiceItemGroup));
@@ -107,8 +69,7 @@ Line.render = function (line, length, voices) {
 }
 
 Line.prototype.render = function (length) {
-
-	const group = engraver.drawLine(length);
+	const group = this.group = engraver.drawLine(length);
 	group.name = TYPE;
 	group.strokeColor = "black";
 	return group;
@@ -127,10 +88,10 @@ Line.prototype.renderVoices = function (voices) {
 /*
  * @param lineGroup - the group returned by line.render
  */
-Line.prototype.renderMeasures = function (lineGroup, lineLength) {
-	let measureGroups = _.reduce(this.children, (groups, measure, i, children) => {
+Line.prototype.renderMeasures = function (measures, lineGroup, lineLength) {
+	let measureGroups = _.reduce(measures, (groups, measure, i, children) => {
 		// let measureLength = measure.measureLength || constants.measure.defaultLength, // + markingLength,
-		let measureLength = Line.calculateAverageMeasureLength(1, lineLength, this.children.length),
+		let measureLength = Line.calculateAverageMeasureLength(1, lineLength, measures.length),
 			previousGroup = _.last(groups),
 			leftBarline;
 
@@ -148,21 +109,15 @@ Line.prototype.renderMeasures = function (lineGroup, lineLength) {
 	}, []);
 }
 
-Line.prototype.note = function (note) {
-	let measure = _.find(this.children, (measure) => {
-		let measureEndsAt = measure.startsAt + timeUtils.getMeasureDuration(measure);
-		return note.time >= measure.startsAt && note.time < measureEndsAt;
-	});
+Line.prototype.note = function (note, measures) {
+	let measure = Measure.getByTime(measures, note.time);
 	if (measure) {
 		measure.note(note);
 	}
 }
 
-Line.prototype.rest = function (rest) {
-	let measure = _.find(this.children, (measure) => {
-		let measureEndsAt = measure.startsAt + timeUtils.getMeasureDuration(measure);
-		return note.time >= measure.startsAt && note.time < measureEndsAt;
-	});
+Line.prototype.rest = function (rest, measures) {
+	let measure = Measure.getByTime(measures, rest.time);
 	if (measure) {
 		measure.rest(rest);
 	}
@@ -171,42 +126,6 @@ Line.prototype.rest = function (rest) {
 Line.prototype.voice = function (voice) {
 	voice.children.map(note => this.note(note));
 }
-
-// Line.prototype.note = function (context, xPos) {
-// 	var noteView = new Note(context),
-// 		measure = this.at().measure,
-// 		yPos = placement.calculateNoteYpos(noteView, Scored.config.lineSpacing/2, placement.getClefBase(this.context.clef)),
-// 		position = this.measures[measure].barlines[0].position.add(xPos, yPos);
-//
-// 	this.addToMeasure(measure, noteView);
-// 	noteView.render(position);
-//
-// 	if (noteView.note.duration.value > 1) {
-// 		let stemPoint = noteUtils.defaultStemPoint(noteView, noteUtils.getStemLength(noteView), "up");
-// 		noteView.drawStem(stemPoint, "up");
-// 	}
-//
-// 	this.incrementTime(noteView.context.duration, this.context.timeSig);
-//
-// 	this.group.addChild(noteView.group);
-//
-// 	return noteView;
-// };
-//
-// Line.prototype.rest = function (context, cursor) {
-// 	var rest = new Rest(context),
-// 		measure = this.at().measure;
-//
-// 	this.addToMeasure(measure, rest);
-// 	var position = this.measures[measure].barlines[0].position.add(cursor, 0);
-// 	rest.render(position);
-//
-// 	this.incrementTime(rest.context.duration, this.context.timeSig);
-//
-// 	this.group.addChild(rest.group);
-//
-// 	return rest;
-// };
 
 /*
  * returns the clef, time signature and accidentals at the given time.
@@ -225,9 +144,9 @@ Line.prototype.contextAt = function (time) {
 		return _.find(markingsOfType, getMarking(time));
 	}
 
-	let clef = getMarkingAtTime(this.markings, constants.type.clef, time),
-		timeSig = getMarkingAtTime(this.markings, constants.type.timeSig, time),
-		key = getMarkingAtTime(this.markings, constants.type.key, time);
+	let clef = getMarkingAtTime(this.markings, constants.type.clef, time) || {},
+		timeSig = getMarkingAtTime(this.markings, constants.type.timeSig, time) || {},
+		key = getMarkingAtTime(this.markings, constants.type.key, time) || {};
 
 	return {clef: clef.value, timeSig: timeSig.value, key: key.value};
 }
