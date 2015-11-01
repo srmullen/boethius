@@ -47,20 +47,44 @@ Line.render = function (line, length, voices, numMeasures=1) {
 	let lineGroup = line.render(length), // draw the line
 		voiceGroups = line.renderVoices(voices),
 		// create the measures
-		measures = Measure.createMeasures(numMeasures, this.children),
-		measureGroups = line.renderMeasures(measures, lineGroup, length);
+		measures = Measure.createMeasures(numMeasures, this.children);
 
 	// position voice children
 	const noteHeadWidth = Scored.config.note.head.width,
 		b = lineUtils.b(lineGroup);
 
+	// render markings
+	// _.each(line.markings, (marking) => {
+	// 	lineGroup.addChild(marking.render(b));
+	// });
+
+
+	let voiceToMeasureLengths = [];
+	_.each(voices, (voice) => {
+		// group voice elements by measure.
+		let itemsInMeasure = _.groupBy(voice.children, (child) => Measure.getMeasureNumber(measures, child.time));
+		// sum the width of elements in each measure.
+		let measureLengths = _.map(itemsInMeasure, (v, i) => {
+			let width = _.reduce(v, (acc, item) => {
+				return acc + item.group.bounds.width;
+			}, 0);
+		});
+		voiceToMeasureLengths.push(measureLengths);
+	});
+
+	// render measures.
+	let measureGroups = line.renderMeasures(measures, lineGroup, length);
+
+	let cursor = 15;
 	_.each(voices, (voice, i) => voice.children.map((item, j) => {
 		let pos = placement.getYOffset(item.group, b),
 			measureNumber = Measure.getMeasureNumber(measures, item.time), //get the measure the item belongs to
 			context = line.contextAt({measure: measureNumber}),
+			leftBarline = measures[measureNumber].barlines[0],
 			yPos = item.type === "note" ?
 				placement.calculateNoteYpos(item, Scored.config.lineSpacing/2, placement.getClefBase(context.clef)) : 0;
-		item.group.translate(pos.add([noteHeadWidth * j, yPos]));
+		item.group.translate(pos.add(cursor, yPos));
+		cursor += (noteHeadWidth * placement.getStaffSpace(0.5, item));
 	}));
 
 	_.each(voiceGroups, voiceItemGroup => lineGroup.addChildren(voiceItemGroup));
@@ -97,10 +121,6 @@ Line.prototype.renderMeasures = function (measures, lineGroup, lineLength) {
 
 		leftBarline = previousGroup ? previousGroup.children.barline : null; //{position: line.b(staves[stave])};
 		let measureGroup = measure.render(lineGroup, leftBarline, measureLength);
-
-		let childGroups = measure.renderChildren(lineGroup, measure.barlines[0]);
-
-		lineGroup.addChildren(childGroups);
 
 		// Measure.addGroupEvents(measureGroup);
 		groups.push(measureGroup);

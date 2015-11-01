@@ -1,3 +1,5 @@
+import * as timeUtils from "./timeUtils";
+
 let noteNameToDegreeObj = {
 		"c": 0,
 		"d": 1,
@@ -140,6 +142,20 @@ function commonShortestDuration (notes) {
 
 }
 
+/*
+ * returns the amount to multiply note head width by. Doubles
+ * @param shortestDuration - Number representing
+ */
+function getStaffSpace (shortestDuration, item) {
+	const duration = timeUtils.calculateDuration(item);
+	console.log(duration);
+	if (duration < shortestDuration) {
+		return 1;
+	} else {
+		return 1 + Math.log2(duration / shortestDuration);
+	}
+}
+
 export {
 	calculateNoteYpos,
 	calculateAccidentalYpos,
@@ -149,5 +165,6 @@ export {
 	getLineNames,
 	lineup,
 	getYOffset,
-	commonShortestDuration
+	commonShortestDuration,
+	getStaffSpace
 }
