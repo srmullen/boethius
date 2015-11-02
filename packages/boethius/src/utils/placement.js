@@ -148,7 +148,6 @@ function commonShortestDuration (notes) {
  */
 function getStaffSpace (shortestDuration, item) {
 	const duration = timeUtils.calculateDuration(item);
-	console.log(duration);
 	if (duration < shortestDuration) {
 		return 1;
 	} else {

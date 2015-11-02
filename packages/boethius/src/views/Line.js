@@ -44,21 +44,57 @@ Line.calculateAverageMeasureLength = function (staves, lineLength, measures) {
  * @param length - the length of the line.
  */
 Line.render = function (line, length, voices, numMeasures=1) {
+	// Steps for rendering a Line.
+	// 1. Find the minimum width of each measure given the items that need to be renderred in it.
+	// 2. Warn if there's not enough room on the line.
+	// 3. Stretch the measures to accomodate the line length.
+	// 4. Place items with the same stretch factor.
+
 	let lineGroup = line.render(length), // draw the line
 		voiceGroups = line.renderVoices(voices),
 		// create the measures
-		measures = Measure.createMeasures(numMeasures, this.children);
+		measures = Measure.createMeasures(numMeasures, line.children);
 
 	// position voice children
 	const noteHeadWidth = Scored.config.note.head.width,
-		b = lineUtils.b(lineGroup);
+		b = lineUtils.b(lineGroup),
+		shortestDuration = 0.125; // need function to calculate this.
 
 	// render markings
 	// _.each(line.markings, (marking) => {
 	// 	lineGroup.addChild(marking.render(b));
 	// });
 
+	// calculating measure lengths
+	calculateAndSetMeasureLengths(measures, voices, noteHeadWidth, shortestDuration);
 
+	// render measures.
+	let measureGroups = line.renderMeasures(measures, lineGroup, length);
+
+	let cursor = noteHeadWidth,
+		previousMeasureNumber = 0;
+	_.each(voices, (voice, i) => voice.children.map((item, j) => {
+		let pos = placement.getYOffset(item.group, b),
+			measureNumber = Measure.getMeasureNumber(measures, item.time), //get the measure the item belongs to
+			context = line.contextAt(measures, {measure: measureNumber});
+		let leftBarline = measures[measureNumber].barlines[0],
+			yPos = item.type === "note" ?
+				placement.calculateNoteYpos(item, Scored.config.lineSpacing/2, placement.getClefBase(context.clef)) : 0;
+
+		if (measureNumber !== previousMeasureNumber) {
+			cursor = leftBarline.position.x + noteHeadWidth;
+		}
+		item.group.translate(pos.add(cursor, yPos));
+		cursor += item.group.bounds.width + (noteHeadWidth * placement.getStaffSpace(shortestDuration, item));
+		previousMeasureNumber = measureNumber;
+	}));
+
+	_.each(voiceGroups, voiceItemGroup => lineGroup.addChildren(voiceItemGroup));
+
+	return lineGroup;
+}
+
+function calculateAndSetMeasureLengths (measures, voices, noteHeadWidth, shortestDuration) {
 	let voiceToMeasureLengths = [];
 	_.each(voices, (voice) => {
 		// group voice elements by measure.
@@ -66,30 +102,19 @@ Line.render = function (line, length, voices, numMeasures=1) {
 		// sum the width of elements in each measure.
 		let measureLengths = _.map(itemsInMeasure, (v, i) => {
 			let width = _.reduce(v, (acc, item) => {
-				return acc + item.group.bounds.width;
+				return acc + item.group.bounds.width + (noteHeadWidth * placement.getStaffSpace(shortestDuration, item));
+				// return acc + (noteHeadWidth * placement.getStaffSpace(shortestDuration, item));
 			}, 0);
+			return width ;
 		});
 		voiceToMeasureLengths.push(measureLengths);
 	});
 
-	// render measures.
-	let measureGroups = line.renderMeasures(measures, lineGroup, length);
+	console.log(voiceToMeasureLengths);
 
-	let cursor = 15;
-	_.each(voices, (voice, i) => voice.children.map((item, j) => {
-		let pos = placement.getYOffset(item.group, b),
-			measureNumber = Measure.getMeasureNumber(measures, item.time), //get the measure the item belongs to
-			context = line.contextAt({measure: measureNumber}),
-			leftBarline = measures[measureNumber].barlines[0],
-			yPos = item.type === "note" ?
-				placement.calculateNoteYpos(item, Scored.config.lineSpacing/2, placement.getClefBase(context.clef)) : 0;
-		item.group.translate(pos.add(cursor, yPos));
-		cursor += (noteHeadWidth * placement.getStaffSpace(0.5, item));
-	}));
-
-	_.each(voiceGroups, voiceItemGroup => lineGroup.addChildren(voiceItemGroup));
-
-	return lineGroup;
+	for (let i = 0; i < measures.length; i++) {
+		measures[i].length = _.max(voiceToMeasureLengths.map(lengths => lengths[i]));
+	}
 }
 
 Line.prototype.render = function (length) {
@@ -113,16 +138,17 @@ Line.prototype.renderVoices = function (voices) {
  * @param lineGroup - the group returned by line.render
  */
 Line.prototype.renderMeasures = function (measures, lineGroup, lineLength) {
+	let averageMeasureLength = Line.calculateAverageMeasureLength(1, lineLength, measures.length);
+
 	let measureGroups = _.reduce(measures, (groups, measure, i, children) => {
 		// let measureLength = measure.measureLength || constants.measure.defaultLength, // + markingLength,
-		let measureLength = Line.calculateAverageMeasureLength(1, lineLength, measures.length),
+		let measureLength = measure.length || averageMeasureLength,
 			previousGroup = _.last(groups),
 			leftBarline;
 
-		leftBarline = previousGroup ? previousGroup.children.barline : null; //{position: line.b(staves[stave])};
+		leftBarline = previousGroup ? previousGroup.children.barline : null;
 		let measureGroup = measure.render(lineGroup, leftBarline, measureLength);
 
-		// Measure.addGroupEvents(measureGroup);
 		groups.push(measureGroup);
 		lineGroup.addChild(measureGroup); // add the measure to the line
 		return groups;
@@ -150,8 +176,8 @@ Line.prototype.voice = function (voice) {
 /*
  * returns the clef, time signature and accidentals at the given time.
  */
-Line.prototype.contextAt = function (time) {
-	let measure = this.children[time.measure];
+Line.prototype.contextAt = function (measures, time) {
+	let measure = measures[time.measure];
 
 	if (!measure) return null;
 
