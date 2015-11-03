@@ -78,7 +78,7 @@ Note.prototype.render = function () {
 		group.addChild(accidentalSymbol.place(position));
 	}
 
-	this.drawGroupBounds();
+	// this.drawGroupBounds();
 
 	return group;
 };

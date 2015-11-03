@@ -61,7 +61,7 @@ var Config = (function () {
 	};
 
 	function fontSizeToNoteHeadWidth (fontSize) {
-		return 13;
+		return 10.5;
 	};
 
 	function fontSizeToNoteHeadHeight (fontSize) {

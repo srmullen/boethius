@@ -174,5 +174,5 @@ function noteValues () {
 	var notes = _.fill(new Array(16), 16).concat(_.fill(new Array(8), 8)).concat(_.fill(new Array(4), 4)).concat(_.fill(new Array(2), 2)).concat(_.fill(new Array(1), 1));
 	var voice = scored.voice({}, _.map(notes, function (n) {return scored.note({value: n})}));
 
-	scored.render(line, 400, [voice], 5).translate(50, 150);
+	scored.render(line, 1000, [voice], 5).translate(50, 150);
 }

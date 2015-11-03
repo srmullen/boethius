@@ -84,8 +84,12 @@ Line.render = function (line, length, voices, numMeasures=1) {
 		if (measureNumber !== previousMeasureNumber) {
 			cursor = leftBarline.position.x + noteHeadWidth;
 		}
+		// item needs to be shifted so its left bound is aligned with the cursor.
 		item.group.translate(pos.add(cursor, yPos));
 		cursor += item.group.bounds.width + (noteHeadWidth * placement.getStaffSpace(shortestDuration, item));
+		// item.group.translate(pos.add(cursor + (item.group.bounds.center.x - item.group.bounds.left), yPos));
+		// cursor = item.group.bounds.right + (noteHeadWidth * placement.getStaffSpace(shortestDuration, item));
+
 		previousMeasureNumber = measureNumber;
 	}));
 
@@ -105,7 +109,7 @@ function calculateAndSetMeasureLengths (measures, voices, noteHeadWidth, shortes
 				return acc + item.group.bounds.width + (noteHeadWidth * placement.getStaffSpace(shortestDuration, item));
 				// return acc + (noteHeadWidth * placement.getStaffSpace(shortestDuration, item));
 			}, 0);
-			return width ;
+			return width + noteHeadWidth; // noteHeadWidth added for padding.
 		});
 		voiceToMeasureLengths.push(measureLengths);
 	});
