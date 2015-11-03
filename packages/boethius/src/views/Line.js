@@ -65,6 +65,13 @@ Line.render = function (line, length, voices, numMeasures=1) {
 	// 	lineGroup.addChild(marking.render(b));
 	// });
 
+	// group and sort voice items by time.
+	let times = _.sortBy(_.map(_.groupBy(_.reduce(voices, (acc, voice) => {
+		return acc.concat(voice.children);
+	}, []), (item) => item.time), (v, k) => {
+		return {time: Number.parseFloat(k), items: v};
+	}), v => v.time);
+
 	// calculating measure lengths
 	calculateAndSetMeasureLengths(measures, voices, noteHeadWidth, shortestDuration);
 
@@ -73,25 +80,27 @@ Line.render = function (line, length, voices, numMeasures=1) {
 
 	let cursor = noteHeadWidth,
 		previousMeasureNumber = 0;
-	_.each(voices, (voice, i) => voice.children.map((item, j) => {
-		let pos = placement.getYOffset(item.group, b),
-			measureNumber = Measure.getMeasureNumber(measures, item.time), //get the measure the item belongs to
-			context = line.contextAt(measures, {measure: measureNumber});
-		let leftBarline = measures[measureNumber].barlines[0],
-			yPos = item.type === "note" ?
-				placement.calculateNoteYpos(item, Scored.config.lineSpacing/2, placement.getClefBase(context.clef)) : 0;
+	_.each(times, ({time, items}) => {
+		let measureNumber = Measure.getMeasureNumber(measures, time), // get the measure the items belongs to
+			context = line.contextAt(measures, {measure: measureNumber}),
+			leftBarline = measures[measureNumber].barlines[0];
+		let possibleNextPositions = items.map(item => {
+			let pos = placement.getYOffset(item.group, b),
+				yPos = item.type === "note" ?
+					placement.calculateNoteYpos(item, Scored.config.lineSpacing/2, placement.getClefBase(context.clef)) : 0;
 
-		if (measureNumber !== previousMeasureNumber) {
-			cursor = leftBarline.position.x + noteHeadWidth;
-		}
-		// item needs to be shifted so its left bound is aligned with the cursor.
-		item.group.translate(pos.add(cursor, yPos));
-		cursor += item.group.bounds.width + (noteHeadWidth * placement.getStaffSpace(shortestDuration, item));
-		// item.group.translate(pos.add(cursor + (item.group.bounds.center.x - item.group.bounds.left), yPos));
-		// cursor = item.group.bounds.right + (noteHeadWidth * placement.getStaffSpace(shortestDuration, item));
+			if (measureNumber !== previousMeasureNumber) {
+				cursor = leftBarline.position.x + noteHeadWidth;
+			}
+			item.group.translate(pos.add(cursor, yPos));
+
+			return item.group.bounds.width + (noteHeadWidth * placement.getStaffSpace(shortestDuration, item));
+		});
+
+		cursor += _.min(possibleNextPositions);
 
 		previousMeasureNumber = measureNumber;
-	}));
+	});
 
 	_.each(voiceGroups, voiceItemGroup => lineGroup.addChildren(voiceItemGroup));
 
@@ -113,8 +122,6 @@ function calculateAndSetMeasureLengths (measures, voices, noteHeadWidth, shortes
 		});
 		voiceToMeasureLengths.push(measureLengths);
 	});
-
-	console.log(voiceToMeasureLengths);
 
 	for (let i = 0; i < measures.length; i++) {
 		measures[i].length = _.max(voiceToMeasureLengths.map(lengths => lengths[i]));

@@ -8,7 +8,8 @@ function run () {
 	// interaction();
 
 	renderingNotesOnLine();
-	noteValues();
+	oneVoice();
+	twoVoices();
 }
 
 function createMeasures () {
@@ -169,10 +170,24 @@ function renderingNotesOnLine () {
 	scored.render(trebleLine, 400, [voice], 2).translate(50);
 }
 
-function noteValues () {
+function oneVoice () {
 	var line = scored.line({}, [scored.clef({value: "treble", measure: 0}), scored.timeSig({value: "4/4", measure: 0})]);
 	var notes = _.fill(new Array(16), 16).concat(_.fill(new Array(8), 8)).concat(_.fill(new Array(4), 4)).concat(_.fill(new Array(2), 2)).concat(_.fill(new Array(1), 1));
 	var voice = scored.voice({}, _.map(notes, function (n) {return scored.note({value: n})}));
 
 	scored.render(line, 1000, [voice], 5).translate(50, 150);
+}
+
+function twoVoices () {
+	var line = scored.line({}, [scored.clef({value: "treble", measure: 0}), scored.timeSig({value: "4/4", measure: 0})]);
+	var notes1 = _.fill(new Array(16), 16).concat(_.fill(new Array(8), 8)).concat(_.fill(new Array(4), 4)).concat(_.fill(new Array(2), 2)).concat(_.fill(new Array(1), 1));
+	var notes2 = _.fill(new Array(4), 4).concat(
+		_.fill(new Array(2), 2)).concat(
+			_.fill(new Array(8), 8)).concat(
+				_.fill(new Array(8), 8)).concat(
+					_.fill(new Array(16), 16));
+	var voice1 = scored.voice({}, _.map(notes1, function (n) {return scored.note({value: n})}));
+	var voice2 = scored.voice({}, _.map(notes2, function (n) {return scored.note({value: n, pitch: "c5"})}));
+
+	scored.render(line, 1000, [voice1, voice2], 5).translate(50, 250);
 }
