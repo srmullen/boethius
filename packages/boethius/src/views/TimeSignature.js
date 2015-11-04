@@ -1,8 +1,6 @@
 import engraver from "../engraver";
 import constants from "../constants";
 
-"use strict";
-
 const TYPE = constants.type.timeSig;
 
 function TimeSignature ({value="4/4", measure}) {
@@ -12,7 +10,7 @@ function TimeSignature ({value="4/4", measure}) {
 
 TimeSignature.prototype.type = TYPE;
 
-TimeSignature.prototype.render = function (position, cursor) {
+TimeSignature.prototype.render = function (position) {
 	const margin = {
 		top: 0,
 		left: 2,
@@ -20,7 +18,7 @@ TimeSignature.prototype.render = function (position, cursor) {
 		right: 10
 	}
 
-	const group = new paper.Group({
+	const group = this.group = new paper.Group({
 		name: TYPE
 	});
 

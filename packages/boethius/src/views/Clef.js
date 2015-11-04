@@ -20,7 +20,7 @@ Clef.prototype.render = function (position) {
 		right: 7
 	}
 
-	const group = new paper.Group({
+	const group = this.group = new paper.Group({
 		name: TYPE
 	});
 

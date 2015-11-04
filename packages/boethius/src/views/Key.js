@@ -3,8 +3,6 @@ import * as placement from "../utils/placement";
 import _ from "lodash";
 import constants from "../constants";
 
-"use strict";
-
 const TYPE = constants.type.key,
 
 	flats = [
@@ -121,7 +119,7 @@ Key.prototype.render = function (position, clef) {
 		right: 10
 	}
 
-	const group = new paper.Group({
+	const group = this.group = new paper.Group({
 		name: TYPE
 	});
 	position = new paper.Point(position); // make sure position isn't just an array

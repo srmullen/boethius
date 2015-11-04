@@ -61,19 +61,21 @@ Line.render = function (line, length, voices, numMeasures=1) {
 		shortestDuration = 0.125; // need function to calculate this.
 
 	// render markings
-	// _.each(line.markings, (marking) => {
-	// 	lineGroup.addChild(marking.render(b));
-	// });
+	_.each(line.markings, (marking) => {
+		marking.render(b)
+		// lineGroup.addChild();
+	});
 
 	// group and sort voice items by time.
-	let times = _.sortBy(_.map(_.groupBy(_.reduce(voices, (acc, voice) => {
+	let allItems = line.markings.concat(_.reduce(voices, (acc, voice) => {
 		return acc.concat(voice.children);
-	}, []), (item) => item.time), (v, k) => {
+	}, []));
+	let times = _.sortBy(_.map(_.groupBy(allItems, (item) => item.time || 0), (v, k) => {
 		return {time: Number.parseFloat(k), items: v};
 	}), v => v.time);
 
 	// calculating measure lengths
-	calculateAndSetMeasureLengths(measures, voices, noteHeadWidth, shortestDuration);
+	calculateAndSetMeasureLengths(measures, times, noteHeadWidth, shortestDuration);
 
 	// render measures.
 	let measureGroups = line.renderMeasures(measures, lineGroup, length);
@@ -83,8 +85,12 @@ Line.render = function (line, length, voices, numMeasures=1) {
 	_.each(times, ({time, items}) => {
 		let measureNumber = Measure.getMeasureNumber(measures, time), // get the measure the items belongs to
 			context = line.contextAt(measures, {measure: measureNumber}),
-			leftBarline = measures[measureNumber].barlines[0];
-		let possibleNextPositions = items.map(item => {
+			leftBarline = measures[measureNumber].barlines[0],
+			[markings, voiceItems] = _.partition(items, isMarking);
+		// Place markings at the given time.
+
+		// Place voice items at the given time.
+		let possibleNextPositions = voiceItems.map(item => {
 			let pos = placement.getYOffset(item.group, b),
 				yPos = item.type === "note" ?
 					placement.calculateNoteYpos(item, Scored.config.lineSpacing/2, placement.getClefBase(context.clef)) : 0;
@@ -107,26 +113,53 @@ Line.render = function (line, length, voices, numMeasures=1) {
 	return lineGroup;
 }
 
-function calculateAndSetMeasureLengths (measures, voices, noteHeadWidth, shortestDuration) {
-	let voiceToMeasureLengths = [];
-	_.each(voices, (voice) => {
-		// group voice elements by measure.
-		let itemsInMeasure = _.groupBy(voice.children, (child) => Measure.getMeasureNumber(measures, child.time));
-		// sum the width of elements in each measure.
-		let measureLengths = _.map(itemsInMeasure, (v, i) => {
-			let width = _.reduce(v, (acc, item) => {
-				return acc + item.group.bounds.width + (noteHeadWidth * placement.getStaffSpace(shortestDuration, item));
-				// return acc + (noteHeadWidth * placement.getStaffSpace(shortestDuration, item));
-			}, 0);
-			return width + noteHeadWidth; // noteHeadWidth added for padding.
-		});
-		voiceToMeasureLengths.push(measureLengths);
+function calculateAndSetMeasureLengths (measures, times, noteHeadWidth, shortestDuration) {
+	// group items by measure.
+	let itemsInMeasure = _.groupBy(times, ({time}) => Measure.getMeasureNumber(measures, time));
+
+	let measureLengths = _.map(measures, (measure, i) => {
+		let measureLength = _.sum(_.map(itemsInMeasure[i], ({items}) => {
+			let [markings, voiceItems] = _.partition(items, isMarking),
+				markingsLength = _.sum(markings.map(marking => marking.group.bounds.width)),
+				voiceItemsLength = _.min(_.map(voiceItems, item => {
+					return item.group.bounds.width + (noteHeadWidth * placement.getStaffSpace(shortestDuration, item));
+				}));
+			return markingsLength + voiceItemsLength
+		}));
+		measure.length = measureLength;
+		return measureLength;
 	});
 
-	for (let i = 0; i < measures.length; i++) {
-		measures[i].length = _.max(voiceToMeasureLengths.map(lengths => lengths[i]));
-	}
+	return measureLengths;
 }
+
+function isMarking (item) {
+	return item.type === constants.type.clef ||
+			item.type === constants.type.marking ||
+			item.type === constants.type.timeSig ||
+			false;
+}
+
+// function calculateAndSetMeasureLengths (measures, voices, noteHeadWidth, shortestDuration) {
+// 	let voiceToMeasureLengths = [];
+// 	_.each(voices, (voice) => {
+// 		// group voice elements by measure.
+// 		let itemsInMeasure = _.groupBy(voice.children, (child) => Measure.getMeasureNumber(measures, child.time));
+// 		// sum the width of elements in each measure.
+// 		let measureLengths = _.map(itemsInMeasure, (v, i) => {
+// 			let width = _.reduce(v, (acc, item) => {
+// 				return acc + item.group.bounds.width + (noteHeadWidth * placement.getStaffSpace(shortestDuration, item));
+// 				// return acc + (noteHeadWidth * placement.getStaffSpace(shortestDuration, item));
+// 			}, 0);
+// 			return width + noteHeadWidth; // noteHeadWidth added for padding.
+// 		});
+// 		voiceToMeasureLengths.push(measureLengths);
+// 	});
+//
+// 	for (let i = 0; i < measures.length; i++) {
+// 		measures[i].length = _.max(voiceToMeasureLengths.map(lengths => lengths[i]));
+// 	}
+// }
 
 Line.prototype.render = function (length) {
 	const group = this.group = engraver.drawLine(length);
