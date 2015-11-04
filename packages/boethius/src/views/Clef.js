@@ -33,8 +33,4 @@ Clef.prototype.render = function (position) {
 	return group;
 }
 
-// Clef.prototype.getWidth = function () {
-// 	return this.symbol.definition.bounds.width;
-// }
-
 export default Clef;

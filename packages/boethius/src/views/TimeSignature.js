@@ -31,12 +31,4 @@ TimeSignature.prototype.render = function (position) {
 	return group;
 }
 
-// TimeSignature.prototype.getWidth = function () {
-// 	return this.symbol.definition.bounds.width;
-// }
-
-TimeSignature.prototype.serialize = function () {
-	return this.context;
-}
-
 export default TimeSignature;

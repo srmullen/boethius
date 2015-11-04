@@ -144,8 +144,4 @@ Key.prototype.render = function (position, clef) {
 	return group;
 }
 
-// Key.prototype.getWidth = function () {
-// 	return this.group.bounds.width;
-// }
-
 export default Key;

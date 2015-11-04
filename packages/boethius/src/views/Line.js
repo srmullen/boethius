@@ -62,8 +62,8 @@ Line.render = function (line, length, voices, numMeasures=1) {
 
 	// render markings
 	_.each(line.markings, (marking) => {
-		marking.render(b)
-		// lineGroup.addChild();
+		let markingGroup = marking.render(b)
+		lineGroup.addChild(markingGroup);
 	});
 
 	// group and sort voice items by time.
@@ -88,6 +88,10 @@ Line.render = function (line, length, voices, numMeasures=1) {
 			leftBarline = measures[measureNumber].barlines[0],
 			[markings, voiceItems] = _.partition(items, isMarking);
 		// Place markings at the given time.
+		let definateNextPosition = markings.map(marking => {
+			marking.group.translate(cursor, 0);
+			cursor += marking.group.bounds.width + noteHeadWidth; // FIXME: needs a little work for perfect positioning
+		});
 
 		// Place voice items at the given time.
 		let possibleNextPositions = voiceItems.map(item => {
@@ -103,6 +107,7 @@ Line.render = function (line, length, voices, numMeasures=1) {
 			return item.group.bounds.width + (noteHeadWidth * placement.getStaffSpace(shortestDuration, item));
 		});
 
+		// next time is at smallest distance
 		cursor += _.min(possibleNextPositions);
 
 		previousMeasureNumber = measureNumber;
@@ -120,7 +125,7 @@ function calculateAndSetMeasureLengths (measures, times, noteHeadWidth, shortest
 	let measureLengths = _.map(measures, (measure, i) => {
 		let measureLength = _.sum(_.map(itemsInMeasure[i], ({items}) => {
 			let [markings, voiceItems] = _.partition(items, isMarking),
-				markingsLength = _.sum(markings.map(marking => marking.group.bounds.width)),
+				markingsLength = _.sum(markings.map(marking => marking.group.bounds.width + noteHeadWidth)),
 				voiceItemsLength = _.min(_.map(voiceItems, item => {
 					return item.group.bounds.width + (noteHeadWidth * placement.getStaffSpace(shortestDuration, item));
 				}));
