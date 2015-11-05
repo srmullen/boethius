@@ -115,9 +115,15 @@ Line.render = function (line, length, voices, numMeasures=1) {
 
 	_.each(voiceGroups, voiceItemGroup => lineGroup.addChildren(voiceItemGroup));
 
+	// now that all the note heads are rendered the rest of the note can be drawn
+	_.each(voices, voice => {
+		voice.renderNoteDecorations(b);
+	});
+
 	return lineGroup;
 }
 
+// TODO: will need to be able to handle when overlapping of items require more space. ex. two voice with same note at same time.
 function calculateAndSetMeasureLengths (measures, times, noteHeadWidth, shortestDuration) {
 	// group items by measure.
 	let itemsInMeasure = _.groupBy(times, ({time}) => Measure.getMeasureNumber(measures, time));

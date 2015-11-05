@@ -5,11 +5,13 @@ import _ from "lodash";
 /*
  * @param bline - y position of the bline
  */
-function getStemDirection (note, bline) {
+function getStemDirection (note, bLine) {
 	if (note.stemDirection) {
 		return note.stemDirection;
-	} else if (!_.isUndefined(bline)) {
-		return "down"; // FIXME: figure out when adding notes to lines
+	} else if (!_.isUndefined(bLine)) {
+		// return "down"; // FIXME: figure out when adding notes to lines
+		// return (note.noteHead.position.y <= bLine.y) ? "down" : "up";
+		return (placement.getNoteHeadCenter(note.noteHead.position).y > bLine.y) ? "up" : "down";
 	} else {
 		return "up";
 	}

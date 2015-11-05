@@ -163,7 +163,7 @@ function fourBars () {
 
 function renderingNotesOnLine () {
 	var trebleLine = scored.line({}, [scored.clef({measure: 0}), scored.clef({value: "bass", measure: 1})]);
-	var voice = scored.voice({}, [scored.note({pitch: "c4", value: 2}), scored.note({pitch: "d4", value: 2}),
+	var voice = scored.voice({}, [scored.note({pitch: "a4", value: 2}), scored.note({pitch: "b4", value: 2}),
 								  scored.note({pitch: "c4", value: 2}), scored.note({pitch: "d4", value: 4}), scored.rest({value: 4})]);
 	// var composition = scored.compose(trebleLine, [voice]);
 
@@ -186,8 +186,8 @@ function twoVoices () {
 			_.fill(new Array(8), 8)).concat(
 				_.fill(new Array(8), 8)).concat(
 					_.fill(new Array(16), 16));
-	var voice1 = scored.voice({}, _.map(notes1, function (n) {return scored.note({value: n})}));
-	var voice2 = scored.voice({}, _.map(notes2, function (n) {return scored.note({value: n, pitch: "c5"})}));
+	var voice1 = scored.voice({stemDirection: "down"}, _.map(notes1, function (n) {return scored.note({value: n})}));
+	var voice2 = scored.voice({stemDirection: "up"}, _.map(notes2, function (n) {return scored.note({value: n, pitch: "c5"})}));
 
 	scored.render(line, 1000, [voice1, voice2], 5).translate(50, 250);
 }

@@ -27,13 +27,17 @@ Note.prototype.type = TYPE;
 
 Note.render = function (note, position) {
 	let group = note.render().translate(position);
-	if (note.note.duration.value >= 2) {
+	Note.renderStem(note);
+	return group;
+}
+
+Note.renderStem = function (note) {
+	if (note.needsStem()) {
 		let stemDirection = noteUtils.getStemDirection(note),
 			stemPoint = noteUtils.defaultStemPoint(note, Scored.utils.note.getStemLength(note), stemDirection);
 		note.drawStem(stemPoint, stemDirection);
 		note.drawFlag();
 	}
-	return group;
 }
 
 Note.prototype.render = function () {
@@ -43,7 +47,7 @@ Note.prototype.render = function () {
 
 	this.symbol = engraver.drawHead(1/this.note.duration.value);
 
-	common.addEvents(this);
+	// common.addEvents(this);
 
 	// If the note has already been rendered remove any children so it is ready to be rendered again.
 	group.removeChildren();
@@ -54,19 +58,17 @@ Note.prototype.render = function () {
 
 	group.addChild(noteHead);
 
-	// this.drawLegerLines(barLine, lineSpacing);
-
 	if (this.note.duration.dots) {
 		let dots = engraver.drawDots(noteHead, this.note.duration.dots);
 		group.addChild(dots);
 	}
 
-	// if (this.context.stacato) {
+	// if (this.stacato) {
 	// 	let stacato = engraver.drawStacato();
 	// 	group.addChild(stacato);
 	// }
 	//
-	// if (this.context.legato) {
+	// if (this.legato) {
 	// 	let legato = engraver.drawLegato();
 	// 	group.addChild(legato);
 	// }
@@ -82,6 +84,13 @@ Note.prototype.render = function () {
 
 	return group;
 };
+
+/*
+ * @return Boolean - true if the note needs a stem drawn, False otherwise.
+ */
+Note.prototype.needsStem = function () {
+	return this.note.duration.value >= 2;
+}
 
 Note.prototype.drawLegerLines = function (centerLine, lineSpacing) {
 	var legerLines = engraver.drawLegerLines(this.noteHead, centerLine, lineSpacing);

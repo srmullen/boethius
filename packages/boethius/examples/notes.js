@@ -190,7 +190,6 @@ function renderNotes (notes, yPos) {
 		}
 	} else {
 		for (key in notes) {
-			// renderNote(notes[key], xPos, yPos);
 			scored.render(notes[key], [xPos, yPos]);
 			xPos = xPos + 50;
 		}
