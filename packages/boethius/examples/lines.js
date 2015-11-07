@@ -7,9 +7,9 @@ function run () {
 	// createMeasures();
 	// interaction();
 
-	renderingNotesOnLine();
+	// renderingNotesOnLine();
 	oneVoice();
-	twoVoices();
+	// twoVoices();
 }
 
 function createMeasures () {

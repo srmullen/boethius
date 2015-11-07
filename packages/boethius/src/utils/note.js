@@ -61,7 +61,7 @@ function getStemPoint (note, fulcrum, vector) {
 	return {point, direction, duration};
 }
 
-var durationToBars = {
+const durationToBars = {
 	8: 1, 16: 2, 32: 3, 64: 4, 128: 5, 256: 6
 };
 
@@ -170,6 +170,7 @@ function beam (notes, fulcrum, vector) {
 			});
 		});
 
+	// what group should this be added to?
 	return new paper.Group({
 		name: "beam",
 		children: paths

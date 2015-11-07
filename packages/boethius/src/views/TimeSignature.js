@@ -3,12 +3,39 @@ import constants from "../constants";
 
 const TYPE = constants.type.timeSig;
 
-function TimeSignature ({value="4/4", measure}) {
+function TimeSignature ({value="4/4", measure, beatStructure}) {
 	this.value = value;
 	this.measure = measure;
+	this.beatStructure = beatStructure || TimeSignature.createBeatStructure(value);
 }
 
 TimeSignature.prototype.type = TYPE;
+
+TimeSignature.createBeatStructure = function (value) {
+	// handle common time signatures first
+	switch (value) {
+		case "4/4":
+			return [2,2];
+			break;
+		case "c":
+			return [2,2];
+			break;
+
+	}
+
+}
+
+/*
+ * @param sig {String} - ex. "4/4", "h"
+ */
+TimeSignature.parseValue = function (sig) {
+	if (sig === "c" || sig === "h") {
+		return [4, 4];
+	} else {
+		let nums = sig.split("/");
+		return [+nums[0], +nums[1]]; // convert strings to numbers
+	}
+}
 
 TimeSignature.prototype.render = function (position) {
 	const margin = {

@@ -1,9 +1,13 @@
+import teoria from "teoria";
+import _ from "lodash";
+
 import engraver from "../engraver";
-import * as common from "../utils/common";
+import {concat} from "../utils/common";
 import * as placement from "../utils/placement";
 import * as noteUtils from "../utils/note";
-import teoria from "teoria";
+import * as timeUtils from "../utils/timeUtils";
 import constants from "../constants";
+import TimeSignature from "./TimeSignature";
 
 const TYPE = constants.type.note;
 
@@ -38,6 +42,41 @@ Note.renderStem = function (note) {
 		note.drawStem(stemPoint, stemDirection);
 		note.drawFlag();
 	}
+}
+
+ /*
+  * Notes must have time properties for this function to work.
+  * Should this function just calculate their times from the first note instead?
+  * @param timeSig - TimeSignature
+  * @param note - Note[]
+  * @return - array of note groupings.
+  */
+Note.findBeaming = function (timeSig, notes) {
+	if (!notes.length) {
+		return [];
+	}
+
+	// get the beat type
+	let sig = TimeSignature.parseValue(timeSig.value),
+		baseTime = notes[0].time; // the time from which the groupings are reckoned.
+
+	// remove notes that don't need beaming or flags (i.e. quarter notes and greater)
+	let flaggedNotes = _.groupBy(_.filter(notes, note => note.needsFlag()), note => {
+		return Math.floor(timeUtils.getBeat(note.time, sig, baseTime));
+	});
+
+	let groupings = [];
+	for (let i = 0, beat = 0; i < timeSig.beatStructure.length; i++) { // count down through the beats for each
+		let grouping = [];											   // beat structure and add the notes to be beamed.
+		for (let beats = timeSig.beatStructure[i]; beats > 0; beats--) {
+			// if (flaggedNotes[beat]) grouping = concat(grouping, flaggedNotes[beat]);
+			if (flaggedNotes[beat]) grouping = grouping.concat(flaggedNotes[beat]);
+			beat++;
+		}
+		if (grouping.length) groupings.push(grouping);
+	}
+
+	return groupings;
 }
 
 Note.prototype.render = function () {
@@ -90,6 +129,10 @@ Note.prototype.render = function () {
  */
 Note.prototype.needsStem = function () {
 	return this.note.duration.value >= 2;
+}
+
+Note.prototype.needsFlag = function () {
+	return this.note.duration.value >= 8;
 }
 
 Note.prototype.drawLegerLines = function (centerLine, lineSpacing) {

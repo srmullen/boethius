@@ -117,7 +117,7 @@ Line.render = function (line, length, voices, numMeasures=1) {
 
 	// now that all the note heads are rendered the rest of the note can be drawn
 	_.each(voices, voice => {
-		voice.renderNoteDecorations(b);
+		voice.renderNoteDecorations(line, measures);
 	});
 
 	return lineGroup;
@@ -150,27 +150,6 @@ function isMarking (item) {
 			item.type === constants.type.timeSig ||
 			false;
 }
-
-// function calculateAndSetMeasureLengths (measures, voices, noteHeadWidth, shortestDuration) {
-// 	let voiceToMeasureLengths = [];
-// 	_.each(voices, (voice) => {
-// 		// group voice elements by measure.
-// 		let itemsInMeasure = _.groupBy(voice.children, (child) => Measure.getMeasureNumber(measures, child.time));
-// 		// sum the width of elements in each measure.
-// 		let measureLengths = _.map(itemsInMeasure, (v, i) => {
-// 			let width = _.reduce(v, (acc, item) => {
-// 				return acc + item.group.bounds.width + (noteHeadWidth * placement.getStaffSpace(shortestDuration, item));
-// 				// return acc + (noteHeadWidth * placement.getStaffSpace(shortestDuration, item));
-// 			}, 0);
-// 			return width + noteHeadWidth; // noteHeadWidth added for padding.
-// 		});
-// 		voiceToMeasureLengths.push(measureLengths);
-// 	});
-//
-// 	for (let i = 0; i < measures.length; i++) {
-// 		measures[i].length = _.max(voiceToMeasureLengths.map(lengths => lengths[i]));
-// 	}
-// }
 
 Line.prototype.render = function (length) {
 	const group = this.group = engraver.drawLine(length);
@@ -235,8 +214,6 @@ Line.prototype.contextAt = function (measures, time) {
 	let measure = measures[time.measure];
 
 	if (!measure) return null;
-
-	// let [beats,] = timeUtils.sigToNums(measure.timeSig);
 
 	const getMarking = _.curry((time, marking) => marking.measure <= time.measure && (marking.beat || 0) <= (time.beat || 0));
 	const getMarkingAtTime = (markings, type, time) => {

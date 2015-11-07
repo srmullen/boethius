@@ -23,8 +23,7 @@ function getMeasure (time=0, [beats, value], offset=0) {
 }
 
 /*
- * Still need to add in offset
- * @return {number} - integer representation
+ * @return {number} - float representation
  */
 function getBeat (time, [beats, value], offset=0) {
 	var measureDuration = beats * (1/value),
@@ -145,7 +144,6 @@ export {
 	compareByTime,
 	getTimeSigDuration,
 	getMeasureDuration,
-	sigToNums,
 	splitByTime,
 	splitByMeasure,
 	calculateDuration

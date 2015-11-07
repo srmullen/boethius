@@ -7,6 +7,7 @@ import * as lineUtils from "../utils/line";
 import * as noteUtils from "../utils/note";
 import {calculateDuration} from "../utils/timeUtils";
 import Note from "./Note";
+import Measure from "./Measure";
 
 function Voice ({value, stemDirection}, children=[]) {
     this.value = value;
@@ -37,18 +38,32 @@ Voice.prototype.renderChildren = function () {
 /*
  * @param bLine - point representing leftmost starting point of center line
  */
-Voice.prototype.renderNoteDecorations = function (bLine) {
-    return this.children.map(child => {
-        if (child.type === constants.type.note) {
-            child.drawLegerLines(bLine, Scored.config.lineSpacing);
-            if (child.needsStem()) {
-                let stemDirection = this.stemDirection || noteUtils.getStemDirection(child, bLine),
-        			stemPoint = noteUtils.defaultStemPoint(child, noteUtils.getStemLength(child), stemDirection);
-        		child.drawStem(stemPoint, stemDirection);
-        		child.drawFlag();
-            }
-        }
+Voice.prototype.renderNoteDecorations = function (line, measures) {
+    // group children by measures
+    let b = lineUtils.b(line.group),
+        itemsByMeasure = _.groupBy(this.children, child => Measure.getMeasureNumber(measures, child.time));
+
+    _.map(itemsByMeasure, (items, measureNum) => {
+        let notes = _.filter(items, item => item.type === constants.type.note);
+        notes.map(note => note.drawLegerLines(b, Scored.config.lineSpacing));
     });
+
+    // just beam the first measure as a test
+    let beamings = Note.findBeaming(scored.timeSig(), itemsByMeasure[0]);
+    let beams = beamings.map(noteGroup => noteUtils.beam(noteGroup));
+    line.group.addChildren(beams);
+
+    // return this.children.map(child => {
+    //     if (child.type === constants.type.note) {
+    //         child.drawLegerLines(bLine, Scored.config.lineSpacing);
+    //         if (child.needsStem()) {
+    //             let stemDirection = this.stemDirection || noteUtils.getStemDirection(child, bLine),
+    //     			stemPoint = noteUtils.defaultStemPoint(child, noteUtils.getStemLength(child), stemDirection);
+    //     		child.drawStem(stemPoint, stemDirection);
+    //     		child.drawFlag();
+    //         }
+    //     }
+    // });
 }
 
 export default Voice;

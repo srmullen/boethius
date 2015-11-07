@@ -123,7 +123,7 @@ describe("Scored", () => {
 			it("should layout", () => {
 				let timeSig = scored.layout(["timeSig"]);
 				expect(timeSig).to.eql(scored.timeSig());
-				expect(JSON.stringify(scored.serialize(timeSig))).to.equal(JSON.stringify(["timeSig", {value: "4/4"}]));
+				expect(JSON.stringify(scored.serialize(timeSig))).to.equal(JSON.stringify(["timeSig", {value: "4/4", beatStructure: [2,2]}]));
 
 				timeSig = scored.layout(["timeSig", {value: "3/8"}]);
 				expect(timeSig).to.eql(scored.timeSig({value: "3/8"}));
