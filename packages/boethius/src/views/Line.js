@@ -97,7 +97,7 @@ Line.render = function (line, length, voices, numMeasures=1) {
 		let possibleNextPositions = voiceItems.map(item => {
 			let pos = placement.getYOffset(item.group, b),
 				yPos = item.type === "note" ?
-					placement.calculateNoteYpos(item, Scored.config.lineSpacing/2, placement.getClefBase(context.clef)) : 0;
+					placement.calculateNoteYpos(item, Scored.config.lineSpacing/2, placement.getClefBase(context.clef.value)) : 0;
 
 			if (measureNumber !== previousMeasureNumber) {
 				cursor = leftBarline.position.x + noteHeadWidth;
@@ -226,7 +226,8 @@ Line.prototype.contextAt = function (measures, time) {
 		timeSig = getMarkingAtTime(this.markings, constants.type.timeSig, time) || {},
 		key = getMarkingAtTime(this.markings, constants.type.key, time) || {};
 
-	return {clef: clef.value, timeSig: timeSig.value, key: key.value};
+	// return {clef: clef.value, timeSig: timeSig.value, key: key.value};
+	return {clef, timeSig, key};
 }
 
 /*

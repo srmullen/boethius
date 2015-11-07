@@ -49,7 +49,8 @@ Voice.prototype.renderNoteDecorations = function (line, measures) {
     });
 
     // just beam the first measure as a test
-    let beamings = Note.findBeaming(scored.timeSig(), itemsByMeasure[0]);
+    let context = line.contextAt(measures, {measure: 0});
+    let beamings = Note.findBeaming(context.timeSig, itemsByMeasure[0]);
     let beams = beamings.map(noteGroup => noteUtils.beam(noteGroup));
     line.group.addChildren(beams);
 
