@@ -48,11 +48,15 @@ Voice.prototype.renderNoteDecorations = function (line, measures) {
         notes.map(note => note.drawLegerLines(b, Scored.config.lineSpacing));
     });
 
-    // just beam the first measure as a test
-    let context = line.contextAt(measures, {measure: 0});
-    let beamings = Note.findBeaming(context.timeSig, itemsByMeasure[0]);
-    let beams = beamings.map(noteGroup => noteUtils.beam(noteGroup));
-    line.group.addChildren(beams);
+    // beam the notes
+    _.map(itemsByMeasure, (items, measure) => {
+        let context = line.contextAt(measures, {measure: Number.parseInt(measure)});
+        let beamings = Note.findBeaming(context.timeSig, items);
+        let beams = _.compact(beamings.map(noteGrouping => Note.renderDecorations(noteGrouping)));
+        if (beams && beams.length) {
+            line.group.addChildren(beams);
+        }
+    });
 
     // return this.children.map(child => {
     //     if (child.type === constants.type.note) {

@@ -66,6 +66,25 @@ function concat (a, b) {
 	return a.concat([b]);
 }
 
+/*
+ * partitions the collection each time f returns a new value
+ */
+function partitionBy (coll, f) {
+	let previousValue;
+
+	return coll.reduce((acc, el) => {
+		let newValue = f(el);
+		if (previousValue === newValue) {
+			acc[acc.length-1].push(el);
+		} else {
+			let partition = [el];
+			acc.push(partition);
+		}
+		previousValue = newValue;
+		return acc;
+	}, []);
+}
+
 function doTimes (times, fn) {
 	var ret = [], i = 0;
 	for (; i < times; i++) {
@@ -83,5 +102,6 @@ export {
 	doTimes,
 	addEvents,
 	debugGroupEvents,
-	serialize
+	serialize,
+	partitionBy
 }

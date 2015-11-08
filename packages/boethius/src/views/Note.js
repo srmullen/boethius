@@ -2,7 +2,7 @@ import teoria from "teoria";
 import _ from "lodash";
 
 import engraver from "../engraver";
-import {concat} from "../utils/common";
+import {concat, partitionBy} from "../utils/common";
 import * as placement from "../utils/placement";
 import * as noteUtils from "../utils/note";
 import * as timeUtils from "../utils/timeUtils";
@@ -44,6 +44,15 @@ Note.renderStem = function (note) {
 	}
 }
 
+// FIXME: this needs a better name
+Note.renderDecorations = function (notes) {
+	if (notes.length === 1) {
+		Note.renderStem(notes[0]);
+	} else {
+		return noteUtils.beam(notes);
+	}
+}
+
  /*
   * Notes must have time properties for this function to work.
   * Should this function just calculate their times from the first note instead?
@@ -61,19 +70,24 @@ Note.findBeaming = function (timeSig, notes) {
 		baseTime = notes[0].time; // the time from which the groupings are reckoned.
 
 	// remove notes that don't need beaming or flags (i.e. quarter notes and greater)
-	let flaggedNotes = _.groupBy(_.filter(notes, note => note.needsFlag()), note => {
+	let flaggedNotes = _.groupBy(_.filter(notes, note => note.needsStem()), note => {
 		return Math.floor(timeUtils.getBeat(note.time, sig, baseTime));
 	});
 
 	let groupings = [];
 	for (let i = 0, beat = 0; i < timeSig.beatStructure.length; i++) { // count down through the beats for each
-		let grouping = [];											   // beat structure and add the notes to be beamed.
+		// let grouping = [];											   // beat structure and add the notes to be beamed.
 		for (let beats = timeSig.beatStructure[i]; beats > 0; beats--) {
 			// if (flaggedNotes[beat]) grouping = concat(grouping, flaggedNotes[beat]);
-			if (flaggedNotes[beat]) grouping = grouping.concat(flaggedNotes[beat]);
+			if (flaggedNotes[beat]) {
+				let beatSubdivisions = partitionBy(flaggedNotes[beat], note => note.needsFlag())
+				// grouping = grouping.concat();
+				_.each(beatSubdivisions, subdivision => groupings.push(subdivision));
+			}
+
 			beat++;
 		}
-		if (grouping.length) groupings.push(grouping);
+		// if (grouping.length) groupings.push(grouping);
 	}
 
 	return groupings;
