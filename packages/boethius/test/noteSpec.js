@@ -15,9 +15,9 @@ describe("Note", () => {
         });
 
         it("should return a note grouped by itself if it doesn't need beaming", () => {
-            // expect(findBeaming(fourfour, [scored.note({type: 4, time: 0})])).to.eql([scored.note({type: 4, time: 0})]);
-            // expect(findBeaming(fourfour, [scored.note({type: 2, time: 0})])).to.eql([scored.note({type: 4, time: 0})]);
-            // expect(findBeaming(fourfour, [scored.note({type: 1, time: 0})])).to.eql([scored.note({type: 4, time: 0})]);
+            expect(findBeaming(fourfour, [scored.note({type: 4, time: 0})])).to.eql([[scored.note({type: 4, time: 0})]]);
+            expect(findBeaming(fourfour, [scored.note({type: 2, time: 0})])).to.eql([[scored.note({type: 4, time: 0})]]);
+            expect(findBeaming(fourfour, [scored.note({type: 1, time: 0})])).to.eql([[scored.note({type: 4, time: 0})]]);
         });
 
         it("should return notes so they can have stems and flags drawn", () => {

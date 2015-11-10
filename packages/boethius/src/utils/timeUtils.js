@@ -18,26 +18,78 @@ function sigToNums (sig) {
  * @return {number} - the measure number as an integer
  */
 function getMeasure (time=0, [beats, value], offset=0) {
-	var measureDuration = beats * (1/value);
+	let measureDuration = beats * (1/value);
 	return Math.floor(time/measureDuration);
 }
 
 /*
+ * @param time - number
+ * @param timesig - string or arrary representation of timeSig value.
+ * @param offset - number representing point in time from which to calculate the beat from.
  * @return {number} - float representation
  */
-function getBeat (time, [beats, value], offset=0) {
-	var measureDuration = beats * (1/value),
+function getBeat (time, timeSig, offset=0) {
+	let [beats, value] = _.isArray(timeSig) ? timeSig : sigToNums(timeSig),
+		measureDuration = beats * (1/value),
 		beatTime = (time - offset) % measureDuration;
 
-	// return Math.floor(beatTime/(1/value));
 	return beatTime/(1/value);
 }
 
 /*
- * @return {number} - time of the first beat in the measure
+ * @param measures Measure[]
+ * @param item - Any object with a time or measure property.
+ * @return time object - object with time, measure, and beat.
  */
-function getTime (measure, [beats, value], offset=0) {
+function getTime (measures, item) {
+	let beat,
+		measure = item.measure,
+		time = item.time,
+		measureView;
+
+	if (!_.isNumber(item.measure)) {
+		measure = getMeasureNumber(measures, item.time);
+	}
+
+	measureView = measures[measure];
+
+	if (!_.isNumber(item.time)) {
+		time = getTimeNumber(measure, measureView.timeSig);
+	}
+
+	beat = item.beat || getBeat(time, measureView.timeSig, measureView.startsAt);
+
+	return {time, measure, beat};
+}
+
+/*
+ * @param time - number
+ * @param timesig - string or arrary representation of timeSig value.
+ * @param offset - number representing point in time from which to calculate the beat from.
+ * @return {number} - float
+ */
+function getTimeNumber (measure, timeSig, offset=0) {
+	let [beats, value] = _.isArray(timeSig) ? timeSig : sigToNums(timeSig);
 	return measure * beats * (1/value) + offset;
+}
+
+/*
+ * @param measures - array of measures.
+ * @param time - number representing time of event.
+ */
+function getMeasureNumber (measures, time) {
+	return _.findIndex(measures, (measure) => {
+		let measureEndsAt = measure.startsAt + getMeasureDuration(measure);
+		return time >= measure.startsAt && time < measureEndsAt;
+	});
+}
+
+/*
+ * @param measures - array of measures.
+ * @param time - number representing time of event.
+ */
+function getMeasureByTime (measures, time) {
+	return measures[getMeasureNumber(measures, time)];
 }
 
 /*
@@ -138,12 +190,14 @@ function sortByKey (obj) {
 export {
 	getTime,
 	getMeasure,
+	getMeasureByTime,
 	getBeat,
 	compareTimes,
 	compareByPosition,
 	compareByTime,
 	getTimeSigDuration,
 	getMeasureDuration,
+	getMeasureNumber,
 	splitByTime,
 	splitByMeasure,
 	calculateDuration

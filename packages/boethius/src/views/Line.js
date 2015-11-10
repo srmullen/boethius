@@ -1,7 +1,8 @@
 import constants from "../constants";
 import engraver from "../engraver";
 import Measure from "./Measure";
-import * as timeUtils from "../utils/timeUtils";
+// import * as timeUtils from "../utils/timeUtils";
+import {getMeasureNumber, getMeasureByTime} from "../utils/timeUtils";
 import * as placement from "../utils/placement";
 import * as common from "../utils/common";
 import * as lineUtils from "../utils/line";
@@ -70,7 +71,9 @@ Line.render = function (line, length, voices, numMeasures=1) {
 	let allItems = line.markings.concat(_.reduce(voices, (acc, voice) => {
 		return acc.concat(voice.children);
 	}, []));
-	let times = _.sortBy(_.map(_.groupBy(allItems, (item) => item.time || 0), (v, k) => {
+	let times = _.sortBy(_.map(_.groupBy(allItems, (item) => {
+		return item.time || 0;
+	}), (v, k) => {
 		return {time: Number.parseFloat(k), items: v};
 	}), v => v.time);
 
@@ -83,7 +86,7 @@ Line.render = function (line, length, voices, numMeasures=1) {
 	let cursor = noteHeadWidth,
 		previousMeasureNumber = 0;
 	_.each(times, ({time, items}) => {
-		let measureNumber = Measure.getMeasureNumber(measures, time), // get the measure the items belongs to
+		let measureNumber = getMeasureNumber(measures, time), // get the measure the items belongs to
 			context = line.contextAt(measures, {measure: measureNumber}),
 			leftBarline = measures[measureNumber].barlines[0],
 			[markings, voiceItems] = _.partition(items, isMarking);
@@ -126,7 +129,7 @@ Line.render = function (line, length, voices, numMeasures=1) {
 // TODO: will need to be able to handle when overlapping of items require more space. ex. two voice with same note at same time.
 function calculateAndSetMeasureLengths (measures, times, noteHeadWidth, shortestDuration) {
 	// group items by measure.
-	let itemsInMeasure = _.groupBy(times, ({time}) => Measure.getMeasureNumber(measures, time));
+	let itemsInMeasure = _.groupBy(times, (item) => item.measure || getMeasureNumber(measures, item.time));
 
 	let measureLengths = _.map(measures, (measure, i) => {
 		let measureLength = _.sum(_.map(itemsInMeasure[i], ({items}) => {
@@ -190,14 +193,14 @@ Line.prototype.renderMeasures = function (measures, lineGroup, lineLength) {
 }
 
 Line.prototype.note = function (note, measures) {
-	let measure = Measure.getByTime(measures, note.time);
+	let measure = getMeasureByTime(measures, note.time);
 	if (measure) {
 		measure.note(note);
 	}
 }
 
 Line.prototype.rest = function (rest, measures) {
-	let measure = Measure.getByTime(measures, rest.time);
+	let measure = getMeasureByTime(measures, rest.time);
 	if (measure) {
 		measure.rest(rest);
 	}

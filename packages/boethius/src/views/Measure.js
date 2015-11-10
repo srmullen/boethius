@@ -150,25 +150,6 @@ Measure.createMeasures = function (numMeasures, children) {
 	return measures;
 }
 
-/*
- * @param measures - array of measures.
- * @param time - number representing time of event.
- */
-Measure.getMeasureNumber = function (measures, time) {
-	return _.findIndex(measures, (measure) => {
-		let measureEndsAt = measure.startsAt + timeUtils.getMeasureDuration(measure);
-		return time >= measure.startsAt && time < measureEndsAt;
-	});
-}
-
-/*
- * @param measures - array of measures.
- * @param time - number representing time of event.
- */
-Measure.getByTime = function (measures, time) {
-	return measures[Measure.getMeasureNumber(measures, time)];
-}
-
 Measure.addGroupEvents = function (group) {
 	_.extend(group, {
 		onMouseEnter: () => {

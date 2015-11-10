@@ -19,28 +19,4 @@ describe("Measure", () => {
 			expect(Measure.createMeasures(4, measures).map(m => m.startsAt)).to.eql([0, 0.75, 1.5, 2.25]);
         });
     });
-
-    describe("getMeasureNumber", () => {
-        it("should return the index of the measure in the measures array given the time", () => {
-            let measures = Measure.createMeasures(4);
-            expect(Measure.getMeasureNumber(measures, 0)).to.equal(0);
-            expect(Measure.getMeasureNumber(measures, 0.5)).to.equal(0);
-            expect(Measure.getMeasureNumber(measures, 0.99)).to.equal(0);
-            expect(Measure.getMeasureNumber(measures, 1)).to.equal(1);
-            expect(Measure.getMeasureNumber(measures, 2.25)).to.equal(2);
-            expect(Measure.getMeasureNumber(measures, 5)).to.equal(-1);
-        });
-    });
-
-    describe("getByTime", () => {
-        it("should return the measure that contains the given time", () => {
-            let measures = Measure.createMeasures(4);
-            expect(Measure.getByTime(measures, 0)).to.equal(measures[0]);
-            expect(Measure.getByTime(measures, 0.5)).to.equal(measures[0]);
-            expect(Measure.getByTime(measures, 0.99)).to.equal(measures[0]);
-            expect(Measure.getByTime(measures, 1)).to.equal(measures[1]);
-            expect(Measure.getByTime(measures, 2.25)).to.equal(measures[2]);
-            expect(Measure.getByTime(measures, 5)).not.to.be.ok;
-        });
-    });
 });

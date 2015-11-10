@@ -7,7 +7,7 @@ function run () {
 	// createMeasures();
 	// interaction();
 
-	// renderingNotesOnLine();
+	renderingNotesOnLine();
 	oneVoice();
 	// twoVoices();
 }
@@ -162,7 +162,10 @@ function fourBars () {
 }
 
 function renderingNotesOnLine () {
-	var trebleLine = scored.line({}, [scored.clef({measure: 0}), scored.clef({value: "bass", measure: 1})]);
+	var trebleLine = scored.line({}, [scored.clef({measure: 0}),
+									  scored.timeSig({value: "4/4", measure: 0}),
+									  scored.clef({value: "bass", measure: 1})
+								  ]);
 	var voice = scored.voice({}, [scored.note({pitch: "a4", value: 2}), scored.note({pitch: "b4", value: 2}),
 								  scored.note({pitch: "c4", value: 2}), scored.note({pitch: "d4", value: 4}), scored.rest({value: 4})]);
 	// var composition = scored.compose(trebleLine, [voice]);
@@ -171,7 +174,9 @@ function renderingNotesOnLine () {
 }
 
 function oneVoice () {
-	var line = scored.line({}, [scored.clef({value: "treble", measure: 0}), scored.timeSig({value: "4/4", measure: 0})]);
+	var line = scored.line({}, [scored.clef({value: "treble", measure: 0}),
+								scored.timeSig({value: "4/4", measure: 0}),
+								scored.clef({value: "bass", measure: 2})]);
 	var notes = _.fill(new Array(16), 16).concat(_.fill(new Array(8), 8)).concat(_.fill(new Array(4), 4)).concat(_.fill(new Array(2), 2)).concat(_.fill(new Array(1), 1));
 	var voice = scored.voice({}, _.map(notes, function (n) {return scored.note({value: n})}));
 

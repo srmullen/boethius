@@ -5,7 +5,7 @@ import {concat} from "../utils/common";
 import * as placement from "../utils/placement";
 import * as lineUtils from "../utils/line";
 import * as noteUtils from "../utils/note";
-import {calculateDuration} from "../utils/timeUtils";
+import {calculateDuration, getMeasureNumber} from "../utils/timeUtils";
 import Note from "./Note";
 import Measure from "./Measure";
 
@@ -41,7 +41,7 @@ Voice.prototype.renderChildren = function () {
 Voice.prototype.renderNoteDecorations = function (line, measures) {
     // group children by measures
     let b = lineUtils.b(line.group),
-        itemsByMeasure = _.groupBy(this.children, child => Measure.getMeasureNumber(measures, child.time));
+        itemsByMeasure = _.groupBy(this.children, child => getMeasureNumber(measures, child.time));
 
     _.map(itemsByMeasure, (items, measureNum) => {
         let notes = _.filter(items, item => item.type === constants.type.note);

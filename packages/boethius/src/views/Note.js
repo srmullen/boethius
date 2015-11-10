@@ -70,7 +70,7 @@ Note.findBeaming = function (timeSig, notes) {
 		baseTime = notes[0].time; // the time from which the groupings are reckoned.
 
 	// remove notes that don't need beaming or flags (i.e. quarter notes and greater)
-	let flaggedNotes = _.groupBy(_.filter(notes, note => note.needsStem()), note => {
+	let stemmedNotes = _.groupBy(_.filter(notes, note => note.type === constants.type.note && note.needsStem()), note => {
 		return Math.floor(timeUtils.getBeat(note.time, sig, baseTime));
 	});
 
@@ -78,16 +78,13 @@ Note.findBeaming = function (timeSig, notes) {
 	for (let i = 0, beat = 0; i < timeSig.beatStructure.length; i++) { // count down through the beats for each
 		// let grouping = [];											   // beat structure and add the notes to be beamed.
 		for (let beats = timeSig.beatStructure[i]; beats > 0; beats--) {
-			// if (flaggedNotes[beat]) grouping = concat(grouping, flaggedNotes[beat]);
-			if (flaggedNotes[beat]) {
-				let beatSubdivisions = partitionBy(flaggedNotes[beat], note => note.needsFlag())
-				// grouping = grouping.concat();
+			if (stemmedNotes[beat]) {
+				let beatSubdivisions = partitionBy(stemmedNotes[beat], note => note.needsFlag())
 				_.each(beatSubdivisions, subdivision => groupings.push(subdivision));
 			}
 
 			beat++;
 		}
-		// if (grouping.length) groupings.push(grouping);
 	}
 
 	return groupings;
