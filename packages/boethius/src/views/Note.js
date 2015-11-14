@@ -35,19 +35,22 @@ Note.render = function (note, position) {
 	return group;
 }
 
-Note.renderStem = function (note) {
+Note.renderStem = function (note, bline) {
 	if (note.needsStem()) {
-		let stemDirection = noteUtils.getStemDirection(note),
-			stemPoint = noteUtils.defaultStemPoint(note, Scored.utils.note.getStemLength(note), stemDirection);
+		let stemDirection = noteUtils.getStemDirection(note, bline),
+			stemPoint = noteUtils.defaultStemPoint(note, Scored.utils.note.getStemLength(note, bline), stemDirection);
 		note.drawStem(stemPoint, stemDirection);
 		note.drawFlag();
 	}
 }
 
-// FIXME: this needs a better name
-Note.renderDecorations = function (notes) {
+/*
+ * @param notes Note[]
+ * @param bline - point representing start of center line
+ */
+Note.renderDecorations = function (notes, bline) {
 	if (notes.length === 1) {
-		Note.renderStem(notes[0]);
+		Note.renderStem(notes[0], bline);
 	} else {
 		return noteUtils.beam(notes);
 	}

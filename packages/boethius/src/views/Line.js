@@ -1,8 +1,7 @@
 import constants from "../constants";
 import engraver from "../engraver";
 import Measure from "./Measure";
-// import * as timeUtils from "../utils/timeUtils";
-import {getMeasureNumber, getMeasureByTime} from "../utils/timeUtils";
+import {getTime, getMeasureNumber, getMeasureByTime} from "../utils/timeUtils";
 import * as placement from "../utils/placement";
 import * as common from "../utils/common";
 import * as lineUtils from "../utils/line";
@@ -72,7 +71,7 @@ Line.render = function (line, length, voices, numMeasures=1) {
 		return acc.concat(voice.children);
 	}, []));
 	let times = _.sortBy(_.map(_.groupBy(allItems, (item) => {
-		return item.time || 0;
+		return getTime(measures, item).time;
 	}), (v, k) => {
 		return {time: Number.parseFloat(k), items: v};
 	}), v => v.time);
@@ -90,9 +89,16 @@ Line.render = function (line, length, voices, numMeasures=1) {
 			context = line.contextAt(measures, {measure: measureNumber}),
 			leftBarline = measures[measureNumber].barlines[0],
 			[markings, voiceItems] = _.partition(items, isMarking);
+
+		// update cursor if its a new measure.
+		if (measureNumber !== previousMeasureNumber) {
+			cursor = leftBarline.position.x + noteHeadWidth;
+		}
+
 		// Place markings at the given time.
 		let definateNextPosition = markings.map(marking => {
-			marking.group.translate(cursor, 0);
+			// marking.group.translate(cursor, 0);
+			marking.group.translate(placement.getYOffset(marking, new paper.Point(cursor, 0)));
 			cursor += marking.group.bounds.width + noteHeadWidth; // FIXME: needs a little work for perfect positioning
 		});
 
@@ -102,9 +108,6 @@ Line.render = function (line, length, voices, numMeasures=1) {
 				yPos = item.type === "note" ?
 					placement.calculateNoteYpos(item, Scored.config.lineSpacing/2, placement.getClefBase(context.clef.value)) : 0;
 
-			if (measureNumber !== previousMeasureNumber) {
-				cursor = leftBarline.position.x + noteHeadWidth;
-			}
 			item.group.translate(pos.add(cursor, yPos));
 
 			return item.group.bounds.width + (noteHeadWidth * placement.getStaffSpace(shortestDuration, item));

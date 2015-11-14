@@ -9,8 +9,6 @@ function getStemDirection (note, bLine) {
 	if (note.stemDirection) {
 		return note.stemDirection;
 	} else if (!_.isUndefined(bLine)) {
-		// return "down"; // FIXME: figure out when adding notes to lines
-		// return (note.noteHead.position.y <= bLine.y) ? "down" : "up";
 		return (placement.getNoteHeadCenter(note.noteHead.position).y > bLine.y) ? "up" : "down";
 	} else {
 		return "up";
@@ -20,8 +18,14 @@ function getStemDirection (note, bLine) {
 /*
  * @param bline - y position of the bline
  */
-function getStemLength (/*note, bline, octaveHeight*/) {
-	return Scored.config.lineSpacing * 3.5;
+function getStemLength (note, bline) {
+	let octaveHeight = Scored.config.lineSpacing * 3.5;
+
+	if (!bline) return octaveHeight;
+
+	let noteDistance = Math.abs(bline.y - placement.getNoteHeadCenter(note.noteHead.position).y);
+
+	return Math.max(octaveHeight, noteDistance);
 }
 
 function defaultStemPoint (note, stemLength, stemDirection) {

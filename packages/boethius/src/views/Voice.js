@@ -52,7 +52,7 @@ Voice.prototype.renderNoteDecorations = function (line, measures) {
     _.map(itemsByMeasure, (items, measure) => {
         let context = line.contextAt(measures, {measure: Number.parseInt(measure)});
         let beamings = Note.findBeaming(context.timeSig, items);
-        let beams = _.compact(beamings.map(noteGrouping => Note.renderDecorations(noteGrouping)));
+        let beams = _.compact(beamings.map(noteGrouping => Note.renderDecorations(noteGrouping, b)));
         if (beams && beams.length) {
             line.group.addChildren(beams);
         }
