@@ -8,6 +8,7 @@ import * as noteUtils from "../utils/note";
 import {calculateDuration, getMeasureNumber} from "../utils/timeUtils";
 import Note from "./Note";
 import Measure from "./Measure";
+import {getCenterLineValue} from "./Clef";
 
 function Voice ({value, stemDirection}, children=[]) {
     this.value = value;
@@ -51,8 +52,9 @@ Voice.prototype.renderNoteDecorations = function (line, measures) {
     // beam the notes
     _.map(itemsByMeasure, (items, measure) => {
         let context = line.contextAt(measures, {measure: Number.parseInt(measure)});
+        let centerLineValue = getCenterLineValue(context.clef);
         let beamings = Note.findBeaming(context.timeSig, items);
-        let beams = _.compact(beamings.map(noteGrouping => Note.renderDecorations(noteGrouping, b)));
+        let beams = _.compact(beamings.map(noteGrouping => Note.renderDecorations(noteGrouping, b, centerLineValue)));
         if (beams && beams.length) {
             line.group.addChildren(beams);
         }

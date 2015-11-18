@@ -33,4 +33,19 @@ Clef.prototype.render = function (position) {
 	return group;
 }
 
+const centerLineValues = {
+	treble: "b4",
+	bass: "d3",
+	alto: "c4",
+	tenor: "a4"
+}
+
+/*
+ * @param Clef
+ * @return String - note value of the center line.
+ */
+export function getCenterLineValue (clef) {
+	return centerLineValues[clef.value];
+}
+
 export default Clef;

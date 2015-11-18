@@ -2,7 +2,7 @@ import {expect} from "chai";
 
 import Scored from "../src/Scored";
 import Note from "../src/views/Note";
-// import {findBeaming} from "../src/utils/note";
+import {getSteps, getNoteStemDirections} from "../src/utils/note";
 
 describe("Note", () => {
     let scored = new Scored();
@@ -32,6 +32,46 @@ describe("Note", () => {
 
         it("should split collection of notes into groups that need to be beamed", () => {
 
+        });
+    });
+
+    describe("getSteps", () => {
+        it("should return the number of visible steps on a staff between given note values", () => {
+            expect(getSteps("b4", "b4")).to.equal(0);
+            expect(getSteps("b4", "a4")).to.equal(-1);
+            expect(getSteps("b4", "ab4")).to.equal(-1);
+            expect(getSteps("b4", "a#4")).to.equal(-1);
+            expect(getSteps("b4", "g#4")).to.equal(-2);
+            expect(getSteps("b4", "gb4")).to.equal(-2);
+            expect(getSteps("b4", "b3")).to.equal(-7);
+
+            expect(getSteps("b4", "c5")).to.equal(1);
+            expect(getSteps("b4", "b5")).to.equal(7);
+            expect(getSteps("b4", "c#5")).to.equal(1);
+            expect(getSteps("b4", "c6")).to.equal(8);
+            expect(getSteps("b4", "d6")).to.equal(9);
+        });
+    });
+
+    describe("getNoteStemDirections", () => {
+        it("should return an array of stem directions", () => {
+            let centerLine = "b4",
+                e4 = scored.note({pitch: "e4", value: 16}),
+                f4 = scored.note({pitch: "f4", value: 16}),
+                g4 = scored.note({pitch: "g4", value: 16}),
+                a4 = scored.note({pitch: "a4", value: 16}),
+                b4 = scored.note({pitch: "b4", value: 16}),
+                c5 = scored.note({pitch: "c5", value: 16}),
+                d5 = scored.note({pitch: "d5", value: 16}),
+                e5 = scored.note({pitch: "e5", value: 16}),
+                f5 = scored.note({pitch: "f5", value: 16});
+
+            expect(getNoteStemDirections([e4, f4, g4, a4], centerLine)).to.eql(["up", "up", "up", "up"]);
+            expect(getNoteStemDirections([g4, a4, b4, c5], centerLine)).to.eql(["up", "up", "up", "up"]);
+            expect(getNoteStemDirections([a4, b4, c5, d5], centerLine)).to.eql(["down", "down", "down", "down"]);
+            expect(getNoteStemDirections([d5, c5, b4, a4], centerLine)).to.eql(["down", "down", "down", "down"]);
+            expect(getNoteStemDirections([e4, e5], centerLine)).to.eql(["up", "up"]);
+            expect(getNoteStemDirections([e4, f5], centerLine)).to.eql(["down", "down"]);
         });
     });
 });

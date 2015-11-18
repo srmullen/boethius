@@ -100,7 +100,10 @@ function beamedEigthsUp () {
 	n3.render().translate([100, 225])
 	n4.render().translate([125, 180]);
 
-	Scored.utils.note.beam([n1, n2, n3, n4], new paper.Point(150, 150), new paper.Point(100, -15));
+	Scored.utils.note.beam([n1, n2, n3, n4], {
+		fulcrum: new paper.Point(150, 150),
+		vector: new paper.Point(100, -15)
+	});
 }
 
 function beamedEigthsDown () {
@@ -114,7 +117,7 @@ function beamedEigthsDown () {
 	n3.render([250, 260]);
 	n4.render([275, 180]);
 
-	Scored.utils.note.beam([n1, n2, n3, n4]);
+	Scored.utils.note.beam([n1, n2, n3, n4], {});
 }
 
 function simpleBeam (type, yPos) {
@@ -129,8 +132,8 @@ function simpleBeam (type, yPos) {
 	n3.render().translate([625, yPos - 25]);
 	n4.render().translate([650, yPos - 25]);
 
-	Scored.utils.note.beam([n1, n2], null, new paper.Point(100, 15));
-	Scored.utils.note.beam([n3, n4]);
+	Scored.utils.note.beam([n1, n2], {vector: new paper.Point(100, 15)});
+	Scored.utils.note.beam([n3, n4], {});
 }
 
 function testBeaming (d1, d2, yPos, stemDirection) {
@@ -171,10 +174,10 @@ function testBeaming (d1, d2, yPos, stemDirection) {
 	n12.render().translate([450, yPos]);
 	n13.render().translate([475, yPos]);
 
-	Scored.utils.note.beam([n1, n2, n3, n4]);
-	Scored.utils.note.beam([n5, n6, n7, n8, n9], null, new paper.Point(100, -15));
-	Scored.utils.note.beam([n10, n11], null, new paper.Point(100, 25));
-	Scored.utils.note.beam([n12, n13], null, new paper.Point(100, 25));
+	Scored.utils.note.beam([n1, n2, n3, n4], {});
+	Scored.utils.note.beam([n5, n6, n7, n8, n9], {vector: new paper.Point(100, -15)});
+	Scored.utils.note.beam([n10, n11], {vector: new paper.Point(100, 25)});
+	Scored.utils.note.beam([n12, n13], {vector: new paper.Point(100, 25)});
 }
 
 function renderNote (note, xPos, yPos) {

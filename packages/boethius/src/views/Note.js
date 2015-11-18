@@ -46,13 +46,15 @@ Note.renderStem = function (note, bline) {
 
 /*
  * @param notes Note[]
- * @param bline - point representing start of center line
+ * @param centerLine - point representing start of center line.
+ * @param centerLineValue - String representing note value.
+ * FIXME: choice should probably be made between centerLine and centerLineValue
  */
-Note.renderDecorations = function (notes, bline) {
+Note.renderDecorations = function (notes, centerLine, centerLineValue) {
 	if (notes.length === 1) {
-		Note.renderStem(notes[0], bline);
+		Note.renderStem(notes[0], centerLine);
 	} else {
-		return noteUtils.beam(notes);
+		return noteUtils.beam(notes, {line: centerLineValue});
 	}
 }
 

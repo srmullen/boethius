@@ -1,5 +1,6 @@
 import * as common from "../utils/common";
 import * as placement from "../utils/placement";
+import teoria from "teoria";
 import _ from "lodash";
 
 /*
@@ -13,6 +14,24 @@ function getStemDirection (note, bLine) {
 	} else {
 		return "up";
 	}
+}
+
+// for use in getSteps function
+const noteValues = {c: 0, d: 1, e: 2, f: 3, g: 4, a: 5, b: 6};
+
+/*
+ * @param n1 - String representing the value of a note.
+ * @param n2 - String representing the value of a note.
+ * @return - Number of visible steps on a staff as the difference between n1 and n2.
+ */
+function getSteps (n1, n2) {
+	let note1 = teoria.note(n1),
+		note2 = teoria.note(n2);
+
+	let octaveDiff = note2.octave() - note1.octave(),
+		noteDiff = noteValues[note2.name()] - noteValues[note1.name()];
+
+	return (octaveDiff * 7) + noteDiff;
 }
 
 /*
@@ -52,24 +71,35 @@ function getLinePoint (x, fulcrum, vector) {
 	return fulcrum.add(shift, vector.y / vector.x * shift);
 }
 
-function getStemPoint (note, fulcrum, vector) {
+function getStemPoint (note, fulcrum, vector, direction) {
 	if (!note) {return;}
 
 	var duration = getDuration(note),
 		// get the beam point at the center of the noteHead
 		noteHead = placement.getNoteHeadCenter(note.noteHead.position),
 		centerPoint = getLinePoint(noteHead.x, fulcrum, vector),
-		direction = centerPoint.y < noteHead.y ? "up" : "down",
+		// direction = centerPoint.y < noteHead.y ? "up" : "down",
 		point = getLinePoint((direction === "up" ? note.noteHead.bounds.right : note.noteHead.bounds.left), fulcrum, vector);
 
-	return {point, direction, duration};
+	return {point, duration};
 }
 
-const durationToBars = {
+/*
+ * @param notes Note[]
+ * @param centerLineValue - String representing center line note value
+ */
+function getNoteStemDirections (notes, centerLineValue) {
+	let averageDirection = _.sum(notes.map(note => getSteps(centerLineValue, note.pitch))) < 0 ? "up" : "down";
+
+	return notes.map(note => averageDirection);
+}
+
+// for use in beam function
+const durationToBeams = {
 	8: 1, 16: 2, 32: 3, 64: 4, 128: 5, 256: 6
 };
 
-function handleBeam (beam, {point, direction, duration}, previous, next, fulcrum, vector, yDiff) {
+function handleBeam (beam, {point, duration}, previous, next, fulcrum, vector, direction, yDiff) {
 	let lastBeam = _.last(beam),
 		BEAM_DIFF = [0, yDiff],
 		p16;
@@ -103,70 +133,75 @@ function handleBeam (beam, {point, direction, duration}, previous, next, fulcrum
  * @param notes - collection of the notes to bar.
  * @param fulcrum - a point that the bar passes through
  * @param vector - the vector of the bar
+ * @param line - String value of center line
  */
-function beam (notes, fulcrum, vector) {
-	vector = vector || new paper.Point(1, 0); // defaults to a flat line
-	fulcrum = fulcrum || defaultStemPoint(notes[0], getStemLength(notes[0]), getStemDirection(notes[0]));
+function beam (notes, {line="b4", fulcrum, vector, kneeGap=5.5}) {
 
-	let numBars = durationToBars[_.max(_.map(notes, note => note.note.duration.value))];
-		// bars is an array of arrays of segments, bars[0] are eighth segments, bars[1] sixteenths, etc.
-	let bars = common.doTimes(numBars, () => [[]]),
+	let numBeams = durationToBeams[_.max(_.map(notes, note => note.note.duration.value))];
+	let stemDirections = getNoteStemDirections(notes, line);
+
+	vector = vector || new paper.Point(1, 0); // defaults to a flat line
+	fulcrum = fulcrum || defaultStemPoint(notes[0], getStemLength(notes[0]), stemDirections[0]);
+
+	// beams is an array of arrays of segments, beams[0] are eighth segments, beams[1] sixteenths, etc.
+	let beams = common.doTimes(numBeams, () => [[]]),
 		segments = _.reduce(notes, (acc, note, i) => {
-			let {point, direction, duration} = _.last(acc),
+			let {point, duration} = _.last(acc),
+				direction = stemDirections[i],
 				current = _.last(acc),
 				previous = acc[i-1],
 				nextNote = notes[i+1],
-				next = getStemPoint(nextNote, fulcrum, vector);
+				next = getStemPoint(nextNote, fulcrum, vector, stemDirections[i+1]);
 
-			_.last(bars[0]).push(point);
+			_.last(beams[0]).push(point);
 
 			if (duration >= 16) {
-				handleBeam(bars[1], current, previous, next, fulcrum, vector, 5);
+				handleBeam(beams[1], current, previous, next, fulcrum, vector, direction, 5);
 			}
 
 			if (duration >= 32) {
-				handleBeam(bars[2], current, previous, next, fulcrum, vector, 10);
+				handleBeam(beams[2], current, previous, next, fulcrum, vector, direction, 10);
 			}
 
 			if (duration >= 64) {
-				handleBeam(bars[3], current, previous, next, fulcrum, vector, 15);
+				handleBeam(beams[3], current, previous, next, fulcrum, vector, direction, 15);
 			}
 
 			if (duration >= 128) {
-				handleBeam(bars[4], current, previous, next, fulcrum, vector, 20);
+				handleBeam(beams[4], current, previous, next, fulcrum, vector, direction, 20);
 			}
 
 			if (duration >= 256) {
-				handleBeam(bars[5], current, previous, next, fulcrum, vector, 25);
+				handleBeam(beams[5], current, previous, next, fulcrum, vector, direction, 25);
 			}
 
-			// Break bars
-			if (duration < 16 && bars[1]) {
-				bars[1].push([]);
+			// Break beams
+			if (duration < 16 && beams[1]) {
+				beams[1].push([]);
 			}
 
-			if (duration < 32 && bars[2]) {
-				bars[2].push([]);
+			if (duration < 32 && beams[2]) {
+				beams[2].push([]);
 			}
 
-			if (duration < 64 && bars[3]) {
-				bars[3].push([]);
+			if (duration < 64 && beams[3]) {
+				beams[3].push([]);
 			}
 
-			if (duration < 128 && bars[4]) {
-				bars[4].push([]);
+			if (duration < 128 && beams[4]) {
+				beams[4].push([]);
 			}
 
-			if (duration < 256 && bars[5]) {
-				bars[5].push([]);
+			if (duration < 256 && beams[5]) {
+				beams[5].push([]);
 			}
 
 			note.drawStem(point, direction);
 
 			return common.concat(acc, next);
-		}, [getStemPoint(notes[0], fulcrum, vector)]), // initialize the accumulator with the first point
+		}, [getStemPoint(notes[0], fulcrum, vector, stemDirections[0])]), // initialize the accumulator with the first point
 
-		paths = _.map(_.flatten(bars), (bar) => {
+		paths = _.map(_.flatten(beams), (bar) => {
 			return new paper.Path({
 				segments: bar,
 				strokeColor: "black",
@@ -227,5 +262,7 @@ export {
 	getStemLength,
 	getStemPoint,
 	defaultStemPoint,
-	slur
+	slur,
+	getSteps,
+	getNoteStemDirections
 };
