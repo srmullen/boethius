@@ -74,13 +74,14 @@ function getLinePoint (x, fulcrum, vector) {
 function getStemPoint (note, fulcrum, vector, direction) {
 	if (!note) {return;}
 
-	var duration = getDuration(note),
+	// var duration = getDuration(note),
 		// get the beam point at the center of the noteHead
-		noteHead = placement.getNoteHeadCenter(note.noteHead.position),
+	let noteHead = placement.getNoteHeadCenter(note.noteHead.position),
 		centerPoint = getLinePoint(noteHead.x, fulcrum, vector),
 		point = getLinePoint((direction === "up" ? note.noteHead.bounds.right : note.noteHead.bounds.left), fulcrum, vector);
 
-	return {point, duration};
+	// return {point, duration};
+	return point;
 }
 
 /*
@@ -98,7 +99,8 @@ const durationToBeams = {
 	8: 1, 16: 2, 32: 3, 64: 4, 128: 5, 256: 6
 };
 
-function handleBeam (beam, {point, duration}, previous, next, fulcrum, vector, direction, yDiff) {
+// function handleBeam (beam, {point, duration}, previous, next, fulcrum, vector, direction, yDiff) {
+function handleBeam (beam, point, duration, previous, next, fulcrum, vector, direction, yDiff) {
 	let lastBeam = _.last(beam),
 		BEAM_DIFF = [0, yDiff],
 		p16;
@@ -140,6 +142,7 @@ function beam (notes, {line="b4", fulcrum, vector, kneeGap=5.5}) {
 	let stemDirections = getNoteStemDirections(notes, line);
 
 	// TODO: Calculate each stem point as it would be if it were placed on its own
+	let durations = notes.map(getDuration);
 
 	vector = vector || new paper.Point(1, 0); // defaults to a flat line
 	fulcrum = fulcrum || defaultStemPoint(notes[0], getStemLength(notes[0]), stemDirections[0]);
@@ -147,7 +150,9 @@ function beam (notes, {line="b4", fulcrum, vector, kneeGap=5.5}) {
 	// beams is an array of arrays of segments, beams[0] are eighth segments, beams[1] sixteenths, etc.
 	let beams = common.doTimes(numBeams, () => [[]]),
 		segments = _.reduce(notes, (acc, note, i) => {
-			let {point, duration} = _.last(acc),
+			// let {point, duration} = _.last(acc),
+			let point = _.last(acc),
+				duration = durations[i],
 				direction = stemDirections[i],
 				current = _.last(acc),
 				previous = acc[i-1],
@@ -157,23 +162,23 @@ function beam (notes, {line="b4", fulcrum, vector, kneeGap=5.5}) {
 			_.last(beams[0]).push(point);
 
 			if (duration >= 16) {
-				handleBeam(beams[1], current, previous, next, fulcrum, vector, direction, 5);
+				handleBeam(beams[1], current, duration, previous, next, fulcrum, vector, direction, 5);
 			}
 
 			if (duration >= 32) {
-				handleBeam(beams[2], current, previous, next, fulcrum, vector, direction, 10);
+				handleBeam(beams[2], current, duration, previous, next, fulcrum, vector, direction, 10);
 			}
 
 			if (duration >= 64) {
-				handleBeam(beams[3], current, previous, next, fulcrum, vector, direction, 15);
+				handleBeam(beams[3], current, duration, previous, next, fulcrum, vector, direction, 15);
 			}
 
 			if (duration >= 128) {
-				handleBeam(beams[4], current, previous, next, fulcrum, vector, direction, 20);
+				handleBeam(beams[4], current, duration, previous, next, fulcrum, vector, direction, 20);
 			}
 
 			if (duration >= 256) {
-				handleBeam(beams[5], current, previous, next, fulcrum, vector, direction, 25);
+				handleBeam(beams[5], current, duration, previous, next, fulcrum, vector, direction, 25);
 			}
 
 			// Break beams
