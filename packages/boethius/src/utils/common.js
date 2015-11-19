@@ -97,11 +97,37 @@ function serialize (item) {
 	return _.filter([item.type, item, _.map(item.children, serialize)], v => _.size(v));
 }
 
+/*
+ * @param fn - Function of any number of arguments to map across the colls until one of the is exhausted.
+ * 		Ignores remaining items in other colls.
+ * @param colls - any number of collections each of which will be passed to each arg of fn
+ * @return Array of results from fn.
+ */
+function map (fn, ...colls) {
+	let l = _.min(colls.map(coll => coll.length)),
+		ret = new Array(l);
+	for (let i = 0; i < l; i++) {
+		let elms = colls.map(coll => coll[i]);
+		ret[i] = fn.apply(null, elms);
+	}
+	return ret;
+}
+
+/*
+ * Takes a variable number of functions. Returns a function that is the juxtposition of those functions.
+ * ex. juxt(a, b, c)(x) = [a(x), b(x), c(x)]
+ */
+function juxt (...fns) {
+	return (x) => fns.map(fn => fn(x));
+}
+
 export {
 	concat,
 	doTimes,
 	addEvents,
 	debugGroupEvents,
 	serialize,
-	partitionBy
+	partitionBy,
+	map,
+	juxt
 }

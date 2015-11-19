@@ -78,7 +78,6 @@ function getStemPoint (note, fulcrum, vector, direction) {
 		// get the beam point at the center of the noteHead
 		noteHead = placement.getNoteHeadCenter(note.noteHead.position),
 		centerPoint = getLinePoint(noteHead.x, fulcrum, vector),
-		// direction = centerPoint.y < noteHead.y ? "up" : "down",
 		point = getLinePoint((direction === "up" ? note.noteHead.bounds.right : note.noteHead.bounds.left), fulcrum, vector);
 
 	return {point, duration};
@@ -139,6 +138,8 @@ function beam (notes, {line="b4", fulcrum, vector, kneeGap=5.5}) {
 
 	let numBeams = durationToBeams[_.max(_.map(notes, note => note.note.duration.value))];
 	let stemDirections = getNoteStemDirections(notes, line);
+
+	// TODO: Calculate each stem point as it would be if it were placed on its own
 
 	vector = vector || new paper.Point(1, 0); // defaults to a flat line
 	fulcrum = fulcrum || defaultStemPoint(notes[0], getStemLength(notes[0]), stemDirections[0]);
