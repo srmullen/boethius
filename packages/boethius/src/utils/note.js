@@ -71,16 +71,14 @@ function getLinePoint (x, fulcrum, vector) {
 	return fulcrum.add(shift, vector.y / vector.x * shift);
 }
 
-function getStemPoint (note, fulcrum, vector, direction) {
+function calculateStemPoint (note, fulcrum, vector, direction) {
 	if (!note) {return;}
 
-	// var duration = getDuration(note),
-		// get the beam point at the center of the noteHead
+	// get the beam point at the center of the noteHead
 	let noteHead = placement.getNoteHeadCenter(note.noteHead.position),
 		centerPoint = getLinePoint(noteHead.x, fulcrum, vector),
 		point = getLinePoint((direction === "up" ? note.noteHead.bounds.right : note.noteHead.bounds.left), fulcrum, vector);
 
-	// return {point, duration};
 	return point;
 }
 
@@ -141,23 +139,22 @@ function beam (notes, {line="b4", fulcrum, vector, kneeGap=5.5}) {
 	let numBeams = durationToBeams[_.max(_.map(notes, note => note.note.duration.value))];
 	let stemDirections = getNoteStemDirections(notes, line);
 
-	// TODO: Calculate each stem point as it would be if it were placed on its own
-	let durations = notes.map(getDuration);
+	let durations = notes.map(getDuration),
+		stemPoints = notes.map((note, i) => defaultStemPoint(note, getStemLength(note), stemDirections[i]));
 
 	vector = vector || new paper.Point(1, 0); // defaults to a flat line
-	fulcrum = fulcrum || defaultStemPoint(notes[0], getStemLength(notes[0]), stemDirections[0]);
+	fulcrum = fulcrum || stemPoints[0];
 
 	// beams is an array of arrays of segments, beams[0] are eighth segments, beams[1] sixteenths, etc.
 	let beams = common.doTimes(numBeams, () => [[]]),
 		segments = _.reduce(notes, (acc, note, i) => {
-			// let {point, duration} = _.last(acc),
 			let point = _.last(acc),
 				duration = durations[i],
 				direction = stemDirections[i],
 				current = _.last(acc),
 				previous = acc[i-1],
 				nextNote = notes[i+1],
-				next = getStemPoint(nextNote, fulcrum, vector, stemDirections[i+1]);
+				next = calculateStemPoint(nextNote, fulcrum, vector, stemDirections[i+1]);
 
 			_.last(beams[0]).push(point);
 
@@ -205,7 +202,7 @@ function beam (notes, {line="b4", fulcrum, vector, kneeGap=5.5}) {
 			note.drawStem(point, direction);
 
 			return common.concat(acc, next);
-		}, [getStemPoint(notes[0], fulcrum, vector, stemDirections[0])]), // initialize the accumulator with the first point
+		}, [calculateStemPoint(notes[0], fulcrum, vector, stemDirections[0])]), // initialize the accumulator with the first point
 
 		paths = _.map(_.flatten(beams), (bar) => {
 			return new paper.Path({
@@ -266,7 +263,7 @@ export {
 	getDuration,
 	getStemDirection,
 	getStemLength,
-	getStemPoint,
+	calculateStemPoint,
 	defaultStemPoint,
 	slur,
 	getSteps,
