@@ -37,9 +37,11 @@ Voice.prototype.renderChildren = function () {
 }
 
 /*
- * @param bLine - point representing leftmost starting point of center line
+ * @param line - Line that the voice is being rendered on.
+ * @param measures - Measure[]
+ * @param voiceNum - optional number specifying which voice, 0 = top voice on the line, 1 = lower voice. Affects stem directions.
  */
-Voice.prototype.renderNoteDecorations = function (line, measures) {
+Voice.prototype.renderNoteDecorations = function (line, measures, voiceNum) {
     // group children by measures
     let b = lineUtils.b(line.group),
         itemsByMeasure = _.groupBy(this.children, child => getMeasureNumber(measures, child.time));
@@ -54,7 +56,7 @@ Voice.prototype.renderNoteDecorations = function (line, measures) {
         let context = line.contextAt(measures, {measure: Number.parseInt(measure)});
         let centerLineValue = getCenterLineValue(context.clef);
         let beamings = Note.findBeaming(context.timeSig, items);
-        let beams = _.compact(beamings.map(noteGrouping => Note.renderDecorations(noteGrouping, b, centerLineValue)));
+        let beams = _.compact(beamings.map(noteGrouping => Note.renderDecorations(noteGrouping, centerLineValue, voiceNum)));
         if (beams && beams.length) {
             line.group.addChildren(beams);
         }

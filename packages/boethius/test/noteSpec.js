@@ -2,7 +2,7 @@ import {expect} from "chai";
 
 import Scored from "../src/Scored";
 import Note from "../src/views/Note";
-import {getSteps, getNoteStemDirections} from "../src/utils/note";
+import {getSteps, getAverageStemDirection} from "../src/utils/note";
 
 describe("Note", () => {
     let scored = new Scored();
@@ -53,7 +53,7 @@ describe("Note", () => {
         });
     });
 
-    describe("getNoteStemDirections", () => {
+    describe("getAverageStemDirection", () => {
         it("should return an array of stem directions", () => {
             let centerLine = "b4",
                 e4 = scored.note({pitch: "e4", value: 16}),
@@ -66,12 +66,12 @@ describe("Note", () => {
                 e5 = scored.note({pitch: "e5", value: 16}),
                 f5 = scored.note({pitch: "f5", value: 16});
 
-            expect(getNoteStemDirections([e4, f4, g4, a4], centerLine)).to.eql(["up", "up", "up", "up"]);
-            expect(getNoteStemDirections([g4, a4, b4, c5], centerLine)).to.eql(["up", "up", "up", "up"]);
-            expect(getNoteStemDirections([a4, b4, c5, d5], centerLine)).to.eql(["down", "down", "down", "down"]);
-            expect(getNoteStemDirections([d5, c5, b4, a4], centerLine)).to.eql(["down", "down", "down", "down"]);
-            expect(getNoteStemDirections([e4, e5], centerLine)).to.eql(["up", "up"]);
-            expect(getNoteStemDirections([e4, f5], centerLine)).to.eql(["down", "down"]);
+            expect(getAverageStemDirection([e4, f4, g4, a4], centerLine)).to.eql(["up", "up", "up", "up"]);
+            expect(getAverageStemDirection([g4, a4, b4, c5], centerLine)).to.eql(["up", "up", "up", "up"]);
+            expect(getAverageStemDirection([a4, b4, c5, d5], centerLine)).to.eql(["down", "down", "down", "down"]);
+            expect(getAverageStemDirection([d5, c5, b4, a4], centerLine)).to.eql(["down", "down", "down", "down"]);
+            expect(getAverageStemDirection([e4, e5], centerLine)).to.eql(["up", "up"]);
+            expect(getAverageStemDirection([e4, f5], centerLine)).to.eql(["down", "down"]);
         });
     });
 });

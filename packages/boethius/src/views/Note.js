@@ -35,10 +35,10 @@ Note.render = function (note, position) {
 	return group;
 }
 
-Note.renderStem = function (note, bline) {
+Note.renderStem = function (note, centerLineValue, voiceNum) {
 	if (note.needsStem()) {
-		let stemDirection = noteUtils.getStemDirection(note, bline),
-			stemPoint = noteUtils.defaultStemPoint(note, stemDirection, Scored.utils.note.getStemLength(note, bline));
+		let stemDirection = noteUtils.getStemDirection(note, centerLineValue, voiceNum),
+			stemPoint = noteUtils.defaultStemPoint(note, stemDirection, Scored.utils.note.getStemLength(note, centerLineValue));
 		note.drawStem(stemPoint, stemDirection);
 		note.drawFlag();
 	}
@@ -46,15 +46,13 @@ Note.renderStem = function (note, bline) {
 
 /*
  * @param notes Note[]
- * @param centerLine - point representing start of center line.
  * @param centerLineValue - String representing note value.
- * FIXME: choice should probably be made between centerLine and centerLineValue
  */
-Note.renderDecorations = function (notes, centerLine, centerLineValue) {
+Note.renderDecorations = function (notes, centerLineValue, voiceNum) {
 	if (notes.length === 1) {
-		Note.renderStem(notes[0], centerLine);
+		Note.renderStem(notes[0], centerLineValue, voiceNum);
 	} else {
-		return noteUtils.beam(notes, {line: centerLineValue});
+		return noteUtils.beam(notes, {line: centerLineValue, voiceNum});
 	}
 }
 

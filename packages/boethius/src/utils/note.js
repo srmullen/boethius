@@ -4,13 +4,17 @@ import teoria from "teoria";
 import _ from "lodash";
 
 /*
- * @param bline - y position of the bline
+ * @param note - Note for which to get the stem direction.
+ * @param centerLineValue - String note pitch of center line.
+ * @param voiceNum - Number of voice the note belongs to.
  */
-function getStemDirection (note, bLine) {
+function getStemDirection (note, centerLineValue, voiceNum) {
 	if (note.stemDirection) {
 		return note.stemDirection;
-	} else if (!_.isUndefined(bLine)) {
-		return (placement.getNoteHeadCenter(note.noteHead.position).y > bLine.y) ? "up" : "down";
+	} else if (_.isNumber(voiceNum)) {
+		return voiceNum === 0 ? "up" : "down";
+	} else if (centerLineValue) {
+		return getSteps(centerLineValue, note.pitch) < 0 ? "up" : "down";
 	} else {
 		return "up";
 	}
@@ -89,56 +93,44 @@ function calculateStemPoint (note, fulcrum, vector, direction) {
 /*
  * @param notes - Note[]
  * @param stemPoints - Point[] representing default stem points of the notes.
- * @return Point with x-coord in the middle of the notes, y-coord = ?
+ * @return [fulcrum Point, vector Point]
+ * Should this be made into two functions? Thinking here was the the value of one would affect the other.
  */
-function calculateBeamFulcrum (notes, stemPoints, stemDirections) {
-	let firstStem = stemPoints[0],
-		lastStem = stemPoints[stemPoints.length-1],
-		x = firstStem.x + ((lastStem.x - firstStem.x) / 2);
+function calculateBeamFulcrumAndVector (notes, stemPoints, stemDirections) {
+	let firstPoint = stemPoints[0],
+		lastPoint = stemPoints[stemPoints.length-1],
+		x = firstPoint.x + ((lastPoint.x - firstPoint.x) / 2);
+
+	let vector = lastPoint.subtract(firstPoint).normalize();
+	if (vector.angle < -Scored.config.maxBeamAngle) {
+		vector = new paper.Point({angle: -Scored.config.maxBeamAngle, length: 1});
+	} else if (vector.angle > Scored.config.maxBeamAngle) {
+		vector = new paper.Point({angle: Scored.config.maxBeamAngle, length: 1});
+	}
 
 	// get stem points given minimum stem lengths
-	let minStemLength = Scored.config.stepSpacing * 5.5;
+	let minStemLength = Scored.config.stepSpacing * 4.5;
 	let minStemPoints = map(_.partialRight(defaultStemPoint, minStemLength), notes, stemDirections);
 	// TODO: Handle stems going different directions
 	let ys;
 	if (stemDirections[0] === "up") {
-		ys = map((p1, p2) => p1.y < p2.y ? p1.y : p2.y , stemPoints, minStemPoints);
+		let minPoint = _.min(minStemPoints, p => p.y);
+		ys = stemPoints.map(p => p.y < minPoint.y ? p.y : minPoint.y);
 	} else if (stemDirections[0] === "down") {
-		ys = map((p1, p2) => p1.y > p2.y ? p1.y : p2.y , stemPoints, minStemPoints);
+		let minPoint = _.max(minStemPoints, p => p.y);
+		ys = stemPoints.map(p => p.y > minPoint.y ? p.y : minPoint.y);
 	}
-
 	// y is the average of all points above the min beam point.
-	return new paper.Point(x, _.sum(ys)/ys.length);
-}
+	let fulcrum = new paper.Point(x, _.sum(ys)/ys.length);
 
-/*
- * @param notes - Note[]
- * @param stemPoints - Point[] representing default stem points of the notes.
- * @return Point representing vector of the beam.
- */
-function calculateBeamVector (notes, stemPoints) {
-	let p1 = stemPoints[0],
-		p2 = stemPoints[stemPoints.length-1];
-	let vector = p2.subtract(p1).normalize();
-	if (Math.abs(vector.angle) < Scored.config.maxBeamAngle) {
-		return vector;
-	} else {
-		return new paper.Point(1, 0);
-	}
-}
-
-/*
- *
- */
-function calculateBeamFulcrumAndVector (notes, stemPoints, stemDirections) {
-	return [calculateBeamFulcrum(notes, stemPoints, stemDirections), calculateBeamVector(notes, stemPoints)];
+	return [fulcrum, vector];
 }
 
 /*
  * @param notes Note[]
  * @param centerLineValue - String representing center line note value
  */
-function getNoteStemDirections (notes, centerLineValue) {
+function getAverageStemDirection (notes, centerLineValue) {
 	let averageDirection = _.sum(notes.map(note => getSteps(centerLineValue, note.pitch))) < 0 ? "up" : "down";
 
 	return notes.map(note => averageDirection);
@@ -149,7 +141,6 @@ const durationToBeams = {
 	8: 1, 16: 2, 32: 3, 64: 4, 128: 5, 256: 6
 };
 
-// function handleBeam (beam, {point, duration}, previous, next, fulcrum, vector, direction, yDiff) {
 function handleBeam (beam, point, duration, previous, next, fulcrum, vector, direction, yDiff) {
 	let lastBeam = _.last(beam),
 		BEAM_DIFF = [0, yDiff],
@@ -186,16 +177,24 @@ function handleBeam (beam, point, duration, previous, next, fulcrum, vector, dir
  * @param vector - the vector of the bar
  * @param line - String value of center line
  */
-function beam (notes, {line="b4", fulcrum, vector, kneeGap=5.5}) {
+function beam (notes, {line="b4", fulcrum, vector, kneeGap=5.5, voiceNum}) {
 
 	let numBeams = durationToBeams[_.max(_.map(notes, note => note.note.duration.value))];
-	let stemDirections = getNoteStemDirections(notes, line);
+	let stemDirection = _.isNumber(voiceNum) ? ["up", "down"][voiceNum] : null;
+	let stemDirections = stemDirection ? _.fill(new Array(notes.length), stemDirection) : getAverageStemDirection(notes, line);
 
 	let durations = notes.map(getDuration),
 		stemLengths = map(_.partialRight(getStemLength, line), notes),
 		stemPoints = notes.map((note, i) => defaultStemPoint(note, stemDirections[i], stemLengths[i]));
 
-	[fulcrum, vector] = calculateBeamFulcrumAndVector(notes, stemPoints, stemDirections);
+	// only calculate the fulcrum and vector if they aren't passed in as arguments
+	if (fulcrum && !vector) {
+		[, vector] = calculateBeamFulcrumAndVector(notes, stemPoints, stemDirections);
+	} else if (vector && !fulcrum) {
+		[fulcrum,] = calculateBeamFulcrumAndVector(notes, stemPoints, stemDirections);
+	} else {
+		[fulcrum, vector] = calculateBeamFulcrumAndVector(notes, stemPoints, stemDirections);
+	}
 
 	// beams is an array of arrays of segments, beams[0] are eighth segments, beams[1] sixteenths, etc.
 	let beams = doTimes(numBeams, () => [[]]),
@@ -319,5 +318,5 @@ export {
 	defaultStemPoint,
 	slur,
 	getSteps,
-	getNoteStemDirections
+	getAverageStemDirection
 };
