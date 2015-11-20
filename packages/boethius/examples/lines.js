@@ -11,7 +11,8 @@ function run () {
 	// oneVoice().translate(25, 150);
 	// twoVoices().translate(25, 250);
 
-	sixteenthBeamings().translate(25, 50);
+	eighthBeamings().translate(25, 50);
+	sixteenthBeamings().translate(25, 150);
 }
 
 function createMeasures () {
@@ -212,6 +213,27 @@ function twoVoices () {
 	return scored.render(line, 1000, [voice1, voice2], 5);
 }
 
+function eighthBeamings () {
+	var line = scored.line({}, [scored.clef({value: "treble", measure: 0}),
+								scored.timeSig({value: "4/4", measure: 0})
+							]);
+
+	var measure1 = palestrina.melody.phrase(_.fill(new Array(8), 8),
+			["g3", "g3", "d6", "d6", "a4", "b4", "c5", "d5"]),
+		measure2 = palestrina.melody.phrase(_.fill(new Array(8), 8),
+			["g3", "a3", "b3", "c4", "d4", "e4", "f4", "g4"]),
+		measure3 = palestrina.melody.phrase(_.fill(new Array(8), 8),
+			["g3", "a3", "b3", "c4", "d4", "e4", "f4", "g4"]),
+		measure4 = palestrina.melody.phrase(_.fill(new Array(8), 8),
+			["g4", "a4", "d5", "c5", "e5", "e4", "d5", "f4"]);
+
+	var voice = scored.voice({}, _.map([].concat(measure1, measure2, measure3, measure4), function (n) {
+		return scored.note({value: n.duration, pitch: n.pitch});
+	}));
+
+	return scored.render(line, 1500, [voice], 4);
+}
+
 function sixteenthBeamings () {
 	var line = scored.line({}, [scored.clef({value: "treble", measure: 0}),
 								scored.timeSig({value: "4/4", measure: 0})
@@ -226,7 +248,7 @@ function sixteenthBeamings () {
 		measure4 = palestrina.melody.phrase(_.fill(new Array(16), 16),
 			["g4", "a4", "d5", "c5", "e5", "e4", "d5", "f4", "e4", "d5", "f4", "e5", "g3", "g4", "g5", "b4"]);
 
-	var voice = scored.voice({}, _.map([].concat(measure1, measure2, measure3, measure4), function (n) {
+	var voice = scored.voice({}, _.map([].concat(measure4, measure1, measure2, measure3), function (n) {
 		return scored.note({value: n.duration, pitch: n.pitch});
 	}));
 

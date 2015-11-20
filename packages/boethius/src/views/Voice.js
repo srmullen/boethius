@@ -59,18 +59,6 @@ Voice.prototype.renderNoteDecorations = function (line, measures) {
             line.group.addChildren(beams);
         }
     });
-
-    // return this.children.map(child => {
-    //     if (child.type === constants.type.note) {
-    //         child.drawLegerLines(bLine, Scored.config.lineSpacing);
-    //         if (child.needsStem()) {
-    //             let stemDirection = this.stemDirection || noteUtils.getStemDirection(child, bLine),
-    //     			stemPoint = noteUtils.defaultStemPoint(child, noteUtils.getStemLength(child), stemDirection);
-    //     		child.drawStem(stemPoint, stemDirection);
-    //     		child.drawFlag();
-    //         }
-    //     }
-    // });
 }
 
 export default Voice;

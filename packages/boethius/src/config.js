@@ -22,10 +22,11 @@ var Config = (function () {
 		layout: {
 			lineSpacing: null,
 			lineLength: 1000,
-			lineDistance: 100
+			lineDistance: 100,
+			stepSpacing: null
 
 		},
-		maxBarAngle: 45, // angle in degrees. angle can range from -maxBarAngle to +maxBarAngle
+		maxBeamAngle: 13, // angle in degrees. angle can range from -maxBeamAngle to +maxBeamAngle
 		minStemLength: 10
 	}
 
@@ -40,6 +41,7 @@ var Config = (function () {
 		config.note.head.width = fontSizeToNoteHeadWidth(config.fontSize);
 		config.note.head.yOffset = fontSizeToNoteHeadYOffset(config.fontSize);
 		config.layout.lineSpacing = config.lineSpacing = fontSizeToLineSpacing(config.fontSize, config.fontFamily);
+		config.layout.stepSpacing = config.stepSpacing = config.layout.lineSpacing / 2;
 
 		return config
 	};

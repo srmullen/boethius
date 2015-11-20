@@ -1,4 +1,4 @@
-import * as common from "../utils/common";
+import {doTimes, concat, map} from "../utils/common";
 import * as placement from "../utils/placement";
 import teoria from "teoria";
 import _ from "lodash";
@@ -35,19 +35,23 @@ function getSteps (n1, n2) {
 }
 
 /*
- * @param bline - y position of the bline
+ * @param note - Note to find the stem length for.
+ * @param centerLineValue - String representing note value at the center line.
  */
-function getStemLength (note, bline) {
+function getStemLength (note, centerLineValue) {
 	let octaveHeight = Scored.config.lineSpacing * 3.5;
 
-	if (!bline) return octaveHeight;
+	// if (!bline) return octaveHeight;
+	if (!centerLineValue) return octaveHeight;
 
-	let noteDistance = Math.abs(bline.y - placement.getNoteHeadCenter(note.noteHead.position).y);
+	// let noteDistance = Math.abs(bline.y - placement.getNoteHeadCenter(note.noteHead.position).y);
+	let steps = getSteps(centerLineValue, note.pitch),
+		noteDistance = steps * Scored.config.stepSpacing;
 
-	return Math.max(octaveHeight, noteDistance);
+	return Math.max(octaveHeight, Math.abs(noteDistance));
 }
 
-function defaultStemPoint (note, stemLength, stemDirection) {
+function defaultStemPoint (note, stemDirection, stemLength) {
 	var frm, to;
 	if (stemDirection === "up") {
 		frm = note.noteHead.bounds.rightCenter.add(0, Scored.config.note.head.yOffset);
@@ -80,6 +84,54 @@ function calculateStemPoint (note, fulcrum, vector, direction) {
 		point = getLinePoint((direction === "up" ? note.noteHead.bounds.right : note.noteHead.bounds.left), fulcrum, vector);
 
 	return point;
+}
+
+/*
+ * @param notes - Note[]
+ * @param stemPoints - Point[] representing default stem points of the notes.
+ * @return Point with x-coord in the middle of the notes, y-coord = ?
+ */
+function calculateBeamFulcrum (notes, stemPoints, stemDirections) {
+	let firstStem = stemPoints[0],
+		lastStem = stemPoints[stemPoints.length-1],
+		x = firstStem.x + ((lastStem.x - firstStem.x) / 2);
+
+	// get stem points given minimum stem lengths
+	let minStemLength = Scored.config.stepSpacing * 5.5;
+	let minStemPoints = map(_.partialRight(defaultStemPoint, minStemLength), notes, stemDirections);
+	// TODO: Handle stems going different directions
+	let ys;
+	if (stemDirections[0] === "up") {
+		ys = map((p1, p2) => p1.y < p2.y ? p1.y : p2.y , stemPoints, minStemPoints);
+	} else if (stemDirections[0] === "down") {
+		ys = map((p1, p2) => p1.y > p2.y ? p1.y : p2.y , stemPoints, minStemPoints);
+	}
+
+	// y is the average of all points above the min beam point.
+	return new paper.Point(x, _.sum(ys)/ys.length);
+}
+
+/*
+ * @param notes - Note[]
+ * @param stemPoints - Point[] representing default stem points of the notes.
+ * @return Point representing vector of the beam.
+ */
+function calculateBeamVector (notes, stemPoints) {
+	let p1 = stemPoints[0],
+		p2 = stemPoints[stemPoints.length-1];
+	let vector = p2.subtract(p1).normalize();
+	if (Math.abs(vector.angle) < Scored.config.maxBeamAngle) {
+		return vector;
+	} else {
+		return new paper.Point(1, 0);
+	}
+}
+
+/*
+ *
+ */
+function calculateBeamFulcrumAndVector (notes, stemPoints, stemDirections) {
+	return [calculateBeamFulcrum(notes, stemPoints, stemDirections), calculateBeamVector(notes, stemPoints)];
 }
 
 /*
@@ -140,13 +192,13 @@ function beam (notes, {line="b4", fulcrum, vector, kneeGap=5.5}) {
 	let stemDirections = getNoteStemDirections(notes, line);
 
 	let durations = notes.map(getDuration),
-		stemPoints = notes.map((note, i) => defaultStemPoint(note, getStemLength(note), stemDirections[i]));
+		stemLengths = map(_.partialRight(getStemLength, line), notes),
+		stemPoints = notes.map((note, i) => defaultStemPoint(note, stemDirections[i], stemLengths[i]));
 
-	vector = vector || new paper.Point(1, 0); // defaults to a flat line
-	fulcrum = fulcrum || stemPoints[0];
+	[fulcrum, vector] = calculateBeamFulcrumAndVector(notes, stemPoints, stemDirections);
 
 	// beams is an array of arrays of segments, beams[0] are eighth segments, beams[1] sixteenths, etc.
-	let beams = common.doTimes(numBeams, () => [[]]),
+	let beams = doTimes(numBeams, () => [[]]),
 		segments = _.reduce(notes, (acc, note, i) => {
 			let point = _.last(acc),
 				duration = durations[i],
@@ -201,7 +253,7 @@ function beam (notes, {line="b4", fulcrum, vector, kneeGap=5.5}) {
 
 			note.drawStem(point, direction);
 
-			return common.concat(acc, next);
+			return concat(acc, next);
 		}, [calculateStemPoint(notes[0], fulcrum, vector, stemDirections[0])]), // initialize the accumulator with the first point
 
 		paths = _.map(_.flatten(beams), (bar) => {

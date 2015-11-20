@@ -38,7 +38,7 @@ Note.render = function (note, position) {
 Note.renderStem = function (note, bline) {
 	if (note.needsStem()) {
 		let stemDirection = noteUtils.getStemDirection(note, bline),
-			stemPoint = noteUtils.defaultStemPoint(note, Scored.utils.note.getStemLength(note, bline), stemDirection);
+			stemPoint = noteUtils.defaultStemPoint(note, stemDirection, Scored.utils.note.getStemLength(note, bline));
 		note.drawStem(stemPoint, stemDirection);
 		note.drawFlag();
 	}
