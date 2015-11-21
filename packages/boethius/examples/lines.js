@@ -207,7 +207,7 @@ function twoVoices () {
 			_.fill(new Array(8), 8)).concat(
 				_.fill(new Array(8), 8)).concat(
 					_.fill(new Array(16), 16));
-	var voice1 = scored.voice({stemDirection: "down"}, _.map(notes1, function (n) {return scored.note({value: n, pitch: "c5"})}));
+	var voice1 = scored.voice({stemDirection: "down"}, _.map(notes1, function (n) {return scored.note({value: n, pitch: "c#5"})}));
 	var voice2 = scored.voice({stemDirection: "up"}, _.map(notes2, function (n) {return scored.note({value: n})}));
 
 	return scored.render(line, 1000, [voice1, voice2], 5);
@@ -221,13 +221,13 @@ function eighthBeamings () {
 	var measure1 = palestrina.melody.phrase(_.fill(new Array(8), 8),
 			["g3", "g3", "d6", "d6", "a4", "b4", "c5", "d5"]),
 		measure2 = palestrina.melody.phrase(_.fill(new Array(8), 8),
-			["g3", "a3", "b3", "c4", "d4", "e4", "f4", "g4"]),
+			["a4", "ab4", "a4", "a#4", "a4", "e4", "f4", "g4"]),
 		measure3 = palestrina.melody.phrase(_.fill(new Array(8), 8),
 			["g3", "a3", "b3", "c4", "d4", "e4", "f4", "g4"]),
 		measure4 = palestrina.melody.phrase(_.fill(new Array(8), 8),
 			["g4", "a4", "d5", "c5", "e5", "e4", "d5", "f4"]);
 
-	var voice = scored.voice({}, _.map([].concat(measure1, measure2, measure3, measure4), function (n) {
+	var voice = scored.voice({}, _.map([].concat(measure2, measure1, measure3, measure4), function (n) {
 		return scored.note({value: n.duration, pitch: n.pitch});
 	}));
 
@@ -242,13 +242,13 @@ function sixteenthBeamings () {
 	var measure1 = palestrina.melody.phrase(_.fill(new Array(16), 16),
 			["g4", "a4", "b4", "c5", "a4", "b4", "c5", "d5", "d5", "c5", "b4", "a4", "c5", "b4", "a4", "g4"]),
 		measure2 = palestrina.melody.phrase(_.fill(new Array(16), 16),
-			["g3", "a3", "b3", "c4", "d4", "e4", "f4", "g4", "a4", "b4", "c5", "d5", "e5", "f5", "g5", "a5"]),
+			["a4", "a#4", "b4", "ab4", "d4", "e4", "f4", "g4", "a4", "b4", "c5", "d5", "e5", "f5", "g5", "a5"]),
 		measure3 = palestrina.melody.phrase(_.fill(new Array(16), 16),
 			["g3", "a3", "b3", "c4", "d4", "e4", "f4", "g4", "a4", "b4", "c5", "d5", "e5", "f5", "g5", "a5"].reverse()),
 		measure4 = palestrina.melody.phrase(_.fill(new Array(16), 16),
 			["g4", "a4", "d5", "c5", "e5", "e4", "d5", "f4", "e4", "d5", "f4", "e5", "g3", "g4", "g5", "b4"]);
 
-	var voice = scored.voice({}, _.map([].concat(measure4, measure1, measure2, measure3), function (n) {
+	var voice = scored.voice({}, _.map([].concat(measure2, measure1, measure4, measure3), function (n) {
 		return scored.note({value: n.duration, pitch: n.pitch});
 	}));
 

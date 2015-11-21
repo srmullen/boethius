@@ -1,4 +1,6 @@
 import * as timeUtils from "./timeUtils";
+import {isMarking} from "./common";
+import constants from "../constants";
 
 let noteNameToDegreeObj = {
 		"c": 0,
@@ -135,6 +137,25 @@ function getYOffset (item, position) {
 	return position.add(0, offsetFn(item));
 }
 
+function calculateCursor (item1, item2) {
+	const noteHeadWidth = Scored.config.note.head.width,
+		shortestDuration = 0.125;
+
+	let cursor;
+
+	if (isMarking(item1)) {
+		cursor = item1.group.bounds.width + noteHeadWidth; // FIXME: needs a little work for perfect positioning
+	} else if (item1.type === constants.type.measure) {
+		let leftBarline = item1.barlines[0];
+		cursor = leftBarline.position.x + noteHeadWidth;
+	} else {
+		cursor = item1.group.bounds.width + (noteHeadWidth * getStaffSpace(shortestDuration, item1));
+		// cursor = item1.group.bounds.right + (noteHeadWidth * getStaffSpace(shortestDuration, item1));
+	}
+
+	return cursor;
+}
+
 // The most common shortest duration is determined as follows: in every measure, the shortest duration is determined.
 // The most common shortest duration is taken as the basis for the spacing, with the stipulation that this shortest
 // duration should always be equal to or shorter than an 8th note.
@@ -165,5 +186,6 @@ export {
 	lineup,
 	getYOffset,
 	commonShortestDuration,
-	getStaffSpace
+	getStaffSpace,
+	calculateCursor
 }

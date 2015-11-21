@@ -121,6 +121,13 @@ function juxt (...fns) {
 	return (x) => fns.map(fn => fn(x));
 }
 
+function isMarking (item) {
+	return item.type === constants.type.clef ||
+			item.type === constants.type.marking ||
+			item.type === constants.type.timeSig ||
+			false;
+}
+
 export {
 	concat,
 	doTimes,
@@ -129,5 +136,6 @@ export {
 	serialize,
 	partitionBy,
 	map,
-	juxt
+	juxt,
+	isMarking
 }

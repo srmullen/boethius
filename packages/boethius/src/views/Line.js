@@ -88,18 +88,18 @@ Line.render = function (line, length, voices, numMeasures=1) {
 		let measureNumber = getMeasureNumber(measures, time), // get the measure the items belongs to
 			context = line.contextAt(measures, {measure: measureNumber}),
 			leftBarline = measures[measureNumber].barlines[0],
-			[markings, voiceItems] = _.partition(items, isMarking);
+			[markings, voiceItems] = _.partition(items, common.isMarking);
 
 		// update cursor if its a new measure.
 		if (measureNumber !== previousMeasureNumber) {
-			cursor = leftBarline.position.x + noteHeadWidth;
+			let measure = measures[measureNumber];
+			cursor = placement.calculateCursor(measure);
 		}
 
 		// Place markings at the given time.
 		let definateNextPosition = markings.map(marking => {
-			// marking.group.translate(cursor, 0);
 			marking.group.translate(placement.getYOffset(marking, new paper.Point(cursor, 0)));
-			cursor += marking.group.bounds.width + noteHeadWidth; // FIXME: needs a little work for perfect positioning
+			cursor += placement.calculateCursor(marking);
 		});
 
 		// Place voice items at the given time.
@@ -108,9 +108,10 @@ Line.render = function (line, length, voices, numMeasures=1) {
 				yPos = item.type === "note" ?
 					placement.calculateNoteYpos(item, Scored.config.lineSpacing/2, placement.getClefBase(context.clef.value)) : 0;
 
-			item.group.translate(pos.add(cursor, yPos));
+			item.group.translate(pos.add(0, yPos));
+			item.group.bounds.center.x = cursor;
 
-			return item.group.bounds.width + (noteHeadWidth * placement.getStaffSpace(shortestDuration, item));
+			return placement.calculateCursor(item);
 		});
 
 		// next time is at smallest distance
@@ -140,7 +141,7 @@ function calculateAndSetMeasureLengths (measures, times, noteHeadWidth, shortest
 
 	let measureLengths = _.map(measures, (measure, i) => {
 		let measureLength = _.sum(_.map(itemsInMeasure[i], ({items}) => {
-			let [markings, voiceItems] = _.partition(items, isMarking),
+			let [markings, voiceItems] = _.partition(items, common.isMarking),
 				markingsLength = _.sum(markings.map(marking => marking.group.bounds.width + noteHeadWidth)),
 				voiceItemsLength = _.min(_.map(voiceItems, item => {
 					return item.group.bounds.width + (noteHeadWidth * placement.getStaffSpace(shortestDuration, item));
@@ -152,13 +153,6 @@ function calculateAndSetMeasureLengths (measures, times, noteHeadWidth, shortest
 	});
 
 	return measureLengths;
-}
-
-function isMarking (item) {
-	return item.type === constants.type.clef ||
-			item.type === constants.type.marking ||
-			item.type === constants.type.timeSig ||
-			false;
 }
 
 Line.prototype.render = function (length) {
