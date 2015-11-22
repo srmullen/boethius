@@ -111,13 +111,18 @@ function lineup (items) {
 }
 
 /*
- * Places the right bound of the item at cursor.
+ * Places the left bound of the item at cursor.
  * @param cursor - Number
  * @param item - Scored item.
  */
 function placeAt (cursor, item) {
-	let offset = (item.group.bounds.center.x - item.group.bounds.left);
-	item.group.position.x = cursor + offset;
+	if (item.type === constants.type.note && item.note.accidental()) {
+		let offset = (item.noteHead.bounds.center.x - item.noteHead.bounds.left);
+		item.group.position.x = cursor + offset;
+	} else {
+		let offset = (item.group.bounds.center.x - item.group.bounds.left);
+		item.group.position.x = cursor + offset;
+	}
 }
 
 const offsets = {
@@ -149,7 +154,7 @@ function getYOffset (item) {
 	return offsetFn(item);
 }
 
-function calculateCursor (item1, item2) {
+function calculateCursor (item1) {
 	const noteHeadWidth = Scored.config.note.head.width,
 		shortestDuration = 0.125;
 
@@ -161,10 +166,22 @@ function calculateCursor (item1, item2) {
 		let leftBarline = item1.barlines[0];
 		cursor = leftBarline.position.x + noteHeadWidth;
 	} else {
-		cursor = item1.group.bounds.width + (noteHeadWidth * getStaffSpace(shortestDuration, item1));
+		cursor = item1.group.bounds.right + (noteHeadWidth * getStaffSpace(shortestDuration, item1));
 	}
 
 	return cursor;
+}
+
+/*
+ * Aligns the notes so they are all at the same x position.
+ * @param xPos - Number
+ * @param notes - Note[]
+ */
+function alignNoteHeads (xPos, notes) {
+	_.each(notes, note => {
+		let offset = xPos - note.noteHead.bounds.center.x;
+		note.group.translate([offset, 0]);
+	});
 }
 
 // The most common shortest duration is determined as follows: in every measure, the shortest duration is determined.
@@ -199,5 +216,6 @@ export {
 	commonShortestDuration,
 	getStaffSpace,
 	calculateCursor,
-	placeAt
+	placeAt,
+	alignNoteHeads
 }

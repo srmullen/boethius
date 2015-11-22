@@ -109,16 +109,32 @@ Line.render = function (line, length, voices, numMeasures=1) {
 			cursor += placement.calculateCursor(marking);
 		});
 
-		let possibleNextPositions = _.map(notes, note => {
-			let yPos = placement.calculateNoteYpos(note, Scored.config.lineSpacing/2, placement.getClefBase(context.clef.value));
+		let possibleNextPositions = [];
 
-			note.group.translate(b.add([0, yPos]));
-			placement.placeAt(cursor, note);
+		if (notes && notes.length) {
+			// get widest note. that will be placed first.
+			let widestNote = _.max(notes, note => note.group.bounds.width),
+				placeNote = (note) => {
+					let yPos = placement.calculateNoteYpos(note, Scored.config.lineSpacing/2, placement.getClefBase(context.clef.value));
+					note.group.translate(b.add([0, yPos]));
+					placement.placeAt(cursor, note);
 
-			return placement.calculateCursor(note);
-		});
+					return placement.calculateCursor(note);
+				};
 
-		possibleNextPositions.concat(_.map(rests, rest => {
+
+			possibleNextPositions = possibleNextPositions.concat(placeNote(widestNote));
+
+			_.remove(notes, note => note === widestNote); // mutation of notes array
+
+			possibleNextPositions = possibleNextPositions.concat(_.map(notes, placeNote));
+
+			placement.alignNoteHeads(widestNote.noteHead.bounds.center.x, notes);
+
+			possibleNextPositions = possibleNextPositions.concat(_.map(notes, placement.calculateCursor));
+		}
+
+		possibleNextPositions = possibleNextPositions.concat(_.map(rests, rest => {
 			let pos = placement.getYOffset(rest.group);
 
 			rest.group.translate(b.add(0, pos));
@@ -128,7 +144,7 @@ Line.render = function (line, length, voices, numMeasures=1) {
 		}));
 
 		// next time is at smallest distance
-		cursor += _.min(possibleNextPositions);
+		cursor = _.min(possibleNextPositions);
 
 		previousMeasureNumber = measureNumber;
 	});
