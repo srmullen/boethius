@@ -207,8 +207,8 @@ function twoVoices () {
 			_.fill(new Array(8), 8)).concat(
 				_.fill(new Array(8), 8)).concat(
 					_.fill(new Array(16), 16));
-	var voice1 = scored.voice({stemDirection: "down"}, _.map(notes1, function (n) {return scored.note({value: n, pitch: "c#5"})}));
-	var voice2 = scored.voice({stemDirection: "up"}, _.map(notes2, function (n) {return scored.note({value: n})}));
+	var voice1 = scored.voice({stemDirection: "up"}, _.map(notes1, function (n) {return scored.note({value: n, pitch: "c#5"})}));
+	var voice2 = scored.voice({stemDirection: "down"}, _.map(notes2, function (n) {return scored.note({value: n})}));
 
 	return scored.render(line, 1000, [voice1, voice2], 5);
 }

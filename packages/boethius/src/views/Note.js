@@ -35,10 +35,10 @@ Note.render = function (note, position) {
 	return group;
 }
 
-Note.renderStem = function (note, centerLineValue, voiceNum) {
+Note.renderStem = function (note, centerLineValue, stemDirection) {
 	if (note.needsStem()) {
-		let stemDirection = noteUtils.getStemDirection(note, centerLineValue, voiceNum),
-			stemPoint = noteUtils.defaultStemPoint(note, stemDirection, Scored.utils.note.getStemLength(note, centerLineValue));
+		stemDirection = stemDirection || noteUtils.getStemDirection(note, centerLineValue);
+		let stemPoint = noteUtils.defaultStemPoint(note, stemDirection, Scored.utils.note.getStemLength(note, centerLineValue));
 		note.drawStem(stemPoint, stemDirection);
 		note.drawFlag();
 	}
@@ -47,12 +47,14 @@ Note.renderStem = function (note, centerLineValue, voiceNum) {
 /*
  * @param notes Note[]
  * @param centerLineValue - String representing note value.
+ * @param stemDirection - optional String specifying the direction of all note stems.
  */
-Note.renderDecorations = function (notes, centerLineValue, voiceNum) {
+Note.renderDecorations = function (notes, centerLineValue, stemDirection) {
+	console.log(stemDirection);
 	if (notes.length === 1) {
-		Note.renderStem(notes[0], centerLineValue, voiceNum);
+		Note.renderStem(notes[0], centerLineValue, stemDirection);
 	} else {
-		return noteUtils.beam(notes, {line: centerLineValue, voiceNum});
+		return noteUtils.beam(notes, {line: centerLineValue, stemDirection});
 	}
 }
 

@@ -151,14 +151,9 @@ Line.render = function (line, length, voices, numMeasures=1) {
 
 	_.each(voiceGroups, voiceItemGroup => lineGroup.addChildren(voiceItemGroup));
 
-	// now that all the note heads are rendered the rest of the note can be drawn
-	if (voices.length === 1) {
-		voices[0].renderNoteDecorations(line, measures);
-	} else {
-		_.each(voices, (voice, voiceNum) => {
-			voice.renderNoteDecorations(line, measures, voiceNum);
-		});
-	}
+	_.each(voices, voice => {
+		voice.renderNoteDecorations(line, measures);
+	});
 
 	return lineGroup;
 }

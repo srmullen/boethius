@@ -6,13 +6,10 @@ import _ from "lodash";
 /*
  * @param note - Note for which to get the stem direction.
  * @param centerLineValue - String note pitch of center line.
- * @param voiceNum - Number of voice the note belongs to.
  */
-function getStemDirection (note, centerLineValue, voiceNum) {
+function getStemDirection (note, centerLineValue) {
 	if (note.stemDirection) {
 		return note.stemDirection;
-	} else if (_.isNumber(voiceNum)) {
-		return voiceNum === 0 ? "up" : "down";
 	} else if (centerLineValue) {
 		return getSteps(centerLineValue, note.pitch) < 0 ? "up" : "down";
 	} else {
@@ -177,10 +174,9 @@ function handleBeam (beam, point, duration, previous, next, fulcrum, vector, dir
  * @param vector - the vector of the bar
  * @param line - String value of center line
  */
-function beam (notes, {line="b4", fulcrum, vector, kneeGap=5.5, voiceNum}) {
+function beam (notes, {line="b4", fulcrum, vector, kneeGap=5.5, stemDirection}) {
 
 	let numBeams = durationToBeams[_.max(_.map(notes, note => note.note.duration.value))];
-	let stemDirection = _.isNumber(voiceNum) ? ["up", "down"][voiceNum] : null;
 	let stemDirections = stemDirection ? _.fill(new Array(notes.length), stemDirection) : getAverageStemDirection(notes, line);
 
 	let durations = notes.map(getDuration),
