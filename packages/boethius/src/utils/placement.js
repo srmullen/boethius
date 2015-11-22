@@ -106,12 +106,21 @@ function lineup (items) {
 		left = items[i-1]; right = items[i];
 		offset = (right.bounds.center.x - right.bounds.left) +
 				 (left.bounds.right - left.bounds.center.x);
-		// right.setPosition(left.group.position.add([offset, 0]));
 		right.position.x = left.position.x + offset;
 	}
 }
 
-var offsets = {
+/*
+ * Places the right bound of the item at cursor.
+ * @param cursor - Number
+ * @param item - Scored item.
+ */
+function placeAt (cursor, item) {
+	let offset = (item.group.bounds.center.x - item.group.bounds.left);
+	item.group.position.x = cursor + offset;
+}
+
+const offsets = {
 	clef: function ({value}) {
 		return {
 			treble: 0,
@@ -132,9 +141,12 @@ var offsets = {
 	}
 }
 
-function getYOffset (item, position) {
+/*
+ *
+ */
+function getYOffset (item) {
 	let offsetFn = offsets[item.type] || () => 0;
-	return position.add(0, offsetFn(item));
+	return offsetFn(item);
 }
 
 function calculateCursor (item1, item2) {
@@ -150,7 +162,6 @@ function calculateCursor (item1, item2) {
 		cursor = leftBarline.position.x + noteHeadWidth;
 	} else {
 		cursor = item1.group.bounds.width + (noteHeadWidth * getStaffSpace(shortestDuration, item1));
-		// cursor = item1.group.bounds.right + (noteHeadWidth * getStaffSpace(shortestDuration, item1));
 	}
 
 	return cursor;
@@ -187,5 +198,6 @@ export {
 	getYOffset,
 	commonShortestDuration,
 	getStaffSpace,
-	calculateCursor
+	calculateCursor,
+	placeAt
 }

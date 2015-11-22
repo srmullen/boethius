@@ -47,7 +47,7 @@ Measure.prototype.render = function (line, leftBarline, width) {
 
 Measure.prototype.renderChildren = function (line, leftBarline) {
 	let childGroups = _.map(this.children, (child) => {
-		let pos = placement.getYOffset(child, lineUtils.b(line)),
+		let pos = placement.getYOffset(child, lineUtils.b(line)), // TODO: is this used? getYOffset has changed!
 			yPos = child.type === "note" ?
 				placement.calculateNoteYpos(child, Scored.config.lineSpacing/2, placement.getClefBase("treble")) : 0,
 			childGroup = child.render(pos.add([leftBarline.position.x + 15, yPos]));

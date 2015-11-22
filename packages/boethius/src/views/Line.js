@@ -83,12 +83,13 @@ Line.render = function (line, length, voices, numMeasures=1) {
 	let measureGroups = line.renderMeasures(measures, lineGroup, length);
 
 	let cursor = noteHeadWidth,
+	// let cursor = 0,
 		previousMeasureNumber = 0;
 	_.each(times, ({time, items}) => {
 		let measureNumber = getMeasureNumber(measures, time), // get the measure the items belongs to
 			context = line.contextAt(measures, {measure: measureNumber}),
 			leftBarline = measures[measureNumber].barlines[0],
-			[markings, voiceItems] = _.partition(items, common.isMarking);
+			{clef: clefs, timeSig: timeSigs, note: notes, rest: rests} = _.groupBy(items, item => item.type);
 
 		// update cursor if its a new measure.
 		if (measureNumber !== previousMeasureNumber) {
@@ -96,23 +97,35 @@ Line.render = function (line, length, voices, numMeasures=1) {
 			cursor = placement.calculateCursor(measure);
 		}
 
-		// Place markings at the given time.
-		let definateNextPosition = markings.map(marking => {
-			marking.group.translate(placement.getYOffset(marking, new paper.Point(cursor, 0)));
+		_.map(clefs, marking => {
+			marking.group.translate([0, placement.getYOffset(marking)]);
+			placement.placeAt(cursor, marking);
 			cursor += placement.calculateCursor(marking);
 		});
 
-		// Place voice items at the given time.
-		let possibleNextPositions = voiceItems.map(item => {
-			let pos = placement.getYOffset(item.group, b),
-				yPos = item.type === "note" ?
-					placement.calculateNoteYpos(item, Scored.config.lineSpacing/2, placement.getClefBase(context.clef.value)) : 0;
-
-			item.group.translate(pos.add(0, yPos));
-			item.group.bounds.center.x = cursor;
-
-			return placement.calculateCursor(item);
+		_.map(timeSigs, marking => {
+			marking.group.translate([0, placement.getYOffset(marking)]);
+			placement.placeAt(cursor, marking);
+			cursor += placement.calculateCursor(marking);
 		});
+
+		let possibleNextPositions = _.map(notes, note => {
+			let yPos = placement.calculateNoteYpos(note, Scored.config.lineSpacing/2, placement.getClefBase(context.clef.value));
+
+			note.group.translate(b.add([0, yPos]));
+			placement.placeAt(cursor, note);
+
+			return placement.calculateCursor(note);
+		});
+
+		possibleNextPositions.concat(_.map(rests, rest => {
+			let pos = placement.getYOffset(rest.group);
+
+			rest.group.translate(b.add(0, pos));
+			placement.placeAt(cursor, rest);
+
+			return placement.calculateCursor(rest);
+		}));
 
 		// next time is at smallest distance
 		cursor += _.min(possibleNextPositions);
@@ -148,6 +161,7 @@ function calculateAndSetMeasureLengths (measures, times, noteHeadWidth, shortest
 				}));
 			return markingsLength + voiceItemsLength
 		}));
+		measureLength += noteHeadWidth;
 		measure.length = measureLength;
 		return measureLength;
 	});
