@@ -8,12 +8,14 @@ function run () {
 	// interaction();
 
 	// simpleLine().translate(25, 50);
-	renderingNotesOnLine().translate(25, 50);
-	oneVoice().translate(25, 150);
-	twoVoices().translate(25, 250);
+	// renderingNotesOnLine().translate(25, 50);
+	// oneVoice().translate(25, 150);
+	// twoVoices().translate(25, 250);
 
 	// eighthBeamings().translate(25, 50);
 	// sixteenthBeamings().translate(25, 150);
+
+	accidentals("c").translate(25, 50);
 }
 
 function createMeasures () {
@@ -266,4 +268,20 @@ function sixteenthBeamings () {
 	}));
 
 	return scored.render(line, 1500, [voice], 4);
+}
+
+function accidentals (key) {
+	var line = scored.line({}, [scored.clef({value: "treble", measure: 0}),
+								scored.key({value: key, measure: 0}),
+								scored.timeSig({value: "4/4", measure: 0})
+							]);
+	var n = scored.note; // just to shorten the voice declaration
+	var voice = scored.voice({}, [
+		n({pitch: "c4", value: 16}), n({pitch: "c4", value: 16}), n({pitch: "c4", value: 16}), n({pitch: "c4", value: 16}),
+		n({pitch: "c4", value: 16}), n({pitch: "c4", value: 16}), n({pitch: "c4", value: 16}), n({pitch: "c4", value: 16}),
+		n({pitch: "c4", value: 16}), n({pitch: "c4", value: 16}), n({pitch: "c4", value: 16}), n({pitch: "c4", value: 16}),
+		n({pitch: "c4", value: 16}), n({pitch: "c4", value: 16}), n({pitch: "c4", value: 16}), n({pitch: "c4", value: 16}),
+	]);
+
+	return scored.render(line, 1500, [voice], 1);
 }

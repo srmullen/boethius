@@ -123,7 +123,7 @@ function juxt (...fns) {
 
 function isMarking (item) {
 	return item.type === constants.type.clef ||
-			item.type === constants.type.marking ||
+			item.type === constants.type.key ||
 			item.type === constants.type.timeSig ||
 			false;
 }

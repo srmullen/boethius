@@ -21,7 +21,7 @@ function pageOne () {
 	up.oneDot = scored.note({dots: 1});
 	up.twoDot = scored.note({dots: 2})
 
-	renderNotes(up, 50);
+	// renderNotes(up, 50);
 
 	down.whole = scored.note({value: 1, stemDirection: "down"}),
 	down.half = scored.note({value: 2, stemDirection: "down"}),
@@ -38,12 +38,12 @@ function pageOne () {
 	down.oneDot = scored.note({dots: 1, stemDirection: "down"});
 	down.twoDot = scored.note({dots: 2, stemDirection: "down"});
 
-	renderNotes(down, 100);
+	// renderNotes(down, 100);
 
 	// beamedEigthsUp();
-	simpleBeam(8, 250);
-	simpleBeam(16, 300);
-	simpleBeam(32, 350);
+	// simpleBeam(8, 150);
+	// simpleBeam(16, 200);
+	// simpleBeam(32, 250);
 
 	var stemDirection;
 	// stemDirection = "down";
@@ -53,7 +53,7 @@ function pageOne () {
 	testBeaming(64, 128, 650, stemDirection);
 	testBeaming(128, 256, 750, stemDirection);
 
-	testBeaming(8, 32, 350, stemDirection);
+	// testBeaming(8, 32, 350, stemDirection);
 
 	drawRests();
 
@@ -129,8 +129,8 @@ function simpleBeam (type, yPos) {
 	n1.render().translate([550, yPos]);
 	n2.render().translate([575, yPos]);
 
-	n3.render().translate([625, yPos - 25]);
-	n4.render().translate([650, yPos - 25]);
+	n3.render().translate([625, yPos]);
+	n4.render().translate([650, yPos]);
 
 	Scored.utils.note.beam([n1, n2], {vector: new paper.Point(100, 15)});
 	Scored.utils.note.beam([n3, n4], {});
@@ -154,8 +154,11 @@ function testBeaming (d1, d2, yPos, stemDirection) {
 		n11 = scored.note({value: d2}),
 
 		n12 = scored.note({value: d2, stemDirection: stemDirection}),
-		n13 = scored.note({value: d1});
+		n13 = scored.note({value: d1}),
 
+		n14 = scored.note({value: d2}),
+		n15 = scored.note({value: d1}),
+		n16 = scored.note({value: d2});
 
 	n1.render().translate([100, yPos]);
 	n2.render().translate([125, yPos]);
@@ -174,10 +177,15 @@ function testBeaming (d1, d2, yPos, stemDirection) {
 	n12.render().translate([450, yPos]);
 	n13.render().translate([475, yPos]);
 
+	n14.render().translate([525, yPos]);
+	n15.render().translate([550, yPos]);
+	n16.render().translate([575, yPos]);
+
 	Scored.utils.note.beam([n1, n2, n3, n4], {});
 	Scored.utils.note.beam([n5, n6, n7, n8, n9], {vector: new paper.Point(100, -15)});
 	Scored.utils.note.beam([n10, n11], {vector: new paper.Point(100, 25)});
 	Scored.utils.note.beam([n12, n13], {vector: new paper.Point(100, 25)});
+	Scored.utils.note.beam([n14, n15, n16], {});
 }
 
 function renderNote (note, xPos, yPos) {
@@ -227,12 +235,10 @@ function createClefs () {
 		alto = scored.clef({value: "alto"}),
 		tenor = scored.clef({value: "tenor"});
 
-	treble.render([550, 400]);
-	bass.render([600, 400]);
-	alto.render([650, 400]);
-	tenor.render([700, 400]);
-
-	window.treble = treble;
+	treble.render([650, 400]);
+	bass.render([700, 400]);
+	alto.render([750, 400]);
+	tenor.render([800, 400]);
 }
 
 function createTimeSigs () {
@@ -243,11 +249,11 @@ function createTimeSigs () {
 		twelveeight = scored.timeSig({value: "12/8"});
 
 
-	common.render([550, 500]);
-	half.render([600, 500]);
-	fourfour.render([650, 500]);
-	sixeight.render([700, 500]);
-	twelveeight.render([750, 500]);
+	common.render([650, 500]);
+	half.render([700, 500]);
+	fourfour.render([750, 500]);
+	sixeight.render([800, 500]);
+	twelveeight.render([850, 500]);
 }
 
 function createKeys () {

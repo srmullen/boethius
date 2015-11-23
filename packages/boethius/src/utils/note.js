@@ -138,7 +138,7 @@ const durationToBeams = {
 	8: 1, 16: 2, 32: 3, 64: 4, 128: 5, 256: 6
 };
 
-function handleBeam (beam, point, duration, previous, next, fulcrum, vector, direction, yDiff) {
+function handleBeam (beam, point, duration, previousDuration, nextDuration, fulcrum, vector, direction, yDiff) {
 	let lastBeam = _.last(beam),
 		BEAM_DIFF = [0, yDiff],
 		p16;
@@ -150,7 +150,7 @@ function handleBeam (beam, point, duration, previous, next, fulcrum, vector, dir
 	}
 
 	// create left flag point
-	if (previous && previous.duration < duration && (!next || next.duration < duration)) {
+	if (previousDuration && previousDuration < duration && (!nextDuration || nextDuration < duration)) {
 		let p = getLinePoint(p16.x - 10, fulcrum, vector),
 			flag = direction === "up" ? p.add(BEAM_DIFF) : p.subtract(BEAM_DIFF);
 
@@ -160,8 +160,7 @@ function handleBeam (beam, point, duration, previous, next, fulcrum, vector, dir
 	lastBeam.push(p16);
 
 	// create right flag point
-	if (next && !previous && next.duration < duration) {
-		// let flag = getLinePoint(p16.x + 10, fulcrum, vector).subtract(BEAM_DIFF);
+	if (nextDuration && !previousDuration && nextDuration < duration) {
 		let p = getLinePoint(p16.x + 10, fulcrum, vector),
 			flag = direction === "up" ? p.add(BEAM_DIFF) : p.subtract(BEAM_DIFF);
 		lastBeam.push(flag);
@@ -200,29 +199,31 @@ function beam (notes, {line="b4", fulcrum, vector, kneeGap=5.5, stemDirection}) 
 				direction = stemDirections[i],
 				current = _.last(acc),
 				previous = acc[i-1],
+				previousDuration = durations[i-1],
+				nextDuration = durations[i+1],
 				nextNote = notes[i+1],
 				next = calculateStemPoint(nextNote, fulcrum, vector, stemDirections[i+1]);
 
 			_.last(beams[0]).push(point);
 
 			if (duration >= 16) {
-				handleBeam(beams[1], current, duration, previous, next, fulcrum, vector, direction, 5);
+				handleBeam(beams[1], current, duration, previousDuration, nextDuration, fulcrum, vector, direction, 5);
 			}
 
 			if (duration >= 32) {
-				handleBeam(beams[2], current, duration, previous, next, fulcrum, vector, direction, 10);
+				handleBeam(beams[2], current, duration, previousDuration, nextDuration, fulcrum, vector, direction, 10);
 			}
 
 			if (duration >= 64) {
-				handleBeam(beams[3], current, duration, previous, next, fulcrum, vector, direction, 15);
+				handleBeam(beams[3], current, duration, previousDuration, nextDuration, fulcrum, vector, direction, 15);
 			}
 
 			if (duration >= 128) {
-				handleBeam(beams[4], current, duration, previous, next, fulcrum, vector, direction, 20);
+				handleBeam(beams[4], current, duration, previousDuration, nextDuration, fulcrum, vector, direction, 20);
 			}
 
 			if (duration >= 256) {
-				handleBeam(beams[5], current, duration, previous, next, fulcrum, vector, direction, 25);
+				handleBeam(beams[5], current, duration, previousDuration, nextDuration, fulcrum, vector, direction, 25);
 			}
 
 			// Break beams

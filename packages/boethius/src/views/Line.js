@@ -88,7 +88,7 @@ Line.render = function (line, length, voices, numMeasures=1) {
 		previousMeasureNumber = 0;
 	_.each(times, ({time, items, context}) => {
 		let leftBarline = measures[time.measure].barlines[0],
-			{clef: clefs, timeSig: timeSigs, note: notes, rest: rests} = _.groupBy(items, item => item.type);
+			{clef: clefs, key: keys, timeSig: timeSigs, note: notes, rest: rests} = _.groupBy(items, item => item.type);
 
 		// update cursor if its a new measure.
 		if (time.measure !== previousMeasureNumber) {
@@ -96,17 +96,16 @@ Line.render = function (line, length, voices, numMeasures=1) {
 			cursor = placement.calculateCursor(measure);
 		}
 
-		_.map(clefs, marking => {
+		let placeMarking = marking => {
 			marking.group.translate([0, placement.getYOffset(marking)]);
 			placement.placeAt(cursor, marking);
 			cursor = placement.calculateCursor(marking);
-		});
+		};
 
-		_.map(timeSigs, marking => {
-			marking.group.translate([0, placement.getYOffset(marking)]);
-			placement.placeAt(cursor, marking);
-			cursor = placement.calculateCursor(marking);
-		});
+		// place the markings
+		_.each(clefs, placeMarking);
+		_.each(keys, placeMarking);
+		_.each(timeSigs, placeMarking);
 
 		let possibleNextPositions = [];
 
