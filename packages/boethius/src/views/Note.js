@@ -50,7 +50,6 @@ Note.renderStem = function (note, centerLineValue, stemDirection) {
  * @param stemDirection - optional String specifying the direction of all note stems.
  */
 Note.renderDecorations = function (notes, centerLineValue, stemDirection) {
-	console.log(stemDirection);
 	if (notes.length === 1) {
 		Note.renderStem(notes[0], centerLineValue, stemDirection);
 	} else {

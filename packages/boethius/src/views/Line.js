@@ -70,11 +70,13 @@ Line.render = function (line, length, voices, numMeasures=1) {
 	let allItems = line.markings.concat(_.reduce(voices, (acc, voice) => {
 		return acc.concat(voice.children);
 	}, []));
+
 	let times = _.sortBy(_.map(_.groupBy(allItems, (item) => {
 		return getTime(measures, item).time;
 	}), (v, k) => {
-		return {time: Number.parseFloat(k), items: v};
-	}), v => v.time);
+		let time = getTime(measures, v[0]);
+		return {time, items: v, context: line.contextAt(measures, time)};
+	}), ({time}) => time.time);
 
 	// calculating measure lengths
 	calculateAndSetMeasureLengths(measures, times, noteHeadWidth, shortestDuration);
@@ -83,30 +85,27 @@ Line.render = function (line, length, voices, numMeasures=1) {
 	let measureGroups = line.renderMeasures(measures, lineGroup, length);
 
 	let cursor = noteHeadWidth,
-	// let cursor = 0,
 		previousMeasureNumber = 0;
-	_.each(times, ({time, items}) => {
-		let measureNumber = getMeasureNumber(measures, time), // get the measure the items belongs to
-			context = line.contextAt(measures, {measure: measureNumber}),
-			leftBarline = measures[measureNumber].barlines[0],
+	_.each(times, ({time, items, context}) => {
+		let leftBarline = measures[time.measure].barlines[0],
 			{clef: clefs, timeSig: timeSigs, note: notes, rest: rests} = _.groupBy(items, item => item.type);
 
 		// update cursor if its a new measure.
-		if (measureNumber !== previousMeasureNumber) {
-			let measure = measures[measureNumber];
+		if (time.measure !== previousMeasureNumber) {
+			let measure = measures[time.measure];
 			cursor = placement.calculateCursor(measure);
 		}
 
 		_.map(clefs, marking => {
 			marking.group.translate([0, placement.getYOffset(marking)]);
 			placement.placeAt(cursor, marking);
-			cursor += placement.calculateCursor(marking);
+			cursor = placement.calculateCursor(marking);
 		});
 
 		_.map(timeSigs, marking => {
 			marking.group.translate([0, placement.getYOffset(marking)]);
 			placement.placeAt(cursor, marking);
-			cursor += placement.calculateCursor(marking);
+			cursor = placement.calculateCursor(marking);
 		});
 
 		let possibleNextPositions = [];
@@ -114,11 +113,16 @@ Line.render = function (line, length, voices, numMeasures=1) {
 		if (notes && notes.length) {
 			// get widest note. that will be placed first.
 			let widestNote = _.max(notes, note => note.group.bounds.width),
-				placeNote = (note) => {
+				placeNoteY = (note) => {
 					let yPos = placement.calculateNoteYpos(note, Scored.config.lineSpacing/2, placement.getClefBase(context.clef.value));
 					note.group.translate(b.add([0, yPos]));
+				},
+				placeNoteX = (note) => {
 					placement.placeAt(cursor, note);
-
+				},
+				placeNote = (note) => {
+					placeNoteY(note);
+					placeNoteX(note);
 					return placement.calculateCursor(note);
 				};
 
@@ -127,7 +131,8 @@ Line.render = function (line, length, voices, numMeasures=1) {
 
 			_.remove(notes, note => note === widestNote); // mutation of notes array
 
-			possibleNextPositions = possibleNextPositions.concat(_.map(notes, placeNote));
+			// possibleNextPositions = possibleNextPositions.concat(_.map(notes, placeNote));
+			_.each(notes, placeNoteY);
 
 			placement.alignNoteHeads(widestNote.noteHead.bounds.center.x, notes);
 
@@ -146,7 +151,7 @@ Line.render = function (line, length, voices, numMeasures=1) {
 		// next time is at smallest distance
 		cursor = _.min(possibleNextPositions);
 
-		previousMeasureNumber = measureNumber;
+		previousMeasureNumber = time.measure;
 	});
 
 	_.each(voiceGroups, voiceItemGroup => lineGroup.addChildren(voiceItemGroup));
@@ -161,7 +166,9 @@ Line.render = function (line, length, voices, numMeasures=1) {
 // TODO: will need to be able to handle when overlapping of items require more space. ex. two voice with same note at same time.
 function calculateAndSetMeasureLengths (measures, times, noteHeadWidth, shortestDuration) {
 	// group items by measure.
-	let itemsInMeasure = _.groupBy(times, (item) => item.measure || getMeasureNumber(measures, item.time));
+	let itemsInMeasure = _.groupBy(times, (item) => {
+		return item.time.measure;
+	});
 
 	let measureLengths = _.map(measures, (measure, i) => {
 		let measureLength = _.sum(_.map(itemsInMeasure[i], ({items}) => {
@@ -255,7 +262,6 @@ Line.prototype.contextAt = function (measures, time) {
 		timeSig = getMarkingAtTime(this.markings, constants.type.timeSig, time) || {},
 		key = getMarkingAtTime(this.markings, constants.type.key, time) || {};
 
-	// return {clef: clef.value, timeSig: timeSig.value, key: key.value};
 	return {clef, timeSig, key};
 }
 

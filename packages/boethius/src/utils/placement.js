@@ -161,7 +161,8 @@ function calculateCursor (item1) {
 	let cursor;
 
 	if (isMarking(item1)) {
-		cursor = item1.group.bounds.width + noteHeadWidth; // FIXME: needs a little work for perfect positioning
+		// cursor = item1.group.bounds.width + noteHeadWidth; // FIXME: needs a little work for perfect positioning
+		cursor = item1.group.bounds.right + noteHeadWidth; // FIXME: needs a little work for perfect positioning
 	} else if (item1.type === constants.type.measure) {
 		let leftBarline = item1.barlines[0];
 		cursor = leftBarline.position.x + noteHeadWidth;

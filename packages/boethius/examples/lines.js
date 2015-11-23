@@ -7,6 +7,7 @@ function run () {
 	// createMeasures();
 	// interaction();
 
+	// simpleLine().translate(25, 50);
 	renderingNotesOnLine().translate(25, 50);
 	oneVoice().translate(25, 150);
 	twoVoices().translate(25, 250);
@@ -172,6 +173,18 @@ function renderingNotesOnLine () {
 	var voice = scored.voice({}, [scored.note({pitch: "a4", value: 2}), scored.note({pitch: "b4", value: 2}),
 								  scored.note({pitch: "c5", value: 2}), scored.note({pitch: "d4", value: 4}), scored.rest({value: 4})]);
 	// var composition = scored.compose(trebleLine, [voice]);
+
+	return scored.render(trebleLine, 400, [voice], 2);
+}
+
+function simpleLine () {
+	var trebleLine = scored.line({}, [scored.clef({measure: 0}),
+									  scored.timeSig({value: "4/4", measure: 0})
+								  ]);
+	var voice = scored.voice({}, [scored.note({pitch: "a4", value: 4}), scored.note({pitch: "a4", value: 4}),
+								  scored.note({pitch: "a4", value: 4}), scored.note({pitch: "a4", value: 4}),
+								  scored.note({pitch: "a4", value: 1})
+							  ]);
 
 	return scored.render(trebleLine, 400, [voice], 2);
 }
