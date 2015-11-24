@@ -15,3 +15,5 @@ Should view render methods return a paper group, or should they return themselve
 - If a view doesn't have this.group then it is more like a template.
 - Rendering ofter requires multiple render methods for various parts intertwined with render method calls on other "templates".
 - subsequent render method calls require both the view and the group. Hard to keep explicit reference between view and group without group property on the view.
+
+TODO: There should be a segregation between files that require paper.js and those that do not.

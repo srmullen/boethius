@@ -2,6 +2,7 @@ import {expect} from "chai";
 import Line from "../src/views/Line";
 import Measure from "../src/views/Measure";
 import Scored from "../src/Scored";
+import {getTimeContexts, getAccidentals} from "../src/utils/line";
 
 describe("Line", () => {
     const scored = new Scored();
@@ -105,6 +106,16 @@ describe("Line", () => {
         it("should return null if the given measure doesn't exist on the line", () => {
             let line = scored.line();
             expect(line.contextAt(Measure.createMeasures(1), 100)).to.be.null;
+        });
+    });
+
+    describe("utils", () => {
+        describe("getTimeContexts", () => {
+
+        });
+
+        describe("getAccidentals", () => {
+
         });
     });
 });

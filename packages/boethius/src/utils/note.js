@@ -1,4 +1,4 @@
-import {doTimes, concat, map} from "../utils/common";
+import {doTimes, concat, map, partitionBy} from "../utils/common";
 import * as placement from "../utils/placement";
 import teoria from "teoria";
 import _ from "lodash";
@@ -306,6 +306,51 @@ function slur (notes) {
 	path.segments[1].handleIn = handle;
 }
 
+const arrayToString = (arr) => _.reduce(arr, (acc, c) => acc + c, "");
+
+/*
+ * @param pitch - String representation of note pitch.
+ * @return - {name, accidental, octave}
+ */
+function parsePitch (pitch) {
+	let [nameAndAccidental, [...octave]] = partitionBy(pitch, (c) => !!_.isNaN(Number.parseInt(c)));
+
+	let name = _.first(nameAndAccidental),
+		accidental = arrayToString(nameAndAccidental.slice(1));
+
+	return {name, accidental, octave: arrayToString(octave)};
+}
+
+/*
+ * @param noteAccdiental - String representation of the pitches accidental.
+ * @param accidentals - list of parsed accidentals already in the context.
+ * @return - String representation of accidental that needs to be rendered.
+ */
+function getAccidental (pitch, accidentals) {
+	const {name, accidental, octave} = parsePitch(pitch);
+	let returnAccidental;
+
+	// get the accidentals on the diatonic pitch.
+	let affects = _.filter(accidentals, (a) => a.name === name && a.octave === octave);
+
+	if (affects.length) {
+		let realizedAccidental = affects[0].accidental;
+		if (realizedAccidental === accidental) {
+			returnAccidental = "";
+		} else if (realizedAccidental === "n" && accidental === "") {
+			returnAccidental = "";
+		} else if (realizedAccidental && accidental === "") {
+			returnAccidental = "n";
+		} else {
+			returnAccidental = accidental;
+		}
+	} else {
+		returnAccidental = accidental;
+	}
+
+	return returnAccidental;
+}
+
 export {
 	beam,
 	getDuration,
@@ -315,5 +360,7 @@ export {
 	defaultStemPoint,
 	slur,
 	getSteps,
-	getAverageStemDirection
+	getAverageStemDirection,
+	parsePitch,
+	getAccidental
 };

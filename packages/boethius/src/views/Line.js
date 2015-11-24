@@ -1,7 +1,7 @@
 import constants from "../constants";
 import engraver from "../engraver";
 import Measure from "./Measure";
-import {getTime, getMeasureNumber, getMeasureByTime} from "../utils/timeUtils";
+import {getMeasureNumber, getMeasureByTime} from "../utils/timeUtils";
 import * as placement from "../utils/placement";
 import * as common from "../utils/common";
 import * as lineUtils from "../utils/line";
@@ -51,7 +51,6 @@ Line.render = function (line, length, voices, numMeasures=1) {
 	// 4. Place items with the same stretch factor.
 
 	let lineGroup = line.render(length), // draw the line
-		voiceGroups = line.renderVoices(voices),
 		// create the measures
 		measures = Measure.createMeasures(numMeasures, line.children);
 
@@ -60,23 +59,15 @@ Line.render = function (line, length, voices, numMeasures=1) {
 		b = lineUtils.b(lineGroup),
 		shortestDuration = 0.125; // need function to calculate this.
 
-	// render markings
+	// group and sort voice items by time.
+	let times = lineUtils.getTimeContexts(line, measures, voices);
+
+	// render all items
+	let voiceGroups = line.renderVoices(voices);
 	_.each(line.markings, (marking) => {
 		let markingGroup = marking.render(b)
 		lineGroup.addChild(markingGroup);
 	});
-
-	// group and sort voice items by time.
-	let allItems = line.markings.concat(_.reduce(voices, (acc, voice) => {
-		return acc.concat(voice.children);
-	}, []));
-
-	let times = _.sortBy(_.map(_.groupBy(allItems, (item) => {
-		return getTime(measures, item).time;
-	}), (v, k) => {
-		let time = getTime(measures, v[0]);
-		return {time, items: v, context: line.contextAt(measures, time)};
-	}), ({time}) => time.time);
 
 	// calculating measure lengths
 	calculateAndSetMeasureLengths(measures, times, noteHeadWidth, shortestDuration);
@@ -84,6 +75,7 @@ Line.render = function (line, length, voices, numMeasures=1) {
 	// render measures.
 	let measureGroups = line.renderMeasures(measures, lineGroup, length);
 
+	// place all items
 	let cursor = noteHeadWidth,
 		previousMeasureNumber = 0;
 	_.each(times, ({time, items, context}) => {

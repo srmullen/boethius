@@ -72,7 +72,7 @@ function concat (a, b) {
 function partitionBy (coll, f) {
 	let previousValue;
 
-	return coll.reduce((acc, el) => {
+	return _.reduce(coll, (acc, el) => {
 		let newValue = f(el);
 		if (previousValue === newValue) {
 			acc[acc.length-1].push(el);

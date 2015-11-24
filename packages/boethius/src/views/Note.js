@@ -29,8 +29,8 @@ function Note ({pitch="a4", value=4, dots=0, tuplet, time, voice}) {
 
 Note.prototype.type = TYPE;
 
-Note.render = function (note, position) {
-	let group = note.render().translate(position);
+Note.render = function (note, context) {
+	let group = note.render(context);
 	Note.renderStem(note);
 	return group;
 }
@@ -94,7 +94,7 @@ Note.findBeaming = function (timeSig, notes) {
 	return groupings;
 }
 
-Note.prototype.render = function () {
+Note.prototype.render = function ({accidentals = []} = {}) {
 	const group = this.group = new paper.Group({
 		name: TYPE
 	});
@@ -127,8 +127,11 @@ Note.prototype.render = function () {
 	// 	group.addChild(legato);
 	// }
 
-	if (this.note.accidental()) {
-		var accidentalSymbol = engraver.drawAccidental(this.note.accidental());
+	let accidental = noteUtils.getAccidental(this.pitch, accidentals);
+
+	if (accidental) {
+		// var accidentalSymbol = engraver.drawAccidental(this.note.accidental());
+		let accidentalSymbol = engraver.drawAccidental(accidental);
 		let position = placement.getNoteHeadCenter(noteHead.bounds.center)
 								.add(-Scored.config.note.accidental.xOffset, Scored.config.note.accidental.yOffset);
 		group.addChild(accidentalSymbol.place(position));

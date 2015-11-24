@@ -1,4 +1,5 @@
 import _ from "lodash";
+import {getTime} from "./timeUtils";
 
 function lineGetter (name) {
 	return function (lineGroup) {
@@ -39,6 +40,35 @@ function getMeasure (line) {
 	}
 }
 
+/*
+ * @param line - Line
+ * @param measures - Measure[]
+ * @param voices - Voice[]
+ * @return [...{time, items, context}] Array ordered by time
+ */
+function getTimeContexts (line, measures, voices) {
+	let allItems = line.markings.concat(_.reduce(voices, (acc, voice) => {
+		return acc.concat(voice.children);
+	}, []));
+
+	let times = _.sortBy(_.map(_.groupBy(allItems, (item) => {
+		return getTime(measures, item).time;
+	}), (v, k) => {
+		let time = getTime(measures, v[0]);
+		return {time, items: v, context: line.contextAt(measures, time)};
+	}), ({time}) => time.time);
+
+	return times;
+}
+
+/*
+ * @param times - array describing the rendering context as returned from getTimeContexts.
+ * @return String[] - Array with the notes for which accidentals already exist in the measure.
+ */
+function getAccidentals (times) {
+
+}
+
 export {
 	f,
 	d,
@@ -46,5 +76,6 @@ export {
 	g,
 	e,
 	getClosestLine,
-	getMeasure
+	getMeasure,
+	getTimeContexts
 }

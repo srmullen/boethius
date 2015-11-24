@@ -1,7 +1,8 @@
 var up = {}, down = {}, beamed = {};
 
 function run () {
-	pageOne();
+	testAccidentals();
+	// pageOne();
 	// pageTwo();
 }
 
@@ -21,7 +22,7 @@ function pageOne () {
 	up.oneDot = scored.note({dots: 1});
 	up.twoDot = scored.note({dots: 2})
 
-	// renderNotes(up, 50);
+	renderNotes(up, 50);
 
 	down.whole = scored.note({value: 1, stemDirection: "down"}),
 	down.half = scored.note({value: 2, stemDirection: "down"}),
@@ -38,12 +39,12 @@ function pageOne () {
 	down.oneDot = scored.note({dots: 1, stemDirection: "down"});
 	down.twoDot = scored.note({dots: 2, stemDirection: "down"});
 
-	// renderNotes(down, 100);
+	renderNotes(down, 100);
 
 	// beamedEigthsUp();
-	// simpleBeam(8, 150);
-	// simpleBeam(16, 200);
-	// simpleBeam(32, 250);
+	simpleBeam(8, 150);
+	simpleBeam(16, 200);
+	simpleBeam(32, 250);
 
 	var stemDirection;
 	// stemDirection = "down";
@@ -72,20 +73,20 @@ function pageTwo () {
 		note7 = scored.note({value: 4, stemDirection: "down"}),
 		note8 = scored.note({value: 4});
 
-	scored.render(note1, [100, 100]);
-	scored.render(note2, [125, 100]);
+	scored.render(note1).translate([100, 100]);
+	scored.render(note2).translate([125, 100]);
 	Scored.utils.note.slur([note1, note2]);
 
-	scored.render(note3, [175, 100]);
-	scored.render(note4, [200, 100]);
+	scored.render(note3).translate([175, 100]);
+	scored.render(note4).translate([200, 100]);
 	Scored.utils.note.slur([note3, note4]);
 
-	scored.render(note5, [250, 100]);
-	scored.render(note6, [275, 100]);
+	scored.render(note5).translate([250, 100]);
+	scored.render(note6).translate([275, 100]);
 	Scored.utils.note.slur([note5, note6]);
 
-	scored.render(note7, [325, 100]);
-	scored.render(note8, [350, 100]);
+	scored.render(note7).translate([325, 100]);
+	scored.render(note8).translate([350, 100]);
 	Scored.utils.note.slur([note7, note8]);
 }
 
@@ -112,10 +113,10 @@ function beamedEigthsDown () {
 		n3 = scored.note({value: 8}),
 		n4 = scored.note({value: 8});
 
-	n1.render([200, 200]);
-	n2.render([225, 200]);
-	n3.render([250, 260]);
-	n4.render([275, 180]);
+	n1.render().translate([200, 200]);
+	n2.render().translate([225, 200]);
+	n3.render().translate([250, 260]);
+	n4.render().translate([275, 180]);
 
 	Scored.utils.note.beam([n1, n2, n3, n4], {});
 }
@@ -201,7 +202,7 @@ function renderNotes (notes, yPos) {
 		}
 	} else {
 		for (key in notes) {
-			scored.render(notes[key], [xPos, yPos]);
+			scored.render(notes[key]).translate([xPos, yPos]);
 			xPos = xPos + 50;
 		}
 	}
@@ -290,4 +291,31 @@ function createKeys () {
 	db.render([375, 850]);
 	gb.render([450, 850]);
 	cb.render([525, 850]);
+}
+
+function testAccidentals () {
+	var sharp = scored.note({pitch: "a#4", value: 4}),
+		flat = scored.note({pitch: "ab4", value: 4}),
+		natural = scored.note({pitch: "a4", value: 4});
+
+	var noAccidentals = [],
+		sharpAccidental = [Scored.utils.note.parsePitch("a#4")],
+		flatAccidental = [Scored.utils.note.parsePitch("ab4")],
+		naturalAccidental = [Scored.utils.note.parsePitch("an4")];
+
+	scored.render(sharp, {accidentals: noAccidentals}).translate(50, 50);
+	scored.render(flat, {accidentals: noAccidentals}).translate(75, 50);
+	scored.render(natural, {accidentals: noAccidentals}).translate(100, 50);
+
+	scored.render(sharp, {accidentals: sharpAccidental}).translate(150, 50);
+	scored.render(flat, {accidentals: sharpAccidental}).translate(175, 50);
+	scored.render(natural, {accidentals: sharpAccidental}).translate(200, 50);
+
+	scored.render(sharp, {accidentals: flatAccidental}).translate(250, 50);
+	scored.render(flat, {accidentals: flatAccidental}).translate(275, 50);
+	scored.render(natural, {accidentals: flatAccidental}).translate(300, 50);
+
+	scored.render(sharp, {accidentals: naturalAccidental}).translate(350, 50);
+	scored.render(flat, {accidentals: naturalAccidental}).translate(375, 50);
+	scored.render(natural, {accidentals: naturalAccidental}).translate(400, 50);
 }
