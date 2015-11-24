@@ -321,36 +321,6 @@ function parsePitch (pitch) {
 	return {name, accidental, octave: arrayToString(octave)};
 }
 
-/*
- * @param noteAccdiental - String representation of the pitches accidental.
- * @param accidentals - list of parsed accidentals already in the context.
- * @return - String representation of accidental that needs to be rendered.
- */
-function getAccidental (pitch, accidentals) {
-	const {name, accidental, octave} = parsePitch(pitch);
-	let returnAccidental;
-
-	// get the accidentals on the diatonic pitch.
-	let affects = _.filter(accidentals, (a) => a.name === name && a.octave === octave);
-
-	if (affects.length) {
-		let realizedAccidental = affects[0].accidental;
-		if (realizedAccidental === accidental) {
-			returnAccidental = "";
-		} else if (realizedAccidental === "n" && accidental === "") {
-			returnAccidental = "";
-		} else if (realizedAccidental && accidental === "") {
-			returnAccidental = "n";
-		} else {
-			returnAccidental = accidental;
-		}
-	} else {
-		returnAccidental = accidental;
-	}
-
-	return returnAccidental;
-}
-
 export {
 	beam,
 	getDuration,
@@ -361,6 +331,5 @@ export {
 	slur,
 	getSteps,
 	getAverageStemDirection,
-	parsePitch,
-	getAccidental
+	parsePitch
 };

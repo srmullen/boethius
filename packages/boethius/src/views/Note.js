@@ -6,6 +6,7 @@ import {concat, partitionBy} from "../utils/common";
 import * as placement from "../utils/placement";
 import * as noteUtils from "../utils/note";
 import * as timeUtils from "../utils/timeUtils";
+import {getAccidental} from "../utils/accidental";
 import constants from "../constants";
 import TimeSignature from "./TimeSignature";
 
@@ -127,10 +128,9 @@ Note.prototype.render = function ({accidentals = []} = {}) {
 	// 	group.addChild(legato);
 	// }
 
-	let accidental = noteUtils.getAccidental(this.pitch, accidentals);
+	let accidental = getAccidental(noteUtils.parsePitch(this.pitch), accidentals);
 
 	if (accidental) {
-		// var accidentalSymbol = engraver.drawAccidental(this.note.accidental());
 		let accidentalSymbol = engraver.drawAccidental(accidental);
 		let position = placement.getNoteHeadCenter(noteHead.bounds.center)
 								.add(-Scored.config.note.accidental.xOffset, Scored.config.note.accidental.yOffset);

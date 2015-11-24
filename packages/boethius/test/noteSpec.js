@@ -2,7 +2,7 @@ import {expect} from "chai";
 
 import Scored from "../src/Scored";
 import Note from "../src/views/Note";
-import {getSteps, getAverageStemDirection, parsePitch, getAccidental} from "../src/utils/note";
+import {getSteps, getAverageStemDirection, parsePitch} from "../src/utils/note";
 
 describe("Note", () => {
     let scored = new Scored();
@@ -82,46 +82,6 @@ describe("Note", () => {
             expect(parsePitch("ax4")).to.eql({name: "a", octave: "4", accidental: "x"});
             expect(parsePitch("b12")).to.eql({name: "b", octave: "12", accidental: ""});
             expect(parsePitch("cbb5")).to.eql({name: "c", octave: "5", accidental: "bb"});
-        });
-    });
-
-    describe("getAccidental", () => {
-        it("should return the pitches accidental if accidentals is empty", () => {
-            expect(getAccidental("a4", [])).to.equal("");
-            expect(getAccidental("a#5", [])).to.equal("#");
-            expect(getAccidental("bb6", [])).to.equal("b");
-            expect(getAccidental("cx7")).to.equal("x");
-            expect(getAccidental("cbb8")).to.equal("bb");
-        });
-
-        it("should return an empty string if the pitches accidental is already in context", () => {
-            expect(getAccidental("a#5", [parsePitch("a#5")])).to.equal("");
-            expect(getAccidental("bb6", [parsePitch("bb6")])).to.equal("");
-            expect(getAccidental("cx7", [parsePitch("cx7")])).to.equal("");
-            expect(getAccidental("cbb8", [parsePitch("cbb8")])).to.equal("");
-            expect(getAccidental("d4", [parsePitch("dn4")])).to.equal("");
-        });
-
-        it("should return the pitches accidental if the accidental was realized in a different octave", () => {
-            expect(getAccidental("a#5", [parsePitch("a#1")])).to.equal("#");
-            expect(getAccidental("bb6", [parsePitch("bb2")])).to.equal("b");
-            expect(getAccidental("cx7", [parsePitch("cx3")])).to.equal("x");
-            expect(getAccidental("cbb8", [parsePitch("cbb4")])).to.equal("bb");
-            expect(getAccidental("d4", [parsePitch("dn5")])).to.equal("");
-        });
-
-        it("should return a natural if the pitch has no accidental but on has already been realized", () => {
-            expect(getAccidental("a5", [parsePitch("a#5")])).to.equal("n");
-            expect(getAccidental("b6", [parsePitch("bb6")])).to.equal("n");
-            expect(getAccidental("c7", [parsePitch("cx7")])).to.equal("n");
-            expect(getAccidental("c8", [parsePitch("cbb8")])).to.equal("n");
-        });
-
-        it("should return the pitches accidental if the contexts accidental is different", () => {
-            expect(getAccidental("a#5", [parsePitch("ab5")])).to.equal("#");
-            expect(getAccidental("bb6", [parsePitch("b#6")])).to.equal("b");
-            expect(getAccidental("cx7", [parsePitch("cn7")])).to.equal("x");
-            expect(getAccidental("cbb8", [parsePitch("cx8")])).to.equal("bb");
         });
     });
 });

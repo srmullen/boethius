@@ -113,9 +113,5 @@ describe("Line", () => {
         describe("getTimeContexts", () => {
 
         });
-
-        describe("getAccidentals", () => {
-
-        });
     });
 });

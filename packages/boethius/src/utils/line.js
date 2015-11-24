@@ -61,14 +61,6 @@ function getTimeContexts (line, measures, voices) {
 	return times;
 }
 
-/*
- * @param times - array describing the rendering context as returned from getTimeContexts.
- * @return String[] - Array with the notes for which accidentals already exist in the measure.
- */
-function getAccidentals (times) {
-
-}
-
 export {
 	f,
 	d,

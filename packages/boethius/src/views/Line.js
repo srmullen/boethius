@@ -5,6 +5,7 @@ import {getMeasureNumber, getMeasureByTime} from "../utils/timeUtils";
 import * as placement from "../utils/placement";
 import * as common from "../utils/common";
 import * as lineUtils from "../utils/line";
+import {getAccidentalContexts} from "../utils/accidental";
 import Note from "../views/Note";
 import Rest from "../views/Rest";
 import _ from "lodash";
@@ -61,6 +62,8 @@ Line.render = function (line, length, voices, numMeasures=1) {
 
 	// group and sort voice items by time.
 	let times = lineUtils.getTimeContexts(line, measures, voices);
+
+	let accidentals = getAccidentalContexts(times);
 
 	// render all items
 	let voiceGroups = line.renderVoices(voices);
