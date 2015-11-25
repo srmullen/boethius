@@ -37,7 +37,7 @@ TimeSignature.parseValue = function (sig) {
 	}
 }
 
-TimeSignature.prototype.render = function (position) {
+TimeSignature.prototype.render = function () {
 	const margin = {
 		top: 0,
 		left: 2,
@@ -53,7 +53,7 @@ TimeSignature.prototype.render = function (position) {
 
 	// this.group.removeChildren();
 
-	group.addChild(symbol.place(position));
+	group.addChild(symbol.place());
 
 	return group;
 }

@@ -111,7 +111,7 @@ Key.prototype.type = TYPE;
 /*
  * @param position {Point} - the location to draw the first accidental
  */
-Key.prototype.render = function (position, clef) {
+Key.prototype.render = function (clef) {
 	const margin = {
 		top: 0,
 		left: 2,
@@ -128,7 +128,7 @@ Key.prototype.render = function (position, clef) {
 
 	let [signature, accidental] = nameToSignature[this.value];
 
-	var symbol, item, yTranslate;
+	var symbol, item, yTranslate, position = new paper.Point([0, 0]);
 	for (var i = 0; i < signature.length; i++) {
 		symbol = engraver.drawAccidental(accidental);
 

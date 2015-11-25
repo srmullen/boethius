@@ -1,8 +1,8 @@
 var up = {}, down = {}, beamed = {};
 
 function run () {
-	testAccidentals();
-	// pageOne();
+	// testAccidentals();
+	pageOne();
 	// pageTwo();
 }
 
@@ -15,10 +15,10 @@ function pageOne () {
 	up.thirtysecond = scored.note({value: 32}),
 	up.sixtyfourth = scored.note({value: 64}),
 	up.onetwentyeighth = scored.note({value: 128});
-	up.sharp = scored.note({pitch: "a#"});
-	up.flat = scored.note({pitch: "ab"});
-	up.doubleSharp = scored.note({pitch: "ax"});
-	up.doubleFlat = scored.note({pitch: "abb"});
+	up.sharp = scored.note({pitch: "a#4"});
+	up.flat = scored.note({pitch: "ab4"});
+	up.doubleSharp = scored.note({pitch: "ax4"});
+	up.doubleFlat = scored.note({pitch: "abb4"});
 	up.oneDot = scored.note({dots: 1});
 	up.twoDot = scored.note({dots: 2})
 
@@ -32,10 +32,10 @@ function pageOne () {
 	down.thirtysecond = scored.note({value: 32, stemDirection: "down"}),
 	down.sixtyfourth = scored.note({value: 64, stemDirection: "down"}),
 	down.onetwentyeighth = scored.note({value: 128, stemDirection: "down"});
-	down.sharp = scored.note({pitch: "a#", stemDirection: "down"});
-	down.flat = scored.note({pitch: "ab", stemDirection: "down"});
-	down.doublesharp = scored.note({pitch: "ax", stemDirection: "down"});
-	down.doubleflat = scored.note({pitch: "abb", stemDirection: "down"});
+	down.sharp = scored.note({pitch: "a#4", stemDirection: "down"});
+	down.flat = scored.note({pitch: "ab4", stemDirection: "down"});
+	down.doublesharp = scored.note({pitch: "ax4", stemDirection: "down"});
+	down.doubleflat = scored.note({pitch: "abb4", stemDirection: "down"});
 	down.oneDot = scored.note({dots: 1, stemDirection: "down"});
 	down.twoDot = scored.note({dots: 2, stemDirection: "down"});
 
@@ -236,10 +236,10 @@ function createClefs () {
 		alto = scored.clef({value: "alto"}),
 		tenor = scored.clef({value: "tenor"});
 
-	treble.render([650, 400]);
-	bass.render([700, 400]);
-	alto.render([750, 400]);
-	tenor.render([800, 400]);
+	treble.render().translate([650, 400]);
+	bass.render().translate([700, 400]);
+	alto.render().translate([750, 400]);
+	tenor.render().translate([800, 400]);
 }
 
 function createTimeSigs () {
@@ -250,11 +250,11 @@ function createTimeSigs () {
 		twelveeight = scored.timeSig({value: "12/8"});
 
 
-	common.render([650, 500]);
-	half.render([700, 500]);
-	fourfour.render([750, 500]);
-	sixeight.render([800, 500]);
-	twelveeight.render([850, 500]);
+	common.render().translate([650, 500]);
+	half.render().translate([700, 500]);
+	fourfour.render().translate([750, 500]);
+	sixeight.render().translate([800, 500]);
+	twelveeight.render().translate([850, 500]);
 }
 
 function createKeys () {
@@ -274,23 +274,23 @@ function createKeys () {
 		gb = scored.key({value: "Gb"}),
 		cb = scored.key({value: "Cb"});
 
-	c.render([100, 800]);
+	c.render().translate([100, 800]);
 	// sharps
-	g.render([150, 800]);
-	d.render([200, 800]);
-	a.render([250, 800]);
-	e.render([300, 800]);
-	b.render([375, 800]);
-	fs.render([450, 800]);
-	cs.render([525, 800]);
+	g.render().translate([150, 800]);
+	d.render().translate([200, 800]);
+	a.render().translate([250, 800]);
+	e.render().translate([300, 800]);
+	b.render().translate([375, 800]);
+	fs.render().translate([450, 800]);
+	cs.render().translate([525, 800]);
 	// flats
-	f.render([150, 850]);
-	bb.render([200, 850]);
-	eb.render([250, 850]);
-	ab.render([300, 850]);
-	db.render([375, 850]);
-	gb.render([450, 850]);
-	cb.render([525, 850]);
+	f.render().translate([150, 850]);
+	bb.render().translate([200, 850]);
+	eb.render().translate([250, 850]);
+	ab.render().translate([300, 850]);
+	db.render().translate([375, 850]);
+	gb.render().translate([450, 850]);
+	cb.render().translate([525, 850]);
 }
 
 function testAccidentals () {

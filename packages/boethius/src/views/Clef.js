@@ -12,7 +12,7 @@ function Clef ({value="treble", measure, beat}) {
 
 Clef.prototype.type = TYPE;
 
-Clef.prototype.render = function (position) {
+Clef.prototype.render = function () {
 	const margin = {
 		top: 0,
 		left: 2,
@@ -26,7 +26,7 @@ Clef.prototype.render = function (position) {
 
 	const symbol = engraver.drawClef(this.value, margin);
 
-	group.addChild(symbol.place(position));
+	group.addChild(symbol.place());
 
 	// common.debugGroupEvents(this.group);
 
