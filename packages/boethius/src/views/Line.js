@@ -91,7 +91,8 @@ Line.render = function (line, length, voices, numMeasures=1) {
 		let placeMarking = marking => {
 			marking.group.translate(b.add([0, placement.getYOffset(marking)]));
 			placement.placeAt(cursor, marking);
-			cursor = placement.calculateCursor(marking);
+			// since keys of C and a have no children calculateCursor return undefined.
+			cursor = placement.calculateCursor(marking) || cursor;
 		};
 
 		// place the markings

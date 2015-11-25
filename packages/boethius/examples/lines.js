@@ -169,6 +169,7 @@ function fourBars () {
 
 function renderingNotesOnLine () {
 	var trebleLine = scored.line({}, [scored.clef({measure: 0}),
+									  scored.key({value: "C", measure: 0}),
 									  scored.timeSig({value: "4/4", measure: 0}),
 									  scored.clef({value: "bass", measure: 1})
 								  ]);
@@ -193,6 +194,7 @@ function simpleLine () {
 
 function oneVoice () {
 	var line = scored.line({}, [scored.clef({value: "treble", measure: 0}),
+								scored.key({value: "C", measure: 0}),
 								scored.timeSig({value: "4/4", measure: 0}),
 								scored.clef({value: "bass", measure: 2})
 							]);
@@ -215,7 +217,9 @@ function oneVoice () {
 }
 
 function twoVoices () {
-	var line = scored.line({}, [scored.clef({value: "treble", measure: 0}), scored.timeSig({value: "4/4", measure: 0})]);
+	var line = scored.line({}, [scored.clef({value: "treble", measure: 0}),
+								scored.key({value: "C", measure: 0}),
+								scored.timeSig({value: "4/4", measure: 0})]);
 	var notes1 = _.fill(new Array(16), 16).concat(_.fill(new Array(8), 8)).concat(_.fill(new Array(4), 4)).concat(_.fill(new Array(2), 2)).concat(_.fill(new Array(1), 1));
 	var notes2 = _.fill(new Array(4), 4).concat(
 		_.fill(new Array(2), 2)).concat(
@@ -279,8 +283,8 @@ function accidentals (key) {
 	var voice = scored.voice({}, [
 		n({pitch: "c#4", value: 16}), n({pitch: "d4", value: 16}), n({pitch: "eb4", value: 16}), n({pitch: "c4", value: 16}),
 		n({pitch: "c#4", value: 16}), n({pitch: "c4", value: 16}), n({pitch: "c4", value: 16}), n({pitch: "c4", value: 16}),
-		n({pitch: "c4", value: 16}), n({pitch: "c4", value: 16}), n({pitch: "c4", value: 16}), n({pitch: "c4", value: 16}),
-		n({pitch: "c4", value: 16}), n({pitch: "c4", value: 16}), n({pitch: "c4", value: 16}), n({pitch: "c4", value: 16}),
+		n({pitch: "e4", value: 16}), n({pitch: "c4", value: 16}), n({pitch: "c4", value: 16}), n({pitch: "c4", value: 16}),
+		n({pitch: "eb4", value: 16}), n({pitch: "c4", value: 16}), n({pitch: "c4", value: 16}), n({pitch: "c4", value: 16}),
 	]);
 
 	return scored.render(line, 1500, [voice], 1);

@@ -313,13 +313,25 @@ const arrayToString = (arr) => _.reduce(arr, (acc, c) => acc + c, "");
  * @return - {name, accidental, octave}
  */
 const parsePitch = _.memoize((pitch) => {
-	let [nameAndAccidental, [...octave]] = partitionBy(pitch, (c) => !!_.isNaN(Number.parseInt(c)));
+	let [nameAndAccidental, octave] = partitionBy(pitch, (c) => !!_.isNaN(Number.parseInt(c)));
 
 	let name = _.first(nameAndAccidental),
 		accidental = arrayToString(nameAndAccidental.slice(1));
 
 	return Object.freeze({name, accidental, octave: arrayToString(octave)});
 });
+
+/*
+ * @param key - Key object.
+ * @param pitch - parsed pitch.
+ */
+function hasPitch(key, {name, accidental}) {
+	if (!key) {
+		return false;
+	}
+	let pitches = _.map(key.getPitches(), parsePitch);
+	return !!_.findWhere(pitches, {name, accidental});
+}
 
 export {
 	beam,
@@ -331,5 +343,6 @@ export {
 	slur,
 	getSteps,
 	getAverageStemDirection,
-	parsePitch
+	parsePitch,
+	hasPitch
 };

@@ -95,7 +95,7 @@ Note.findBeaming = function (timeSig, notes) {
 	return groupings;
 }
 
-Note.prototype.render = function ({accidentals = []} = {}) {
+Note.prototype.render = function ({accidentals = [], context = {}} = {}) {
 	const group = this.group = new paper.Group({
 		name: TYPE
 	});
@@ -128,9 +128,10 @@ Note.prototype.render = function ({accidentals = []} = {}) {
 	// 	group.addChild(legato);
 	// }
 
-	let accidental = getAccidental(noteUtils.parsePitch(this.pitch), accidentals);
+	let parsedPitch = noteUtils.parsePitch(this.pitch);
+	let accidental = getAccidental(parsedPitch, accidentals);
 
-	if (accidental) {
+	if (accidental && !noteUtils.hasPitch(context.key, parsedPitch)) {
 		let accidentalSymbol = engraver.drawAccidental(accidental);
 		let position = placement.getNoteHeadCenter(noteHead.bounds.center)
 								.add(-Scored.config.note.accidental.xOffset, Scored.config.note.accidental.yOffset);

@@ -54,15 +54,6 @@ function getLineNames (clef) {
  * @param note {String}
  */
 function calculateAccidentalYpos (degree, step) {
-	// var clefBase = getClefBase(clef),
-	// 	lineNames = getLineNames(clef),
-	// 	lineIndex = _.indexOf(lineNames, note)
-		// octave = clefBase.octave,
-		// degree = noteNameToDegree(note);
-	// 4 is the offset (number of steps) of the center line.
-	// the clefBase offset it subtracted to normalize to the centerline, since the note is rendered from the centerLine.
-	// var diffY = (clefBase.degree + (clefBase.octave * 7)) - (degree + (octave * 7)) - (4 - clefBase.offset);
-
 	return degree * step;
 }
 
@@ -161,8 +152,8 @@ function calculateCursor (item1) {
 	let cursor;
 
 	if (isMarking(item1)) {
-		// cursor = item1.group.bounds.width + noteHeadWidth; // FIXME: needs a little work for perfect positioning
-		cursor = item1.group.bounds.right + noteHeadWidth; // FIXME: needs a little work for perfect positioning
+		// FIXME: needs a little work for perfect positioning
+		cursor = item1.group.children.length ? item1.group.bounds.right + noteHeadWidth : cursor;
 	} else if (item1.type === constants.type.measure) {
 		let leftBarline = item1.barlines[0];
 		cursor = leftBarline.position.x + noteHeadWidth;

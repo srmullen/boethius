@@ -2,7 +2,7 @@ import {expect} from "chai";
 
 import Scored from "../src/Scored";
 import Note from "../src/views/Note";
-import {getSteps, getAverageStemDirection, parsePitch} from "../src/utils/note";
+import {getSteps, getAverageStemDirection, parsePitch, hasPitch} from "../src/utils/note";
 
 describe("Note", () => {
     let scored = new Scored();
@@ -82,6 +82,30 @@ describe("Note", () => {
             expect(parsePitch("ax4")).to.eql({name: "a", octave: "4", accidental: "x"});
             expect(parsePitch("b12")).to.eql({name: "b", octave: "12", accidental: ""});
             expect(parsePitch("cbb5")).to.eql({name: "c", octave: "5", accidental: "bb"});
+        });
+
+        it("should not require octave", () => {
+            expect(parsePitch("a")).to.eql({name: "a", octave: "", accidental: ""});
+            expect(parsePitch("a#")).to.eql({name: "a", octave: "", accidental: "#"});
+            expect(parsePitch("ax")).to.eql({name: "a", octave: "", accidental: "x"});
+            expect(parsePitch("b")).to.eql({name: "b", octave: "", accidental: ""});
+            expect(parsePitch("cbb")).to.eql({name: "c", octave: "", accidental: "bb"});
+        });
+    });
+
+    describe("hasPitch", () => {
+        it("should return true if the pitch is diatonic to the given key", () => {
+            let cMajor = scored.key({value: "C"});
+            expect(hasPitch(cMajor, parsePitch("c4"))).to.be.true;
+            expect(hasPitch(cMajor, parsePitch("c#4"))).to.be.false;
+            expect(hasPitch(cMajor, parsePitch("b2"))).to.be.true;
+            expect(hasPitch(cMajor, parsePitch("bbb8"))).to.be.false;
+
+            let fMinor = scored.key({value: "f"});
+            expect(hasPitch(fMinor, parsePitch("ab6"))).to.be.true;
+            expect(hasPitch(fMinor, parsePitch("c#4"))).to.be.false;
+            expect(hasPitch(fMinor, parsePitch("eb3"))).to.be.true;
+            expect(hasPitch(fMinor, parsePitch("d8"))).to.be.false;
         });
     });
 });

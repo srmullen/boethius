@@ -1,31 +1,70 @@
 import engraver from "../engraver";
 import * as placement from "../utils/placement";
+import {parsePitch} from "../utils/note";
 import _ from "lodash";
 import constants from "../constants";
 
 const TYPE = constants.type.key,
 
-	flats = [
-		[],
-		["bb"],
-		["bb", "eb"],
-		["bb", "eb", "ab"],
-		["bb", "eb", "ab", "db"],
-		["bb", "eb", "ab", "db", "gb"],
-		["bb", "eb", "ab", "db", "gb", "cb"],
-		["bb", "eb", "ab", "db", "gb", "cb", "fb"]
-	],
+	// flats = [
+	// 	[],
+	// 	["bb"],
+	// 	["bb", "eb"],
+	// 	["bb", "eb", "ab"],
+	// 	["bb", "eb", "ab", "db"],
+	// 	["bb", "eb", "ab", "db", "gb"],
+	// 	["bb", "eb", "ab", "db", "gb", "cb"],
+	// 	["bb", "eb", "ab", "db", "gb", "cb", "fb"]
+	// ],
+	//
+	// sharps = [
+	// 	[],
+	// 	["f#"],
+	// 	["f#", "c#"],
+	// 	["f#", "c#", "g#"],
+	// 	["f#", "c#", "g#", "d#"],
+	// 	["f#", "c#", "g#", "d#", "a#"],
+	// 	["f#", "c#", "g#", "d#", "a#", "e#"],
+	// 	["f#", "c#", "g#", "d#", "a#", "e#", "b#"]
+	// ],
 
-	sharps = [
-		[],
-		["f#"],
-		["f#", "c#"],
-		["f#", "c#", "g#"],
-		["f#", "c#", "g#", "d#"],
-		["f#", "c#", "g#", "d#", "a#"],
-		["f#", "c#", "g#", "d#", "a#", "e#"],
-		["f#", "c#", "g#", "d#", "a#", "e#", "b#"]
-	],
+	keyToPitches = {
+		"C":  ["c", "d", "e", "f", "g", "a", "b"],
+		"C#": ["c#", "d#", "e#", "f#", "g#", "a#", "b#"],
+		"Db": ["db", "eb", "f", "gb", "ab", "bb", "c"],
+		"D":  ["d", "e", "f#", "g", "a", "b", "c#"],
+		"D#": ["d#", "e#", "fx", "g#", "a#", "b#", "cx"],
+		"Eb": ["eb", "f", "g", "ab", "bb", "c", "d"],
+		"E":  ["e", "f#", "g#", "a", "b", "c#", "d#"],
+		"F":  ["f", "g", "a", "bb", "c", "d", "e"],
+		"F#": ["f#", "g#", "a#", "b", "c#", "d#", "e#"],
+		"Gb": ["gb", "ab", "bb", "cb", "db", "eb", "f"],
+		"G":  ["g", "a", "b", "c", "d", "e", "f#"],
+		"G#": ["g#", "a#", "b#", "c#", "d#", "e#", "fx"],
+		"Ab": ["ab", "bb", "c", "db", "eb", "f", "g"],
+		"A":  ["a", "b", "c#", "d", "e", "f#", "g#"],
+		"A#": ["a#", "b#", "cx", "d#", "e#", "fx", "gx"],
+		"Bb": ["bb", "c", "d", "eb", "f", "g", "a"],
+		"B":  ["b", "c#", "d#", "e", "f#", "g#", "a#"],
+
+		"a":  ["a", "b", "c", "d", "e", "f", "g"],
+		"a#": ["a#", "b#", "c#", "d#", "e#", "f#", "g#"],
+		"bb": ["bb", "c", "db", "eb", "f", "gb", "ab"],
+		"b":  ["b", "c#", "d", "e", "f#", "g", "a"],
+		"c":  ["c", "d", "eb", "f", "g", "ab", "bb"],
+		"c#": ["c#", "d#", "e", "f#", "g#", "a", "b"],
+		"db": ["db", "eb", "fb", "gb", "ab", "bbb", "cb"],
+		"d":  ["d", "e", "f", "g", "a", "bb", "c"],
+		"d#": ["d#", "e#", "f#", "g#", "a#", "b", "c#"],
+		"eb": ["eb", "f", "gb", "ab", "bb", "cb", "db"],
+		"e":  ["e", "f#", "g", "a", "b", "c", "d"],
+		"f":  ["f", "g", "ab", "bb", "c", "db", "eb"],
+		"f#": ["f#", "g#", "a", "b", "c#", "d", "e"],
+		"gb": ["gb", "ab", "bbb", "cb", "db", "ebb", "fb"],
+		"g":  ["g", "a", "bb", "c", "d", "eb", "f"],
+		"g#": ["g#", "a#", "b", "c#", "d#", "e", "f#"],
+		"ab": ["ab", "bb", "cb", "db", "eb", "fb", "gb"]
+	},
 
 	// Treble major is the baseline
 	flatSteps = [
@@ -151,6 +190,10 @@ Key.prototype.render = function ({context} = {}) {
 	}
 
 	return group;
+}
+
+Key.prototype.getPitches = function () {
+	return keyToPitches[this.value];
 }
 
 export default Key;
