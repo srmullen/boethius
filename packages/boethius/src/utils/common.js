@@ -128,6 +128,28 @@ function isMarking (item) {
 			false;
 }
 
+/*
+ * @param reducer - Function
+ * @param coll - collection to reduce over.
+ * @param init - optional initialization value
+ * @return - Array of intermediate results from the reducing function.
+ */
+function reductions (reducer, coll, init) {
+	let ret, idx = 1, i = 0;
+	if (!_.isUndefined(init)) {
+		ret = new Array(coll.length + 1)
+		ret[0] = init;
+	} else {
+		ret = new Array(coll.length);
+		ret[0] = coll[0];
+		i++;
+	}
+	for (; i < coll.length; i++, idx++) {
+		ret[idx] = reducer(ret[idx-1], coll[i]);
+	}
+	return ret;
+}
+
 export {
 	concat,
 	doTimes,
@@ -137,5 +159,6 @@ export {
 	partitionBy,
 	map,
 	juxt,
-	isMarking
+	isMarking,
+	reductions
 }

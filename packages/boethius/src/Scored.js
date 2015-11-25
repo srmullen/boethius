@@ -32,7 +32,7 @@ Scored.prototype.setup = function (canvas) {
 
 // Scored.projects = paper.projects;
 
-Scored.utils = {note: noteUtils, line: lineUtils};
+Scored.utils = {note: noteUtils, line: lineUtils, common};
 
 Scored.prototype.layout = function (layout) {
 	return _.bind(parse, this)({}, layout) || [];

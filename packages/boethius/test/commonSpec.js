@@ -1,6 +1,6 @@
 import {expect} from "chai";
 
-import {partitionBy, map, juxt} from "../src/utils/common";
+import {concat, partitionBy, map, juxt, reductions} from "../src/utils/common";
 import Scored from "../src/Scored";
 
 describe("common", () => {
@@ -59,6 +59,22 @@ describe("common", () => {
             let incFrom = juxt(x => x + 1, x => x + 2, x => x + 3);
             expect(incFrom(0)).to.eql([1, 2, 3]);
             expect(incFrom(5)).to.eql([6, 7, 8]);
+        });
+    });
+
+    describe("reductions", () => {
+        it("should return the intermediate results of the reduction", () => {
+            expect(reductions((x, y) => x + y, [1, 1, 1, 1, 1])).to.eql([1, 2, 3, 4, 5]);
+            expect(reductions((x, y) => x + y, [1, 1, 1, 1, 1], 1)).to.eql([1, 2, 3, 4, 5, 6]);
+            expect(reductions((x, y) => x + y, [1, 2, 3, 4, 5])).to.eql([1, 3, 6, 10, 15]);
+            expect(reductions((x, y) => x + y, [1, 2, 3, 4, 5], 1)).to.eql([1, 2, 4, 7, 11, 16]);
+
+            expect(reductions(concat, [1, 2, 3], [])).to.eql([[], [1], [1, 2], [1, 2, 3]]);
+        });
+
+        it("should recognize init for all values except undefined", () => {
+            expect(reductions((x, y) => x + y, [1, 2, 3, 4, 5], 0)).to.eql([0, 1, 3, 6, 10, 15]);
+            expect(reductions((str, c) => str + c, ["a", "b", "c"], "")).to.eql(["", "a", "ab", "abc"]);
         });
     });
 });
