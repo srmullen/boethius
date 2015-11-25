@@ -185,8 +185,7 @@ Line.prototype.render = function (length) {
 
 Line.prototype.renderItems = function (times) {
 	_.each(times, ({time, items, accidentals, context}) => {
-		let {clef: clefs, key: keys, timeSig: timeSigs, note: notes, rest: rests} = _.groupBy(items, item => item.type);
-		let groups = _.map(items, item => item.render({accidentals}));
+		let groups = _.map(items, item => item.render({accidentals, context}));
 		this.group.addChildren(groups);
 	});
 }

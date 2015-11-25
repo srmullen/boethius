@@ -271,7 +271,7 @@ function sixteenthBeamings () {
 }
 
 function accidentals (key) {
-	var line = scored.line({}, [scored.clef({value: "bass", measure: 0}),
+	var line = scored.line({}, [scored.clef({value: "treble", measure: 0}),
 								scored.key({value: key, measure: 0}),
 								scored.timeSig({value: "4/4", measure: 0})
 							]);

@@ -111,7 +111,7 @@ Key.prototype.type = TYPE;
 /*
  * @param position {Point} - the location to draw the first accidental
  */
-Key.prototype.render = function (clef) {
+Key.prototype.render = function ({context} = {}) {
 	const margin = {
 		top: 0,
 		left: 2,
@@ -122,13 +122,22 @@ Key.prototype.render = function (clef) {
 	const group = this.group = new paper.Group({
 		name: TYPE
 	});
-	position = new paper.Point(position); // make sure position isn't just an array
 
 	// group.removeChildren();
 
-	let [signature, accidental] = nameToSignature[this.value];
+	let clefValue = context && context.clef ? context.clef.value : "treble";
 
-	var symbol, item, yTranslate, position = new paper.Point([0, 0]);
+	let clefToPosition = {
+		"treble": [0, 0],
+		"bass": [0, Scored.config.layout.stepSpacing * 2],
+		"alto": [0, Scored.config.layout.stepSpacing],
+		"tenor": [0, -Scored.config.layout.stepSpacing]
+	};
+
+	let [signature, accidental] = nameToSignature[this.value],
+		position = new paper.Point(clefToPosition[clefValue]);
+
+	let symbol, item, yTranslate;
 	for (var i = 0; i < signature.length; i++) {
 		symbol = engraver.drawAccidental(accidental);
 
