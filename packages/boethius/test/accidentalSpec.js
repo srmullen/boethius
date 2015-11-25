@@ -1,4 +1,5 @@
 import {expect} from "chai";
+import _ from "lodash";
 
 import {getAccidental, createAccidentalContext} from "../src/utils/accidental";
 import {parsePitch} from "../src/utils/note";
@@ -45,6 +46,24 @@ describe("accidental", () => {
     });
 
     describe("createAccidentalContext", () => {
+        it("should merge the accidental contexts", () => {
+            let gSharp = parsePitch("g#4"),
+                aFlat = parsePitch("ab4");
+            expect(createAccidentalContext([gSharp], [aFlat])).to.eql([gSharp, aFlat]);
+        });
 
+        it("should overwrite pitches in the first context if they exist diatonically in the second context", () => {
+            let aSharp = parsePitch("a#4"),
+                aFlat = parsePitch("ab4"),
+                eFlat = parsePitch("eb4"),
+                bFlat = parsePitch("bb4");
+            expect(createAccidentalContext([aSharp], [aFlat])).to.eql([aFlat]);
+            let ctx = createAccidentalContext([aSharp, bFlat], [aFlat, eFlat]);
+            expect(ctx.length).to.equal(3);
+            expect(_.indexOf(ctx, aFlat) >= 0).to.be.ok;
+            expect(_.indexOf(ctx, eFlat) >= 0).to.be.ok;
+            expect(_.indexOf(ctx, bFlat) >= 0).to.be.ok;
+            expect(_.indexOf(ctx, aSharp)).to.equal(-1);
+        });
     });
 });

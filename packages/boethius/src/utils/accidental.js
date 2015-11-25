@@ -1,5 +1,6 @@
 import _ from "lodash";
 import {parsePitch} from "./note";
+import {concat} from "./common";
 
 /*
  * @param {name, accidental, octave} - parsed representation of the pitches accidental.
@@ -30,11 +31,31 @@ function getAccidental ({name, accidental, octave}, accidentals) {
 	return returnAccidental;
 }
 
+const dropAccidental = _.memoize(parsedPitch => {
+	const {name, octave} = parsedPitch;
+	return Object.freeze({name, octave});
+}, ({name, octave}) => "" + name + octave);
+
 /*
- * @param ...contexts - variable number of accidental contexts.
- * @return accidental context created as a combination of contexts with rightmost contexts taking precedence.
+ * @param c1 - first context, lower precedence.
+ * @param c2 - second context, higher precedence.
+ * @return - accidental context. combination of c1 and c2. unordered.
  */
-function createAccidentalContext (...contexts) {
+function createAccidentalContext (c1, c2) {
+	const diatonics1 = _.map(c1, dropAccidental),
+		diatonics2 = _.map(c2, dropAccidental);
+
+	// 1. union of diatonics1 diatonics2 - intersection of diatonics1 diatonics2
+	return _.union(_.map(_.difference(_.union(diatonics1, diatonics2),
+				 	_.intersection(diatonics1, diatonics2)),
+			 (diatonic) => {
+				 let accidental = _.findWhere(c2, diatonic);
+				 if (accidental) {
+					return accidental;
+				 } else {
+					return _.findWhere(c1, diatonic);
+				 }
+			 }), c2);
 
 }
 
@@ -47,13 +68,14 @@ function getAccidentalContexts (times) {
 		let {note: notes} = _.groupBy(items, item => item.type),
 			previousAccidentals = _.last(acc);
 
-        return createAccidentalContext();
-	}, []);
+        return concat(acc, createAccidentalContext(previousAccidentals, _.map(notes, ({pitch}) => parsePitch(pitch))));
+	}, [[]]);
 
 	return accidentals;
 }
 
 export {
     getAccidental,
+	createAccidentalContext,
     getAccidentalContexts
 }

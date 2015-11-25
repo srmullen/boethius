@@ -312,14 +312,14 @@ const arrayToString = (arr) => _.reduce(arr, (acc, c) => acc + c, "");
  * @param pitch - String representation of note pitch.
  * @return - {name, accidental, octave}
  */
-function parsePitch (pitch) {
+const parsePitch = _.memoize((pitch) => {
 	let [nameAndAccidental, [...octave]] = partitionBy(pitch, (c) => !!_.isNaN(Number.parseInt(c)));
 
 	let name = _.first(nameAndAccidental),
 		accidental = arrayToString(nameAndAccidental.slice(1));
 
-	return {name, accidental, octave: arrayToString(octave)};
-}
+	return Object.freeze({name, accidental, octave: arrayToString(octave)});
+});
 
 export {
 	beam,

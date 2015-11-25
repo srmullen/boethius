@@ -16,7 +16,6 @@ function Line ({voices=[]}, children=[]) {
 
 	const types = _.groupBy(children, child => child.type);
 
-	// this.children = parseChildren(children, measures);
 	this.children = children;
 
 	// collect all marking arrays into one and sort them by time
@@ -64,13 +63,11 @@ Line.render = function (line, length, voices, numMeasures=1) {
 	let times = lineUtils.getTimeContexts(line, measures, voices);
 
 	let accidentals = getAccidentalContexts(times);
+	// add accidentals to times
+	_.each(times, (time, i) => time.accidentals = accidentals[i]);
 
 	// render all items
-	let voiceGroups = line.renderVoices(voices);
-	_.each(line.markings, (marking) => {
-		let markingGroup = marking.render(b)
-		lineGroup.addChild(markingGroup);
-	});
+	line.renderItems(times);
 
 	// calculating measure lengths
 	calculateAndSetMeasureLengths(measures, times, noteHeadWidth, shortestDuration);
@@ -92,7 +89,7 @@ Line.render = function (line, length, voices, numMeasures=1) {
 		}
 
 		let placeMarking = marking => {
-			marking.group.translate([0, placement.getYOffset(marking)]);
+			marking.group.translate(b.add([0, placement.getYOffset(marking)]));
 			placement.placeAt(cursor, marking);
 			cursor = placement.calculateCursor(marking);
 		};
@@ -148,8 +145,6 @@ Line.render = function (line, length, voices, numMeasures=1) {
 		previousMeasureNumber = time.measure;
 	});
 
-	_.each(voiceGroups, voiceItemGroup => lineGroup.addChildren(voiceItemGroup));
-
 	_.each(voices, voice => {
 		voice.renderNoteDecorations(line, measures);
 	});
@@ -188,15 +183,23 @@ Line.prototype.render = function (length) {
 	return group;
 }
 
-Line.prototype.renderVoices = function (voices) {
-	let voiceGroups = [];
-	_.each(voices, (voice) => {
-		let childGroups = voice.renderChildren();
-		voiceGroups.push(childGroups);
+Line.prototype.renderItems = function (times) {
+	_.each(times, ({time, items, accidentals, context}) => {
+		let {clef: clefs, key: keys, timeSig: timeSigs, note: notes, rest: rests} = _.groupBy(items, item => item.type);
+		let groups = _.map(items, item => item.render({accidentals}));
+		this.group.addChildren(groups);
 	});
-
-	return voiceGroups;
 }
+
+// Line.prototype.renderVoices = function (voices) {
+// 	let voiceGroups = [];
+// 	_.each(voices, (voice) => {
+// 		let childGroups = voice.renderChildren();
+// 		voiceGroups.push(childGroups);
+// 	});
+//
+// 	return voiceGroups;
+// }
 
 /*
  * @param lineGroup - the group returned by line.render
@@ -205,7 +208,6 @@ Line.prototype.renderMeasures = function (measures, lineGroup, lineLength) {
 	let averageMeasureLength = Line.calculateAverageMeasureLength(1, lineLength, measures.length);
 
 	let measureGroups = _.reduce(measures, (groups, measure, i, children) => {
-		// let measureLength = measure.measureLength || constants.measure.defaultLength, // + markingLength,
 		let measureLength = measure.length || averageMeasureLength,
 			previousGroup = _.last(groups),
 			leftBarline;
