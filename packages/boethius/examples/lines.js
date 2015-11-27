@@ -8,14 +8,14 @@ function run () {
 	// interaction();
 
 	// simpleLine().translate(25, 50);
-	// renderingNotesOnLine().translate(25, 50);
-	// oneVoice().translate(25, 150);
-	// twoVoices().translate(25, 250);
+	renderingNotesOnLine().translate(25, 50);
+	oneVoice().translate(25, 150);
+	twoVoices().translate(25, 250);
 
 	// eighthBeamings().translate(25, 50);
 	// sixteenthBeamings().translate(25, 150);
 
-	accidentals("c").translate(25, 50);
+	// accidentals("c").translate(25, 50);
 }
 
 function createMeasures () {
@@ -281,15 +281,17 @@ function accidentals (key) {
 							]);
 	var n = scored.note; // just to shorten the voice declaration
 	var voice = scored.voice({}, [
+
+		n({pitch: "c#4", value: 16}), n({pitch: "d4", value: 16}), n({pitch: "eb4", value: 16}), n({pitch: "c4", value: 16}),
+		n({pitch: "c#4", value: 16}), n({pitch: "c4", value: 16}), n({pitch: "c4", value: 16}), n({pitch: "c4", value: 16}),
+		n({pitch: "e4", value: 16}), n({pitch: "c4", value: 16}), n({pitch: "c4", value: 16}), n({pitch: "c4", value: 16}),
+		n({pitch: "eb4", value: 16}), n({pitch: "c4", value: 16}), n({pitch: "c4", value: 16}), n({pitch: "c4", value: 16}),
+
 		n({pitch: "e4", value: 16}), n({pitch: "eb4", value: 16}), n({pitch: "e4", value: 16}), n({pitch: "eb4", value: 16}),
 		n({pitch: "c#4", value: 16}), n({pitch: "c#4", value: 16}), n({pitch: "c4", value: 16}), n({pitch: "c4", value: 16}),
 		n({pitch: "e4", value: 16}), n({pitch: "c4", value: 16}), n({pitch: "c4", value: 16}), n({pitch: "c4", value: 16}),
 		n({pitch: "eb4", value: 16}), n({pitch: "eb5", value: 16}), n({pitch: "bb4", value: 16}), n({pitch: "c#4", value: 16}),
 
-		n({pitch: "c#4", value: 16}), n({pitch: "d4", value: 16}), n({pitch: "eb4", value: 16}), n({pitch: "c4", value: 16}),
-		n({pitch: "c#4", value: 16}), n({pitch: "c4", value: 16}), n({pitch: "c4", value: 16}), n({pitch: "c4", value: 16}),
-		n({pitch: "e4", value: 16}), n({pitch: "c4", value: 16}), n({pitch: "c4", value: 16}), n({pitch: "c4", value: 16}),
-		n({pitch: "eb4", value: 16}), n({pitch: "c4", value: 16}), n({pitch: "c4", value: 16}), n({pitch: "c4", value: 16})
 	]);
 
 	return scored.render(line, 1500, [voice], 2);

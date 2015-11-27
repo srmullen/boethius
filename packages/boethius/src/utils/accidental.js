@@ -1,6 +1,6 @@
 import _ from "lodash";
 import {parsePitch, hasPitch} from "./note";
-import {concat} from "./common";
+import {concat, partitionBy} from "./common";
 
 /*
  * Converts accidental representations to a consistent representation.
@@ -101,19 +101,23 @@ function createAccidentalContext (c1, c2) {
 
 }
 
+function createAccidentalContexts (times) {
+	const contexts = new Array(times.length);
+	contexts[0] = [];
+	for (let i = 0; i < times.length - 1; i++) {
+		let {note: notes} = _.groupBy(times[i].items, item => item.type);
+		contexts[i + 1] = createAccidentalContext(contexts[i], _.map(notes, ({pitch}) => parsePitch(pitch)));
+	}
+	return contexts;
+}
+
 /*
  * @param times - array describing the rendering context as returned from getTimeContexts.
  * @return String[] - Array with the notes for which accidentals already exist in the measure.
  */
 function getAccidentalContexts (times) {
-	let accidentals = _.reduce(times, (acc, {time, items, context}) => {
-		let {note: notes} = _.groupBy(items, item => item.type),
-			previousAccidentals = _.last(acc);
-
-        return concat(acc, createAccidentalContext(previousAccidentals, _.map(notes, ({pitch}) => parsePitch(pitch))));
-	}, [[]]);
-
-	return accidentals;
+	let measures = partitionBy(times, ({time}) => time.measure);
+	return _.flatten(_.map(measures, createAccidentalContexts));
 }
 
 export {
