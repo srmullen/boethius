@@ -3,11 +3,13 @@ import _ from "lodash";
 
 import {getAccidental, createAccidentalContext} from "../src/utils/accidental";
 import {parsePitch} from "../src/utils/note";
+import Scored from "../src/Scored";
 
 describe("accidental", () => {
+    let scored = new Scored();
     describe("getAccidental", () => {
         it("should return the pitches accidental if accidentals is empty", () => {
-            expect(getAccidental(parsePitch("a4"), [])).to.equal("");
+            expect(getAccidental(parsePitch("a4"), [])).not.to.be.defined;
             expect(getAccidental(parsePitch("a#5"), [])).to.equal("#");
             expect(getAccidental(parsePitch("bb6"), [])).to.equal("b");
             expect(getAccidental(parsePitch("cx7"))).to.equal("x");
@@ -15,11 +17,11 @@ describe("accidental", () => {
         });
 
         it("should return an empty string if the pitches accidental is already in context", () => {
-            expect(getAccidental(parsePitch("a#5"), [parsePitch("a#5")])).to.equal("");
-            expect(getAccidental(parsePitch("bb6"), [parsePitch("bb6")])).to.equal("");
-            expect(getAccidental(parsePitch("cx7"), [parsePitch("cx7")])).to.equal("");
-            expect(getAccidental(parsePitch("cbb8"), [parsePitch("cbb8")])).to.equal("");
-            expect(getAccidental(parsePitch("d4"), [parsePitch("dn4")])).to.equal("");
+            expect(getAccidental(parsePitch("a#5"), [parsePitch("a#5")])).not.to.be.defined;
+            expect(getAccidental(parsePitch("bb6"), [parsePitch("bb6")])).not.to.be.defined;
+            expect(getAccidental(parsePitch("cx7"), [parsePitch("cx7")])).not.to.be.defined;
+            expect(getAccidental(parsePitch("cbb8"), [parsePitch("cbb8")])).not.to.be.defined;
+            expect(getAccidental(parsePitch("d4"), [parsePitch("dn4")])).not.to.be.defined;
         });
 
         it("should return the pitches accidental if the accidental was realized in a different octave", () => {
@@ -27,7 +29,7 @@ describe("accidental", () => {
             expect(getAccidental(parsePitch("bb6"), [parsePitch("bb2")])).to.equal("b");
             expect(getAccidental(parsePitch("cx7"), [parsePitch("cx3")])).to.equal("x");
             expect(getAccidental(parsePitch("cbb8"), [parsePitch("cbb4")])).to.equal("bb");
-            expect(getAccidental(parsePitch("d4"), [parsePitch("dn5")])).to.equal("");
+            expect(getAccidental(parsePitch("d4"), [parsePitch("dn5")])).not.to.be.defined;
         });
 
         it("should return a natural if the pitch has no accidental but on has already been realized", () => {
@@ -42,6 +44,22 @@ describe("accidental", () => {
             expect(getAccidental(parsePitch("bb6"), [parsePitch("b#6")])).to.equal("b");
             expect(getAccidental(parsePitch("cx7"), [parsePitch("cn7")])).to.equal("x");
             expect(getAccidental(parsePitch("cbb8"), [parsePitch("cx8")])).to.equal("bb");
+        });
+
+        it("should handle the key", () => {
+            let dMaj = scored.key({value: "D"}),
+                dMin = scored.key({value: "d"});
+
+            expect(getAccidental(parsePitch("f5"), [], dMaj)).to.equal("n");
+            expect(getAccidental(parsePitch("f#5"), [], dMaj)).not.to.be.defined;
+            expect(getAccidental(parsePitch("f5"), [parsePitch("f5")], dMaj)).not.to.be.defined;
+            expect(getAccidental(parsePitch("f#5"), [parsePitch("f5")], dMaj)).to.equal("#");
+            expect(getAccidental(parsePitch("b6"), [], dMaj)).not.to.be.defined;
+
+            expect(getAccidental(parsePitch("f5"), [], dMin)).not.to.be.defined;
+            expect(getAccidental(parsePitch("f#5"), [], dMin)).to.equal("#");
+            expect(getAccidental(parsePitch("f5"), [parsePitch("f5")], dMin)).not.to.be.defined;
+            expect(getAccidental(parsePitch("b6"), [], dMin)).to.equal("n");
         });
     });
 

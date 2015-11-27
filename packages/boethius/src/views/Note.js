@@ -129,9 +129,9 @@ Note.prototype.render = function ({accidentals = [], context = {}} = {}) {
 	// }
 
 	let parsedPitch = noteUtils.parsePitch(this.pitch);
-	let accidental = getAccidental(parsedPitch, accidentals);
+	let accidental = context.key ? getAccidental(parsedPitch, accidentals, context.key) : parsedPitch.accidental;
 
-	if (accidental && !noteUtils.hasPitch(context.key, parsedPitch)) {
+	if (!_.isUndefined(accidental)) {
 		let accidentalSymbol = engraver.drawAccidental(accidental);
 		let position = placement.getNoteHeadCenter(noteHead.bounds.center)
 								.add(-Scored.config.note.accidental.xOffset, Scored.config.note.accidental.yOffset);

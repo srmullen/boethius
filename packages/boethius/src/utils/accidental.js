@@ -1,34 +1,76 @@
 import _ from "lodash";
-import {parsePitch} from "./note";
+import {parsePitch, hasPitch} from "./note";
 import {concat} from "./common";
+
+/*
+ * Converts accidental representations to a consistent representation.
+ * @param accidental - String.
+ * @return String
+ */
+function normalize (accidental) {
+	if (accidental === "") {
+		return "n";
+	}
+
+	if (accidental === "##") {
+		return "x";
+	}
+
+	return accidental;
+}
+/*
+ * Function for comparison of accidentals with different representation formats. ie. "n" === "".
+ * @param a1 - accidental String.
+ * @param a2 - accidental String.
+ * @return true if accidentals are equal false otherwise.
+ */
+function equal (a1, a2) {
+	return normalize(a1) === normalize(a2);
+}
 
 /*
  * @param {name, accidental, octave} - parsed representation of the pitches accidental.
  * @param accidentals - list of parsed accidentals already in the context.
- * @return - String representation of accidental that needs to be rendered.
+ * @param key - Key object. If no key is passed the hasPitch function treats it as C major.
+ * @return - String representation of accidental that needs to be rendered. or undefined if no accidental to be rendered.
  */
-function getAccidental ({name, accidental, octave}, accidentals) {
-	let returnAccidental;
-
+function getAccidental ({name, accidental, octave}, accidentals, key) {
 	// get the accidentals on the diatonic pitch.
-	let affects = _.filter(accidentals, (a) => a.name === name && a.octave === octave);
+	let [affect] = _.filter(accidentals, (a) => a.name === name && a.octave === octave);
 
-	if (affects.length) {
-		let realizedAccidental = affects[0].accidental;
-		if (realizedAccidental === accidental) {
-			returnAccidental = "";
-		} else if (realizedAccidental === "n" && accidental === "") {
-			returnAccidental = "";
-		} else if (realizedAccidental && accidental === "") {
-			returnAccidental = "n";
+	// Cases
+	// - pitch exists in key.
+	//		- no affects match = return undefined
+	//		- affects match
+	//			- affects.accidental === pitch.accidental = return undefined
+	//			- affects.accidental !== pitch.accidental = return pitch.accidental
+	// - pitch doesn't exist in key.
+	//		- no affects match = return pitch.accidental.
+	//		- affects match
+	//			- affect.accidental === pitch.accidental = return undefined
+	//			- affect.accidental !== pitch.accidental = return pitch.accidental.
+
+	if (hasPitch(key, {name, accidental, octave})) {
+		if (affect) {
+			if (equal(affect.accidental, accidental)) {
+				return;
+			} else {
+				return normalize(accidental);
+			}
 		} else {
-			returnAccidental = accidental;
+			return;
 		}
 	} else {
-		returnAccidental = accidental;
+		if (affect) {
+			if (equal(affect.accidental, accidental)) {
+				return;
+			} else {
+				return normalize(accidental);
+			}
+		} else {
+			return normalize(accidental);
+		}
 	}
-
-	return returnAccidental;
 }
 
 const dropAccidental = _.memoize(parsedPitch => {

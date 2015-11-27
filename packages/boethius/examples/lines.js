@@ -281,11 +281,16 @@ function accidentals (key) {
 							]);
 	var n = scored.note; // just to shorten the voice declaration
 	var voice = scored.voice({}, [
+		n({pitch: "e4", value: 16}), n({pitch: "eb4", value: 16}), n({pitch: "e4", value: 16}), n({pitch: "eb4", value: 16}),
+		n({pitch: "c#4", value: 16}), n({pitch: "c#4", value: 16}), n({pitch: "c4", value: 16}), n({pitch: "c4", value: 16}),
+		n({pitch: "e4", value: 16}), n({pitch: "c4", value: 16}), n({pitch: "c4", value: 16}), n({pitch: "c4", value: 16}),
+		n({pitch: "eb4", value: 16}), n({pitch: "eb5", value: 16}), n({pitch: "bb4", value: 16}), n({pitch: "c#4", value: 16}),
+
 		n({pitch: "c#4", value: 16}), n({pitch: "d4", value: 16}), n({pitch: "eb4", value: 16}), n({pitch: "c4", value: 16}),
 		n({pitch: "c#4", value: 16}), n({pitch: "c4", value: 16}), n({pitch: "c4", value: 16}), n({pitch: "c4", value: 16}),
 		n({pitch: "e4", value: 16}), n({pitch: "c4", value: 16}), n({pitch: "c4", value: 16}), n({pitch: "c4", value: 16}),
-		n({pitch: "eb4", value: 16}), n({pitch: "c4", value: 16}), n({pitch: "c4", value: 16}), n({pitch: "c4", value: 16}),
+		n({pitch: "eb4", value: 16}), n({pitch: "c4", value: 16}), n({pitch: "c4", value: 16}), n({pitch: "c4", value: 16})
 	]);
 
-	return scored.render(line, 1500, [voice], 1);
+	return scored.render(line, 1500, [voice], 2);
 }
