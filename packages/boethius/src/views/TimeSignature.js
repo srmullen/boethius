@@ -20,7 +20,9 @@ TimeSignature.createBeatStructure = function (value) {
 		case "c":
 			return [2,2];
 			break;
-
+		case "3/4":
+			return [1, 1, 1];
+			break;
 	}
 
 }

@@ -62,23 +62,23 @@ describe("Line", () => {
 
     describe("contextAt", () => {
         it("should return an object with key, timeSig, and clef properties", () => {
-            let measures = Measure.createMeasures(1),
-                bassClef = scored.clef({value: "bass", measure: 0}),
+            let bassClef = scored.clef({value: "bass", measure: 0}),
                 twofour = scored.timeSig({value: "2/4", measure: 0}),
-                dsharp = scored.key({value: "d#", measure: 0});
+                dsharp = scored.key({value: "d#", measure: 0}),
+                measures = Measure.createMeasures(1, [bassClef, twofour, dsharp]);
             let line = scored.line({}, [bassClef, twofour, dsharp]);
 
             expect(line.contextAt(measures, {measure: 0})).to.eql({clef: bassClef, timeSig: twofour, key: dsharp});
         });
 
         it("should have the most recent values for the given measure", () => {
-            let measures = Measure.createMeasures(4),
-                bassClef = scored.clef({value: "bass", measure: 0}),
+            let bassClef = scored.clef({value: "bass", measure: 0}),
                 twofour = scored.timeSig({value: "2/4", measure: 0}),
                 dsharp = scored.key({value: "d#", measure: 0}),
                 altoClef = scored.clef({value: "alto", measure: 1}),
                 threeeighth = scored.timeSig({value: "3/8", measure: 2}),
-                gflat = scored.key({value: "gb", measure: 3});
+                gflat = scored.key({value: "gb", measure: 3}),
+                measures = Measure.createMeasures(4, [bassClef, twofour, dsharp, altoClef, threeeighth, gflat]);
             let line = scored.line({}, [bassClef, twofour, dsharp, altoClef, threeeighth, gflat]);
 
             expect(line.contextAt(measures, {measure: 0})).to.eql({clef: bassClef, timeSig: twofour, key: dsharp});
@@ -88,13 +88,13 @@ describe("Line", () => {
         });
 
         it("should have the most recent value for the given beat", () => {
-            let measures = Measure.createMeasures(3),
-                bassClef = scored.clef({value: "bass", measure: 0}),
+            let bassClef = scored.clef({value: "bass", measure: 0}),
                 twofour = scored.timeSig({value: "2/4", measure: 0}),
                 dsharp = scored.key({value: "d#", measure: 0}),
                 altoClef = scored.clef({value: "alto", measure: 0, beat: 1}),
                 fiveeight = scored.timeSig({value: "5/8", measure: 1}),
-                gflat = scored.key({value: "gb", measure: 1, beat: 3});
+                gflat = scored.key({value: "gb", measure: 1, beat: 3}),
+                measures = Measure.createMeasures(3, [bassClef, twofour, dsharp, altoClef, fiveeight, gflat]);
             let line = scored.line({}, [bassClef, twofour, dsharp, altoClef, fiveeight, gflat]);
 
             expect(line.contextAt(measures, {measure: 0})).to.eql({clef: bassClef, timeSig: twofour, key: dsharp});
@@ -105,7 +105,7 @@ describe("Line", () => {
 
         it("should return null if the given measure doesn't exist on the line", () => {
             let line = scored.line();
-            expect(line.contextAt(Measure.createMeasures(1), 100)).to.be.null;
+            expect(line.contextAt(Measure.createMeasures(1, [scored.timeSig()]), 100)).to.be.null;
         });
     });
 

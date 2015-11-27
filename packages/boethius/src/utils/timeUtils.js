@@ -1,10 +1,14 @@
 import _ from "lodash";
 import F from "fraction.js";
+import constants from "../constants";
 
 /*
- * @param sig {String} - ex. "4/4", "h"
+ * @param timeSig - TimeSignaure or time signature value represented as a String. ex. TimeSig({value: "4/4"}) or "4/4", "h"
+ * @return Number[]
  */
-function sigToNums (sig) {
+function sigToNums (timeSig) {
+	let sig = timeSig.type === constants.type.timeSig ? timeSig.value : timeSig;
+
 	if (sig === "c" || sig === "h") {
 		return [4, 4];
 	} else {
@@ -95,11 +99,10 @@ function getMeasureByTime (measures, time) {
 /*
  * @param timeSig {String}
  */
-var getTimeSigDuration = _.memoize(function (timeSig) {
-	// let [beats, value] = timeSig.split("/");
+var getTimeSigDuration = function (timeSig) {
 	let [beats, value] = sigToNums(timeSig);
 	return beats * (1/value);
-});
+};
 
 function getMeasureDuration (measure) {
 	return getTimeSigDuration(measure.timeSig);

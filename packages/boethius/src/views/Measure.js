@@ -8,7 +8,13 @@ import _ from "lodash";
 
 const TYPE = constants.type.measure;
 
-function Measure ({timeSig="4/4", startsAt=0}, children=[]) {
+/*
+ * @param timeSig - TimeSignature. Required.
+ */
+function Measure ({timeSig, startsAt=0}, children=[]) {
+	if (!timeSig) {
+		throw new Error("Time Signature is required when initializing Measure");
+	}
 	this.timeSig = timeSig;
 	this.startsAt = startsAt;
 	this.children = children;
@@ -117,7 +123,6 @@ Measure.createMeasures = function (numMeasures, children) {
 
 	// get the Measures from children and add them to the measures array
 	let [explicitMeasures, markings] = _.partition(_.filter(children, c => !!c), (child) => child.type === constants.type.measure),
-		// measureMarkings = _.groupBy(markings, marking => marking.context.measure || 0);
 		measureMarkings = _.groupBy(markings, marking => marking.measure || 0);
 
 	{ // Put each measure in the right position in the measures array.
@@ -135,11 +140,12 @@ Measure.createMeasures = function (numMeasures, children) {
 	}
 
 	_.each(measures, (measure, i) => {
-		var previousMeasure = measures[i-1],
+		let previousMeasure = measures[i-1],
 			startsAt = previousMeasure ? previousMeasure.startsAt + timeUtils.getMeasureDuration(previousMeasure) : 0;
 
 		if (!measure) {
-			measure = new Measure(_.extend({}, {startsAt: startsAt}), measureMarkings[i]);
+			let timeSig = _.find(measureMarkings[i], marking => marking.type === constants.type.timeSig) || previousMeasure.timeSig;
+			measure = new Measure(_.extend({}, {startsAt, timeSig}), measureMarkings[i]);
 		} else {
 			measure.startsAt = startsAt;
 		}

@@ -221,19 +221,19 @@ Line.prototype.renderMeasures = function (measures, lineGroup, lineLength) {
 	}, []);
 }
 
-Line.prototype.note = function (note, measures) {
-	let measure = getMeasureByTime(measures, note.time);
-	if (measure) {
-		measure.note(note);
-	}
-}
-
-Line.prototype.rest = function (rest, measures) {
-	let measure = getMeasureByTime(measures, rest.time);
-	if (measure) {
-		measure.rest(rest);
-	}
-}
+// Line.prototype.note = function (note, measures) {
+// 	let measure = getMeasureByTime(measures, note.time);
+// 	if (measure) {
+// 		measure.note(note);
+// 	}
+// }
+//
+// Line.prototype.rest = function (rest, measures) {
+// 	let measure = getMeasureByTime(measures, rest.time);
+// 	if (measure) {
+// 		measure.rest(rest);
+// 	}
+// }
 
 Line.prototype.voice = function (voice) {
 	voice.children.map(note => this.note(note));

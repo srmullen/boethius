@@ -19,7 +19,7 @@ function Score ({measures=1}, children=[]) {
      */
     const types = _.groupBy(children, child => child.type);
 
-    this.measures = Measure.createMeasures(measures);
+    this.measures = Measure.createMeasures(measures, types.timeSig);
     this.lines = types.line || [];
     this.staves = types.staff || [];
     _.each(this.lines, line => line.children = this.measures);
