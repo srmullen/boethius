@@ -61,7 +61,7 @@ Line.render = function (line, length, voices, numMeasures=1) {
 
 	// group and sort voice items by time.
 	let times = lineUtils.getTimeContexts(line, measures, voices);
-
+	
 	let accidentals = getAccidentalContexts(times);
 	// add accidentals to times
 	_.each(times, (time, i) => time.accidentals = accidentals[i]);
@@ -191,16 +191,6 @@ Line.prototype.renderItems = function (times) {
 	});
 }
 
-// Line.prototype.renderVoices = function (voices) {
-// 	let voiceGroups = [];
-// 	_.each(voices, (voice) => {
-// 		let childGroups = voice.renderChildren();
-// 		voiceGroups.push(childGroups);
-// 	});
-//
-// 	return voiceGroups;
-// }
-
 /*
  * @param lineGroup - the group returned by line.render
  */
@@ -220,20 +210,6 @@ Line.prototype.renderMeasures = function (measures, lineGroup, lineLength) {
 		return groups;
 	}, []);
 }
-
-// Line.prototype.note = function (note, measures) {
-// 	let measure = getMeasureByTime(measures, note.time);
-// 	if (measure) {
-// 		measure.note(note);
-// 	}
-// }
-//
-// Line.prototype.rest = function (rest, measures) {
-// 	let measure = getMeasureByTime(measures, rest.time);
-// 	if (measure) {
-// 		measure.rest(rest);
-// 	}
-// }
 
 Line.prototype.voice = function (voice) {
 	voice.children.map(note => this.note(note));

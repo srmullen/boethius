@@ -57,7 +57,13 @@ function getTime (measures, item) {
 
 	measureView = measures[measure];
 
-	if (!_.isNumber(item.time)) {
+	// time signatures are always at the beginning of a measure.
+	if (item.type === constants.type.timeSig) {
+		time = measureView.startsAt;
+		beat = 0;
+	}
+
+	if (!_.isNumber(item.time) && !_.isNumber(time)) {
 		time = getTimeNumber(measure, measureView.timeSig);
 	}
 
@@ -67,7 +73,6 @@ function getTime (measures, item) {
 }
 
 /*
- * @param time - number
  * @param timesig - string or arrary representation of timeSig value.
  * @param offset - number representing point in time from which to calculate the beat from.
  * @return {number} - float

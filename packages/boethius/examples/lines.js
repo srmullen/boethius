@@ -301,7 +301,9 @@ function testAccidentals (key) {
 function testTimeSigs () {
 	var line = scored.line({}, [scored.clef({value: "treble", measure: 0}),
 								scored.key({value: "c", measure: 0}),
-								scored.timeSig({value: "3/4", measure: 0})
+								scored.timeSig({value: "3/4", measure: 0}),
+								scored.timeSig({value: "4/4", measure: 2}),
+								scored.timeSig({value: "3/4", measure: 4})
 							]);
 	var n = scored.note; // just to shorten the voice declaration
 	var voice = scored.voice({}, [
@@ -310,7 +312,14 @@ function testTimeSigs () {
 		n({pitch: "c#4", value: 4}), n({pitch: "c4", value: 4}), n({pitch: "c4", value: 4}), n({pitch: "c4", value: 4}),
 		n({pitch: "e4", value: 4}), n({pitch: "c4", value: 4}), n({pitch: "c4", value: 4}), n({pitch: "c4", value: 4}),
 
+		// n({pitch: "c#4", value: 16}), n({pitch: "c4", value: 16}), n({pitch: "c4", value: 16}), n({pitch: "c4", value: 16}),
+		// n({pitch: "e4", value: 16}), n({pitch: "c4", value: 16}), n({pitch: "c4", value: 16}), n({pitch: "c4", value: 16}),
+
+		n({pitch: "c#4", value: 4}), n({pitch: "c4", value: 4}), n({pitch: "c4", value: 4}), n({pitch: "c4", value: 4}),
+		n({pitch: "e4", value: 4}), n({pitch: "c4", value: 4}), n({pitch: "c4", value: 4}), n({pitch: "c4", value: 4}),
+
+		scored.rest({value: 4})
 	]);
 
-	return scored.render(line, 1500, [voice], 4);
+	return scored.render(line, 1500, [voice], 7);
 }

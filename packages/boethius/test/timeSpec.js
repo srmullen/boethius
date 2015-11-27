@@ -60,6 +60,10 @@ describe("timeUtils", () => {
             expect(getTime(measures, rest2)).to.eql({time: 2.5, measure: 2, beat: 2});
 
         });
+
+        it("should always return beat as zero and time as the startTime of the measure", () => {
+
+        });
     });
 
     describe("getMeasureNumber", () => {

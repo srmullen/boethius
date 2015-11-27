@@ -22,18 +22,6 @@ function Measure ({timeSig, startsAt=0}, children=[]) {
 
 Measure.prototype.type = TYPE;
 
-Measure.prototype.note = function (note) {
-	this.children.push(note);
-}
-
-Measure.prototype.rest = function (rest) {
-	this.children.push(rest);
-}
-
-Measure.prototype.chord = function (chord) {
-	this.children.push(chord);
-};
-
 Measure.prototype.render = function (line, leftBarline, width) {
 	const group = this.group = new paper.Group({
 		name: TYPE
