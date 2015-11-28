@@ -8,6 +8,7 @@ import MoveTool from "./tools/MoveTool";
 import Voice from "./views/Voice";
 import Note from "./views/Note";
 import Rest from "./views/Rest";
+import Chord from "./views/Chord";
 import Staff from "./views/Staff";
 import Line from "./views/Line";
 import Measure from "./views/Measure";
@@ -100,6 +101,10 @@ Scored.prototype.key = function key (context={}) {
 
 Scored.prototype.timeSig = function timeSignature (context={}) {
 	return new TimeSignature(context);
+}
+
+Scored.prototype.chord = function chord (context={}, children=[]) {
+	return new Chord(context, children);
 }
 
 Scored.prototype.voice = function voice (context={}, children=[]) {

@@ -8,15 +8,15 @@ function run () {
 	// interaction();
 
 	// simpleLine().translate(25, 50);
-	// renderingNotesOnLine().translate(25, 50);
-	// oneVoice().translate(25, 150);
-	// twoVoices().translate(25, 250);
+	renderingNotesOnLine().translate(25, 50);
+	oneVoice().translate(25, 150);
+	twoVoices().translate(25, 250);
 
 	// eighthBeamings().translate(25, 50);
 	// sixteenthBeamings().translate(25, 150);
 
-	testAccidentals("c").translate(25, 50);
-	testTimeSigs().translate(25, 150);
+	testAccidentals("c").translate(25, 350);
+	testTimeSigs().translate(25, 450);
 }
 
 function createMeasures () {
