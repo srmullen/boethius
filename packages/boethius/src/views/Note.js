@@ -39,7 +39,7 @@ Note.render = function (note, context) {
 Note.renderStem = function (note, centerLineValue, stemDirection) {
 	if (note.needsStem()) {
 		stemDirection = stemDirection || noteUtils.getStemDirection(note, centerLineValue);
-		let stemPoint = noteUtils.defaultStemPoint(note, stemDirection, Scored.utils.note.getStemLength(note, centerLineValue));
+		let stemPoint = noteUtils.defaultStemPoint(note, stemDirection, noteUtils.getStemLength(note, centerLineValue));
 		note.drawStem(stemPoint, stemDirection);
 		note.drawFlag();
 	}
@@ -150,6 +150,9 @@ Note.prototype.needsStem = function () {
 	return this.note.duration.value >= 2;
 }
 
+/*
+ * @return Boolean - true if the note needs a flag drawn, False otherwise.
+ */
 Note.prototype.needsFlag = function () {
 	return this.note.duration.value >= 8;
 }
