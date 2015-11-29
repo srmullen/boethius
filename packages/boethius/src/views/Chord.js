@@ -1,7 +1,7 @@
 import _ from "lodash";
 
 import {getSteps} from "../utils/note";
-import {getStemDirection, defaultStemPoint, getStemLength} from "../utils/chord";
+import {getStemDirection, defaultStemPoint, getStemLength, getOverlappingNotes} from "../utils/chord";
 import constants from "../constants";
 import Note from "./Note";
 
@@ -39,13 +39,26 @@ Chord.renderStem = function (chord, centerLineValue, stemDirection) {
 	}
 }
 
-Chord.prototype.render = function () {
+Chord.prototype.render = function ({accidentals = [], context = {}} = {}) {
 	const group = this.group = new paper.Group({name: TYPE});
 
 	// get steps
 	let [root, ...rest] = this.children;
 
 	let noteGroups = this.children.map(note => note.render());
+
+	let stemDirection = getStemDirection(this),
+		overlaps = getOverlappingNotes(this);
+
+	if (overlaps.length) {
+		_.each(overlaps, ([lower, higher]) => {
+			if (stemDirection === "down") {
+				lower.group.translate(-Scored.config.note.head.width, 0);
+			} else {
+				higher.group.translate(Scored.config.note.head.width, 0);
+			}
+		});
+	}
 
 	_.each(rest, note => {
 		let steps = getSteps(note.pitch, root.pitch);

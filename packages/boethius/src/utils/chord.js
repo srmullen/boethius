@@ -56,6 +56,7 @@ function getStemLength (chord, centerLineValue, stemDirection) {
 
     if (!centerLineValue) return octaveHeight + diff;
 
+    // baseNote is the note that is closes to the stem point
     let baseNote = (stemDirection === UP) ? _.last(chord.children) : chord.children[0];
 
     let steps = noteUtils.getSteps(centerLineValue, chord.children[0].pitch),
@@ -64,8 +65,27 @@ function getStemLength (chord, centerLineValue, stemDirection) {
 	return Math.max(octaveHeight, Math.abs(noteDistance)) + diff;
 }
 
+/*
+ * @param chord - Chord. Chord gaurantees that the notes are ordered which is required for this function.
+ * @return Note[][] - Array of Note arrays where the the first note is lower than the second note.
+ */
+function getOverlappingNotes (chord) {
+    let notes = chord.children,
+        overlaps = [];
+    for (let i = 1; i < notes.length; i++) {
+        let lower = notes[i-1],
+            higher = notes[i],
+            steps = noteUtils.getSteps(lower.pitch, higher.pitch);
+        if (steps <= 1) {
+            overlaps.push([lower, higher]);
+        }
+    }
+    return overlaps;
+}
+
 export {
     getStemDirection,
     defaultStemPoint,
-    getStemLength
+    getStemLength,
+    getOverlappingNotes
 }
