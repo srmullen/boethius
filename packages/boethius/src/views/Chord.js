@@ -24,10 +24,16 @@ function Chord ({value=4, root, name, inversion, stacato, legato, stemDirection}
 
 Chord.prototype.type = TYPE;
 
-Chord.render = function (chord) {
+Chord.render = function (chord, context) {
 	let group = chord.render();
+	Chord.renderAccidentals(chord, context);
 	Chord.renderStem(chord);
 	return group;
+}
+
+// Temporary implementation. Needs to place accidentals correctly.
+Chord.renderAccidentals = function (chord, context={}) {
+	_.each(chord.children, note => Note.renderAccidental(note, context.accidentals, context.key));
 }
 
 Chord.renderStem = function (chord, centerLineValue, stemDirection) {

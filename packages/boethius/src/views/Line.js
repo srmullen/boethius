@@ -61,10 +61,10 @@ Line.render = function (line, length, voices, numMeasures=1) {
 
 	// group and sort voice items by time.
 	let times = lineUtils.getTimeContexts(line, measures, voices);
-	
+
 	let accidentals = getAccidentalContexts(times);
 	// add accidentals to times
-	_.each(times, (time, i) => time.accidentals = accidentals[i]);
+	_.each(times, (time, i) => time.context.accidentals = accidentals[i]);
 
 	// render all items
 	line.renderItems(times);
@@ -186,7 +186,8 @@ Line.prototype.render = function (length) {
 
 Line.prototype.renderItems = function (times) {
 	_.each(times, ({time, items, accidentals, context}) => {
-		let groups = _.map(items, item => item.render({accidentals, context}));
+		// let groups = _.map(items, item => renderItem(item, _.assign({}, {accidentals}, context)));
+		let groups = _.map(items, item => renderItem(item, context));
 		this.group.addChildren(groups);
 	});
 }
@@ -209,10 +210,6 @@ Line.prototype.renderMeasures = function (measures, lineGroup, lineLength) {
 		lineGroup.addChild(measureGroup); // add the measure to the line
 		return groups;
 	}, []);
-}
-
-Line.prototype.voice = function (voice) {
-	voice.children.map(note => this.note(note));
 }
 
 /*
@@ -261,5 +258,19 @@ Line.prototype.addToMeasure = function (measure, item) {
 		throw new Error("Measure " + measure + " doesn't exist.");
 	}
 };
+
+function renderItem (item, context) {
+	if (item.type === constants.type.note) {
+		return Line.renderNote(item, context);
+	} else {
+		return item.render(context);
+	}
+}
+
+Line.renderNote = function (note, context) {
+	let group = note.render(context);
+	Note.renderAccidental(note, context.accidentals, context.key);
+	return group;
+}
 
 export default Line;

@@ -30,10 +30,17 @@ function Note ({pitch="a4", value=4, dots=0, tuplet, time, voice}) {
 
 Note.prototype.type = TYPE;
 
-Note.render = function (note, context) {
+Note.render = function (note, context={}) {
 	let group = note.render(context);
+	Note.renderAccidental(note, context.accidentals, context.key);
 	Note.renderStem(note);
 	return group;
+}
+
+Note.renderAccidental = function (note, accidentals, key) {
+	let parsedPitch = noteUtils.parsePitch(note.pitch);
+	let accidental = key ? getAccidental(parsedPitch, accidentals, key) : parsedPitch.accidental;
+	note.drawAccidental(accidental);
 }
 
 Note.renderStem = function (note, centerLineValue, stemDirection) {
@@ -95,7 +102,7 @@ Note.findBeaming = function (timeSig, notes) {
 	return groupings;
 }
 
-Note.prototype.render = function ({accidentals = [], context = {}} = {}) {
+Note.prototype.render = function (context = {}) {
 	const group = this.group = new paper.Group({
 		name: TYPE
 	});
@@ -127,16 +134,6 @@ Note.prototype.render = function ({accidentals = [], context = {}} = {}) {
 	// 	let legato = engraver.drawLegato();
 	// 	group.addChild(legato);
 	// }
-
-	let parsedPitch = noteUtils.parsePitch(this.pitch);
-	let accidental = context.key ? getAccidental(parsedPitch, accidentals, context.key) : parsedPitch.accidental;
-
-	if (!_.isUndefined(accidental)) {
-		let accidentalSymbol = engraver.drawAccidental(accidental);
-		let position = placement.getNoteHeadCenter(noteHead.bounds.center)
-								.add(-Scored.config.note.accidental.xOffset, Scored.config.note.accidental.yOffset);
-		group.addChild(accidentalSymbol.place(position));
-	}
 
 	// this.drawGroupBounds();
 
@@ -220,5 +217,18 @@ Note.prototype.drawFlag = function (point) {
 
 	return flag;
 };
+
+Note.prototype.drawAccidental = function (accidental) {
+	let accidentalGroup;
+
+	if (!_.isUndefined(accidental)) {
+		let accidentalSymbol = engraver.drawAccidental(accidental);
+		let position = placement.getNoteHeadCenter(this.noteHead.bounds.center)
+								.add(-Scored.config.note.accidental.xOffset, Scored.config.note.accidental.yOffset);
+		accidentalGroup = accidentalSymbol.place(position);
+		this.group.addChild(accidentalSymbol.place(position));
+	}
+	return accidentalGroup;
+}
 
 export default Note;
