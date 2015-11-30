@@ -42,22 +42,43 @@ Chord.renderStem = function (chord, centerLineValue, stemDirection) {
 Chord.prototype.render = function ({accidentals = [], context = {}} = {}) {
 	const group = this.group = new paper.Group({name: TYPE});
 
-	// get steps
-	let [root, ...rest] = this.children;
-
-	let noteGroups = this.children.map(note => note.render());
-
 	let stemDirection = getStemDirection(this),
 		overlaps = getOverlappingNotes(this);
 
+	// get steps
+	let [root, ...rest] = stemDirection === "up" ? this.children : _.clone(this.children).reverse();
+
+	let noteGroups = this.children.map(note => note.render());
+
+	let translationFn;
+
+	// translate note if they overlap
+	if (stemDirection === "down") {
+		const xTranslation = -Scored.config.note.head.width;
+		translationFn = (overlaps) => {
+			let translated = [];
+			_.each(_.clone(overlaps).reverse(), ([lower, higher]) => {
+				if (!_.some(translated, n => n === higher)) {
+					lower.group.translate(xTranslation, 0);
+					translated.push(lower);
+				}
+			});
+		}
+	} else {
+		const xTranslation = Scored.config.note.head.width;
+		translationFn = (overlaps) => {
+			let translated = [];
+			_.each(overlaps, ([lower, higher]) => {
+				if (!_.some(translated, n => n === lower)) {
+					higher.group.translate(xTranslation, 0);
+					translated.push(higher);
+				}
+			});
+		}
+	}
+
 	if (overlaps.length) {
-		_.each(overlaps, ([lower, higher]) => {
-			if (stemDirection === "down") {
-				lower.group.translate(-Scored.config.note.head.width, 0);
-			} else {
-				higher.group.translate(Scored.config.note.head.width, 0);
-			}
-		});
+		translationFn(overlaps)
 	}
 
 	_.each(rest, note => {

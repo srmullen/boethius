@@ -1,7 +1,8 @@
 function run () {
-    testTriads();
-    testSevenths();
-    testClusters();
+    // testTriads();
+    // testSevenths();
+    // testClusters();
+    testAccidentals();
 }
 
 function testTriads () {
@@ -48,4 +49,10 @@ function testClusters () {
     scored.render(threeClusterStemDown).translate(200, 200);
     scored.render(fourClusterStemUp).translate(250, 200);
     scored.render(fourClusterStemDown).translate(300, 200);
+}
+
+function testAccidentals () {
+    var fSharpMaj = scored.chord({}, ["f#4", "a#4", "c#5"])
+
+    scored.render(fSharpMaj).translate(50, 100);
 }
