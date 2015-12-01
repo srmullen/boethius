@@ -6,8 +6,9 @@ import * as placement from "../utils/placement";
 import * as common from "../utils/common";
 import * as lineUtils from "../utils/line";
 import {getAccidentalContexts} from "../utils/accidental";
-import Note from "../views/Note";
-import Rest from "../views/Rest";
+import Note from "./Note";
+import Rest from "./Rest";
+import Chord from "./Chord";
 import _ from "lodash";
 
 const TYPE = constants.type.line;
@@ -79,8 +80,15 @@ Line.render = function (line, length, voices, numMeasures=1) {
 	let cursor = noteHeadWidth,
 		previousMeasureNumber = 0;
 	_.each(times, ({time, items, context}) => {
-		let leftBarline = measures[time.measure].barlines[0],
-			{clef: clefs, key: keys, timeSig: timeSigs, note: notes, rest: rests} = _.groupBy(items, item => item.type);
+		let leftBarline = measures[time.measure].barlines[0];
+		let {
+			clef: clefs,
+			key: keys,
+			timeSig: timeSigs,
+			note: notes,
+			rest: rests,
+			chord: chords
+		} = _.groupBy(items, item => item.type);
 
 		// update cursor if its a new measure.
 		if (time.measure !== previousMeasureNumber) {
@@ -123,12 +131,22 @@ Line.render = function (line, length, voices, numMeasures=1) {
 
 			_.remove(notes, note => note === widestNote); // mutation of notes array
 
-			// possibleNextPositions = possibleNextPositions.concat(_.map(notes, placeNote));
 			_.each(notes, placeNoteY);
 
 			placement.alignNoteHeads(widestNote.noteHead.bounds.center.x, notes);
 
 			possibleNextPositions = possibleNextPositions.concat(_.map(notes, placement.calculateCursor));
+		}
+
+		if (chords && chords.length) {
+			const placeChordY = (chord) => {
+				let yPos = placement.calculateNoteYpos(chord.children[0], Scored.config.lineSpacing/2, placement.getClefBase(context.clef.value));
+				chord.group.translate(b.add([0, yPos]));
+			};
+			_.each(chords, chord => placement.placeAt(cursor, chord));
+			_.each(chords, chord => placeChordY(chord));
+
+			possibleNextPositions = possibleNextPositions.concat(_.map(chords, placement.calculateCursor));
 		}
 
 		possibleNextPositions = possibleNextPositions.concat(_.map(rests, rest => {
@@ -251,25 +269,36 @@ Line.prototype.setMeasureLength = function (index, length) {
 	}
 };
 
-Line.prototype.addToMeasure = function (measure, item) {
-	if (this.measures[measure]) { // measure already exists
-		this.measures[measure][item.type](item);
-	} else {
-		throw new Error("Measure " + measure + " doesn't exist.");
-	}
-};
-
 function renderItem (item, context) {
 	if (item.type === constants.type.note) {
 		return Line.renderNote(item, context);
+	} else if (item.type === constants.type.chord) {
+		return Line.renderChord(item, context);
 	} else {
 		return item.render(context);
 	}
 }
 
+/*
+ * @param note - Note
+ * @param context - {key, timeSig, time, clef, accidentals}
+ * @return paper.Group
+ */
 Line.renderNote = function (note, context) {
 	let group = note.render(context);
 	Note.renderAccidental(note, context.accidentals, context.key);
+	return group;
+}
+
+/*
+ * @param Chord - Chord
+ * @param context - {key, timeSig, time, clef, accidentals}
+ * @return Paper.Group
+ */
+Line.renderChord = function (chord, context) {
+	let group = chord.render();
+	Chord.renderAccidentals(chord, context);
+	Chord.renderStem(chord);
 	return group;
 }
 

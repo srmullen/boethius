@@ -9,6 +9,7 @@ let constants = {
 		measure: "measure",
 		note: "note",
 		rest: "rest",
+		chord: "chord",
 		clef: "clef",
 		key: "key",
 		timeSig: "timeSig"

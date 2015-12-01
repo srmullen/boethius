@@ -4,6 +4,7 @@ import {getSteps, parsePitch} from "../utils/note";
 import {getStemDirection, defaultStemPoint, getStemLength, getOverlappingNotes, getAccidentalOrdering} from "../utils/chord";
 import {map, isEven} from "../utils/common";
 import {getAccidentalTop, getAccidentalBottom, getNoteHeadCenter, calculateDefaultAccidentalPosition} from "../utils/placement";
+import {getAccidental} from "../utils/accidental";
 import constants from "../constants";
 import Note from "./Note";
 

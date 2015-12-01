@@ -8,15 +8,17 @@ function run () {
 	// interaction();
 
 	// simpleLine().translate(25, 50);
-	renderingNotesOnLine().translate(25, 50);
-	oneVoice().translate(25, 150);
-	twoVoices().translate(25, 250);
+	// renderingNotesOnLine().translate(25, 50);
+	// oneVoice().translate(25, 150);
+	// twoVoices().translate(25, 250);
 
 	// eighthBeamings().translate(25, 50);
 	// sixteenthBeamings().translate(25, 150);
 
-	testAccidentals("c").translate(25, 350);
-	testTimeSigs().translate(25, 450);
+	// testAccidentals("c").translate(25, 350);
+	// testTimeSigs().translate(25, 450);
+
+	testChords().translate(25, 50);
 }
 
 function createMeasures () {
@@ -322,4 +324,16 @@ function testTimeSigs () {
 	]);
 
 	return scored.render(line, 1500, [voice], 7);
+}
+
+function testChords () {
+	var trebleLine = scored.line({}, [scored.clef({measure: 0}),
+									  scored.timeSig({value: "4/4", measure: 0}),
+									  scored.key({value: "C", measure: 0})
+								  ]);
+	var c = scored.chord;
+	var voice = scored.voice({}, [c({}, ["c4", "e4", "g4"]), c({}, ["d4", "e4", "f4"])
+							  ]);
+
+	return scored.render(trebleLine, 400, [voice], 2);
 }
