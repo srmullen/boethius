@@ -2,7 +2,8 @@ function run () {
     // testTriads();
     // testSevenths();
     // testClusters();
-    testAccidentals();
+    // testAccidentals();
+    testDifferentValues("up");
 }
 
 function testTriads () {
@@ -75,4 +76,25 @@ function testAccidentals () {
     scored.render(firstInversionFlat).translate(400, 100);
     scored.render(secondInversionFlat).translate(450, 100);
     scored.render(clusterFlat).translate(500, 100);
+}
+
+function testDifferentValues (stemDirection) {
+    stemDirection = stemDirection || "up";
+    var wholeChord = scored.chord({value: 1, stemDirection: stemDirection}, ["c4", "e4", "g4"]);
+    var halfChord = scored.chord({value: 2, stemDirection: stemDirection}, ["c4", "e4", "g4"]);
+    var quarterChord = scored.chord({value: 4, stemDirection: stemDirection}, ["c4", "e4", "g4"]);
+    var eighthChord = scored.chord({value: 8, stemDirection: stemDirection}, ["c4", "e4", "g4"]);
+    var sixteenthChord = scored.chord({value: 16, stemDirection: stemDirection}, ["c4", "e4", "g4"]);
+    var thirtySecondChord = scored.chord({value: 32, stemDirection: stemDirection}, ["c4", "e4", "g4"]);
+    var sixtyFourthChord = scored.chord({value: 64, stemDirection: stemDirection}, ["c4", "e4", "g4"]);
+    var oneTwentyEighthChord = scored.chord({value: 128, stemDirection: stemDirection}, ["c4", "e4", "g4"]);
+
+    scored.render(wholeChord).translate(50, 100)
+    scored.render(halfChord).translate(100, 100);
+    scored.render(quarterChord).translate(150, 100);
+    scored.render(eighthChord).translate(200, 100);
+    scored.render(sixteenthChord).translate(250, 100);
+    scored.render(thirtySecondChord).translate(300, 100);
+    scored.render(sixtyFourthChord).translate(350, 100);
+    scored.render(oneTwentyEighthChord).translate(400, 100);
 }

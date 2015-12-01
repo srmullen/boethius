@@ -204,10 +204,12 @@ Note.prototype.drawStem = function (to, stemDirection) {
 }
 
 /*
+ * The Stem must already be rendered for this to work.
  * @param point - optional point to draw the flag to.
+ * @return paper.Group
  */
 Note.prototype.drawFlag = function (point) {
-	var dur = this.note.duration.value,
+	let dur = this.value,
 		stem = this.group.children.stem,
 		flag, position;
 

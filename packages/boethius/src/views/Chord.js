@@ -1,5 +1,6 @@
 import _ from "lodash";
 
+import engraver from "../engraver";
 import {getSteps, parsePitch} from "../utils/note";
 import {getStemDirection, defaultStemPoint, getStemLength, getOverlappingNotes, getAccidentalOrdering} from "../utils/chord";
 import {map, isEven} from "../utils/common";
@@ -162,8 +163,25 @@ Chord.prototype.drawStem = function (to, stemDirection) {
 	return stem;
 }
 
-Chord.prototype.drawFlag = function () {
-	console.log("drawing chord flag");
+/*
+ * The stem must already be rendered for this to work.
+ * @param point - optional point to draw the flag to.
+ * @return paper.Group
+ */
+Chord.prototype.drawFlag = function (point) {
+	let dur = this.value,
+		stem = this.group.children.stem,
+		flag, position;
+
+	let flagSymbol = engraver.drawFlag(dur, this.stemDirection);
+
+	if (flagSymbol) {
+		position = engraver.getFlagOffset(stem.segments[1].point, this.stemDirection);
+		flag = flagSymbol.place(position);
+		this.group.addChild(flag);
+	}
+
+	return flag;
 }
 
 /*
