@@ -1,6 +1,6 @@
 import {expect} from "chai";
 
-import {concat, partitionBy, map, juxt, reductions} from "../src/utils/common";
+import {concat, partitionBy, map, juxt, reductions, isEven, isOdd} from "../src/utils/common";
 import Scored from "../src/Scored";
 
 describe("common", () => {
@@ -75,6 +75,28 @@ describe("common", () => {
         it("should recognize init for all values except undefined", () => {
             expect(reductions((x, y) => x + y, [1, 2, 3, 4, 5], 0)).to.eql([0, 1, 3, 6, 10, 15]);
             expect(reductions((str, c) => str + c, ["a", "b", "c"], "")).to.eql(["", "a", "ab", "abc"]);
+        });
+    });
+
+    describe("isEven", () => {
+        it("should return true for even numbers, false otherwise", () => {
+            expect(isEven(0)).to.be.true;
+            expect(isEven(1)).to.be.false;
+            expect(isEven(2)).to.be.true;
+            expect(isEven(-0)).to.be.true;
+            expect(isEven(-1)).to.be.false;
+            expect(isEven(-2)).to.be.true;
+        });
+    });
+
+    describe("isOdd", () => {
+        it("should return true for odd numbers, false otherwise", () => {
+            expect(isOdd(0)).to.be.false;
+            expect(isOdd(1)).to.be.true;
+            expect(isOdd(2)).to.be.false;
+            expect(isOdd(-0)).to.be.false;
+            expect(isOdd(-1)).to.be.true;
+            expect(isOdd(-2)).to.be.false;
         });
     });
 });

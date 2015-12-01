@@ -150,6 +150,14 @@ function reductions (reducer, coll, init) {
 	return ret;
 }
 
+function isEven (n) {
+	return !(n % 2);
+}
+
+function isOdd (n) {
+	return !isEven(n);
+}
+
 export {
 	concat,
 	doTimes,
@@ -160,5 +168,7 @@ export {
 	map,
 	juxt,
 	isMarking,
-	reductions
+	reductions,
+	isEven,
+	isOdd
 }

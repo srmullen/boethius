@@ -140,7 +140,7 @@ function drawStaffBar (lines) {
 //////////////////////
 
 // memoized to always return the same symbol for a given clef. May cause issues with margin param
-var drawClef = _.memoize(function (clef, margin={}) {
+const drawClef = _.memoize(function (clef, margin={}) {
 	const svgItem = new paper.PointText({
 		content: {
 			treble: '9',
@@ -157,7 +157,7 @@ var drawClef = _.memoize(function (clef, margin={}) {
 	return new paper.Symbol(drawBounds(svgItem, margin));
 });
 
-var drawTimeSig = _.memoize(function (timeSig, margin) {
+const drawTimeSig = _.memoize(function (timeSig, margin) {
 	var item;
 
 	if (timeSig === "c") { // common time
@@ -238,7 +238,7 @@ function drawBounds (item, {top=0, left=0, bottom=0, right=0}) {
 // Note Engraver //
 ///////////////////
 
-var drawHead = _.memoize(function (type) {
+const drawHead = _.memoize(function (type) {
 	var noteHead, noteheadChar;
 
 	if (type >= 1) {
@@ -293,7 +293,7 @@ function drawLegato () {
 	return new paper.path.Line();
 }
 
-var drawAccidental = _.memoize(function (accidental) {
+const drawAccidental = _.memoize(function (accidental) {
 	var content = {
 			"#": constants.font.accidentals.sharp,
 			"b": constants.font.accidentals.flat,
@@ -311,7 +311,7 @@ var drawAccidental = _.memoize(function (accidental) {
 	return new paper.Symbol(item);
 });
 
-var drawFlag = _.memoize(function (dur, stemDirection) {
+const drawFlag = _.memoize(function (dur, stemDirection) {
 	var flagName = {
 			8: "eighth",
 			16: "sixteenth",
@@ -338,7 +338,7 @@ function getFlagOffset (point, direction) {
 					  down: [5, -11]}[direction]);
 }
 
-var drawRest = _.memoize(function (type) {
+const drawRest = _.memoize(function (type) {
 	var rest = new paper.PointText({
 		content: constants.font.rests[type],
 		fontFamily: 'gonville',

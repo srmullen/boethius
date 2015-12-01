@@ -1,5 +1,6 @@
 import _ from "lodash";
 
+import {isEven} from "./common";
 import * as noteUtils from "./note";
 
 const UP = "up", DOWN = "down";
@@ -88,17 +89,13 @@ function getOverlappingNotes (chord) {
  * @param Number[] - the order in which to place the accidentals.
  */
 function getAccidentalOrdering (length) {
-    // if (length === 1) {
-    //     return [0];
-    // }
-
     let half = Math.ceil(length / 2),
         low = 0,
         high = length - 1,
         ordering = new Array(length);
 
     for (let i = 0; i < length; i++) {
-        if (!(i % 2)) { // is even?
+        if (isEven(i)) {
             ordering[i] = high;
             high--;
         } else {

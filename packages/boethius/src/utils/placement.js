@@ -196,6 +196,34 @@ function getStaffSpace (shortestDuration, item) {
 	}
 }
 
+// TODO: get correct values for all offsets.
+const accidentalTopOffsets = {};
+accidentalTopOffsets[constants.font.accidentals.sharp] = 10;
+accidentalTopOffsets[constants.font.accidentals.flat] = 10;
+accidentalTopOffsets[constants.font.accidentals.doubleFlat] = 10;
+accidentalTopOffsets[constants.font.accidentals.doubleSharp] = 10;
+accidentalTopOffsets[constants.font.accidentals.natural] = 10;
+
+/*
+ * The accidentals group bounds don't align exactly to it's perimeter.
+ * This function handles the difference.
+ */
+function getAccidentalTop (accidental) {
+	return accidental.bounds.top + accidentalTopOffsets[accidental.symbol.definition.content];
+}
+
+function getAccidentalBottom (accidental) {
+	return accidental.bounds.bottom;
+}
+
+/*
+ * @param note - Note
+ * @return Point - the default position to place the accidental for the given note.
+ */
+function calculateDefaultAccidentalPosition (note) {
+	return getNoteHeadCenter(note.noteHead.bounds.center).add(-Scored.config.note.accidental.xOffset, Scored.config.note.accidental.yOffset);
+}
+
 export {
 	calculateNoteYpos,
 	calculateAccidentalYpos,
@@ -209,5 +237,8 @@ export {
 	getStaffSpace,
 	calculateCursor,
 	placeAt,
-	alignNoteHeads
+	alignNoteHeads,
+	getAccidentalTop,
+	getAccidentalBottom,
+	calculateDefaultAccidentalPosition
 }

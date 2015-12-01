@@ -40,7 +40,11 @@ Note.render = function (note, context={}) {
 Note.renderAccidental = function (note, accidentals, key) {
 	let parsedPitch = noteUtils.parsePitch(note.pitch);
 	let accidental = key ? getAccidental(parsedPitch, accidentals, key) : parsedPitch.accidental;
-	note.drawAccidental(accidental);
+	if (!_.isUndefined(accidental)) {
+		let position = placement.calculateDefaultAccidentalPosition(note);
+		let accidentalGroup = note.drawAccidental(accidental);
+		accidentalGroup.translate(position);
+	}
 }
 
 Note.renderStem = function (note, centerLineValue, stemDirection) {
@@ -219,15 +223,13 @@ Note.prototype.drawFlag = function (point) {
 };
 
 Note.prototype.drawAccidental = function (accidental) {
-	let accidentalGroup;
+	let accidentalSymbol = engraver.drawAccidental(accidental);
 
-	if (!_.isUndefined(accidental)) {
-		let accidentalSymbol = engraver.drawAccidental(accidental);
-		let position = placement.getNoteHeadCenter(this.noteHead.bounds.center)
-								.add(-Scored.config.note.accidental.xOffset, Scored.config.note.accidental.yOffset);
-		accidentalGroup = accidentalSymbol.place(position);
-		this.group.addChild(accidentalSymbol.place(position));
-	}
+	// accidentalGroup = accidentalSymbol.place(position);
+	let accidentalGroup = accidentalSymbol.place();
+
+	this.group.addChild(accidentalGroup);
+
 	return accidentalGroup;
 }
 

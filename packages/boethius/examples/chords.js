@@ -52,7 +52,27 @@ function testClusters () {
 }
 
 function testAccidentals () {
-    var fSharpMaj = scored.chord({}, ["f#4", "a#4", "c#5"])
+    var fSharpMaj = scored.chord({}, ["f#4", "a#4", "c#5"]);
+    var firstInversionSharp = scored.chord({}, ["a#4", "c#5", "f#5"]);
+    var secondInversionSharp = scored.chord({}, ["c#5", "f#5", "a#5"]);
+    var fSharpOctave = scored.chord({}, ["f#4", "e#5"]);
+    var clusterSharp = scored.chord({}, ["c#4", "d#4", "e#4", "f#4"]);
+
+    var gFlatMaj = scored.chord({}, ["gb4", "bb4", "db5"]);
+    var firstInversionFlat = scored.chord({}, ["bb4", "db5", "gb5"]);
+    var secondInversionFlat = scored.chord({}, ["db5", "gb5", "bb5"]);
+    var gFlatOctave = scored.chord({}, ["gb4", "gb5"]);
+    var clusterFlat = scored.chord({}, ["cb4", "db4", "eb4", "fb4"]);
 
     scored.render(fSharpMaj).translate(50, 100);
+    scored.render(fSharpOctave).translate(100, 100);
+    scored.render(firstInversionSharp).translate(150, 100);
+    scored.render(secondInversionSharp).translate(200, 100);
+    scored.render(clusterSharp).translate(250, 100);
+
+    scored.render(gFlatMaj).translate(300, 100);
+    scored.render(gFlatOctave).translate(350, 100);
+    scored.render(firstInversionFlat).translate(400, 100);
+    scored.render(secondInversionFlat).translate(450, 100);
+    scored.render(clusterFlat).translate(500, 100);
 }

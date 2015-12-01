@@ -1,8 +1,9 @@
 import _ from "lodash";
 
 import {getSteps, parsePitch} from "../utils/note";
-import {getStemDirection, defaultStemPoint, getStemLength, getOverlappingNotes} from "../utils/chord";
-import {map} from "../utils/common";
+import {getStemDirection, defaultStemPoint, getStemLength, getOverlappingNotes, getAccidentalOrdering} from "../utils/chord";
+import {map, isEven} from "../utils/common";
+import {getAccidentalTop, getAccidentalBottom, getNoteHeadCenter, calculateDefaultAccidentalPosition} from "../utils/placement";
 import constants from "../constants";
 import Note from "./Note";
 
@@ -41,8 +42,40 @@ Chord.renderAccidentals = function (chord, context={}) {
 		return context.key ? getAccidental(parsedPitch, context.accidentals, context.key) : parsedPitch.accidental;
 	});
 
-	map((note, accidental) => note.drawAccidental(accidental), chord.children, accidentals);
+	// calculate the default position of all the accidentals
+	let positions = _.map(chord.children, calculateDefaultAccidentalPosition);
+	// get default leftmost accidental. All other accidentals will be set to this position before translating because of overlaps
+	let startingXPos = _.min(positions, position => position.x).x;
 
+	// render the accidentals in their default location.
+	let accidentalGroups = map((note, accidental, position) => {
+		let accidentalGroup = note.drawAccidental(accidental);
+		accidentalGroup.translate(startingXPos, position.y);
+		return accidentalGroup;
+	}, chord.children, accidentals, positions);
+
+	let renderOrder = getAccidentalOrdering(chord.children.length);
+
+	// translate the accidentals to avoid overlaps if needed.
+	let translationDepth = 1;
+	_.each(renderOrder, (idx, i) => {
+		let accidental = accidentalGroups[idx];
+		let neighbor = accidentalGroups[renderOrder[i+1]];
+
+		if (neighbor) {
+			if (isEven(i)) {
+				if (getAccidentalBottom(accidental) > getAccidentalTop(neighbor)) {
+					neighbor.translate(-Scored.config.note.accidental.xOffset * translationDepth, 0);
+					translationDepth++;
+				}
+			} else {
+				if (getAccidentalTop(accidental) < getAccidentalBottom(neighbor)) {
+					neighbor.translate(-Scored.config.note.accidental.xOffset * translationDepth, 0);
+					translationDepth++;
+				}
+			}
+		}
+	});
 }
 
 Chord.renderStem = function (chord, centerLineValue, stemDirection) {
