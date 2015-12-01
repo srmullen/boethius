@@ -3,7 +3,7 @@ import {expect} from "chai";
 import Scored from "../src/Scored";
 import Note from "../src/views/Note";
 import Chord from "../src/views/Chord";
-import {getStemDirection, getOverlappingNotes} from "../src/utils/chord";
+import {getStemDirection, getOverlappingNotes, getAccidentalOrdering} from "../src/utils/chord";
 
 describe("Chord", () => {
     let scored = new Scored();
@@ -143,6 +143,20 @@ describe("Chord", () => {
             expect(overlaps.length).to.equal(2);
             expect(overlaps[0]).to.eql([c, d]);
             expect(overlaps[1]).to.eql([d, e]);
+        });
+    });
+
+    describe("getAccidentalOrdering", () => {
+        it("should return an array of the given length", () => {
+            expect(getAccidentalOrdering(1).length).to.equal(1);
+            expect(getAccidentalOrdering(23).length).to.equal(23);
+        });
+
+        it("should list the note indexes working it's way inward from the outside and starting with the highest note", () => {
+            expect(getAccidentalOrdering(1)).to.eql([0]);
+            expect(getAccidentalOrdering(2)).to.eql([1, 0]);
+            expect(getAccidentalOrdering(3)).to.eql([2, 0, 1]);
+            expect(getAccidentalOrdering(10)).to.eql([9, 0, 8, 1, 7, 2, 6, 3, 5, 4]);
         });
     });
 });

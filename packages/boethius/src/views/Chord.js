@@ -1,7 +1,8 @@
 import _ from "lodash";
 
-import {getSteps} from "../utils/note";
+import {getSteps, parsePitch} from "../utils/note";
 import {getStemDirection, defaultStemPoint, getStemLength, getOverlappingNotes} from "../utils/chord";
+import {map} from "../utils/common";
 import constants from "../constants";
 import Note from "./Note";
 
@@ -31,9 +32,17 @@ Chord.render = function (chord, context) {
 	return group;
 }
 
-// Temporary implementation. Needs to place accidentals correctly.
+// render accidentals from outside in. Closest accidental always starts at highest note.
+// translate the accidental left based on the number of accidental overlaps.
 Chord.renderAccidentals = function (chord, context={}) {
-	_.each(chord.children, note => Note.renderAccidental(note, context.accidentals, context.key));
+	// get the accidental to be rendered on each note.
+	let accidentals = _.map(chord.children, (note) => {
+		let parsedPitch = parsePitch(note.pitch);
+		return context.key ? getAccidental(parsedPitch, context.accidentals, context.key) : parsedPitch.accidental;
+	});
+
+	map((note, accidental) => note.drawAccidental(accidental), chord.children, accidentals);
+
 }
 
 Chord.renderStem = function (chord, centerLineValue, stemDirection) {
