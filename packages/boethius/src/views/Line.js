@@ -159,7 +159,7 @@ Line.render = function (line, length, voices, numMeasures=1) {
 	});
 
 	_.each(voices, voice => {
-		voice.renderNoteDecorations(line, measures);
+		voice.renderDecorations(line, measures);
 	});
 
 	return lineGroup;

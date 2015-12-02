@@ -333,7 +333,8 @@ function testChords () {
 								  ]);
 	var c = scored.chord;
 	var n = scored.note;
-	var voice = scored.voice({}, [c({}, ["c4", "e4", "g4"]), n({pitch: "d5"}), c({}, ["d4", "e4", "f4"]), n({pitch: "c5"})
+	var voice = scored.voice({}, [c({}, ["c4", "e4", "g4"]), n({pitch: "d5"}), c({}, ["d4", "e4", "f4"]), n({pitch: "c5"}),
+								c({value: 1}, ["g3", "d4", "b4", "g5"])
 							  ]);
 
 	return scored.render(trebleLine, 400, [voice], 2);

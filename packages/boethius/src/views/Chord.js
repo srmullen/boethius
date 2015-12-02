@@ -185,6 +185,15 @@ Chord.prototype.drawFlag = function (point) {
 }
 
 /*
+ * Draws leger lines on the notes that need them
+ * @param centerLine - Point representing the center line.
+ * @param lineSpacing - Number, space between each line.
+ */
+Chord.prototype.drawLegerLines = function (centerLine, lineSpacing) {
+	this.children.map(note => note.drawLegerLines(centerLine, lineSpacing));
+}
+
+/*
  * @return Boolean - true if the note needs a stem drawn, False otherwise.
  */
 Chord.prototype.needsStem = function () {

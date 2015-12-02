@@ -1,10 +1,9 @@
 import _ from "lodash";
 
 import constants from "../constants";
+import {isNote, isChord} from "../types";
 import {concat} from "../utils/common";
-import * as placement from "../utils/placement";
 import * as lineUtils from "../utils/line";
-import * as noteUtils from "../utils/note";
 import {calculateDuration, getMeasureNumber} from "../utils/timeUtils";
 import Note from "./Note";
 import Measure from "./Measure";
@@ -40,15 +39,16 @@ Voice.prototype.renderChildren = function () {
  * @param line - Line that the voice is being rendered on.
  * @param measures - Measure[]
  */
-Voice.prototype.renderNoteDecorations = function (line, measures) {
+Voice.prototype.renderDecorations = function (line, measures) {
     // group children by measures
     let b = lineUtils.b(line.group),
         itemsByMeasure = _.groupBy(this.children, child => getMeasureNumber(measures, child.time)),
         stemDirection = this.stemDirection;
 
     _.map(itemsByMeasure, (items, measureNum) => {
-        let notes = _.filter(items, item => item.type === constants.type.note);
-        notes.map(note => note.drawLegerLines(b, Scored.config.lineSpacing));
+        // let notes = _.filter(items, item => item.type === constants.type.note);
+        const pitched = _.filter(items, item => isNote || isChord);
+        pitched.map(note => note.drawLegerLines(b, Scored.config.lineSpacing));
     });
 
     // beam the notes
