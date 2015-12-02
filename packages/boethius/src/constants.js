@@ -1,5 +1,3 @@
-"use strict";
-
 let constants = {
 	type: {
 		score: "score",

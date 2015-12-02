@@ -3,9 +3,10 @@ import engraver from "../engraver";
 import Measure from "./Measure";
 import {getMeasureNumber, getMeasureByTime} from "../utils/timeUtils";
 import * as placement from "../utils/placement";
-import * as common from "../utils/common";
+import {isMarking, concat} from "../utils/common";
 import * as lineUtils from "../utils/line";
 import {getAccidentalContexts} from "../utils/accidental";
+import {isNote, isChord} from "../types";
 import Note from "./Note";
 import Rest from "./Rest";
 import Chord from "./Chord";
@@ -110,6 +111,37 @@ Line.render = function (line, length, voices, numMeasures=1) {
 
 		let possibleNextPositions = [];
 
+		const pitchedItems = _.compact(concat(notes, chords));
+
+		// if (pitchedItems.length) {
+		// 	// get widest note. that will be placed first.
+		// 	let widestNote = _.max(pitchedItems, item => item.group.bounds.width),
+		// 		placeY = (item) => {
+		// 			let yPos = placement.calculateNoteYpos(item, Scored.config.lineSpacing/2, placement.getClefBase(context.clef.value));
+		// 			item.group.translate(b.add([0, yPos]));
+		// 		},
+		// 		placeX = (item) => {
+		// 			placement.placeAt(cursor, item);
+		// 		},
+		// 		place = (item) => {
+		// 			placeY(item);
+		// 			placeX(item);
+		// 			return placement.calculateCursor(item);
+		// 		};
+		//
+		//
+		// 	possibleNextPositions = possibleNextPositions.concat(placeNote(widestNote));
+		//
+		// 	_.remove(notes, note => note === widestNote); // mutation of notes array
+		//
+		// 	_.each(notes, placeNoteY);
+		//
+		// 	placement.alignNoteHeads(widestNote.noteHead.bounds.center.x, notes);
+		//
+		// 	possibleNextPositions = possibleNextPositions.concat(_.map(notes, placement.calculateCursor));
+		// }
+
+
 		if (notes && notes.length) {
 			// get widest note. that will be placed first.
 			let widestNote = _.max(notes, note => note.group.bounds.width),
@@ -180,7 +212,7 @@ function calculateAndSetMeasureLengths (measures, times, noteHeadWidth, shortest
 
 	let measureLengths = _.map(measures, (measure, i) => {
 		let measureLength = _.sum(_.map(itemsInMeasure[i], ({items}) => {
-			let [markings, voiceItems] = _.partition(items, common.isMarking),
+			let [markings, voiceItems] = _.partition(items, isMarking),
 				markingsLength = _.sum(markings.map(marking => marking.group.bounds.width + noteHeadWidth)),
 				voiceItemsLength = _.min(_.map(voiceItems, item => {
 					return item.group.bounds.width + (noteHeadWidth * placement.getStaffSpace(shortestDuration, item));
@@ -298,7 +330,7 @@ Line.renderNote = function (note, context) {
 Line.renderChord = function (chord, context) {
 	let group = chord.render();
 	Chord.renderAccidentals(chord, context);
-	Chord.renderStem(chord);
+	// Chord.renderStem(chord);
 	return group;
 }
 

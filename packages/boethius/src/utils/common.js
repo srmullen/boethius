@@ -62,7 +62,7 @@ function debugGroupEvents (group) {
 	_.extend(item.group, debugEvents);
 }
 
-function concat (a, b) {
+function concat (a = [], b) {
 	return a.concat([b]);
 }
 
@@ -158,6 +158,10 @@ function isOdd (n) {
 	return !isEven(n);
 }
 
+// const isNote = _.partial(isType, constants.type.note);
+//
+// const isChord = _.partial(isType, constants.type.chord);
+
 export {
 	concat,
 	doTimes,
@@ -170,5 +174,7 @@ export {
 	isMarking,
 	reductions,
 	isEven,
-	isOdd
+	isOdd,
+	// isNote,
+	// isChord
 }

@@ -24,6 +24,8 @@ import * as common from "./utils/common";
 import constants from "./constants";
 import _ from "lodash";
 
+import * as types from "./types";
+
 const Scored = function (options={}) {
 	Scored.config = new Config(options.config);
 };
