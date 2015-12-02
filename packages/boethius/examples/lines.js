@@ -9,8 +9,8 @@ function run () {
 
 	// simpleLine().translate(25, 50);
 	// renderingNotesOnLine().translate(25, 50);
-	// oneVoice().translate(25, 150);
-	// twoVoices().translate(25, 250);
+	oneVoice().translate(25, 150);
+	twoVoices().translate(25, 250);
 
 	// eighthBeamings().translate(25, 50);
 	// sixteenthBeamings().translate(25, 150);
@@ -332,7 +332,8 @@ function testChords () {
 									  scored.key({value: "C", measure: 0})
 								  ]);
 	var c = scored.chord;
-	var voice = scored.voice({}, [c({}, ["c4", "e4", "g4"]), c({}, ["d4", "e4", "f4"])
+	var n = scored.note;
+	var voice = scored.voice({}, [c({}, ["c4", "e4", "g4"]), n({pitch: "d5"}), c({}, ["d4", "e4", "f4"]), n({pitch: "c5"})
 							  ]);
 
 	return scored.render(trebleLine, 400, [voice], 2);

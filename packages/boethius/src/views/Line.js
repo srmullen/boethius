@@ -111,74 +111,36 @@ Line.render = function (line, length, voices, numMeasures=1) {
 
 		let possibleNextPositions = [];
 
-		const pitchedItems = _.compact(concat(notes, chords));
+		const pitchedItems = _.compact([].concat(notes, chords));
 
-		// if (pitchedItems.length) {
-		// 	// get widest note. that will be placed first.
-		// 	let widestNote = _.max(pitchedItems, item => item.group.bounds.width),
-		// 		placeY = (item) => {
-		// 			let yPos = placement.calculateNoteYpos(item, Scored.config.lineSpacing/2, placement.getClefBase(context.clef.value));
-		// 			item.group.translate(b.add([0, yPos]));
-		// 		},
-		// 		placeX = (item) => {
-		// 			placement.placeAt(cursor, item);
-		// 		},
-		// 		place = (item) => {
-		// 			placeY(item);
-		// 			placeX(item);
-		// 			return placement.calculateCursor(item);
-		// 		};
-		//
-		//
-		// 	possibleNextPositions = possibleNextPositions.concat(placeNote(widestNote));
-		//
-		// 	_.remove(notes, note => note === widestNote); // mutation of notes array
-		//
-		// 	_.each(notes, placeNoteY);
-		//
-		// 	placement.alignNoteHeads(widestNote.noteHead.bounds.center.x, notes);
-		//
-		// 	possibleNextPositions = possibleNextPositions.concat(_.map(notes, placement.calculateCursor));
-		// }
-
-
-		if (notes && notes.length) {
+		if (pitchedItems.length) {
 			// get widest note. that will be placed first.
-			let widestNote = _.max(notes, note => note.group.bounds.width),
-				placeNoteY = (note) => {
+			let widestItem = _.max(pitchedItems, item => item.group.bounds.width),
+				placeY = (item) => {
+					let note = isNote(item) ? item : item.children[0];
 					let yPos = placement.calculateNoteYpos(note, Scored.config.lineSpacing/2, placement.getClefBase(context.clef.value));
-					note.group.translate(b.add([0, yPos]));
+					item.group.translate(b.add([0, yPos]));
 				},
-				placeNoteX = (note) => {
-					placement.placeAt(cursor, note);
+				placeX = (item) => {
+					placement.placeAt(cursor, item);
 				},
-				placeNote = (note) => {
-					placeNoteY(note);
-					placeNoteX(note);
-					return placement.calculateCursor(note);
+				place = (item) => {
+					placeY(item);
+					placeX(item);
+					return placement.calculateCursor(item);
 				};
 
 
-			possibleNextPositions = possibleNextPositions.concat(placeNote(widestNote));
+			possibleNextPositions = possibleNextPositions.concat(place(widestItem));
 
-			_.remove(notes, note => note === widestNote); // mutation of notes array
+			_.remove(pitchedItems, item => item === widestItem); // mutation of notes array
 
-			_.each(notes, placeNoteY);
+			_.each(pitchedItems, placeY);
 
-			placement.alignNoteHeads(widestNote.noteHead.bounds.center.x, notes);
+			const alignToNoteHead = isNote(widestItem) ? widestItem.noteHead : widestItem.children[0].noteHead;
+			placement.alignNoteHeads(alignToNoteHead.bounds.center.x, notes);
 
-			possibleNextPositions = possibleNextPositions.concat(_.map(notes, placement.calculateCursor));
-		}
-
-		if (chords && chords.length) {
-			const placeChordY = (chord) => {
-				let yPos = placement.calculateNoteYpos(chord.children[0], Scored.config.lineSpacing/2, placement.getClefBase(context.clef.value));
-				chord.group.translate(b.add([0, yPos]));
-			};
-			_.each(chords, chord => placement.placeAt(cursor, chord));
-			_.each(chords, chord => placeChordY(chord));
-
-			possibleNextPositions = possibleNextPositions.concat(_.map(chords, placement.calculateCursor));
+			possibleNextPositions = possibleNextPositions.concat(_.map(pitchedItems, placement.calculateCursor));
 		}
 
 		possibleNextPositions = possibleNextPositions.concat(_.map(rests, rest => {

@@ -158,10 +158,6 @@ function isOdd (n) {
 	return !isEven(n);
 }
 
-// const isNote = _.partial(isType, constants.type.note);
-//
-// const isChord = _.partial(isType, constants.type.chord);
-
 export {
 	concat,
 	doTimes,
@@ -174,7 +170,5 @@ export {
 	isMarking,
 	reductions,
 	isEven,
-	isOdd,
-	// isNote,
-	// isChord
+	isOdd
 }
