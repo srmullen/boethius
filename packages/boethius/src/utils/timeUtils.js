@@ -6,7 +6,7 @@ import constants from "../constants";
  * @param timeSig - TimeSignaure or time signature value represented as a String. ex. TimeSig({value: "4/4"}) or "4/4", "h"
  * @return Number[]
  */
-function sigToNums (timeSig) {
+function parseSignature (timeSig) {
 	let sig = timeSig.type === constants.type.timeSig ? timeSig.value : timeSig;
 
 	if (sig === "c" || sig === "h") {
@@ -33,7 +33,7 @@ function getMeasure (time=0, [beats, value], offset=0) {
  * @return {number} - float representation
  */
 function getBeat (time, timeSig, offset=0) {
-	let [beats, value] = _.isArray(timeSig) ? timeSig : sigToNums(timeSig),
+	let [beats, value] = _.isArray(timeSig) ? timeSig : parseSignature(timeSig),
 		measureDuration = beats * (1/value),
 		beatTime = (time - offset) % measureDuration;
 
@@ -78,7 +78,7 @@ function getTime (measures, item) {
  * @return {number} - float
  */
 function getTimeNumber (measure, timeSig, offset=0) {
-	let [beats, value] = _.isArray(timeSig) ? timeSig : sigToNums(timeSig);
+	let [beats, value] = _.isArray(timeSig) ? timeSig : parseSignature(timeSig);
 	return measure * beats * (1/value) + offset;
 }
 
@@ -105,7 +105,7 @@ function getMeasureByTime (measures, time) {
  * @param timeSig {String}
  */
 var getTimeSigDuration = function (timeSig) {
-	let [beats, value] = sigToNums(timeSig);
+	let [beats, value] = parseSignature(timeSig);
 	return beats * (1/value);
 };
 
@@ -208,5 +208,6 @@ export {
 	getMeasureNumber,
 	splitByTime,
 	splitByMeasure,
-	calculateDuration
+	calculateDuration,
+	parseSignature
 }

@@ -5,33 +5,33 @@ import * as noteUtils from "./note";
 
 const UP = "up", DOWN = "down";
 
-/*
- * @param chord - Chord for which to get the stem direction.
- * @param centerLineValue - String note pitch of center line.
- * @return String
- */
-function getStemDirection (chord, centerLineValue) {
-    if (chord.stemDirection) {
-		return chord.stemDirection;
-	} else if (centerLineValue) {
-        if (chord.children.length === 1) {
-            return getSteps(centerLineValue, chord.children[0].pitch) < 0 ? UP : DOWN;
-        }
-        // stem direction will be the the direction of the note that is furthest from the center line. Tie goes down.
-        let firstSteps = noteUtils.getSteps(centerLineValue, chord.children[0].pitch),
-            lastSteps = noteUtils.getSteps(centerLineValue, _.last(chord.children).pitch);
-
-        if (firstSteps < 0 && lastSteps < 0) {
-            return UP;
-        } else if (firstSteps >= 0 && lastSteps >= 0) {
-            return DOWN;
-        } else {
-            return (Math.abs(firstSteps) > Math.abs(lastSteps)) ? UP : DOWN;
-        }
-	} else {
-		return UP;
-	}
-}
+// /*
+//  * @param chord - Chord for which to get the stem direction.
+//  * @param centerLineValue - String note pitch of center line.
+//  * @return String
+//  */
+// function getStemDirection (chord, centerLineValue) {
+//     if (chord.stemDirection) {
+// 		return chord.stemDirection;
+// 	} else if (centerLineValue) {
+//         if (chord.children.length === 1) {
+//             return getSteps(centerLineValue, chord.children[0].pitch) < 0 ? UP : DOWN;
+//         }
+//         // stem direction will be the the direction of the note that is furthest from the center line. Tie goes down.
+//         let firstSteps = noteUtils.getSteps(centerLineValue, chord.children[0].pitch),
+//             lastSteps = noteUtils.getSteps(centerLineValue, _.last(chord.children).pitch);
+//
+//         if (firstSteps < 0 && lastSteps < 0) {
+//             return UP;
+//         } else if (firstSteps >= 0 && lastSteps >= 0) {
+//             return DOWN;
+//         } else {
+//             return (Math.abs(firstSteps) > Math.abs(lastSteps)) ? UP : DOWN;
+//         }
+// 	} else {
+// 		return UP;
+// 	}
+// }
 
 function defaultStemPoint (chord, stemDirection, stemLength) {
     let frm, to;
@@ -108,7 +108,7 @@ function getAccidentalOrdering (length) {
 }
 
 export {
-    getStemDirection,
+    // getStemDirection,
     defaultStemPoint,
     getStemLength,
     getOverlappingNotes,

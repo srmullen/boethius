@@ -9,8 +9,8 @@ function run () {
 
 	// simpleLine().translate(25, 50);
 	// renderingNotesOnLine().translate(25, 50);
-	oneVoice().translate(25, 150);
-	twoVoices().translate(25, 250);
+	// oneVoice().translate(25, 150);
+	// twoVoices().translate(25, 250);
 
 	// eighthBeamings().translate(25, 50);
 	// sixteenthBeamings().translate(25, 150);
@@ -333,9 +333,24 @@ function testChords () {
 								  ]);
 	var c = scored.chord;
 	var n = scored.note;
-	var voice = scored.voice({}, [c({}, ["c4", "e4", "g4"]), n({pitch: "d5"}), c({}, ["d4", "e4", "f4"]), n({pitch: "c5"}),
-								c({value: 1}, ["g3", "d4", "b4", "g5"])
-							  ]);
+	var voice = scored.voice({}, [
+		c({value: 8}, ["c4", "e4", "g4"]), c({value: 8}, ["d4", "f4", "a4"]), n({pitch: "d5"}), c({}, ["d4", "e4", "f4"]), n({pitch: "c5"}),
 
-	return scored.render(trebleLine, 400, [voice], 2);
+		n({pitch: "g4", value: 16}), c({value: 16}, ["f4", "a4"]), n({pitch: "b4", value: 16}), c({value: 16}, ["a4", "c5"]),
+		n({pitch: "a4", value: 16}), c({value: 16}, ["g4", "b4"]), n({pitch: "c5", value: 16}), c({value: 16}, ["b4", "d5"]),
+		n({pitch: "b4", value: 16}), c({value: 16}, ["a4", "c5"]), n({pitch: "d5", value: 16}), c({value: 16}, ["c5", "e5"]),
+		n({pitch: "c5", value: 16}), c({value: 16}, ["f4", "a4"]), n({pitch: "b4", value: 16}), c({value: 16}, ["a4", "c5"]),
+
+		n({pitch: "g4", value: 16}), c({value: 16}, ["f4", "a4"]), n({pitch: "b4", value: 16}), c({value: 16}, ["a4", "c5"]),
+		n({pitch: "g4", value: 16}), c({value: 16}, ["f4", "a4"]), n({pitch: "b4", value: 16}), c({value: 16}, ["a4", "c5"]),
+		n({pitch: "g4", value: 16}), c({value: 16}, ["f4", "a4"]), n({pitch: "b4", value: 16}), c({value: 16}, ["a4", "c5"]),
+		n({pitch: "g4", value: 16}), c({value: 16}, ["f4", "a4"]), n({pitch: "b4", value: 16}), c({value: 16}, ["a4", "c5"]),
+
+		c({value: 8}, ["g3", "g4"]), c({value: 8}, ["g4", "g5"]), c({value: 8}, ["b4", "c5"]), c({value: 8}, ["g4", "e5"]),
+		c({value: 8}, ["g3", "g4"]), c({value: 8}, ["f4", "a4"]), c({value: 8}, ["a5", "a6"]), c({value: 8}, ["a4", "c5"]),
+
+		c({value: 1}, ["g3", "d4", "b4", "g5"])
+	  ]);
+
+	return scored.render(trebleLine, 1500, [voice], 5);
 }

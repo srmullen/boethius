@@ -6,34 +6,6 @@ import {getSteps, getAverageStemDirection, parsePitch, hasPitch} from "../src/ut
 
 describe("Note", () => {
     let scored = new Scored();
-    describe("findBeaming", () => {
-        let findBeaming = Note.findBeaming,
-            fourfour = scored.timeSig();
-
-        it("should return an empty array if there are no notes in the collection", () => {
-            expect(findBeaming(fourfour, [])).to.eql([]);
-        });
-
-        it("should return a note grouped by itself if it doesn't need beaming", () => {
-            expect(findBeaming(fourfour, [scored.note({type: 4, time: 0})])).to.eql([[scored.note({type: 4, time: 0})]]);
-            expect(findBeaming(fourfour, [scored.note({type: 2, time: 0})])).to.eql([[scored.note({type: 4, time: 0})]]);
-            expect(findBeaming(fourfour, [scored.note({type: 1, time: 0})])).to.eql([[scored.note({type: 4, time: 0})]]);
-        });
-
-        it("should return notes so they can have stems and flags drawn", () => {
-            expect(findBeaming(fourfour, [scored.note({type: 1, time: 0})])).to.eql([[scored.note({type: 1, time: 0})]]);
-            expect(findBeaming(fourfour, [scored.note({type: 2, time: 0})])).to.eql([[scored.note({type: 2, time: 0})]]);
-            expect(findBeaming(fourfour, [scored.note({type: 4, time: 0})])).to.eql([[scored.note({type: 4, time: 0})]]);
-            expect(findBeaming(fourfour, [scored.note({value: 8, time: 0})])).to.eql([[scored.note({value: 8, time: 0})]]);
-            expect(findBeaming(fourfour, [scored.note({value: 16, time: 0})])).to.eql([[scored.note({value: 16, time: 0})]]);
-            expect(findBeaming(fourfour, [scored.note({value: 32, time: 0})])).to.eql([[scored.note({value: 32, time: 0})]]);
-            expect(findBeaming(fourfour, [scored.note({value: 64, time: 0})])).to.eql([[scored.note({value: 64, time: 0})]]);
-        });
-
-        it("should split collection of notes into groups that need to be beamed", () => {
-
-        });
-    });
 
     describe("getSteps", () => {
         it("should return the number of visible steps on a staff between given note values", () => {
@@ -72,6 +44,30 @@ describe("Note", () => {
             expect(getAverageStemDirection([d5, c5, b4, a4], centerLine)).to.eql(["down", "down", "down", "down"]);
             expect(getAverageStemDirection([e4, e5], centerLine)).to.eql(["up", "up"]);
             expect(getAverageStemDirection([e4, f5], centerLine)).to.eql(["down", "down"]);
+        });
+
+        it("should handle chords and notes", () => {
+            let centerLine = "b4",
+                e4 = scored.note({pitch: "e4", value: 16}),
+                f4 = scored.note({pitch: "f4", value: 16}),
+                g4 = scored.note({pitch: "g4", value: 16}),
+                a4 = scored.note({pitch: "a4", value: 16}),
+                b4 = scored.note({pitch: "b4", value: 16}),
+                c5 = scored.note({pitch: "c5", value: 16}),
+                d5 = scored.note({pitch: "d5", value: 16}),
+                e5 = scored.note({pitch: "e5", value: 16}),
+                f5 = scored.note({pitch: "f5", value: 16}),
+                fmaj = scored.chord({value: 16}, ["f4", "a4", "c5"]),
+                gmaj = scored.chord({value: 16}, ["g4", "b4", "d5"]),
+                amin = scored.chord({value: 16}, ["a4", "c5", "e5"]),
+                bdim = scored.chord({value: 16}, ["b4", "d5", "f5"]);
+
+            expect(getAverageStemDirection([e4, fmaj, g4, a4], centerLine)).to.eql(["up", "up", "up", "up"]);
+            expect(getAverageStemDirection([gmaj, a4, b4, c5], centerLine)).to.eql(["down", "down", "down", "down"]);
+            expect(getAverageStemDirection([gmaj, a4, g4, e4], centerLine)).to.eql(["up", "up", "up", "up"]);
+            expect(getAverageStemDirection([amin, bdim], centerLine)).to.eql(["down", "down"]);
+            expect(getAverageStemDirection([fmaj, gmaj], centerLine)).to.eql(["up", "up"]);
+            expect(getAverageStemDirection([fmaj, bdim], centerLine)).to.eql(["down", "down"]);
         });
     });
 

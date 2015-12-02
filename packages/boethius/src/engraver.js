@@ -1,7 +1,11 @@
 import * as paperUtils from "./utils/paperUtils";
+import {isNote, isChord} from "./types";
 import constants from "./constants";
 import * as placement from "./utils/placement";
 import * as lineUtils from "./utils/line";
+import * as noteUtils from "./utils/note";
+import * as chordUtils from "./utils/chord";
+import {map, doTimes, concat} from "./utils/common";
 import _ from "lodash";
 
 
@@ -29,6 +33,7 @@ function getYpositionFunc (num, centerY, lineSpacing) {
  * @centerLine {Point} the leftmost point of the center line in the measure.
  * @lineSpaceing {Integer} distance between lines in a measure.
  */
+// FIXME: This could be improved by using a string i.e. "b4", rather than an Point to represent the center line.
 function drawLegerLines (noteHead, centerLine, lineSpacing) {
 
 	// get the distance from the center line.
@@ -349,6 +354,198 @@ const drawRest = _.memoize(function (type) {
 	return new paper.Symbol(rest);
 });
 
+/*
+ * @param items - <Note, Chord>[]
+ * @param stemPoints - Point[] representing default stem points of the notes.
+ * @return [fulcrum Point, vector Point]
+ * Should this be made into two functions? Thinking here was the the value of one would affect the other.
+ */
+function calculateBeamFulcrumAndVector (items, stemPoints, stemDirections) {
+	let firstPoint = stemPoints[0],
+		lastPoint = stemPoints[stemPoints.length-1],
+		x = firstPoint.x + ((lastPoint.x - firstPoint.x) / 2);
+
+	let vector = lastPoint.subtract(firstPoint).normalize();
+	if (vector.angle < -Scored.config.maxBeamAngle) {
+		vector = new paper.Point({angle: -Scored.config.maxBeamAngle, length: 1});
+	} else if (vector.angle > Scored.config.maxBeamAngle) {
+		vector = new paper.Point({angle: Scored.config.maxBeamAngle, length: 1});
+	}
+
+	// get stem points given minimum stem lengths
+	let minStemLength = Scored.config.stepSpacing * 4.5;
+	// let minStemPoints = map(_.partialRight(defaultStemPoint, minStemLength), items, stemDirections);
+	let minStemPoints = map((item, stemDirection) => {
+		if (isNote(item)) {
+			return noteUtils.defaultStemPoint(item, stemDirection, minStemLength);
+		} else if (isChord(item)) {
+			return chordUtils.defaultStemPoint(item, stemDirection, minStemLength);
+		}
+	}, items, stemDirections);
+	// TODO: Handle stems going different directions
+	let ys;
+	if (stemDirections[0] === "up") {
+		let minPoint = _.min(minStemPoints, p => p.y);
+		ys = stemPoints.map(p => p.y < minPoint.y ? p.y : minPoint.y);
+	} else if (stemDirections[0] === "down") {
+		let minPoint = _.max(minStemPoints, p => p.y);
+		ys = stemPoints.map(p => p.y > minPoint.y ? p.y : minPoint.y);
+	}
+	// y is the average of all points above the min beam point.
+	let fulcrum = new paper.Point(x, _.sum(ys)/ys.length);
+
+	return [fulcrum, vector];
+}
+
+function handleBeam (beam, point, duration, previousDuration, nextDuration, fulcrum, vector, direction, yDiff) {
+	let lastBeam = _.last(beam),
+		BEAM_DIFF = [0, yDiff],
+		p16;
+
+	if (direction === "up") { // should use vector from stemPoint to note rather than direction string
+		p16 = point.add(BEAM_DIFF);
+	} else {
+		p16 = point.subtract(BEAM_DIFF);
+	}
+
+	// create left flag point
+	if (previousDuration && previousDuration < duration && (!nextDuration || nextDuration < duration)) {
+		let p = getLinePoint(p16.x - 10, fulcrum, vector),
+			flag = direction === "up" ? p.add(BEAM_DIFF) : p.subtract(BEAM_DIFF);
+
+		lastBeam.push(flag);
+	}
+
+	lastBeam.push(p16);
+
+	// create right flag point
+	if (nextDuration && !previousDuration && nextDuration < duration) {
+		let p = getLinePoint(p16.x + 10, fulcrum, vector),
+			flag = direction === "up" ? p.add(BEAM_DIFF) : p.subtract(BEAM_DIFF);
+		lastBeam.push(flag);
+	}
+}
+
+
+// for use in beam function
+const durationToBeams = {
+	8: 1, 16: 2, 32: 3, 64: 4, 128: 5, 256: 6
+};
+
+/*
+ * @param items - collection of the items to bar.
+ * @param fulcrum - a point that the bar passes through
+ * @param vector - the vector of the bar
+ * @param line - String value of center line
+ */
+function beam (items, {line="b4", fulcrum, vector, kneeGap=5.5, stemDirection}) {
+
+	let numBeams = durationToBeams[_.max(_.map(items, item => item.value))];
+	let stemDirections = stemDirection ? _.fill(new Array(items.length), stemDirection) : noteUtils.getAverageStemDirection(items, line);
+
+	let durations = items.map(item => item.value),
+		// stemLengths = map(_.partialRight(getStemLength, line), items, stemDirections),
+		stemLengths = map((item, stemDirection) => {
+			if (isNote(item)) {
+				return noteUtils.getStemLength(item, line);
+			} else if (isChord) {
+				return chordUtils.getStemLength(item, line, stemDirection);
+			}
+		}, items, stemDirections),
+		stemPoints = items.map((item, i) => {
+			if (isNote(item)) {
+				return noteUtils.defaultStemPoint(item, stemDirections[i], stemLengths[i]);
+			} else if (isChord) {
+				return chordUtils.defaultStemPoint(item, stemDirections[i], stemLengths[i]);
+			}
+		});
+
+	// only calculate the fulcrum and vector if they aren't passed in as arguments
+	if (fulcrum && !vector) {
+		[, vector] = calculateBeamFulcrumAndVector(items, stemPoints, stemDirections);
+	} else if (vector && !fulcrum) {
+		[fulcrum,] = calculateBeamFulcrumAndVector(items, stemPoints, stemDirections);
+	} else {
+		[fulcrum, vector] = calculateBeamFulcrumAndVector(items, stemPoints, stemDirections);
+	}
+
+	// beams is an array of arrays of segments, beams[0] are eighth segments, beams[1] sixteenths, etc.
+	let beams = doTimes(numBeams, () => [[]]),
+		segments = _.reduce(items, (acc, item, i) => {
+			let point = _.last(acc),
+				duration = durations[i],
+				direction = stemDirections[i],
+				current = _.last(acc),
+				previous = acc[i-1],
+				previousDuration = durations[i-1],
+				nextDuration = durations[i+1],
+				nextItem = items[i+1],
+				next = nextItem ? nextItem.calculateStemPoint(fulcrum, vector, stemDirections[i+1]) : null;
+
+			_.last(beams[0]).push(point);
+
+			if (duration >= 16) {
+				handleBeam(beams[1], current, duration, previousDuration, nextDuration, fulcrum, vector, direction, 5);
+			}
+
+			if (duration >= 32) {
+				handleBeam(beams[2], current, duration, previousDuration, nextDuration, fulcrum, vector, direction, 10);
+			}
+
+			if (duration >= 64) {
+				handleBeam(beams[3], current, duration, previousDuration, nextDuration, fulcrum, vector, direction, 15);
+			}
+
+			if (duration >= 128) {
+				handleBeam(beams[4], current, duration, previousDuration, nextDuration, fulcrum, vector, direction, 20);
+			}
+
+			if (duration >= 256) {
+				handleBeam(beams[5], current, duration, previousDuration, nextDuration, fulcrum, vector, direction, 25);
+			}
+
+			// Break beams
+			if (duration < 16 && beams[1]) {
+				beams[1].push([]);
+			}
+
+			if (duration < 32 && beams[2]) {
+				beams[2].push([]);
+			}
+
+			if (duration < 64 && beams[3]) {
+				beams[3].push([]);
+			}
+
+			if (duration < 128 && beams[4]) {
+				beams[4].push([]);
+			}
+
+			if (duration < 256 && beams[5]) {
+				beams[5].push([]);
+			}
+
+			item.drawStem(point, direction);
+
+			return concat(acc, next);
+		}, [items[0].calculateStemPoint(fulcrum, vector, stemDirections[0])]), // initialize the accumulator with the first point
+
+		paths = _.map(_.flatten(beams), (bar) => {
+			return new paper.Path({
+				segments: bar,
+				strokeColor: "black",
+				strokeWidth: 3
+			});
+		});
+
+	// what group should this be added to?
+	return new paper.Group({
+		name: "beam",
+		children: paths
+	});
+}
+
+
 export default {
 	drawLegerLines,
 	drawBarline,
@@ -363,5 +560,6 @@ export default {
 	drawAccidental,
 	drawFlag,
 	getFlagOffset,
-	drawRest
+	drawRest,
+	beam
 };

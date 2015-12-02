@@ -2,10 +2,12 @@ import _ from "lodash";
 
 import constants from "../constants";
 import {isNote, isChord} from "../types";
-import {concat} from "../utils/common";
+import {concat, partitionBy} from "../utils/common";
+import {beam} from "../engraver";
 import * as lineUtils from "../utils/line";
-import {calculateDuration, getMeasureNumber} from "../utils/timeUtils";
-import Note from "./Note";
+import {calculateDuration, getMeasureNumber, getBeat, parseSignature} from "../utils/timeUtils";
+import TimeSignature from "./TimeSignature";
+// import Note from "./Note";
 import Measure from "./Measure";
 import {getCenterLineValue} from "./Clef";
 
@@ -36,6 +38,56 @@ Voice.prototype.renderChildren = function () {
 }
 
 /*
+ * Notes must have time properties for this function to work.
+ * Should this function just calculate their times from the first note instead?
+ * @param timeSig - TimeSignature
+ * @param items - <Note, Chord>[]
+ * @return - array of note groupings.
+ */
+Voice.findBeaming = function findBeaming (timeSig, items) {
+   if (!items.length) {
+       return [];
+   }
+
+   // get the beat type
+   const sig = parseSignature(timeSig);
+   const baseTime = items[0].time; // the time from which the groupings are reckoned.
+
+   // remove notes that don't need beaming or flags (i.e. quarter notes and greater)
+   let stemmedItems = _.groupBy(_.filter(items, item => (isNote(item) || isChord(item)) && item.needsStem()), item => {
+       return Math.floor(getBeat(item.time, sig, baseTime));
+   });
+
+   let groupings = [];
+   for (let i = 0, beat = 0; i < timeSig.beatStructure.length; i++) { // count down through the beats for each
+								                                        // beat structure and add the notes to be beamed.
+       for (let beats = timeSig.beatStructure[i]; beats > 0; beats--) {
+           if (stemmedItems[beat]) {
+               let beatSubdivisions = partitionBy(stemmedItems[beat], item => item.needsFlag())
+               _.each(beatSubdivisions, subdivision => groupings.push(subdivision));
+           }
+
+           beat++;
+       }
+   }
+
+   return groupings;
+}
+
+/*
+ * @param notes <Note, Chord>[]
+ * @param centerLineValue - String representing note value.
+ * @param stemDirection - optional String specifying the direction of all note stems.
+ */
+function stemAndBeam (items, centerLineValue, stemDirection) {
+	if (items.length === 1) {
+		items[0].renderStem(centerLineValue, stemDirection);
+	} else {
+		return beam(items, {line: centerLineValue, stemDirection});
+	}
+}
+
+/*
  * @param line - Line that the voice is being rendered on.
  * @param measures - Measure[]
  */
@@ -46,8 +98,7 @@ Voice.prototype.renderDecorations = function (line, measures) {
         stemDirection = this.stemDirection;
 
     _.map(itemsByMeasure, (items, measureNum) => {
-        // let notes = _.filter(items, item => item.type === constants.type.note);
-        const pitched = _.filter(items, item => isNote || isChord);
+        const pitched = _.filter(items, item => isNote(item) || isChord(item));
         pitched.map(note => note.drawLegerLines(b, Scored.config.lineSpacing));
     });
 
@@ -55,8 +106,8 @@ Voice.prototype.renderDecorations = function (line, measures) {
     _.map(itemsByMeasure, (items, measure) => {
         let context = line.contextAt(measures, {measure: Number.parseInt(measure)});
         let centerLineValue = getCenterLineValue(context.clef);
-        let beamings = Note.findBeaming(context.timeSig, items);
-        let beams = _.compact(beamings.map(noteGrouping => Note.renderDecorations(noteGrouping, centerLineValue, this.stemDirection)));
+        let beamings = Voice.findBeaming(context.timeSig, items);
+        let beams = _.compact(beamings.map(noteGrouping => stemAndBeam(noteGrouping, centerLineValue, this.stemDirection)));
         if (beams && beams.length) {
             line.group.addChildren(beams);
         }

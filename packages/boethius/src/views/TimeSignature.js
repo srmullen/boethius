@@ -27,18 +27,6 @@ TimeSignature.createBeatStructure = function (value) {
 
 }
 
-/*
- * @param sig {String} - ex. "4/4", "h"
- */
-TimeSignature.parseValue = function (sig) {
-	if (sig === "c" || sig === "h") {
-		return [4, 4];
-	} else {
-		let nums = sig.split("/");
-		return [+nums[0], +nums[1]]; // convert strings to numbers
-	}
-}
-
 TimeSignature.prototype.render = function () {
 	const margin = {
 		top: 0,

@@ -3,7 +3,7 @@ import {expect} from "chai";
 import Scored from "../src/Scored";
 import Note from "../src/views/Note";
 import Chord from "../src/views/Chord";
-import {getStemDirection, getOverlappingNotes, getAccidentalOrdering} from "../src/utils/chord";
+import {getOverlappingNotes, getAccidentalOrdering} from "../src/utils/chord";
 
 describe("Chord", () => {
     let scored = new Scored();
@@ -84,25 +84,25 @@ describe("Chord", () => {
             let cmaj = scored.chord({stemDirection: "up"}, ["c4", "e4"]),
                 cmin = scored.chord({stemDirection: "down"}, ["c4", "eb4"]);
 
-            expect(getStemDirection(cmaj)).to.equal("up");
-            expect(getStemDirection(cmin)).to.equal("down");
-            expect(getStemDirection(cmaj, "b1")).to.equal("up");
-            expect(getStemDirection(cmin, "b12")).to.equal("down");
+            expect(cmaj.getStemDirection()).to.equal("up");
+            expect(cmin.getStemDirection()).to.equal("down");
+            expect(cmaj.getStemDirection("b1")).to.equal("up");
+            expect(cmin.getStemDirection("b12")).to.equal("down");
         });
 
         it("should return 'up' if the center line is above all the notes of the chord", () => {
-            expect(getStemDirection(scored.chord({}, ["d3", "g3"]), "b4")).to.equal("up");
+            expect(scored.chord({}, ["d3", "g3"]).getStemDirection("b4")).to.equal("up");
         });
 
         it("should return 'down' if the center line is above all the notes of the chord", () => {
-            expect(getStemDirection(scored.chord({}, ["d5", "g5"]), "b4")).to.equal("down");
+            expect(scored.chord({}, ["d5", "g5"]).getStemDirection("b4")).to.equal("down");
         });
 
         it("should return the direction of the note that is furthest from the center line", () => {
-            expect(getStemDirection(scored.chord({}, ["a4", "c5"]), "b4")).to.equal("down");
-            expect(getStemDirection(scored.chord({}, ["g4", "c5"]), "b4")).to.equal("up");
-            expect(getStemDirection(scored.chord({}, ["a4", "b4"]), "b4")).to.equal("up");
-            expect(getStemDirection(scored.chord({}, ["b4", "c5"]), "b4")).to.equal("down");
+            expect(scored.chord({}, ["a4", "c5"]).getStemDirection("b4")).to.equal("down");
+            expect(scored.chord({}, ["g4", "c5"]).getStemDirection("b4")).to.equal("up");
+            expect(scored.chord({}, ["a4", "b4"]).getStemDirection("b4")).to.equal("up");
+            expect(scored.chord({}, ["b4", "c5"]).getStemDirection("b4")).to.equal("down");
         });
     });
 

@@ -2,7 +2,7 @@ import _ from "lodash";
 
 import engraver from "../engraver";
 import {getSteps, parsePitch} from "../utils/note";
-import {getStemDirection, defaultStemPoint, getStemLength, getOverlappingNotes, getAccidentalOrdering} from "../utils/chord";
+import {defaultStemPoint, getStemLength, getOverlappingNotes, getAccidentalOrdering} from "../utils/chord";
 import {map, isEven} from "../utils/common";
 import {getAccidentalTop, getAccidentalBottom, getNoteHeadCenter, calculateDefaultAccidentalPosition} from "../utils/placement";
 import {getAccidental} from "../utils/accidental";
@@ -10,12 +10,17 @@ import constants from "../constants";
 import Note from "./Note";
 
 const TYPE = constants.type.chord;
+const UP = "up";
+const DOWN = "down";
 
 /*
  * @param children - Array of notes. Can take several representations. String, Object, or Note.
  */
-function Chord ({value=4, root, name, inversion, stacato, legato, stemDirection}, children=[]) {
+function Chord ({value=4, dots=0, tuplet, time, root, name, inversion, stacato, legato, stemDirection}, children=[]) {
 	this.value = value;
+	this.dots = dots;
+	this.tuplet = tuplet;
+	this.time = time;
 	this.root = root;
 	this.name = name;
 	this.inversion = inversion;
@@ -31,7 +36,8 @@ Chord.prototype.type = TYPE;
 Chord.render = function (chord, context) {
 	let group = chord.render();
 	Chord.renderAccidentals(chord, context);
-	Chord.renderStem(chord);
+	// Chord.renderStem(chord);
+	chord.renderStem();
 	return group;
 }
 
@@ -80,19 +86,19 @@ Chord.renderAccidentals = function (chord, context={}) {
 	});
 }
 
-Chord.renderStem = function (chord, centerLineValue, stemDirection) {
-	if (chord.needsStem()) {
-		stemDirection = stemDirection || getStemDirection(chord, centerLineValue);
-		let stemPoint = defaultStemPoint(chord, stemDirection, getStemLength(chord, centerLineValue));
-		chord.drawStem(stemPoint, stemDirection);
-		chord.drawFlag();
+Chord.prototype.renderStem = function (centerLineValue, stemDirection) {
+	if (this.needsStem()) {
+		stemDirection = stemDirection || this.getStemDirection(centerLineValue);
+		let stemPoint = defaultStemPoint(this, stemDirection, getStemLength(this, centerLineValue));
+		this.drawStem(stemPoint, stemDirection);
+		this.drawFlag();
 	}
 }
 
 Chord.prototype.render = function ({accidentals = [], context = {}} = {}) {
 	const group = this.group = new paper.Group({name: TYPE});
 
-	let stemDirection = getStemDirection(this),
+	let stemDirection = this.getStemDirection(),
 		overlaps = getOverlappingNotes(this);
 
 	// get steps
@@ -208,6 +214,33 @@ Chord.prototype.needsFlag = function () {
 }
 
 /*
+ * @param centerLineValue - String note pitch of center line.
+ * @return String
+ */
+Chord.prototype.getStemDirection = function (centerLineValue) {
+    if (this.stemDirection) {
+		return this.stemDirection;
+	} else if (centerLineValue) {
+        if (this.children.length === 1) {
+            return getSteps(centerLineValue, this.children[0].pitch) < 0 ? UP : DOWN;
+        }
+        // stem direction will be the the direction of the note that is furthest from the center line. Tie goes down.
+        let firstSteps = getSteps(centerLineValue, this.children[0].pitch),
+            lastSteps = getSteps(centerLineValue, _.last(this.children).pitch);
+
+        if (firstSteps < 0 && lastSteps < 0) {
+            return UP;
+        } else if (firstSteps >= 0 && lastSteps >= 0) {
+            return DOWN;
+        } else {
+            return (Math.abs(firstSteps) > Math.abs(lastSteps)) ? UP : DOWN;
+        }
+	} else {
+		return UP;
+	}
+}
+
+/*
  * @param children - Array<Note representations>
  * @return Note[]
  */
@@ -227,6 +260,11 @@ function parseChildren (children, defaults={}) {
 	});
 
 	return _.sortBy(notes, note => note.note.midi());
+}
+
+Chord.prototype.calculateStemPoint = function (fulcrum, vector, direction) {
+	let baseNote = direction === "up" ? this.children[0] : _.last(this.children);
+	return baseNote.calculateStemPoint(fulcrum, vector, direction);
 }
 
 export default Chord;

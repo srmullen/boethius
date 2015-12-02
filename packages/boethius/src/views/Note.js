@@ -3,6 +3,7 @@ import _ from "lodash";
 
 import engraver from "../engraver";
 import {concat, partitionBy} from "../utils/common";
+import {getLinePoint} from "../utils/geometry";
 import * as placement from "../utils/placement";
 import * as noteUtils from "../utils/note";
 import * as timeUtils from "../utils/timeUtils";
@@ -33,7 +34,8 @@ Note.prototype.type = TYPE;
 Note.render = function (note, context={}) {
 	let group = note.render(context);
 	Note.renderAccidental(note, context.accidentals, context.key);
-	Note.renderStem(note);
+	// Note.renderStem(note);
+	note.renderStem();
 	return group;
 }
 
@@ -47,63 +49,13 @@ Note.renderAccidental = function (note, accidentals, key) {
 	}
 }
 
-Note.renderStem = function (note, centerLineValue, stemDirection) {
-	if (note.needsStem()) {
-		stemDirection = stemDirection || noteUtils.getStemDirection(note, centerLineValue);
-		let stemPoint = noteUtils.defaultStemPoint(note, stemDirection, noteUtils.getStemLength(note, centerLineValue));
-		note.drawStem(stemPoint, stemDirection);
-		note.drawFlag();
+Note.prototype.renderStem = function (centerLineValue, stemDirection) {
+	if (this.needsStem()) {
+		stemDirection = stemDirection || this.getStemDirection(centerLineValue);
+		let stemPoint = noteUtils.defaultStemPoint(this, stemDirection, noteUtils.getStemLength(this, centerLineValue));
+		this.drawStem(stemPoint, stemDirection);
+		this.drawFlag();
 	}
-}
-
-/*
- * @param notes Note[]
- * @param centerLineValue - String representing note value.
- * @param stemDirection - optional String specifying the direction of all note stems.
- */
-Note.renderDecorations = function (notes, centerLineValue, stemDirection) {
-	if (notes.length === 1) {
-		Note.renderStem(notes[0], centerLineValue, stemDirection);
-	} else {
-		return noteUtils.beam(notes, {line: centerLineValue, stemDirection});
-	}
-}
-
- /*
-  * Notes must have time properties for this function to work.
-  * Should this function just calculate their times from the first note instead?
-  * @param timeSig - TimeSignature
-  * @param note - Note[]
-  * @return - array of note groupings.
-  */
-Note.findBeaming = function (timeSig, notes) {
-	if (!notes.length) {
-		return [];
-	}
-
-	// get the beat type
-	let sig = TimeSignature.parseValue(timeSig.value),
-		baseTime = notes[0].time; // the time from which the groupings are reckoned.
-
-	// remove notes that don't need beaming or flags (i.e. quarter notes and greater)
-	let stemmedNotes = _.groupBy(_.filter(notes, note => note.type === constants.type.note && note.needsStem()), note => {
-		return Math.floor(timeUtils.getBeat(note.time, sig, baseTime));
-	});
-
-	let groupings = [];
-	for (let i = 0, beat = 0; i < timeSig.beatStructure.length; i++) { // count down through the beats for each
-		// let grouping = [];											   // beat structure and add the notes to be beamed.
-		for (let beats = timeSig.beatStructure[i]; beats > 0; beats--) {
-			if (stemmedNotes[beat]) {
-				let beatSubdivisions = partitionBy(stemmedNotes[beat], note => note.needsFlag())
-				_.each(beatSubdivisions, subdivision => groupings.push(subdivision));
-			}
-
-			beat++;
-		}
-	}
-
-	return groupings;
 }
 
 Note.prototype.render = function (context = {}) {
@@ -233,6 +185,28 @@ Note.prototype.drawAccidental = function (accidental) {
 	this.group.addChild(accidentalGroup);
 
 	return accidentalGroup;
+}
+
+/*
+ * @param centerLineValue - String note pitch of center line.
+ */
+Note.prototype.getStemDirection = function (centerLineValue) {
+	if (this.stemDirection) {
+		return this.stemDirection;
+	} else if (centerLineValue) {
+		return noteUtils.getSteps(centerLineValue, this.pitch) < 0 ? "up" : "down";
+	} else {
+		return "up";
+	}
+}
+
+Note.prototype.calculateStemPoint = function (fulcrum, vector, direction) {
+	// get the beam point at the center of the noteHead
+	let noteHead = placement.getNoteHeadCenter(this.noteHead.position),
+		centerPoint = getLinePoint(noteHead.x, fulcrum, vector),
+		point = getLinePoint((direction === "up" ? this.noteHead.bounds.right : this.noteHead.bounds.left), fulcrum, vector);
+
+	return point;
 }
 
 export default Note;
