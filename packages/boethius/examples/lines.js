@@ -15,7 +15,7 @@ function run () {
 	// eighthBeamings().translate(25, 50);
 	// sixteenthBeamings().translate(25, 150);
 
-	// testAccidentals("c").translate(25, 350);
+	testAccidentals("c").translate(25, 350);
 	// testTimeSigs().translate(25, 450);
 
 	testChords().translate(25, 50);
@@ -336,8 +336,8 @@ function testChords () {
 	var voice = scored.voice({}, [
 		c({value: 8}, ["c4", "e4", "g4"]), c({value: 8}, ["d4", "f4", "a4"]), n({pitch: "d5"}), c({}, ["d4", "e4", "f4"]), n({pitch: "c5"}),
 
-		n({pitch: "g4", value: 16}), c({value: 16}, ["f4", "a4"]), n({pitch: "b4", value: 16}), c({value: 16}, ["a4", "c5"]),
-		n({pitch: "a4", value: 16}), c({value: 16}, ["g4", "b4"]), n({pitch: "c5", value: 16}), c({value: 16}, ["b4", "d5"]),
+		n({pitch: "g4", value: 16}), c({value: 16}, ["f4", "ab4"]), n({pitch: "b4", value: 16}), c({value: 16}, ["ab4", "c5"]),
+		n({pitch: "a4", value: 16}), c({value: 16}, ["g4", "bb4"]), n({pitch: "c#5", value: 16}), c({value: 16}, ["b4", "d5"]),
 		n({pitch: "b4", value: 16}), c({value: 16}, ["a4", "c5"]), n({pitch: "d5", value: 16}), c({value: 16}, ["c5", "e5"]),
 		n({pitch: "c5", value: 16}), c({value: 16}, ["f4", "a4"]), n({pitch: "b4", value: 16}), c({value: 16}, ["a4", "c5"]),
 
@@ -353,4 +353,8 @@ function testChords () {
 	  ]);
 
 	return scored.render(trebleLine, 1500, [voice], 5);
+}
+
+function testChordsTwoVoices () {
+
 }

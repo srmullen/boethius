@@ -105,8 +105,10 @@ function createAccidentalContexts (times) {
 	const contexts = new Array(times.length);
 	contexts[0] = [];
 	for (let i = 0; i < times.length - 1; i++) {
-		let {note: notes} = _.groupBy(times[i].items, item => item.type);
-		contexts[i + 1] = createAccidentalContext(contexts[i], _.map(notes, ({pitch}) => parsePitch(pitch)));
+		let {note: notes=[], chord: chords=[]} = _.groupBy(times[i].items, item => item.type);
+		let chordNotes = _.reduce(chords, (acc, chord) => acc.concat(chord.children), []);
+		let pitches = _.map(notes.concat(chordNotes), ({pitch}) => parsePitch(pitch));
+		contexts[i + 1] = createAccidentalContext(contexts[i], pitches);
 	}
 	return contexts;
 }
