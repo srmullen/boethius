@@ -138,7 +138,8 @@ Line.render = function (line, length, voices, numMeasures=1) {
 			_.each(pitchedItems, placeY);
 
 			const alignToNoteHead = isNote(widestItem) ? widestItem.noteHead : widestItem.children[0].noteHead;
-			placement.alignNoteHeads(alignToNoteHead.bounds.center.x, notes);
+			console.log(alignToNoteHead.bounds.center.x);
+			placement.alignNoteHeads(alignToNoteHead.bounds.center.x, pitchedItems);
 
 			possibleNextPositions = possibleNextPositions.concat(_.map(pitchedItems, placement.calculateCursor));
 		}

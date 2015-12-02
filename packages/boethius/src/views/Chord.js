@@ -36,13 +36,13 @@ Chord.prototype.type = TYPE;
 Chord.render = function (chord, context) {
 	let group = chord.render();
 	Chord.renderAccidentals(chord, context);
-	// Chord.renderStem(chord);
 	chord.renderStem();
 	return group;
 }
 
 // render accidentals from outside in. Closest accidental always starts at highest note.
 // translate the accidental left based on the number of accidental overlaps.
+// FIXME: this has to take into consideration accidentals from other voices.
 Chord.renderAccidentals = function (chord, context={}) {
 	// get the accidental to be rendered on each note.
 	let accidentals = _.map(chord.children, (note) => {

@@ -34,7 +34,6 @@ Note.prototype.type = TYPE;
 Note.render = function (note, context={}) {
 	let group = note.render(context);
 	Note.renderAccidental(note, context.accidentals, context.key);
-	// Note.renderStem(note);
 	note.renderStem();
 	return group;
 }

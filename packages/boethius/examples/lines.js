@@ -15,10 +15,11 @@ function run () {
 	// eighthBeamings().translate(25, 50);
 	// sixteenthBeamings().translate(25, 150);
 
-	testAccidentals("c").translate(25, 350);
+	// testAccidentals("c").translate(25, 350);
 	// testTimeSigs().translate(25, 450);
 
-	testChords().translate(25, 50);
+	// testChords().translate(25, 50);
+	testChordsTwoVoices().translate(25, 150);
 }
 
 function createMeasures () {
@@ -356,5 +357,22 @@ function testChords () {
 }
 
 function testChordsTwoVoices () {
+	var line = scored.line({}, [scored.clef({value: "treble", measure: 0}),
+								scored.key({value: "C", measure: 0}),
+								scored.timeSig({value: "4/4", measure: 0})]);
 
+	var notes1 = _.fill(new Array(16), 16).concat(_.fill(new Array(8), 8)).concat(_.fill(new Array(4), 4)).concat(_.fill(new Array(2), 2)).concat(_.fill(new Array(1), 1));
+	var notes2 = _.fill(new Array(4), 4).concat(
+		_.fill(new Array(2), 2)).concat(
+			_.fill(new Array(8), 8)).concat(
+				_.fill(new Array(8), 8)).concat(
+					_.fill(new Array(16), 16));
+
+	// var voice1 = scored.voice({stemDirection: "up"}, _.map(notes1, function (n) {return scored.note({value: n, pitch: "c#5"})}));
+	// var voice2 = scored.voice({stemDirection: "down"}, _.map(notes2, function (n) {return scored.chord({value: n}, ["f#4", "a4"])}));
+
+	var voice1 = scored.voice({stemDirection: "up"}, _.map(notes1, function (n) {return scored.chord({value: n}, ["a4", "c#5"])}));
+	var voice2 = scored.voice({stemDirection: "down"}, _.map(notes2, function (n) {return scored.note({value: n, pitch: "f#4"})}));
+
+	return scored.render(line, 1000, [voice1, voice2], 5);
 }

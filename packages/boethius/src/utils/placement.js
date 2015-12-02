@@ -1,6 +1,7 @@
 import * as timeUtils from "./timeUtils";
 import {isMarking} from "./common";
 import constants from "../constants";
+import {isNote, isChord} from "../types";
 
 let noteNameToDegreeObj = {
 		"c": 0,
@@ -167,12 +168,14 @@ function calculateCursor (item1) {
 /*
  * Aligns the notes so they are all at the same x position.
  * @param xPos - Number
- * @param notes - Note[]
+ * @param notes - <Note, Chord>[]
  */
-function alignNoteHeads (xPos, notes) {
-	_.each(notes, note => {
+function alignNoteHeads (xPos, items) {
+	_.each(items, item => {
+		let note = isNote(item) ? item : item.children[0];
 		let offset = xPos - note.noteHead.bounds.center.x;
-		note.group.translate([offset, 0]);
+
+		item.group.translate([offset, 0]);
 	});
 }
 
