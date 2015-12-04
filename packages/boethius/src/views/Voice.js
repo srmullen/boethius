@@ -1,8 +1,9 @@
 import _ from "lodash";
+import F from "fraction.js";
 
 import constants from "../constants";
 import {isNote, isChord} from "../types";
-import {concat, partitionBy} from "../utils/common";
+import {concat, partitionBy, partitionWhen} from "../utils/common";
 import {beam} from "../engraver";
 import * as lineUtils from "../utils/line";
 import {calculateDuration, getMeasureNumber, getBeat, parseSignature} from "../utils/timeUtils";
@@ -18,7 +19,7 @@ function Voice ({value, stemDirection}, children=[]) {
         let previousItem = _.last(acc);
 
         if (previousItem) {
-            item.time = previousItem.time + (calculateDuration(previousItem) || 0);
+            item.time = F(previousItem.time).add(calculateDuration(previousItem)).valueOf();
         } else {
             item.time = 0;
         }
@@ -63,7 +64,10 @@ Voice.findBeaming = function findBeaming (timeSig, items) {
 								                                        // beat structure and add the notes to be beamed.
        for (let beats = timeSig.beatStructure[i]; beats > 0; beats--) {
            if (stemmedItems[beat]) {
-               let beatSubdivisions = partitionBy(stemmedItems[beat], item => item.needsFlag())
+               let breakNum = 0; // for causing splits between quater notes in the same beat (i.e. tuplets);
+               let beatSubdivisions = partitionBy(stemmedItems[beat], item => {
+                   return item.needsFlag() ? "flag" : breakNum++;
+               });
                _.each(beatSubdivisions, subdivision => groupings.push(subdivision));
            }
 
@@ -72,6 +76,45 @@ Voice.findBeaming = function findBeaming (timeSig, items) {
    }
 
    return groupings;
+}
+
+function needsNewTupletGrouping (tuplet) {
+
+};
+
+/*
+ * items must have time properties.
+ * @param timeSig - time signature in the current contet.
+ * @param items - array if items.
+ * @return - array of arrays of tuplets.
+ */
+Voice.groupTuplets = function groupTuplets (timeSig, items) {
+    if (!items.length) {
+        return [];
+    }
+
+    // get the beat type
+    const sig = parseSignature(timeSig);
+    const baseTime = items[0].time; // the time from which the groupings are reckoned.
+
+    // filter out items that don't have a tuplet after partitioning them.
+    let currentTuplet;
+
+    const groupings = [];
+    let previousTuplet = null;
+    for (let i = 0; i < items.length; i++) {
+        let item = items[i];
+        if (!item.tuplet) { // skip this item
+            previousTuplet = null;
+        } else if (item.tuplet !== previousTuplet || !_.last(groupings)) { // create a new tuplet grouping
+            groupings.push([item]);
+            previousTuplet = item.tuplet;
+        } else { // add the item to the previous grouping.
+            _.last(groupings).push(item);
+            // no need to update previousTuplet since it is the same
+        }
+    }
+    return groupings;
 }
 
 /*
@@ -106,7 +149,10 @@ Voice.prototype.renderDecorations = function (line, measures) {
     _.map(itemsByMeasure, (items, measure) => {
         let context = line.contextAt(measures, {measure: Number.parseInt(measure)});
         let centerLineValue = getCenterLineValue(context.clef);
+        // TODO: Should only iterate once for all grouping types. (beams, tuplets, etc.)
         let beamings = Voice.findBeaming(context.timeSig, items);
+        let tuplets = Voice.groupTuplets(context.timeSig, items);
+
         let beams = _.compact(beamings.map(noteGrouping => stemAndBeam(noteGrouping, centerLineValue, this.stemDirection)));
         if (beams && beams.length) {
             line.group.addChildren(beams);

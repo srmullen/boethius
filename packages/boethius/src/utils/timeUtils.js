@@ -3,11 +3,11 @@ import F from "fraction.js";
 import constants from "../constants";
 
 /*
- * @param timeSig - TimeSignaure or time signature value represented as a String. ex. TimeSig({value: "4/4"}) or "4/4", "h"
+ * @param signature - TimeSignaure or time signature value or tuplet represented as a String. ex. TimeSig({value: "4/4"}) or "4/4", "h"
  * @return Number[]
  */
-function parseSignature (timeSig) {
-	let sig = timeSig.type === constants.type.timeSig ? timeSig.value : timeSig;
+function parseSignature (signature) {
+	let sig = signature.type === constants.type.timeSig ? signature.value : signature;
 
 	if (sig === "c" || sig === "h") {
 		return [4, 4];
@@ -104,10 +104,20 @@ function getMeasureByTime (measures, time) {
 /*
  * @param timeSig {String}
  */
-var getTimeSigDuration = function (timeSig) {
+function getTimeSigDuration (timeSig) {
 	let [beats, value] = parseSignature(timeSig);
 	return beats * (1/value);
 };
+
+/*
+ * @param tuplet - String representing the tuplet (ex. "3/2")
+ * @param value - Number representing note value.
+ * @return - duration of the fully realized tuplet.
+ */
+function getTupletDuration (tuplet, value) {
+	const [,tupletDenominator] = parseSignature(tuplet);
+	return tupletDenominator * (1/value);
+}
 
 function getMeasureDuration (measure) {
 	return getTimeSigDuration(measure.timeSig);
@@ -204,6 +214,7 @@ export {
 	compareByPosition,
 	compareByTime,
 	getTimeSigDuration,
+	getTupletDuration,
 	getMeasureDuration,
 	getMeasureNumber,
 	splitByTime,

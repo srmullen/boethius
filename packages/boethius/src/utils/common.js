@@ -74,13 +74,29 @@ function partitionBy (coll, f) {
 
 	return _.reduce(coll, (acc, el) => {
 		let newValue = f(el);
-		if (previousValue === newValue) {
-			acc[acc.length-1].push(el);
-		} else {
+		if (previousValue !== newValue || !acc[acc.length-1]) {
 			let partition = [el];
 			acc.push(partition);
+		} else {
+			acc[acc.length-1].push(el);
 		}
 		previousValue = newValue;
+		return acc;
+	}, []);
+}
+
+/*
+ * partitions the coll everytime f returns truthy.
+ */
+function partitionWhen (coll, f) {
+	return _.reduce(coll, (acc, el) => {
+		let newValue = f(el);
+		if (f(el) || !acc[acc.length-1]) {
+			let partition = [el];
+			acc.push(partition);
+		} else {
+			acc[acc.length-1].push(el);
+		}
 		return acc;
 	}, []);
 }
@@ -165,6 +181,7 @@ export {
 	debugGroupEvents,
 	serialize,
 	partitionBy,
+	partitionWhen,
 	map,
 	juxt,
 	isMarking,

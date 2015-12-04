@@ -1,6 +1,6 @@
 import {expect} from "chai";
 
-import {concat, partitionBy, map, juxt, reductions, isEven, isOdd} from "../src/utils/common";
+import {concat, partitionBy, partitionWhen, map, juxt, reductions, isEven, isOdd} from "../src/utils/common";
 import Scored from "../src/Scored";
 
 describe("common", () => {
@@ -29,6 +29,14 @@ describe("common", () => {
                 [scored.note({value: 4}), scored.note({value: 4})],
                 [scored.note({value: 8}), scored.note({value: 16})]
             ]);
+        });
+    });
+
+    describe("partitionWhen", () => {
+        it("should partition the collection everytime the given function returns true", () => {
+            expect(partitionWhen([1, 2], isEven)).to.eql([[1], [2]]);
+            expect(partitionWhen([1, 2], isOdd)).to.eql([[1, 2]]);
+            expect(partitionWhen([1, 2, 3, 1, 2, 3, 4], x => x === 1)).to.eql([[1,2,3], [1,2,3,4]]);
         });
     });
 

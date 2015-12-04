@@ -91,8 +91,6 @@ Line.render = function (line, length, voices, numMeasures=1) {
 			chord: chords
 		} = _.groupBy(items, item => item.type);
 
-		console.log(time.time);
-
 		// update cursor if its a new measure.
 		if (time.measure !== previousMeasureNumber) {
 			let measure = measures[time.measure];

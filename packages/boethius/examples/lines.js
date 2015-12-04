@@ -21,7 +21,7 @@ function run () {
 	// testChords().translate(25, 50);
 	// testChordsTwoVoices().translate(25, 150);
 
-	testTuplets().translate(25, 50);
+	testTriplets().translate(25, 50);
 }
 
 function createMeasures () {
@@ -179,9 +179,8 @@ function renderingNotesOnLine () {
 									  scored.timeSig({value: "4/4", measure: 0}),
 									  scored.clef({value: "bass", measure: 1})
 								  ]);
-	var voice = scored.voice({}, [scored.note({pitch: "a4", value: 2}), scored.note({pitch: "b4", value: 2}),
+	var voice = scored.voice({}, [scored.note({pitch: "a4", value: 8}), scored.note({pitch: "c5", value: 4, dots: 1}), scored.note({pitch: "b4", value: 2}),
 								  scored.note({pitch: "c5", value: 2}), scored.note({pitch: "d4", value: 4}), scored.rest({value: 4})]);
-	// var composition = scored.compose(trebleLine, [voice]);
 
 	return scored.render(trebleLine, 400, [voice], 2);
 }
@@ -379,16 +378,19 @@ function testChordsTwoVoices () {
 	return scored.render(line, 1000, [voice1, voice2], 5);
 }
 
-function testTuplets () {
+function testTriplets () {
 	var line = scored.line({}, [scored.clef({value: "treble", measure: 0}),
 								scored.key({value: "C", measure: 0}),
 								scored.timeSig({value: "4/4", measure: 0})]);
 	var n = scored.note;
 
-	var measure1 = [n({value: 4, tuplet: "3/2"}), n({value: 4, tuplet: "3/2"}), n({value: 4, tuplet: "3/2"}),
+	var quarters = [n({value: 4, tuplet: "3/2"}), n({value: 4, tuplet: "3/2"}), n({value: 4, tuplet: "3/2"}),
 					n({value: 4, tuplet: "3/2"}), n({value: 4, tuplet: "3/2"}), n({value: 4, tuplet: "3/2"})];
 
-	var voice = scored.voice({}, measure1);
+	var eighths = [n({value: 8, tuplet: "3/2"}), n({value: 8, tuplet: "3/2"}), n({value: 8, tuplet: "3/2"}),
+					n({value: 8, tuplet: "3/2"}), n({value: 8, tuplet: "3/2"}), n({value: 8, tuplet: "3/2"})];
+
+	var voice = scored.voice({}, quarters.concat(eighths));
 
 	return scored.render(line, 100, [voice], 5);
 }
