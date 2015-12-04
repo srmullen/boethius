@@ -91,6 +91,8 @@ Line.render = function (line, length, voices, numMeasures=1) {
 			chord: chords
 		} = _.groupBy(items, item => item.type);
 
+		console.log(time.time);
+
 		// update cursor if its a new measure.
 		if (time.measure !== previousMeasureNumber) {
 			let measure = measures[time.measure];
@@ -138,7 +140,6 @@ Line.render = function (line, length, voices, numMeasures=1) {
 			_.each(pitchedItems, placeY);
 
 			const alignToNoteHead = isNote(widestItem) ? widestItem.noteHead : widestItem.children[0].noteHead;
-			console.log(alignToNoteHead.bounds.center.x);
 			placement.alignNoteHeads(alignToNoteHead.bounds.center.x, pitchedItems);
 
 			possibleNextPositions = possibleNextPositions.concat(_.map(pitchedItems, placement.calculateCursor));

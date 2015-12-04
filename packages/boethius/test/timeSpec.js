@@ -1,6 +1,7 @@
 import {expect} from "chai";
+import _ from "lodash";
 
-import {getBeat, getTime, getMeasureNumber, getMeasureByTime} from "../src/utils/timeUtils";
+import {getBeat, getTime, getMeasureNumber, getMeasureByTime, calculateDuration} from "../src/utils/timeUtils";
 import Measure from "../src/views/Measure";
 import Scored from "../src/Scored";
 
@@ -87,6 +88,43 @@ describe("timeUtils", () => {
             expect(getMeasureByTime(measures, 1)).to.equal(measures[1]);
             expect(getMeasureByTime(measures, 2.25)).to.equal(measures[2]);
             expect(getMeasureByTime(measures, 5)).not.to.be.ok;
+        });
+    });
+
+    describe("calculateDuration", () => {
+        let n = scored.note;
+        let r = scored.rest;
+        let c = scored.chord;
+
+        it("should handle tuplets", () => {
+            expect(_.sum(_.map([
+                n({value: 16, tuplet: "3/2"}), n({value: 16, tuplet: "3/2"}), n({value: 16, tuplet: "3/2"})
+            ], calculateDuration))).to.equal(0.125);
+            expect(_.sum(_.map([
+                n({value: 8, tuplet: "3/2"}), n({value: 8, tuplet: "3/2"}), n({value: 8, tuplet: "3/2"})
+            ], calculateDuration))).to.equal(0.25);
+            expect(_.sum(_.map([
+                n({value: 4, tuplet: "3/2"}), n({value: 4, tuplet: "3/2"}), n({value: 4, tuplet: "3/2"})
+            ], calculateDuration))).to.equal(0.5);
+            expect(_.sum(_.map([
+                n({value: 2, tuplet: "3/2"}), n({value: 2, tuplet: "3/2"}), n({value: 2, tuplet: "3/2"})
+            ], calculateDuration))).to.equal(1);
+            expect(_.sum(_.map([
+                n({value: 8, tuplet: "3/2", dots: 1}), n({value: 8, tuplet: "3/2", dots: 1})
+            ], calculateDuration))).to.equal(0.25);
+
+            expect(_.sum(_.map([
+                n({value: 16, tuplet: "5/4"}), n({value: 16, tuplet: "5/4"}), n({value: 16, tuplet: "5/4"}), n({value: 16, tuplet: "5/4"}), n({value: 16, tuplet: "5/4"})
+            ], calculateDuration))).to.equal(0.25);
+            expect(_.sum(_.map([
+                n({value: 8, tuplet: "5/4"}), n({value: 8, tuplet: "5/4"}), n({value: 8, tuplet: "5/4"}), n({value: 8, tuplet: "5/4"}), n({value: 8, tuplet: "5/4"})
+            ], calculateDuration))).to.equal(0.5);
+            expect(_.sum(_.map([
+                n({value: 4, tuplet: "5/4"}), n({value: 4, tuplet: "5/4"}), n({value: 4, tuplet: "5/4"}), n({value: 4, tuplet: "5/4"}), n({value: 4, tuplet: "5/4"})
+            ], calculateDuration))).to.equal(1);
+            expect(_.sum(_.map([
+                n({value: 2, tuplet: "5/4"}), n({value: 2, tuplet: "5/4"}), n({value: 2, tuplet: "5/4"}), n({value: 2, tuplet: "5/4"}), n({value: 2, tuplet: "5/4"})
+            ], calculateDuration))).to.equal(2);
         });
     });
 });

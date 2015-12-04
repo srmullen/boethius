@@ -160,24 +160,24 @@ function splitByTime (events) {
 }
 
 /*
- * Given and event, return the rational duration of the event;
+ * @param item - Scored item. Given an item, return the rational duration of the item;
  */
-function calculateDuration (ctx) {
+function calculateDuration (item) {
 
 	// If the event has no type it has no duration.
-	if (!ctx.type) return 0;
+	if (!item.type) return 0;
 
-	var s = ctx.tuplet ? ctx.tuplet.split("/") : null,
+	let s = item.tuplet ? item.tuplet.split("/") : null,
 		tuplet = s ? new F(s[0], s[1]) : null,
-		dur = new F(1, ctx.value),
-		dots = ctx.dots || 0;
+		dur = new F(1, item.value),
+		dots = item.dots || 0;
 
 	for (let i = 0; i < dots; i++) {
 		dur = dur.mul(1.5);
 	}
 
 	if (tuplet && dur) {
-		dur = dur.mul(tuplet);
+		dur = dur.mul(s[1]).div(s[0]);
 	}
 
 	return dur.valueOf();

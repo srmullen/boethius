@@ -19,7 +19,9 @@ function run () {
 	// testTimeSigs().translate(25, 450);
 
 	// testChords().translate(25, 50);
-	testChordsTwoVoices().translate(25, 150);
+	// testChordsTwoVoices().translate(25, 150);
+
+	testTuplets().translate(25, 50);
 }
 
 function createMeasures () {
@@ -375,4 +377,18 @@ function testChordsTwoVoices () {
 	var voice2 = scored.voice({stemDirection: "down"}, _.map(notes2, function (n) {return scored.note({value: n, pitch: "f#4"})}));
 
 	return scored.render(line, 1000, [voice1, voice2], 5);
+}
+
+function testTuplets () {
+	var line = scored.line({}, [scored.clef({value: "treble", measure: 0}),
+								scored.key({value: "C", measure: 0}),
+								scored.timeSig({value: "4/4", measure: 0})]);
+	var n = scored.note;
+
+	var measure1 = [n({value: 4, tuplet: "3/2"}), n({value: 4, tuplet: "3/2"}), n({value: 4, tuplet: "3/2"}),
+					n({value: 4, tuplet: "3/2"}), n({value: 4, tuplet: "3/2"}), n({value: 4, tuplet: "3/2"})];
+
+	var voice = scored.voice({}, measure1);
+
+	return scored.render(line, 100, [voice], 5);
 }
