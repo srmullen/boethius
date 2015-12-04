@@ -5,6 +5,7 @@ import * as placement from "./utils/placement";
 import * as lineUtils from "./utils/line";
 import * as noteUtils from "./utils/note";
 import * as chordUtils from "./utils/chord";
+import {parseSignature} from "./utils/timeUtils";
 import {map, doTimes, concat} from "./utils/common";
 import _ from "lodash";
 
@@ -545,6 +546,28 @@ function beam (items, {line="b4", fulcrum, vector, kneeGap=5.5, stemDirection}) 
 	});
 }
 
+function drawTuplets (items) {
+	// just draw it on top right now.
+	const tuplet = parseSignature(items[0].tuplet);
+	const distance = _.last(items).group.bounds.right - items[0].group.bounds.left;
+
+	let line = new paper.Path.Line({
+		from: items[0].group.bounds.leftCenter,
+		to: _.last(items).group.bounds.rightCenter,
+		strokeColor: "black"
+	});
+
+	let num = new paper.PointText({
+		content: tuplet[0],
+		fontFamily: 'gonville',
+		fontSize: Scored.config.fontSize,
+		fillColor: 'black',
+		position: line.segments[0].point.add(distance/2, 0)
+	});
+
+	return new paper.Group({children: [line, num]});
+}
+
 
 export default {
 	drawLegerLines,
@@ -561,5 +584,6 @@ export default {
 	drawFlag,
 	getFlagOffset,
 	drawRest,
-	beam
+	beam,
+	drawTuplets
 };

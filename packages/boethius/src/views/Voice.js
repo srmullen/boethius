@@ -4,7 +4,7 @@ import F from "fraction.js";
 import constants from "../constants";
 import {isNote, isChord} from "../types";
 import {concat, partitionBy, partitionWhen} from "../utils/common";
-import {beam} from "../engraver";
+import {beam, drawTuplets} from "../engraver";
 import * as lineUtils from "../utils/line";
 import {calculateDuration, getMeasureNumber, getBeat, parseSignature} from "../utils/timeUtils";
 import TimeSignature from "./TimeSignature";
@@ -88,14 +88,10 @@ function needsNewTupletGrouping (tuplet) {
  * @param items - array if items.
  * @return - array of arrays of tuplets.
  */
-Voice.groupTuplets = function groupTuplets (timeSig, items) {
+Voice.groupTuplets = function groupTuplets (items) {
     if (!items.length) {
         return [];
     }
-
-    // get the beat type
-    const sig = parseSignature(timeSig);
-    const baseTime = items[0].time; // the time from which the groupings are reckoned.
 
     // filter out items that don't have a tuplet after partitioning them.
     let currentTuplet;
@@ -151,11 +147,15 @@ Voice.prototype.renderDecorations = function (line, measures) {
         let centerLineValue = getCenterLineValue(context.clef);
         // TODO: Should only iterate once for all grouping types. (beams, tuplets, etc.)
         let beamings = Voice.findBeaming(context.timeSig, items);
-        let tuplets = Voice.groupTuplets(context.timeSig, items);
-
         let beams = _.compact(beamings.map(noteGrouping => stemAndBeam(noteGrouping, centerLineValue, this.stemDirection)));
         if (beams && beams.length) {
             line.group.addChildren(beams);
+        }
+
+        let tuplets = Voice.groupTuplets(items);
+        let tupletGroups = tuplets.map(drawTuplets);
+        if (tupletGroups && tupletGroups.length) {
+            line.group.addChildren(tupletGroups);
         }
     });
 }
