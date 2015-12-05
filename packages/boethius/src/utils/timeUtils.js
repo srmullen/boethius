@@ -114,7 +114,7 @@ function getTimeSigDuration (timeSig) {
  * @param value - Number representing note value.
  * @return - duration of the fully realized tuplet.
  */
-function getTupletDuration (tuplet, value) {
+function calculateTupletDuration (tuplet, value) {
 	const [,tupletDenominator] = parseSignature(tuplet);
 	return tupletDenominator * (1/value);
 }
@@ -214,7 +214,7 @@ export {
 	compareByPosition,
 	compareByTime,
 	getTimeSigDuration,
-	getTupletDuration,
+	calculateTupletDuration,
 	getMeasureDuration,
 	getMeasureNumber,
 	splitByTime,

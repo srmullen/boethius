@@ -548,7 +548,7 @@ function beam (items, {line="b4", fulcrum, vector, kneeGap=5.5, stemDirection}) 
 
 function drawTuplets (items) {
 	// just draw it on top right now.
-	const tuplet = parseSignature(items[0].tuplet);
+	const [numerator,] = parseSignature(items[0].tuplet);
 	const distance = _.last(items).group.bounds.right - items[0].group.bounds.left;
 
 	let line = new paper.Path.Line({
@@ -558,9 +558,9 @@ function drawTuplets (items) {
 	});
 
 	let num = new paper.PointText({
-		content: tuplet[0],
-		fontFamily: 'gonville',
-		fontSize: Scored.config.fontSize,
+		content: numerator,
+		fontFamily: 'gonvillealpha',
+		fontSize: Scored.config.fontSize/1.5,
 		fillColor: 'black',
 		position: line.segments[0].point.add(distance/2, 0)
 	});

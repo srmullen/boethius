@@ -6,7 +6,7 @@ import {isNote, isChord} from "../types";
 import {concat, partitionBy, partitionWhen} from "../utils/common";
 import {beam, drawTuplets} from "../engraver";
 import * as lineUtils from "../utils/line";
-import {calculateDuration, getMeasureNumber, getBeat, parseSignature} from "../utils/timeUtils";
+import {calculateDuration, getMeasureNumber, getBeat, parseSignature, calculateTupletDuration} from "../utils/timeUtils";
 import TimeSignature from "./TimeSignature";
 // import Note from "./Note";
 import Measure from "./Measure";
@@ -98,6 +98,8 @@ Voice.groupTuplets = function groupTuplets (items) {
 
     const groupings = [];
     let previousTuplet = null;
+    let tupletType = null;
+    let tupletDuration = 0;
     for (let i = 0; i < items.length; i++) {
         let item = items[i];
         if (!item.tuplet) { // skip this item
@@ -105,11 +107,21 @@ Voice.groupTuplets = function groupTuplets (items) {
         } else if (item.tuplet !== previousTuplet || !_.last(groupings)) { // create a new tuplet grouping
             groupings.push([item]);
             previousTuplet = item.tuplet;
+            tupletType = item.value;
         } else { // add the item to the previous grouping.
-            _.last(groupings).push(item);
+            let grouping = _.last(groupings);
+            let longestDuration = _.min(grouping, item => item.value).value;
+            let currentTupletDuration = _.sum(grouping.map(calculateDuration));
+            let maxTupletDuration = calculateTupletDuration(previousTuplet, longestDuration);
+            if (currentTupletDuration < maxTupletDuration) { // floating point error
+                grouping.push(item); // add the item to the last tuplet grouping.
+            } else {
+                groupings.push([item]); // create a new tuplet grouping.
+            }
             // no need to update previousTuplet since it is the same
         }
     }
+
     return groupings;
 }
 
@@ -146,12 +158,15 @@ Voice.prototype.renderDecorations = function (line, measures) {
         let context = line.contextAt(measures, {measure: Number.parseInt(measure)});
         let centerLineValue = getCenterLineValue(context.clef);
         // TODO: Should only iterate once for all grouping types. (beams, tuplets, etc.)
+
+        // beams
         let beamings = Voice.findBeaming(context.timeSig, items);
         let beams = _.compact(beamings.map(noteGrouping => stemAndBeam(noteGrouping, centerLineValue, this.stemDirection)));
         if (beams && beams.length) {
             line.group.addChildren(beams);
         }
 
+        // tuplets
         let tuplets = Voice.groupTuplets(items);
         let tupletGroups = tuplets.map(drawTuplets);
         if (tupletGroups && tupletGroups.length) {

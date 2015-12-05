@@ -1,7 +1,7 @@
 import {expect} from "chai";
 import _ from "lodash";
 
-import {getBeat, getTime, getMeasureNumber, getMeasureByTime, calculateDuration, getTupletDuration} from "../src/utils/timeUtils";
+import {getBeat, getTime, getMeasureNumber, getMeasureByTime, calculateDuration, calculateTupletDuration} from "../src/utils/timeUtils";
 import Measure from "../src/views/Measure";
 import Scored from "../src/Scored";
 
@@ -128,11 +128,11 @@ describe("timeUtils", () => {
         });
     });
 
-    describe("getTupletDuration", () => {
+    describe("calculateTupletDuration", () => {
         it("should return the length of a tuplet of given value", () => {
-            expect(getTupletDuration("3/2", 4)).to.equal(0.5);
-            expect(getTupletDuration("3/2", 8)).to.equal(0.25);
-            expect(getTupletDuration("5/4", 16)).to.equal(0.25);
+            expect(calculateTupletDuration("3/2", 4)).to.equal(0.5);
+            expect(calculateTupletDuration("3/2", 8)).to.equal(0.25);
+            expect(calculateTupletDuration("5/4", 16)).to.equal(0.25);
         });
     });
 });

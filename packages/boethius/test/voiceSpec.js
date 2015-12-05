@@ -70,7 +70,7 @@ describe("Voice", () => {
 
             expect(groupTuplets([
                 eighthTriplet, eighthTriplet, eighthTriplet, sixteenthTriplet, sixteenthTriplet, eighthTriplet, eighthTriplet
-            ])).to.eql([[eighthTriplet, eighthTriplet, eighthTriplet, sixteenthTriplet, sixteenthTriplet, eighthTriplet, eighthTriplet]]);
+            ])).to.eql([[eighthTriplet, eighthTriplet, eighthTriplet], [sixteenthTriplet, sixteenthTriplet, eighthTriplet, eighthTriplet]]);
 
             expect(groupTuplets([
                 sixteenthQuintuplet, sixteenthQuintuplet, sixteenthQuintuplet, sixteenthQuintuplet, sixteenthQuintuplet,
