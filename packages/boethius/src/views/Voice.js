@@ -78,10 +78,6 @@ Voice.findBeaming = function findBeaming (timeSig, items) {
    return groupings;
 }
 
-function needsNewTupletGrouping (tuplet) {
-
-};
-
 /*
  * items must have time properties.
  * @param timeSig - time signature in the current contet.
