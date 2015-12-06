@@ -6,6 +6,7 @@ import {isNote, isChord} from "../types";
 import {concat, partitionBy, partitionWhen} from "../utils/common";
 import {beam, drawTuplets} from "../engraver";
 import * as lineUtils from "../utils/line";
+import {getAverageStemDirection} from "../utils/note";
 import {calculateDuration, getMeasureNumber, getBeat, parseSignature, calculateTupletDuration, sumDurations} from "../utils/timeUtils";
 import TimeSignature from "./TimeSignature";
 // import Note from "./Note";
@@ -42,7 +43,7 @@ Voice.prototype.renderChildren = function () {
  * Notes must have time properties for this function to work.
  * Should this function just calculate their times from the first note instead?
  * @param timeSig - TimeSignature
- * @param items - <Note, Chord>[]
+ * @param items - <Note, Chord>[][]
  * @return - array of note groupings.
  */
 Voice.findBeaming = function findBeaming (timeSig, items) {
@@ -55,7 +56,7 @@ Voice.findBeaming = function findBeaming (timeSig, items) {
    const baseTime = items[0].time; // the time from which the groupings are reckoned.
 
    // remove notes that don't need beaming or flags (i.e. quarter notes and greater)
-   let stemmedItems = _.groupBy(_.filter(items, item => (isNote(item) || isChord(item)) && item.needsStem()), item => {
+   let stemmedItems = _.groupBy(_.filter(items, item => (isNote(item) || isChord(item))), item => {
        return Math.floor(getBeat(item.time, sig, baseTime));
    });
 
@@ -124,14 +125,25 @@ Voice.groupTuplets = function groupTuplets (items) {
 /*
  * @param notes <Note, Chord>[]
  * @param centerLineValue - String representing note value.
- * @param stemDirection - optional String specifying the direction of all note stems.
+ * @param stemDirections - optional String specifying the direction of all note stems.
  */
-function stemAndBeam (items, centerLineValue, stemDirection) {
+function stemAndBeam (items, centerLineValue, stemDirections) {
 	if (items.length === 1) {
-		items[0].renderStem(centerLineValue, stemDirection);
+		items[0].renderStem(centerLineValue, stemDirections[0]);
 	} else {
-		return beam(items, {line: centerLineValue, stemDirection});
+		return beam(items, {line: centerLineValue, stemDirections});
 	}
+}
+
+/*
+ * @param Item[][] - beamings
+ * @param centerLineValue - String
+ * @return String[] - stem direction of every note.
+ */
+function getAllStemDirections (beamings, centerLineValue) {
+    return _.reduce(beamings, (acc, beaming) => {
+        return acc.concat(getAverageStemDirection(beaming, centerLineValue));
+    }, []);
 }
 
 /*
@@ -157,7 +169,17 @@ Voice.prototype.renderDecorations = function (line, measures) {
 
         // beams
         let beamings = Voice.findBeaming(context.timeSig, items);
-        let beams = _.compact(beamings.map(noteGrouping => stemAndBeam(noteGrouping, centerLineValue, this.stemDirection)));
+
+        // get all the stemDirections
+        let stemDirections = this.stemDirection ? _.fill(new Array(items.length), stemDirection) : getAllStemDirections(beamings, centerLineValue);
+
+        let itemIdx = 0;
+        let beams = _.compact(beamings.map(noteGrouping => {
+            let directions = _.slice(stemDirections, itemIdx, itemIdx + noteGrouping.length);
+            itemIdx += noteGrouping.length;
+            return stemAndBeam(noteGrouping, centerLineValue, directions);
+        }));
+
         if (beams && beams.length) {
             line.group.addChildren(beams);
         }

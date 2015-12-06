@@ -439,13 +439,11 @@ const durationToBeams = {
  * @param vector - the vector of the bar
  * @param line - String value of center line
  */
-function beam (items, {line="b4", fulcrum, vector, kneeGap=5.5, stemDirection}) {
+function beam (items, {line="b4", fulcrum, vector, kneeGap=5.5, stemDirections}) {
 
 	let numBeams = durationToBeams[_.max(_.map(items, item => item.value))];
-	let stemDirections = stemDirection ? _.fill(new Array(items.length), stemDirection) : noteUtils.getAverageStemDirection(items, line);
 
 	let durations = items.map(item => item.value),
-		// stemLengths = map(_.partialRight(getStemLength, line), items, stemDirections),
 		stemLengths = map((item, stemDirection) => {
 			if (isNote(item)) {
 				return noteUtils.getStemLength(item, line);

@@ -8,9 +8,9 @@ function run () {
 	// interaction();
 
 	// simpleLine().translate(25, 50);
-	// renderingNotesOnLine().translate(25, 50);
-	// oneVoice().translate(25, 150);
-	// twoVoices().translate(25, 250);
+	renderingNotesOnLine().translate(25, 50);
+	oneVoice().translate(25, 150);
+	twoVoices().translate(25, 250);
 
 	// eighthBeamings().translate(25, 50);
 	// sixteenthBeamings().translate(25, 150);
@@ -21,7 +21,7 @@ function run () {
 	// testChords().translate(25, 50);
 	// testChordsTwoVoices().translate(25, 150);
 
-	testTriplets().translate(25, 50);
+	testTriplets().translate(25, 350);
 }
 
 function createMeasures () {
@@ -239,6 +239,7 @@ function twoVoices () {
 
 function eighthBeamings () {
 	var line = scored.line({}, [scored.clef({value: "treble", measure: 0}),
+								scored.key({measure: 0}),
 								scored.timeSig({value: "4/4", measure: 0})
 							]);
 
@@ -260,6 +261,7 @@ function eighthBeamings () {
 
 function sixteenthBeamings () {
 	var line = scored.line({}, [scored.clef({value: "treble", measure: 0}),
+								scored.key({measure: 0}),
 								scored.timeSig({value: "4/4", measure: 0})
 							]);
 
