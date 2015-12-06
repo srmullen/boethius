@@ -171,6 +171,7 @@ function splitByTime (events) {
 
 /*
  * @param item - Scored item. Given an item, return the rational duration of the item;
+ * @return Number
  */
 function calculateDuration (item) {
 
@@ -190,7 +191,7 @@ function calculateDuration (item) {
 		dur = dur.mul(s[1]).div(s[0]);
 	}
 
-	return dur.valueOf();
+	return dur;
 }
 
 function sortByKey (obj) {
@@ -203,6 +204,16 @@ function sortByKey (obj) {
 	return _.map(sortedTimes, function (time) {
 		return obj[time];
 	});
+}
+
+/*
+ * @param items - Array of items that have a duration.
+ * @return Number
+ */
+function sumDurations (items) {
+	return _.reduce(items, (sum, item) => {
+		return sum.add(calculateDuration(item));
+	}, F(0)).valueOf();
 }
 
 export {
@@ -220,5 +231,6 @@ export {
 	splitByTime,
 	splitByMeasure,
 	calculateDuration,
-	parseSignature
+	parseSignature,
+	sumDurations
 }

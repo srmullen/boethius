@@ -6,7 +6,7 @@ import {isNote, isChord} from "../types";
 import {concat, partitionBy, partitionWhen} from "../utils/common";
 import {beam, drawTuplets} from "../engraver";
 import * as lineUtils from "../utils/line";
-import {calculateDuration, getMeasureNumber, getBeat, parseSignature, calculateTupletDuration} from "../utils/timeUtils";
+import {calculateDuration, getMeasureNumber, getBeat, parseSignature, calculateTupletDuration, sumDurations} from "../utils/timeUtils";
 import TimeSignature from "./TimeSignature";
 // import Note from "./Note";
 import Measure from "./Measure";
@@ -107,7 +107,7 @@ Voice.groupTuplets = function groupTuplets (items) {
         } else { // add the item to the previous grouping.
             let grouping = _.last(groupings);
             let longestDuration = _.min(grouping, item => item.value).value;
-            let currentTupletDuration = _.sum(grouping.map(calculateDuration));
+            let currentTupletDuration = sumDurations(grouping);
             let maxTupletDuration = calculateTupletDuration(previousTuplet, longestDuration);
             if (currentTupletDuration < maxTupletDuration) { // floating point error
                 grouping.push(item); // add the item to the last tuplet grouping.
