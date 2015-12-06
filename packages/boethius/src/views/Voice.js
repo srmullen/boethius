@@ -3,7 +3,7 @@ import F from "fraction.js";
 
 import constants from "../constants";
 import {isNote, isChord} from "../types";
-import {concat, partitionBy, partitionWhen} from "../utils/common";
+import {concat, partitionBy, partitionWhen, mapDeep} from "../utils/common";
 import {beam, drawTuplets} from "../engraver";
 import * as lineUtils from "../utils/line";
 import {getAverageStemDirection} from "../utils/note";
@@ -123,11 +123,11 @@ Voice.groupTuplets = function groupTuplets (items) {
 }
 
 /*
- * @param notes <Note, Chord>[]
  * @param centerLineValue - String representing note value.
+ * @param notes <Note, Chord>[]
  * @param stemDirections - optional String specifying the direction of all note stems.
  */
-function stemAndBeam (items, centerLineValue, stemDirections) {
+function stemAndBeam (centerLineValue, items, stemDirections) {
 	if (items.length === 1) {
 		items[0].renderStem(centerLineValue, stemDirections[0]);
 	} else {
@@ -174,11 +174,8 @@ Voice.prototype.renderDecorations = function (line, measures) {
         let stemDirections = this.stemDirection ? _.fill(new Array(items.length), stemDirection) : getAllStemDirections(beamings, centerLineValue);
 
         let itemIdx = 0;
-        let beams = _.compact(beamings.map(noteGrouping => {
-            let directions = _.slice(stemDirections, itemIdx, itemIdx + noteGrouping.length);
-            itemIdx += noteGrouping.length;
-            return stemAndBeam(noteGrouping, centerLineValue, directions);
-        }));
+        
+        let beams = _.compact(mapDeep(_.partial(stemAndBeam, centerLineValue), beamings, stemDirections));
 
         if (beams && beams.length) {
             line.group.addChildren(beams);

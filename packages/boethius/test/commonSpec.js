@@ -1,6 +1,6 @@
 import {expect} from "chai";
 
-import {concat, partitionBy, partitionWhen, map, juxt, reductions, isEven, isOdd} from "../src/utils/common";
+import {concat, partitionBy, partitionWhen, map, mapDeep, juxt, reductions, isEven, isOdd} from "../src/utils/common";
 import Scored from "../src/Scored";
 
 describe("common", () => {
@@ -59,6 +59,12 @@ describe("common", () => {
         it("should return a collection only as long as the shortest input collection", () => {
             expect(map((x, y) => x + y, [1,2], [3,4,5])).to.eql([4,6]);
             expect(map((x, y) => x + y, [3,4,5], [1,2])).to.eql([4,6]);
+        });
+    });
+
+    describe("mapDeep", () => {
+        it("map fn across deepColl and and exraction of deepColl.length from flat coll", () => {
+            expect(mapDeep((w, x) => map((y, z) => y + z, w, x), [[1,2,3], [4,5], [6,7,8]], [1,2,3,4,5,6,7,8])).to.eql([[2,4,6],[8,10],[12,14,16]]);
         });
     });
 

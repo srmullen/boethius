@@ -130,6 +130,20 @@ function map (fn, ...colls) {
 }
 
 /*
+ * @param (coll1, coll2) => value - Function of any number of arguments to map across the colls until one of the is exhausted.
+ * @param deepColl - nested collection.
+ * @param flatColl - flat coll is grouped into lenths of each element of the nested collection.
+ */
+function mapDeep (fn, deepColl, flatColl) {
+	let itemIdx = 0;
+	return _.map(deepColl, arr => {
+		let section = _.slice(flatColl, itemIdx, itemIdx + arr.length);
+		itemIdx += arr.length;
+		return fn(arr, section);
+	});
+}
+
+/*
  * Takes a variable number of functions. Returns a function that is the juxtposition of those functions.
  * ex. juxt(a, b, c)(x) = [a(x), b(x), c(x)]
  */
@@ -183,6 +197,7 @@ export {
 	partitionBy,
 	partitionWhen,
 	map,
+	mapDeep,
 	juxt,
 	isMarking,
 	reductions,
