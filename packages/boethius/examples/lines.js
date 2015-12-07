@@ -8,9 +8,9 @@ function run () {
 	// interaction();
 
 	// simpleLine().translate(25, 50);
-	renderingNotesOnLine().translate(25, 50);
-	oneVoice().translate(25, 150);
-	twoVoices().translate(25, 250);
+	// renderingNotesOnLine().translate(25, 50);
+	// oneVoice().translate(25, 150);
+	// twoVoices().translate(25, 250);
 
 	// eighthBeamings().translate(25, 50);
 	// sixteenthBeamings().translate(25, 150);
@@ -21,6 +21,7 @@ function run () {
 	// testChords().translate(25, 50);
 	// testChordsTwoVoices().translate(25, 150);
 
+	testTripletsTwoVoices().translate(25, 150);
 	testTriplets().translate(25, 350);
 }
 
@@ -387,7 +388,7 @@ function testTriplets () {
 	var n = scored.note;
 
 	var quartersAndEights = [
-		n({value: 4, tuplet: "3/2"}), n({value: 4, tuplet: "3/2"}), n({value: 4, tuplet: "3/2"}),
+		n({pitch: "g4", value: 4, tuplet: "3/2"}), n({value: 4, tuplet: "3/2"}), n({value: 4, tuplet: "3/2"}),
 		n({value: 8, tuplet: "3/2"}), n({value: 8, tuplet: "3/2"}), n({value: 4, tuplet: "3/2"}), n({value: 4, tuplet: "3/2"}),
 		n({value: 4, tuplet: "3/2"}), n({value: 8, tuplet: "3/2"}), n({value: 8, tuplet: "3/2"}), n({value: 4, tuplet: "3/2"}),
 		n({value: 4, tuplet: "3/2"}), n({value: 4, tuplet: "3/2"}), n({value: 8, tuplet: "3/2"}), n({value: 8, tuplet: "3/2"})
@@ -408,4 +409,36 @@ function testTriplets () {
 	var voice = scored.voice({}, [].concat(quartersAndEights));
 
 	return scored.render(line, 1000, [voice], 5);
+}
+
+function testTripletsTwoVoices () {
+	var line = scored.line({}, [scored.clef({value: "treble", measure: 0}),
+								scored.key({value: "C", measure: 0}),
+								scored.timeSig({value: "4/4", measure: 0})]);
+	var n = scored.note;
+
+	var template = {pitch: "c5", value: 4, tuplet: "3/2"};
+	var quartersAndEights = [
+		n(template), n(template), n(template),
+		n(template), n(template), n(template), n(template),
+		n(template), n(template), n(template), n(template),
+		n(template), n(template), n(template), n(template),
+	];
+
+	var eighthsAndSixteenths = [
+		n({value: 8, tuplet: "3/2"}), n({value: 8, tuplet: "3/2"}), n({value: 8, tuplet: "3/2"}),
+		n({value: 16, tuplet: "3/2"}), n({value: 16, tuplet: "3/2"}), n({value: 8, tuplet: "3/2"}), n({value: 8, tuplet: "3/2"}),
+		n({value: 8, tuplet: "3/2"}), n({value: 16, tuplet: "3/2"}), n({value: 16, tuplet: "3/2"}), n({value: 8, tuplet: "3/2"}),
+		n({value: 8, tuplet: "3/2"}), n({value: 8, tuplet: "3/2"}), n({value: 16, tuplet: "3/2"}), n({value: 16, tuplet: "3/2"}),
+
+		n({value: 16, tuplet: "3/2"}), n({value: 16, tuplet: "3/2"}), n({value: 16, tuplet: "3/2"}), n({value: 16, tuplet: "3/2"}), n({value: 8, tuplet: "3/2"}),
+		n({value: 16, tuplet: "3/2"}), n({value: 16, tuplet: "3/2"}), n({value: 8, tuplet: "3/2"}), n({value: 16, tuplet: "3/2"}), n({value: 16, tuplet: "3/2"}),
+		n({value: 8, tuplet: "3/2"}), n({value: 16, tuplet: "3/2"}), n({value: 16, tuplet: "3/2"}), n({value: 8, tuplet: "3/2"}),
+		n({value: 16, tuplet: "3/2"}), n({value: 16, tuplet: "3/2"}), n({value: 16, tuplet: "3/2"}), n({value: 16, tuplet: "3/2"}), n({value: 16, tuplet: "3/2"}), n({value: 16, tuplet: "3/2"})
+	];
+
+	var voice1 = scored.voice({stemDirection: "up"}, [].concat(quartersAndEights));
+	var voice2 = scored.voice({stemDirection: "down"}, [].concat(eighthsAndSixteenths));
+
+	return scored.render(line, 1000, [voice1, voice2], 5);
 }

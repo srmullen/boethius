@@ -173,8 +173,6 @@ Voice.prototype.renderDecorations = function (line, measures) {
         // get all the stemDirections
         let stemDirections = this.stemDirection ? _.fill(new Array(items.length), stemDirection) : getAllStemDirections(beamings, centerLineValue);
 
-        let itemIdx = 0;
-        
         let beams = _.compact(mapDeep(_.partial(stemAndBeam, centerLineValue), beamings, stemDirections));
 
         if (beams && beams.length) {
@@ -183,7 +181,7 @@ Voice.prototype.renderDecorations = function (line, measures) {
 
         // tuplets
         let tuplets = Voice.groupTuplets(items);
-        let tupletGroups = tuplets.map(drawTuplets);
+        let tupletGroups = tuplets.map(tuplet => drawTuplets(tuplet, b, this.stemDirection));
         if (tupletGroups && tupletGroups.length) {
             line.group.addChildren(tupletGroups);
         }
