@@ -557,34 +557,24 @@ function getStemPoint (item) {
  * @param voiceDirection - String direction of the voices stems. optional.
  */
 function drawTuplets (items, centerLine, voiceDirection) {
-	// just draw it on top right now.
 	const [numerator,] = parseSignature(items[0].tuplet);
-	const distance = _.last(items).group.bounds.right - items[0].group.bounds.left;
-	let frm, to;
-	if (voiceDirection === "up") {
-		// get highest stem point
-		let highestPoint = _.min(_.map(items, getStemPoint), point => point.y);
-		let yPos = highestPoint.y - Scored.config.note.head.height;
-		frm = [items[0].group.bounds.left, yPos];
-		to = [_.last(items).group.bounds.right, yPos];
-	} else if (voiceDirection === "down") {
-		let lowestPoint = _.min(_.map(items, getStemPoint), point => point.y);
-		let yPos = lowestPoint.y + Scored.config.note.head.height;
-		frm = [items[0].group.bounds.left, yPos];
-		to = [_.last(items).group.bounds.right, yPos];
-	} else {
-		// get the part of the tuplet that furthest from the center line. draw the tuplet on that side.
-		let distances = _.map(items, item => {
-			let stemPoint = item.group.children["stem"].segments[1].point;
-			return centerLine.y - stemPoint.y;
-		});
+	const stemPoints = _.map(items, getStemPoint);
+	const fromX = stemPoints[0].x - Scored.config.note.head.width/2;
+	const toX = _.last(stemPoints).x + Scored.config.note.head.width/2;
+	const distance = toX - fromX;
+	const direction = voiceDirection || (_.sum(_.map(stemPoints, point => point.y - centerLine.y)) >= 0 ? "down" : "up");
+	let yPos;
+	if (direction === "up") {
+		let highestPoint = _.min(stemPoints, point => point.y);
+		yPos = highestPoint.y - Scored.config.note.head.height;
+	} else if (direction === "down") {
+		let lowestPoint = _.max(stemPoints, point => point.y);
+		yPos = lowestPoint.y + Scored.config.note.head.height;
 	}
 
 	let line = new paper.Path.Line({
-		// from: items[0].group.bounds.leftCenter,
-		// to: _.last(items).group.bounds.rightCenter,
-		from: frm,
-		to: to,
+		from: [fromX, yPos],
+		to: [toX, yPos],
 		strokeColor: "black"
 	});
 

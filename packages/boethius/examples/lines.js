@@ -21,8 +21,8 @@ function run () {
 	// testChords().translate(25, 50);
 	// testChordsTwoVoices().translate(25, 150);
 
-	testTripletsTwoVoices().translate(25, 150);
-	testTriplets().translate(25, 350);
+	testTriplets().translate(25, 100);
+	testTripletsTwoVoices().translate(25, 200);
 }
 
 function createMeasures () {
@@ -387,15 +387,17 @@ function testTriplets () {
 								scored.timeSig({value: "4/4", measure: 0})]);
 	var n = scored.note;
 
+	var a3eigth = {pitch: "a3", value: 8, tuplet: "3/2"};
 	var quartersAndEights = [
-		n({pitch: "g4", value: 4, tuplet: "3/2"}), n({value: 4, tuplet: "3/2"}), n({value: 4, tuplet: "3/2"}),
+		n({pitch: "g4", value: 4, tuplet: "3/2"}), n({pitch: "a4", value: 4, tuplet: "3/2"}), n({pitch: "b4", value: 4, tuplet: "3/2"}),
 		n({value: 8, tuplet: "3/2"}), n({value: 8, tuplet: "3/2"}), n({value: 4, tuplet: "3/2"}), n({value: 4, tuplet: "3/2"}),
-		n({value: 4, tuplet: "3/2"}), n({value: 8, tuplet: "3/2"}), n({value: 8, tuplet: "3/2"}), n({value: 4, tuplet: "3/2"}),
+
+		n({pitch: "c5", value: 4, tuplet: "3/2"}), n({pitch: "c5", value: 8, tuplet: "3/2"}), n({pitch: "c5", value: 8, tuplet: "3/2"}), n({pitch: "c5", value: 4, tuplet: "3/2"}),
 		n({value: 4, tuplet: "3/2"}), n({value: 4, tuplet: "3/2"}), n({value: 8, tuplet: "3/2"}), n({value: 8, tuplet: "3/2"})
 	];
 
 	var eighthsAndSixteenths = [
-		n({value: 8, tuplet: "3/2"}), n({value: 8, tuplet: "3/2"}), n({value: 8, tuplet: "3/2"}),
+		n(a3eigth), n(a3eigth), n(a3eigth),
 		n({value: 16, tuplet: "3/2"}), n({value: 16, tuplet: "3/2"}), n({value: 8, tuplet: "3/2"}), n({value: 8, tuplet: "3/2"}),
 		n({value: 8, tuplet: "3/2"}), n({value: 16, tuplet: "3/2"}), n({value: 16, tuplet: "3/2"}), n({value: 8, tuplet: "3/2"}),
 		n({value: 8, tuplet: "3/2"}), n({value: 8, tuplet: "3/2"}), n({value: 16, tuplet: "3/2"}), n({value: 16, tuplet: "3/2"}),
@@ -417,28 +419,31 @@ function testTripletsTwoVoices () {
 								scored.timeSig({value: "4/4", measure: 0})]);
 	var n = scored.note;
 
-	var template = {pitch: "c5", value: 4, tuplet: "3/2"};
-	var quartersAndEights = [
-		n(template), n(template), n(template),
-		n(template), n(template), n(template), n(template),
-		n(template), n(template), n(template), n(template),
-		n(template), n(template), n(template), n(template),
+	var c5 = {pitch: "c5", value: 4, tuplet: "3/2"};
+	var c4 = {pitch: "c4", value: 4, tuplet: "3/2"};
+	var c6 = {pitch: "c6", value: 4, tuplet: "3/2"};
+	var quarters = [
+		n(c5), n(c5),
+		n(c5), n(c5), n(c5), n(c5),
+		n(c4), n(c4), n(c4), n(c4), n(c4), n(c4),
+		n(c6), n(c6), n(c6),
 	];
 
-	var eighthsAndSixteenths = [
-		n({value: 8, tuplet: "3/2"}), n({value: 8, tuplet: "3/2"}), n({value: 8, tuplet: "3/2"}),
-		n({value: 16, tuplet: "3/2"}), n({value: 16, tuplet: "3/2"}), n({value: 8, tuplet: "3/2"}), n({value: 8, tuplet: "3/2"}),
-		n({value: 8, tuplet: "3/2"}), n({value: 16, tuplet: "3/2"}), n({value: 16, tuplet: "3/2"}), n({value: 8, tuplet: "3/2"}),
-		n({value: 8, tuplet: "3/2"}), n({value: 8, tuplet: "3/2"}), n({value: 16, tuplet: "3/2"}), n({value: 16, tuplet: "3/2"}),
+	var a4 = {pitch: "a4", value: 8, tuplet: "3/2"};
+	var a3 = {pitch: "a3", value: 8, tuplet: "3/2"};
+	var eighths = [
+		n(a4), n(a4), n(a4), n(a4), n(a4), n(a4), n(a4), n(a4), n(a4), n(a4), n(a4), n(a4),
 
-		n({value: 16, tuplet: "3/2"}), n({value: 16, tuplet: "3/2"}), n({value: 16, tuplet: "3/2"}), n({value: 16, tuplet: "3/2"}), n({value: 8, tuplet: "3/2"}),
-		n({value: 16, tuplet: "3/2"}), n({value: 16, tuplet: "3/2"}), n({value: 8, tuplet: "3/2"}), n({value: 16, tuplet: "3/2"}), n({value: 16, tuplet: "3/2"}),
-		n({value: 8, tuplet: "3/2"}), n({value: 16, tuplet: "3/2"}), n({value: 16, tuplet: "3/2"}), n({value: 8, tuplet: "3/2"}),
-		n({value: 16, tuplet: "3/2"}), n({value: 16, tuplet: "3/2"}), n({value: 16, tuplet: "3/2"}), n({value: 16, tuplet: "3/2"}), n({value: 16, tuplet: "3/2"}), n({value: 16, tuplet: "3/2"})
+		n(a3), n(a3), n(a3), n(a3), n(a3), n(a3), n(a3), n(a3), n(a3), n(a3), n(a3), n(a3),
+
+		// n({value: 16, tuplet: "3/2"}), n({value: 16, tuplet: "3/2"}), n({value: 16, tuplet: "3/2"}), n({value: 16, tuplet: "3/2"}), n({value: 8, tuplet: "3/2"}),
+		// n({value: 16, tuplet: "3/2"}), n({value: 16, tuplet: "3/2"}), n({value: 8, tuplet: "3/2"}), n({value: 16, tuplet: "3/2"}), n({value: 16, tuplet: "3/2"}),
+		// n({value: 8, tuplet: "3/2"}), n({value: 16, tuplet: "3/2"}), n({value: 16, tuplet: "3/2"}), n({value: 8, tuplet: "3/2"}),
+		// n({value: 16, tuplet: "3/2"}), n({value: 16, tuplet: "3/2"}), n({value: 16, tuplet: "3/2"}), n({value: 16, tuplet: "3/2"}), n({value: 16, tuplet: "3/2"}), n({value: 16, tuplet: "3/2"})
 	];
 
-	var voice1 = scored.voice({stemDirection: "up"}, [].concat(quartersAndEights));
-	var voice2 = scored.voice({stemDirection: "down"}, [].concat(eighthsAndSixteenths));
+	var voice1 = scored.voice({stemDirection: "up"}, [].concat(quarters));
+	var voice2 = scored.voice({stemDirection: "down"}, [].concat(eighths));
 
 	return scored.render(line, 1000, [voice1, voice2], 5);
 }
