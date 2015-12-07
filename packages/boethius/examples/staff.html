@@ -5,7 +5,7 @@
 <!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
 <head>
     <meta charset="UTF-8">
-    <title>Parnassus</title>
+    <title>Staff</title>
     <link rel="stylesheet" href="../styles/index.css">
     <script src="../node_modules/jquery/dist/jquery.min.js"></script>
 </head>
@@ -15,6 +15,7 @@
     </div>
     <div class="music"></div>
 
+    <!-- <script type="text/javascript" src="../bower_components/teoria/teoria.js"></script> -->
     <script type="text/javascript" src="../node_modules/palestrina.js/dist/palestrina.js"></script>
     <script type="text/javascript" src="../bower_components/paper/dist/paper-core.js"></script>
     <script type="text/javascript" src="../src/vendor/FontLoader.js"></script>
@@ -22,43 +23,9 @@
 
     <!-- Scored -->
     <script type="text/javascript" src="../dist/boethius.js"></script>
-    <script type="text/javascript" src="./parnassus.js"></script>
-    
-    <script type="text/javascript">
-    var scored;
+    <script type="text/javascript" src="./staff.js"></script>
 
-    function start (cb) {
-        var fontLoader = new FontLoader(['gonville', "gonvillealpha"], {
-            fontsLoaded: cb
-        });
-        fontLoader.loadFonts();
-    }
-
-    function drawCircle (point, radius, color) {
-        radius = radius || 10;
-        var circ = new paper.Path.Circle(point, radius);
-        circ.fillColor = color || "red";
-        return circ;
-    }
-
-    /*
-     * @param $el {jQuery} - element to append the canvas to.
-     */
-    function createCanvas ($el) {
-        $el.append('<canvas class="scored-canvas parnassus"><canvas>');
-
-        return $(".scored-canvas");
-    }
-
-    start(function () {
-        var $canvas = createCanvas($(".music"));
-        scored = new Scored();
-        scored.setup($canvas[0]);
-        run();
-        paper.view.update();
-    });
-
-    </script>
+    <script type="text/javascript" src="./loader.js"></script>
 
 </body>
 </html>

@@ -25,42 +25,7 @@
     <script type="text/javascript" src="../dist/boethius.js"></script>
     <script type="text/javascript" src="./chords.js"></script>
 
-    <script type="text/javascript">
-    var Note = Scored.Note,
-        scored;
-
-    function start (cb) {
-        var fontLoader = new FontLoader(['gonville', "gonvillealpha"], {
-            fontsLoaded: cb
-        });
-        fontLoader.loadFonts();
-    }
-
-    function drawCircle (point, radius, color) {
-        radius = radius || 10;
-        var circ = new paper.Path.Circle(point, radius);
-        circ.fillColor = color || "red";
-        return circ;
-    }
-
-    /*
-     * @param $el {jQuery} - element to append the canvas to.
-     */
-    function createCanvas ($el) {
-        $el.append('<canvas class="scored-canvas parnassus"><canvas>');
-
-        return $(".scored-canvas");
-    }
-
-    start(function () {
-        var $canvas = createCanvas($(".music"));
-        scored = new Scored();
-        scored.setup($canvas[0]);
-        run();
-        paper.view.update();
-    });
-
-    </script>
+    <script type="text/javascript" src="./loader.js"></script>
 
 </body>
 </html>
