@@ -68,7 +68,7 @@ Scored.prototype.render = function (composition, ...args) {
 			break;
 
 		case constants.type.staff:
-			console.log("Staff.render not implemented");
+			view = Staff.render(composition, ...args);
 			break;
 
 		case constants.type.score:

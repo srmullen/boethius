@@ -98,14 +98,6 @@ function Staff ({timeSig="4/4", startMeasure=0, measures, lineLength}, children=
 
 	this.voices = new Map();
 
-
-	var self = {
-		time: 0,
-		measure: 0,
-		beat: 0,
-		previousTime: undefined
-	};
-
 	// setup voiceMap
 	for (let i = 0, lineNum = 0; i < children.length; i++) {
 		let voices = children[i].voices || 1;
@@ -114,6 +106,10 @@ function Staff ({timeSig="4/4", startMeasure=0, measures, lineLength}, children=
 			lineNum++;
 		}
 	}
+}
+
+Staff.render = function render (staff, lines) {
+	return staff.render(lines);
 }
 
 Staff.prototype.type = TYPE;
@@ -129,7 +125,7 @@ Staff.prototype.render = function (lines, startMeasure=0, numMeasures) {
 
 	// draw each line
 	let lineGroups = lines.map((child) => {
-		return child.render(this.lineLength);
+		return child.render(1000);
 	});
 
 	group.addChildren(lineGroups);
@@ -163,38 +159,6 @@ Staff.prototype.renderMeasures = function (lines, lineGroups, startMeasure, numM
 		}));
 	}
 }
-
-Staff.prototype.processEvents = function (events) {
-
-	var currentTime = getTime(events) || 0,
-		splitTimeSig = this.timeSig.split("/"),
-		currentMeasure = timeUtils.getMeasure(currentTime, splitTimeSig);
-
-	/* Get the position for drawing items */
-	var cursor = calculateCursor(this.children, currentMeasure, currentTime),
-		items = _.filter(_.reduce(events, function (acc, [e, ctx]) {
-			var item = this[e](ctx, cursor);
-			acc.push(item);
-			return acc;
-		}, [], this), x => x),
-		lastLineItem = _.max(this.children, line => line.at().time),
-		lastLineAt = lastLineItem.at();
-
-	// set the time of the staff
-	this.setTime(lastLineAt);
-	self.previousTime = currentTime;
-
-	// Draw the time bounds group
-	// var timeBounds;
-	// if (timeBounds = drawTimeBounds(items, this.children)) {
-	// 	this.group.addChild(timeBounds);
-	// }
-
-	// return the min line time
-	return _.min(_.map(this.children,
-					line => line.at()),
-				t => t.time);
-};
 
 Staff.prototype.note = function (note, cursor) {
 	var line = this.getLine(note.voice);
