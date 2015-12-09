@@ -188,4 +188,23 @@ Voice.prototype.renderDecorations = function (line, measures) {
     });
 }
 
+/*
+ * The given times must be a number because a Voice doesn't know about the measures or beats.
+ * @param frm - Time to start collecting items at.
+ * @param to - Time up to but not including collected items.
+ * @return Item[]
+ */
+Voice.prototype.getTimeFrame = function getTimeFrame(frm, to) {
+    const timeFrame = [];
+    for (let i = 0; i < this.children.length; i++) {
+        let item = this.children[i];
+        if (item.time >= to) {
+            break;
+        } else if (item.time >= frm) {
+            timeFrame.push(item);
+        }
+    }
+    return timeFrame;
+}
+
 export default Voice;

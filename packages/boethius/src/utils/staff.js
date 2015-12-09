@@ -1,24 +1,18 @@
 import _ from "lodash";
 
 /*
- * @param staff - Staff
- * @param measures - Measure[]
- * @param voices - Voice[]
- * @return [...{time, items, context}] Array ordered by time
+ * Groups and indexes voices by the lines they are to be rendered on. Voice names take priority, then order.
+ * @param lines - Line[]
+ * @param Voices - Voice[]
+ * @return Map<Line, Voice[]>
  */
-function getTimeContexts (staff, measures, voices) {
-	let allItems = line.markings.concat(_.reduce(voices, (acc, voice) => {
-		return acc.concat(voice.children);
-	}, []));
-
-	let times = _.sortBy(_.map(_.groupBy(allItems, (item) => {
-		return getTime(measures, item).time;
-	}), (v, k) => {
-		let time = getTime(measures, v[0]);
-		return {time, items: v, context: line.contextAt(measures, time)};
-	}), ({time}) => time.time);
-
-	return times;
+function groupVoices (lines, voices) {
+    const voiceMap = new Map();
+    _.each(voices, (voice, i) => {
+        let voiceArr = voiceMap.get(lines[i]) || [];
+        voiceMap.set(lines[i], voiceArr.concat(voice));
+    });
+    return voiceMap;
 }
 
-export {getTimeContexts};
+export {groupVoices};

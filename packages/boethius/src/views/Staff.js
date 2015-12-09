@@ -1,10 +1,12 @@
+import _ from "lodash";
+
 import * as paperUtils from "../utils/paperUtils";
 import * as timeUtils from "../utils/timeUtils";
 import {isLine, isMarking} from "../types";
 import engraver from "../engraver";
 import constants from "../constants";
 import Measure from "./Measure";
-import _ from "lodash";
+import {getTimeContexts} from "../utils/line";
 
 
 const TYPE = constants.type.staff;
@@ -42,7 +44,19 @@ function Staff ({startMeasure=0, measures}, children=[]) {
 
 Staff.render = function render (staff, voices) {
 	let staffGroup = staff.render();
+
 	let measures = Measure.createMeasures(5, staff.markings);
+
+	// decide which voices get rendered on each line.
+	let voiceMap = groupVoices(staff.lines, voices);
+
+	// get the time contexts
+	let times = _.map(staff.lines, line => {
+		return getTimeContexts(line, measures, voices);
+	});
+
+	console.log(times);
+
 	return staffGroup;
 }
 

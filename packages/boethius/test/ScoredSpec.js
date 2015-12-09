@@ -89,7 +89,7 @@ describe("Scored", () => {
 			let line = scored.line();
 			expect(line.type).to.equal("line");
 			expect(line.children.length).to.equal(0);
-			expect(line.voices).to.eql([]);
+			expect(line.voices).to.eql({});
 
 			line = scored.line({voices: 2});
 			expect(line.voices).to.equal(2);

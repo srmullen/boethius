@@ -83,4 +83,22 @@ describe("Voice", () => {
             ]);
         });
     });
+
+    describe("getTimeFrame", () => {
+        it("should return an array", () => {
+            let v = scored.voice();
+            expect(v.getTimeFrame(0, 1)).to.eql([]);
+        });
+
+        it("should return only the items that fall in the given time frame", () => {
+            let n1 = scored.note({value: 4}),
+                n2 = scored.note({value: 4}),
+                n3 = scored.note({value: 4}),
+                n4 = scored.note({value: 4}),
+                n5 = scored.note({value: 4});
+            let v = scored.voice({}, [n1, n2, n3, n4, n5]);
+            expect(v.getTimeFrame(0, 1)).to.eql([n1, n2, n3, n4]);
+            expect(v.getTimeFrame(0.25, 0.5)).to.eql([n2]);
+        });
+    });
 });

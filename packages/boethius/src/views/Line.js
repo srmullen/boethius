@@ -14,7 +14,10 @@ import _ from "lodash";
 
 const TYPE = constants.type.line;
 
-function Line ({voices=[]}, children=[]) {
+/*
+ * @param voices - Object mapping voice names to an array describing when they are to be rendered on the line.
+ */
+function Line ({voices={}}, children=[]) {
 
 	const types = _.groupBy(children, child => child.type);
 

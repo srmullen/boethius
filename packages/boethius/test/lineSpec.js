@@ -110,8 +110,10 @@ describe("Line", () => {
     });
 
     describe("utils", () => {
-        describe("getTimeContexts", () => {
-
+        xdescribe("getTimeContexts", () => {
+            it("should return an array", () => {
+                expect(getTimeContexts()).to.eql([]);
+            });
         });
     });
 });
