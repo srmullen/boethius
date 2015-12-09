@@ -4,6 +4,7 @@ import * as timeUtils from "../utils/timeUtils";
 import * as placement from "../utils/placement";
 import * as lineUtils from "../utils/line";
 import * as common from "../utils/common";
+import {isMeasure, isTimeSignature} from "../types";
 import _ from "lodash";
 
 const TYPE = constants.type.measure;
@@ -110,7 +111,7 @@ Measure.createMeasures = function (numMeasures, children) {
 	let measures = new Array(numMeasures);
 
 	// get the Measures from children and add them to the measures array
-	let [explicitMeasures, markings] = _.partition(_.filter(children, c => !!c), (child) => child.type === constants.type.measure),
+	let [explicitMeasures, markings] = _.partition(_.filter(children, c => !!c), isMeasure),
 		measureMarkings = _.groupBy(markings, marking => marking.measure || 0);
 
 	{ // Put each measure in the right position in the measures array.
@@ -132,7 +133,7 @@ Measure.createMeasures = function (numMeasures, children) {
 			startsAt = previousMeasure ? previousMeasure.startsAt + timeUtils.getMeasureDuration(previousMeasure) : 0;
 
 		if (!measure) {
-			let timeSig = _.find(measureMarkings[i], marking => marking.type === constants.type.timeSig) || previousMeasure.timeSig;
+			let timeSig = _.find(measureMarkings[i], isTimeSignature) || previousMeasure.timeSig;
 			measure = new Measure(_.extend({}, {startsAt, timeSig}), measureMarkings[i]);
 		} else {
 			measure.startsAt = startsAt;

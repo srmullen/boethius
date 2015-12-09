@@ -8,9 +8,9 @@ function run () {
 	// interaction();
 
 	// simpleLine().translate(25, 50);
-	// renderingNotesOnLine().translate(25, 50);
-	// oneVoice().translate(25, 150);
-	// twoVoices().translate(25, 250);
+	renderingNotesOnLine().translate(25, 50);
+	oneVoice().translate(25, 150);
+	twoVoices().translate(25, 250);
 
 	// eighthBeamings().translate(25, 50);
 	// sixteenthBeamings().translate(25, 150);
@@ -21,8 +21,8 @@ function run () {
 	// testChords().translate(25, 50);
 	// testChordsTwoVoices().translate(25, 150);
 
-	testTriplets().translate(25, 100);
-	testTripletsTwoVoices().translate(25, 200);
+	// testTriplets().translate(25, 100);
+	testTripletsTwoVoices().translate(25, 350);
 }
 
 function createMeasures () {
