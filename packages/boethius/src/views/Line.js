@@ -77,10 +77,10 @@ Line.render = function (line, length, voices, numMeasures=1) {
 	line.renderItems(times);
 
 	// calculating measure lengths
-	calculateAndSetMeasureLengths(measures, times, noteHeadWidth, shortestDuration);
+	const measureLengths = lineUtils.calculateMeasureLengths(measures, times, noteHeadWidth, shortestDuration);
 
 	// render measures.
-	let measureGroups = line.renderMeasures(measures, lineGroup, length);
+	let measureGroups = line.renderMeasures(measures, measureLengths, lineGroup, length);
 
 	// place all items
 	let cursor = noteHeadWidth,
@@ -170,30 +170,6 @@ Line.render = function (line, length, voices, numMeasures=1) {
 	return lineGroup;
 }
 
-// TODO: will need to be able to handle when overlapping of items require more space. ex. two voice with same note at same time.
-function calculateAndSetMeasureLengths (measures, times, noteHeadWidth, shortestDuration) {
-	// group items by measure.
-	let itemsInMeasure = _.groupBy(times, (item) => {
-		return item.time.measure;
-	});
-
-	let measureLengths = _.map(measures, (measure, i) => {
-		let measureLength = _.sum(_.map(itemsInMeasure[i], ({items}) => {
-			let [markings, voiceItems] = _.partition(items, isMarking),
-				markingsLength = _.sum(markings.map(marking => marking.group.bounds.width + noteHeadWidth)),
-				voiceItemsLength = _.min(_.map(voiceItems, item => {
-					return item.group.bounds.width + (noteHeadWidth * placement.getStaffSpace(shortestDuration, item));
-				}));
-			return markingsLength + voiceItemsLength
-		}));
-		measureLength += noteHeadWidth;
-		measure.length = measureLength;
-		return measureLength;
-	});
-
-	return measureLengths;
-}
-
 Line.prototype.render = function (length) {
 	const group = this.group = engraver.drawLine(length);
 	group.name = TYPE;
@@ -212,11 +188,11 @@ Line.prototype.renderItems = function (times) {
 /*
  * @param lineGroup - the group returned by line.render
  */
-Line.prototype.renderMeasures = function (measures, lineGroup, lineLength) {
+Line.prototype.renderMeasures = function (measures, lengths, lineGroup, lineLength) {
 	let averageMeasureLength = Line.calculateAverageMeasureLength(1, lineLength, measures.length);
 
 	let measureGroups = _.reduce(measures, (groups, measure, i, children) => {
-		let measureLength = measure.length || averageMeasureLength,
+		let measureLength = lengths[i] || averageMeasureLength,
 			previousGroup = _.last(groups),
 			leftBarline;
 

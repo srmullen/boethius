@@ -30,4 +30,31 @@ function getLineItems (lines, voices) {
     return lineItems;
 }
 
-export {groupVoices, getLineItems};
+function calculateAndSetMeasureLengths (measures, times, noteHeadWidth, shortestDuration) {
+	// group items by measure.
+	let itemsInMeasure = _.groupBy(times, (item) => {
+		return item.time.measure;
+	});
+
+	let measureLengths = _.map(measures, (measure, i) => {
+		let measureLength = _.sum(_.map(itemsInMeasure[i], ({items}) => {
+			let [markings, voiceItems] = _.partition(items, isMarking),
+				markingsLength = _.sum(markings.map(marking => marking.group.bounds.width + noteHeadWidth)),
+				voiceItemsLength = _.min(_.map(voiceItems, item => {
+					return item.group.bounds.width + (noteHeadWidth * placement.getStaffSpace(shortestDuration, item));
+				}));
+			return markingsLength + voiceItemsLength
+		}));
+		measureLength += noteHeadWidth;
+		measure.length = measureLength;
+		return measureLength;
+	});
+
+	return measureLengths;
+}
+
+export {
+    groupVoices,
+    getLineItems,
+    calculateAndSetMeasureLengths
+};

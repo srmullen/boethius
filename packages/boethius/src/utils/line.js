@@ -1,5 +1,7 @@
 import _ from "lodash";
 import {getTime} from "./timeUtils";
+import {isMarking} from "../types";
+import {getStaffSpace} from "./placement";
 
 function lineGetter (name) {
 	return function (lineGroup) {
@@ -59,6 +61,29 @@ function getTimeContexts (line, measures, items) {
 	return times;
 }
 
+function calculateMeasureLengths (measures, times, noteHeadWidth, shortestDuration) {
+	// group items by measure.
+	let itemsInMeasure = _.groupBy(times, (item) => {
+		return item.time.measure;
+	});
+
+	let measureLengths = _.map(measures, (measure, i) => {
+		let measureLength = _.sum(_.map(itemsInMeasure[i], ({items}) => {
+			let [markings, voiceItems] = _.partition(items, isMarking),
+				markingsLength = _.sum(markings.map(marking => marking.group.bounds.width + noteHeadWidth)),
+				voiceItemsLength = _.min(_.map(voiceItems, item => {
+					return item.group.bounds.width + (noteHeadWidth * getStaffSpace(shortestDuration, item));
+				}));
+			return markingsLength + voiceItemsLength
+		}));
+		measureLength += noteHeadWidth;
+		// measure.length = measureLength;
+		return measureLength;
+	});
+
+	return measureLengths;
+}
+
 export {
 	f,
 	d,
@@ -67,5 +92,6 @@ export {
 	e,
 	getClosestLine,
 	getMeasure,
-	getTimeContexts
+	getTimeContexts,
+	calculateMeasureLengths
 }

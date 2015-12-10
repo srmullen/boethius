@@ -7,7 +7,7 @@ import engraver from "../engraver";
 import constants from "../constants";
 import Measure from "./Measure";
 import {getTimeContexts} from "../utils/line";
-import {groupVoices, getLineItems} from "../utils/staff";
+import {groupVoices, getLineItems, calculateAndSetMeasureLengths} from "../utils/staff";
 import {map} from "../utils/common";
 import {getAccidentalContexts} from "../utils/accidental";
 
@@ -51,6 +51,11 @@ Staff.render = function render (staff, voices) {
 
 		staff.lines[i].renderItems(times);
 	});
+
+	const noteHeadWidth = Scored.config.note.head.width;
+	const shortestDuration = 0.125; // need function to calculate this.
+
+	calculateAndSetMeasureLengths(measures, lineTimes, noteHeadWidth, shortestDuration);
 
 	return staffGroup;
 }

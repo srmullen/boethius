@@ -4,7 +4,7 @@ import * as timeUtils from "../utils/timeUtils";
 import * as placement from "../utils/placement";
 import * as lineUtils from "../utils/line";
 import * as common from "../utils/common";
-import {isMeasure, isTimeSignature} from "../types";
+import {isMeasure, isTimeSignature, isMarking} from "../types";
 import _ from "lodash";
 
 const TYPE = constants.type.measure;
