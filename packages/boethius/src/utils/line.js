@@ -61,6 +61,16 @@ function getTimeContexts (line, measures, items) {
 	return times;
 }
 
+function calculateTimeLength (items, shortestDuration) {
+	const noteHeadWidth = Scored.config.note.head.width;
+	let [markings, voiceItems] = _.partition(items, isMarking),
+		markingsLength = _.sum(markings.map(marking => marking.group.bounds.width + noteHeadWidth)),
+		voiceItemsLength = _.min(_.map(voiceItems, item => {
+			return item.group.bounds.width + (noteHeadWidth * getStaffSpace(shortestDuration, item));
+		}));
+	return markingsLength + voiceItemsLength;
+}
+
 function calculateMeasureLengths (measures, times, noteHeadWidth, shortestDuration) {
 	// group items by measure.
 	let itemsInMeasure = _.groupBy(times, (item) => {
@@ -68,16 +78,8 @@ function calculateMeasureLengths (measures, times, noteHeadWidth, shortestDurati
 	});
 
 	let measureLengths = _.map(measures, (measure, i) => {
-		let measureLength = _.sum(_.map(itemsInMeasure[i], ({items}) => {
-			let [markings, voiceItems] = _.partition(items, isMarking),
-				markingsLength = _.sum(markings.map(marking => marking.group.bounds.width + noteHeadWidth)),
-				voiceItemsLength = _.min(_.map(voiceItems, item => {
-					return item.group.bounds.width + (noteHeadWidth * getStaffSpace(shortestDuration, item));
-				}));
-			return markingsLength + voiceItemsLength
-		}));
+		let measureLength = _.sum(_.map(itemsInMeasure[i], ({items}) => calculateTimeLength(items, shortestDuration)));
 		measureLength += noteHeadWidth;
-		// measure.length = measureLength;
 		return measureLength;
 	});
 
