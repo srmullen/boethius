@@ -43,13 +43,11 @@ function getMeasure (line) {
 /*
  * @param line - Line
  * @param measures - Measure[]
- * @param voices - Voice[]
+ * @param voices - Item[]
  * @return [...{time, items, context}] Array ordered by time
  */
-function getTimeContexts (line, measures, voices) {
-	let allItems = line.markings.concat(_.reduce(voices, (acc, voice) => {
-		return acc.concat(voice.children);
-	}, []));
+function getTimeContexts (line, measures, items) {
+	let allItems = line.markings.concat(items);
 
 	let times = _.sortBy(_.map(_.groupBy(allItems, (item) => {
 		return getTime(measures, item).time;

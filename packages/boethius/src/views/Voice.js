@@ -9,24 +9,31 @@ import * as lineUtils from "../utils/line";
 import {getAverageStemDirection} from "../utils/note";
 import {calculateDuration, getMeasureNumber, getBeat, parseSignature, calculateTupletDuration, sumDurations} from "../utils/timeUtils";
 import TimeSignature from "./TimeSignature";
-// import Note from "./Note";
 import Measure from "./Measure";
 import {getCenterLineValue} from "./Clef";
 
-function Voice ({value, stemDirection}, children=[]) {
-    this.value = value;
-
-    this.children = children.reduce((acc, item) => {
+/*
+ * @param items - Item[]
+ * @param offset - Optional amount of time that will be added to the items times.
+ */
+function calculateAndSetTimes (items, offset=0) {
+    return items.reduce((acc, item) => {
         let previousItem = _.last(acc);
 
         if (previousItem) {
-            item.time = F(previousItem.time).add(calculateDuration(previousItem)).valueOf();
+            item.time = F(previousItem.time).add(calculateDuration(previousItem)).add(offset).valueOf();
         } else {
             item.time = 0;
         }
 
         return concat(acc, item);
     }, []);
+}
+
+function Voice ({value, stemDirection}, children=[]) {
+    this.value = value;
+
+    this.children = calculateAndSetTimes(children);
 
     this.stemDirection = stemDirection;
 }

@@ -65,7 +65,9 @@ Line.render = function (line, length, voices, numMeasures=1) {
 		shortestDuration = 0.125; // need function to calculate this.
 
 	// group and sort voice items by time.
-	let times = lineUtils.getTimeContexts(line, measures, voices);
+	let times = lineUtils.getTimeContexts(line, measures, _.reduce(voices, (acc, voice) => {
+		return acc.concat(voice.children);
+	}, []));
 
 	let accidentals = getAccidentalContexts(times);
 	// add accidentals to times

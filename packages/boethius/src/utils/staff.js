@@ -15,4 +15,19 @@ function groupVoices (lines, voices) {
     return voiceMap;
 }
 
-export {groupVoices};
+/*
+ * Given lines and voices, returns an array of item arrays. The first array is all items to be rendered on the first line, and so on.
+ * @param lines - Line[]
+ * @param voices- Voice[]
+ * @return Items[][]
+ */
+// FIXME: Incomplete/incorrect implementation just to get staff rendering.
+function getLineItems (lines, voices) {
+    let lineItems = [];
+    for (let i = 0; i < lines.length; i++) {
+        lineItems.push(voices[i].children);
+    }
+    return lineItems;
+}
+
+export {groupVoices, getLineItems};

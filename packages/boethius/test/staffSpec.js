@@ -1,6 +1,6 @@
 import {expect} from "chai";
 import Staff from "../src/views/Staff";
-import {groupVoices} from "../src/utils/staff";
+import {groupVoices, getLineItems} from "../src/utils/staff";
 import Scored from "../src/Scored";
 
 describe("Staff", () => {
@@ -17,12 +17,19 @@ describe("Staff", () => {
         });
 
         xit("should add voices with names to lines that ask for that name", () => {
-            let highLine = scored.line({voices: ["soprano", "alto"]});
-            let lowLine = scored.line({voices: ["tenor", "bass"]});
+            let highLine = scored.line({voices: {"soprano": 0, "alto": 0}}); // zero is start time of the voice on the line
+            let lowLine = scored.line({voices: {"tenor": 0, "bass": 0}});
             let [soprano, alto, tenor, bass] = ["soprano", "alto", "tenor", "bass"].map(name => scored.line({name}));
             let voiceMap = groupVoices([lowLine, highLine], [soprano, alto, tenor, bass]);
             expect(voiceMap.get(highLine)).to.eql([soprano, alto]);
             expect(voiceMap.get(lowLine)).to.eql(tenor, bass);
+        });
+    });
+
+    describe("getLineItems", () => {
+        it("should map one voice to one line", () => {
+            let n1 = scored.note();
+            expect(getLineItems([scored.line()], [scored.voice({}, [n1])])).to.eql([[n1]]);
         });
     });
 });

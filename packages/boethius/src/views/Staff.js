@@ -7,7 +7,9 @@ import engraver from "../engraver";
 import constants from "../constants";
 import Measure from "./Measure";
 import {getTimeContexts} from "../utils/line";
-
+import {groupVoices, getLineItems} from "../utils/staff";
+import {map} from "../utils/common";
+import {getAccidentalContexts} from "../utils/accidental";
 
 const TYPE = constants.type.staff;
 
@@ -29,42 +31,31 @@ function Staff ({startMeasure=0, measures}, children=[]) {
 	this.lines = _.filter(children, isLine);
 
 	this.markings = _.filter(children, isMarking);
-
-	this.voices = new Map();
-
-	// setup voiceMap
-	for (let i = 0, lineNum = 0; i < children.length; i++) {
-		let voices = children[i].voices || 1;
-		for (let j = 0; j < voices; j++) {
-			this.voices.set(lineNum, children[i]);
-			lineNum++;
-		}
-	}
 }
 
 Staff.render = function render (staff, voices) {
-	let staffGroup = staff.render();
+	const staffGroup = staff.render();
 
-	let measures = Measure.createMeasures(5, staff.markings);
-
-	// decide which voices get rendered on each line.
-	let voiceMap = groupVoices(staff.lines, voices);
+	const measures = Measure.createMeasures(5, staff.markings);
 
 	// get the time contexts
-	let times = _.map(staff.lines, line => {
-		return getTimeContexts(line, measures, voices);
-	});
+	const lineItems = getLineItems(staff.lines, voices);
 
-	console.log(times);
+	const lineTimes = map((line, items) => getTimeContexts(line, measures, items), staff.lines, lineItems);
+
+	// calculate the accidentals for each line.
+	_.each(lineTimes, (times, i) => {
+		let accidentals = getAccidentalContexts(times);
+		// add accidentals to times
+		_.each(times, (time, i) => time.context.accidentals = accidentals[i]);
+
+		staff.lines[i].renderItems(times);
+	});
 
 	return staffGroup;
 }
 
 Staff.prototype.type = TYPE;
-
-Staff.prototype.getLine = function (voice) {
-	return this.voices.get(voice) || this.children[0];
-}
 
 Staff.prototype.render = function (lines, startMeasure=0, numMeasures) {
 	const group = this.group = new paper.Group({
