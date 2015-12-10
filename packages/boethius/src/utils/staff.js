@@ -1,5 +1,7 @@
 import _ from "lodash";
 
+import {calculateTimeLength} from "./placement";
+
 /*
  * Groups and indexes voices by the lines they are to be rendered on. Voice names take priority, then order.
  * @param lines - Line[]
@@ -30,31 +32,23 @@ function getLineItems (lines, voices) {
     return lineItems;
 }
 
-function calculateAndSetMeasureLengths (measures, times, noteHeadWidth, shortestDuration) {
-	// group items by measure.
-	let itemsInMeasure = _.groupBy(times, (item) => {
-		return item.time.measure;
-	});
+function calculateMeasureLengths (measures, times, noteHeadWidth, shortestDuration) {
+    // group items by measure.
+    let itemsInMeasure = _.groupBy(times, (item) => {
+        return item.time.measure;
+    });
 
-	let measureLengths = _.map(measures, (measure, i) => {
-		let measureLength = _.sum(_.map(itemsInMeasure[i], ({items}) => {
-			let [markings, voiceItems] = _.partition(items, isMarking),
-				markingsLength = _.sum(markings.map(marking => marking.group.bounds.width + noteHeadWidth)),
-				voiceItemsLength = _.min(_.map(voiceItems, item => {
-					return item.group.bounds.width + (noteHeadWidth * placement.getStaffSpace(shortestDuration, item));
-				}));
-			return markingsLength + voiceItemsLength
-		}));
-		measureLength += noteHeadWidth;
-		measure.length = measureLength;
-		return measureLength;
-	});
+    let measureLengths = _.map(measures, (measure, i) => {
+        let measureLength = _.sum(_.map(itemsInMeasure[i], ({items}) => calculateTimeLength(items, shortestDuration)));
+        measureLength += noteHeadWidth;
+        return measureLength;
+    });
 
-	return measureLengths;
+    return measureLengths;
 }
 
 export {
     groupVoices,
     getLineItems,
-    calculateAndSetMeasureLengths
+    calculateMeasureLengths
 };

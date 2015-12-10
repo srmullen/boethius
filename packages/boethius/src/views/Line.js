@@ -80,7 +80,9 @@ Line.render = function (line, length, voices, numMeasures=1) {
 	const measureLengths = lineUtils.calculateMeasureLengths(measures, times, noteHeadWidth, shortestDuration);
 
 	// render measures.
-	let measureGroups = line.renderMeasures(measures, measureLengths, lineGroup, length);
+	const measureGroups = line.renderMeasures(measures, measureLengths, lineGroup, length);
+
+	lineGroup.addChildren(measureGroups);
 
 	// place all items
 	let cursor = noteHeadWidth,
@@ -197,12 +199,12 @@ Line.prototype.renderMeasures = function (measures, lengths, lineGroup, lineLeng
 			leftBarline;
 
 		leftBarline = previousGroup ? previousGroup.children.barline : null;
-		let measureGroup = measure.render(lineGroup, leftBarline, measureLength);
+		let measureGroup = measure.render([lineGroup], leftBarline, measureLength);
 
 		groups.push(measureGroup);
-		lineGroup.addChild(measureGroup); // add the measure to the line
 		return groups;
 	}, []);
+	return measureGroups;
 }
 
 /*
@@ -226,23 +228,6 @@ Line.prototype.contextAt = function (measures, time) {
 
 	return {clef, timeSig, key};
 }
-
-/*
- * @param index {number} - the measure to be adjusted
- * @param length {number} - the new length of the measure
- */
-Line.prototype.setMeasureLength = function (index, length) {
-	var measure = this.children[index],
-		oldLength = measure.getLength(),
-		lengthDiff = length - oldLength;
-
-	if (lengthDiff) { // no need to do anything if there's no differnece in the length
-		measure.setLength(length);
-		for (var i = index + 1; i < this.children.length; i++) {
-			this.children[i].translate([lengthDiff, 0]);
-		}
-	}
-};
 
 function renderItem (item, context) {
 	if (item.type === constants.type.note) {

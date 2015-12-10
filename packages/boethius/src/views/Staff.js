@@ -7,7 +7,7 @@ import engraver from "../engraver";
 import constants from "../constants";
 import Measure from "./Measure";
 import {getTimeContexts} from "../utils/line";
-import {groupVoices, getLineItems, calculateAndSetMeasureLengths} from "../utils/staff";
+import {groupVoices, getLineItems, calculateMeasureLengths} from "../utils/staff";
 import {map} from "../utils/common";
 import {getAccidentalContexts} from "../utils/accidental";
 
@@ -36,6 +36,12 @@ function Staff ({startMeasure=0, measures}, children=[]) {
 Staff.render = function render (staff, voices) {
 	const staffGroup = staff.render();
 
+	const lineGroups = staff.renderLines();
+
+	staffGroup.addChildren(lineGroups);
+
+	staffGroup.addChild(engraver.drawStaffBar(lineGroups));
+
 	const measures = Measure.createMeasures(5, staff.markings);
 
 	// get the time contexts
@@ -55,7 +61,11 @@ Staff.render = function render (staff, voices) {
 	const noteHeadWidth = Scored.config.note.head.width;
 	const shortestDuration = 0.125; // need function to calculate this.
 
-	calculateAndSetMeasureLengths(measures, lineTimes, noteHeadWidth, shortestDuration);
+	const measureLengths = calculateMeasureLengths(measures, lineTimes[0], noteHeadWidth, shortestDuration);
+
+	const measureGroups = staff.renderMeasures(measures, measureLengths, lineGroups);
+
+	staffGroup.addChildren(measureGroups);
 
 	return staffGroup;
 }
@@ -67,39 +77,55 @@ Staff.prototype.render = function (lines, startMeasure=0, numMeasures) {
 		name: TYPE
 	});
 
+	return group;
+};
+
+Staff.prototype.renderLines = function () {
 	// draw each line
 	let lineGroups = this.lines.map(line => line.render(1000));
-
-	group.addChildren(lineGroups);
 
 	_.each(lineGroups, (lineGroup, j) => {
 		lineGroup.translate([0, 120 * j]);
 	});
 
-	group.addChild(engraver.drawStaffBar(lineGroups));
-
-	return group;
-};
-
-Staff.prototype.renderMeasures = function (lines, lineGroups, startMeasure, numMeasures) {
-	const measureLength = this.lineLength / numMeasures,
-		  measureGroups = [];
-	for (let i = startMeasure; i < startMeasure + numMeasures; i++) {
-		// get the measure from each line
-		let measures = _.map(lines, line => line.children[i]);
-
-		// render each measure
-		measureGroups.push(_.map(measures, (measure, j) => {
-			let lineGroup = lineGroups[j],
-				leftBarline = _.last(measureGroups) ? _.last(measureGroups)[j].children.barline : null,
-				measureGroup = measure.render(lineGroup, leftBarline, measureLength),
-				childGroups = measure.renderChildren(lineGroup, measure.barlines[0]);
-
-			lineGroup.addChild(measureGroup);
-			lineGroup.addChildren(childGroups);
-			return measureGroup;
-		}));
-	}
+	return lineGroups;
 }
+
+Staff.prototype.renderMeasures = function (measures, lengths, staffGroup) {
+	let measureGroups = _.reduce(measures, (groups, measure, i, children) => {
+		let measureLength = lengths[i],
+			previousGroup = _.last(groups),
+			leftBarline;
+
+		leftBarline = previousGroup ? previousGroup.children.barline : null;
+		let measureGroup = measure.render(staffGroup, leftBarline, measureLength);
+
+		groups.push(measureGroup);
+		return groups;
+	}, []);
+
+	return measureGroups;
+}
+
+// Staff.prototype.renderMeasures = function (lines, lineGroups, startMeasure, numMeasures) {
+// 	const measureLength = this.lineLength / numMeasures,
+// 		  measureGroups = [];
+// 	for (let i = startMeasure; i < startMeasure + numMeasures; i++) {
+// 		// get the measure from each line
+// 		let measures = _.map(lines, line => line.children[i]);
+//
+// 		// render each measure
+// 		measureGroups.push(_.map(measures, (measure, j) => {
+// 			let lineGroup = lineGroups[j],
+// 				leftBarline = _.last(measureGroups) ? _.last(measureGroups)[j].children.barline : null,
+// 				measureGroup = measure.render(lineGroup, leftBarline, measureLength),
+// 				childGroups = measure.renderChildren(lineGroup, measure.barlines[0]);
+//
+// 			lineGroup.addChild(measureGroup);
+// 			lineGroup.addChildren(childGroups);
+// 			return measureGroup;
+// 		}));
+// 	}
+// }
 
 export default Staff;

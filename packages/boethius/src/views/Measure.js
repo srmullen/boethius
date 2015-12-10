@@ -23,14 +23,17 @@ function Measure ({timeSig, startsAt=0}, children=[]) {
 
 Measure.prototype.type = TYPE;
 
-Measure.prototype.render = function (line, leftBarline, width) {
+/*
+ * @param lines Group<Line>[]
+ */
+Measure.prototype.render = function (lines, leftBarline, width) {
 	const group = this.group = new paper.Group({
 		name: TYPE
 	});
 
-	leftBarline = leftBarline || engraver.drawBarline([line]);
+	leftBarline = leftBarline || engraver.drawBarline(lines);
 	let previousBarlinePosition = leftBarline.position.x,
-		rightBarline = engraver.drawBarline([line], previousBarlinePosition + width),
+		rightBarline = engraver.drawBarline(lines, previousBarlinePosition + width),
 		bounds = this.drawGroupBounds(previousBarlinePosition, rightBarline);
 
 	group.addChildren([bounds, leftBarline, rightBarline]);
@@ -39,22 +42,6 @@ Measure.prototype.render = function (line, leftBarline, width) {
 
 	return group;
 };
-
-Measure.prototype.renderChildren = function (line, leftBarline) {
-	let childGroups = _.map(this.children, (child) => {
-		let pos = placement.getYOffset(child, lineUtils.b(line)), // TODO: is this used? getYOffset has changed!
-			yPos = child.type === "note" ?
-				placement.calculateNoteYpos(child, Scored.config.lineSpacing/2, placement.getClefBase("treble")) : 0,
-			childGroup = child.render(pos.add([leftBarline.position.x + 15, yPos]));
-
-		common.addEvents(childGroup);
-		return childGroup;
-	});
-
-	placement.lineup(childGroups);
-
-	return childGroups;
-}
 
 Measure.prototype.drawGroupBounds = function (previousBarlinePosition, barline) {
 	var rectangle = new paper.Path.Rectangle({

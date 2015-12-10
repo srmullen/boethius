@@ -227,6 +227,21 @@ function calculateDefaultAccidentalPosition (note) {
 	return getNoteHeadCenter(note.noteHead.bounds.center).add(-Scored.config.note.accidental.xOffset, Scored.config.note.accidental.yOffset);
 }
 
+/*
+ * @param items - RenderedItem[]
+ * @param shortestDuration - Number
+ * @return - pixel length of the time frame.
+ */
+function calculateTimeLength (items, shortestDuration) {
+	const noteHeadWidth = Scored.config.note.head.width;
+	let [markings, voiceItems] = _.partition(items, isMarking),
+		markingsLength = _.sum(markings.map(marking => marking.group.bounds.width + noteHeadWidth)),
+		voiceItemsLength = _.min(_.map(voiceItems, item => {
+			return item.group.bounds.width + (noteHeadWidth * getStaffSpace(shortestDuration, item));
+		}));
+	return markingsLength + voiceItemsLength;
+}
+
 export {
 	calculateNoteYpos,
 	calculateAccidentalYpos,
@@ -243,5 +258,6 @@ export {
 	alignNoteHeads,
 	getAccidentalTop,
 	getAccidentalBottom,
-	calculateDefaultAccidentalPosition
+	calculateDefaultAccidentalPosition,
+	calculateTimeLength
 }
