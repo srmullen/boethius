@@ -7,7 +7,7 @@ import engraver from "../engraver";
 import constants from "../constants";
 import Measure from "./Measure";
 import {getTimeContexts} from "../utils/line";
-import {groupVoices, getLineItems, calculateMeasureLengths} from "../utils/staff";
+import {groupVoices, getLineItems, calculateMeasureLengths, nextTimes, iterateByTime} from "../utils/staff";
 import {map} from "../utils/common";
 import {getAccidentalContexts} from "../utils/accidental";
 
@@ -67,6 +67,11 @@ Staff.render = function render (staff, voices) {
 
 	staffGroup.addChildren(measureGroups);
 
+	// place all items
+	let cursor = noteHeadWidth,
+		previousMeasureNumber = 0;
+	iterateByTime(ctx => console.log(ctx), lineTimes);
+
 	return staffGroup;
 }
 
@@ -106,26 +111,5 @@ Staff.prototype.renderMeasures = function (measures, lengths, staffGroup) {
 
 	return measureGroups;
 }
-
-// Staff.prototype.renderMeasures = function (lines, lineGroups, startMeasure, numMeasures) {
-// 	const measureLength = this.lineLength / numMeasures,
-// 		  measureGroups = [];
-// 	for (let i = startMeasure; i < startMeasure + numMeasures; i++) {
-// 		// get the measure from each line
-// 		let measures = _.map(lines, line => line.children[i]);
-//
-// 		// render each measure
-// 		measureGroups.push(_.map(measures, (measure, j) => {
-// 			let lineGroup = lineGroups[j],
-// 				leftBarline = _.last(measureGroups) ? _.last(measureGroups)[j].children.barline : null,
-// 				measureGroup = measure.render(lineGroup, leftBarline, measureLength),
-// 				childGroups = measure.renderChildren(lineGroup, measure.barlines[0]);
-//
-// 			lineGroup.addChild(measureGroup);
-// 			lineGroup.addChildren(childGroups);
-// 			return measureGroup;
-// 		}));
-// 	}
-// }
 
 export default Staff;

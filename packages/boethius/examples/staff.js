@@ -13,7 +13,7 @@ function run () {
     ]);
 
     var voice2 = scored.voice({name: "bass"}, [
-        n({value: 4, pitch: "c3"}), n({value: 4, pitch: "d3"}), n({value: 4, pitch: "e3"}), n({value: 4, pitch: "f3"})
+        n({value: 8, pitch: "c3"}), n({value: 8, pitch: "c#3"}), n({value: 4, pitch: "d3"}), n({value: 4, pitch: "e3"}), n({value: 4, pitch: "f3"})
     ]);
 
     scored.render(staff, [voice1, voice2]).translate(25, 50);

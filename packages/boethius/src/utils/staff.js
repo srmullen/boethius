@@ -47,8 +47,44 @@ function calculateMeasureLengths (measures, times, noteHeadWidth, shortestDurati
     return measureLengths;
 }
 
+/*
+ * @param times context[][]
+ */
+function nextTimes (times) {
+    const ctxs = _.map(times, _.first);
+
+    if (!_.compact(ctxs).length) return []; // return nothing if there are no more contexts
+
+    const nextTime = _.min(ctxs, ctx => ctx.time.time).time.time;
+    const nexts = [];
+    const rests = [];
+    for (let i = 0; i < ctxs.length; i++) {
+        if (ctxs[i].time.time === nextTime) {
+            nexts.push(ctxs[i]);
+            rests.push(_.rest(times[i]));
+        } else {
+            nexts.push(null);
+            rests.push(times[i])
+        }
+    }
+    return [nexts, rests];
+}
+
+function iterateByTime (fn, times) {
+    let [nexts, rests] = nextTimes(times);
+    const ret = [];
+    while (_.compact(nexts).length) {
+        ret.push(fn(nexts));
+        [nexts, rests] = nextTimes(rests);
+    }
+
+    return ret;
+}
+
 export {
     groupVoices,
     getLineItems,
-    calculateMeasureLengths
+    calculateMeasureLengths,
+    nextTimes,
+    iterateByTime
 };

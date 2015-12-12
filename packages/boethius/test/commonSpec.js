@@ -1,6 +1,6 @@
 import {expect} from "chai";
 
-import {concat, partitionBy, partitionWhen, map, mapDeep, juxt, reductions, isEven, isOdd} from "../src/utils/common";
+import {concat, partitionBy, partitionWhen, map, mapDeep, juxt, reductions, isEven, isOdd, nexts} from "../src/utils/common";
 import Scored from "../src/Scored";
 
 describe("common", () => {
