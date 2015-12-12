@@ -180,7 +180,7 @@ Line.prototype.render = function (length) {
 }
 
 Line.prototype.renderItems = function (times) {
-	_.each(times, ({time, items, accidentals, context}) => {
+	_.each(times, ({time, items, context}) => {
 		let groups = _.map(items, item => renderItem(item, context));
 		this.group.addChildren(groups);
 	});
