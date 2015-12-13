@@ -29,7 +29,11 @@ function Line ({voices={}}, children=[]) {
 	}, []), "measure", (marking) => marking.beat ? marking.beat : 0); // if no beat on the marking then default to 0
 
 	this.voices = voices;
+}
 
+Line.prototype.addMarkings = function (markings) {
+	// FIXME: overwrites markings already on the line.
+	this.markings = _.sortBy(this.markings.concat(markings), m => m.measure);
 }
 
 Line.prototype.type = TYPE;

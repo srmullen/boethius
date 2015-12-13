@@ -31,6 +31,9 @@ function Staff ({startMeasure=0, measures}, children=[]) {
 	this.lines = _.filter(children, isLine);
 
 	this.markings = _.filter(children, isMarking);
+
+	// add the markings to each line.
+	_.each(this.lines, line => line.addMarkings(this.markings));
 }
 
 Staff.render = function render (staff, voices) {
@@ -72,13 +75,15 @@ Staff.render = function render (staff, voices) {
 	_.reduce(staffTimes, (acc, ctxs, i) => {
 		const lineIndices = _.filter(_.map(ctxs, (ctx, i) => ctx ? i : undefined), _.isNumber);
 		const lineCenters = _.map(lineIndices, idx => b(lineGroups[idx]));
-		// console.log(lineIndices, lineCenters);
 		const previousMeasureNumber = staffTimes[i-1] ? _.find(staffTimes[i-1], x => x).time.measure : 0;
 		const cursor = _.last(acc);
-		console.log(lineIndices);
 		let possibleNextPositions = _.map(lineIndices, (idx, i) => renderTimeContext(lineCenters[i], measures, previousMeasureNumber, cursor, ctxs[idx]));
 		return acc.concat(_.min(possibleNextPositions));
 	}, [noteHeadWidth]);
+
+	map((line, voice) => {
+		return voice.renderDecorations(line, measures);
+	}, staff.lines, voices);
 
 	return staffGroup;
 }
