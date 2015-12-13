@@ -6,7 +6,7 @@ import {isLine, isMarking} from "../types";
 import engraver from "../engraver";
 import constants from "../constants";
 import Measure from "./Measure";
-import {getTimeContexts} from "../utils/line";
+import {getTimeContexts, renderTimeContext, b} from "../utils/line";
 import {groupVoices, getLineItems, calculateMeasureLengths, nextTimes, iterateByTime} from "../utils/staff";
 import {map} from "../utils/common";
 import {getAccidentalContexts} from "../utils/accidental";
@@ -68,9 +68,17 @@ Staff.render = function render (staff, voices) {
 	staffGroup.addChildren(measureGroups);
 
 	// place all items
-	let cursor = noteHeadWidth,
-		previousMeasureNumber = 0;
-	iterateByTime(ctx => console.log(ctx), lineTimes);
+	const staffTimes = iterateByTime(x => x, lineTimes);
+	_.reduce(staffTimes, (acc, ctxs, i) => {
+		const lineIndices = _.filter(_.map(ctxs, (ctx, i) => ctx ? i : undefined), _.isNumber);
+		const lineCenters = _.map(lineIndices, idx => b(lineGroups[idx]));
+		// console.log(lineIndices, lineCenters);
+		const previousMeasureNumber = staffTimes[i-1] ? _.find(staffTimes[i-1], x => x).time.measure : 0;
+		const cursor = _.last(acc);
+		console.log(lineIndices);
+		let possibleNextPositions = _.map(lineIndices, (idx, i) => renderTimeContext(lineCenters[i], measures, previousMeasureNumber, cursor, ctxs[idx]));
+		return acc.concat(_.min(possibleNextPositions));
+	}, [noteHeadWidth]);
 
 	return staffGroup;
 }
