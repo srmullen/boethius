@@ -33,7 +33,7 @@ function Staff ({startMeasure=0, measures}, children=[]) {
 	this.markings = _.filter(children, isMarking);
 
 	// add the markings to each line.
-	_.each(this.lines, line => line.addMarkings(this.markings));
+	// _.each(this.lines, line => line.addMarkings(this.markings));
 }
 
 Staff.render = function render (staff, voices) {

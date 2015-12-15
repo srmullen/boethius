@@ -48,6 +48,14 @@ function calculateMeasureLengths (measures, times, noteHeadWidth, shortestDurati
 }
 
 /*
+ * @param time context object
+ * @return Number or undefined if there is no context
+ */
+function getTimeFromContext (ctx) {
+    return ctx && ctx.time ? ctx.time.time : undefined;
+}
+
+/*
  * @param times context[][]
  */
 function nextTimes (times) {
@@ -55,11 +63,11 @@ function nextTimes (times) {
 
     if (!_.compact(ctxs).length) return []; // return nothing if there are no more contexts
 
-    const nextTime = _.min(ctxs, ctx => ctx.time.time).time.time;
+    const nextTime = _.min(ctxs, getTimeFromContext).time.time;
     const nexts = [];
     const rests = [];
     for (let i = 0; i < ctxs.length; i++) {
-        if (ctxs[i].time.time === nextTime) {
+        if (getTimeFromContext(ctxs[i]) === nextTime) {
             nexts.push(ctxs[i]);
             rests.push(_.rest(times[i]));
         } else {
