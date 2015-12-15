@@ -151,8 +151,10 @@ Chord.prototype.drawStem = function (to, stemDirection) {
 	let frm, stem;
 
 	if (stemDirection === "up") {
+		this.stemDirection = "up";
 		frm = this.children[0].noteHead.bounds.rightCenter.add(0, Scored.config.note.head.yOffset);
 	} else {
+		this.stemDirection = "down";
 		frm = _.last(this.children).noteHead.bounds.leftCenter.add(0, Scored.config.note.head.yOffset);
 	}
 

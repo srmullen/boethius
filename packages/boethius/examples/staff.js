@@ -46,17 +46,20 @@ function testThreeLines () {
     var staff = scored.staff({}, [scored.timeSig({value: "4/4", measure: 0}), line1, line2, line3]);
 
     var n = scored.note;
+    var c = scored.chord;
 
     var voice1 = scored.voice({name: "soprano"}, [
-        n({value: 4, pitch: "c5"}), n({value: 4, pitch: "b4"}), n({value: 8, pitch: "a4"}), n({value: 8, pitch: "g4"}), n({value: 4, pitch: "f4"})
+        n({value: 4, pitch: "c5"}), n({value: 4, pitch: "b4"}), n({value: 8, pitch: "a4"}), n({value: 8, pitch: "g4"}), n({value: 4, pitch: "f4"}),
+        n({value: 8})
     ]);
 
     var voice2 = scored.voice({name: "bass"}, [
-        n({value: 8, pitch: "c3"}), n({value: 8, pitch: "c#3"}), n({value: 4, pitch: "d3"}), n({value: 4, pitch: "e3"}), n({value: 4, pitch: "f3"})
+        n({value: 8, pitch: "c3"}), n({value: 8, pitch: "c#3"}), n({value: 4, pitch: "d3"}), n({value: 4, pitch: "e3"}), n({value: 4, pitch: "f3"}),
+        n({value: 8})
     ]);
 
     var voice3 = scored.voice({name: "chords"}, [
-        n({value: 8, pitch: "c4"})
+        c({value: 8}, ["c4", "eb4", "g4", "c5"]) //, c({value: 8}, ["c4", "eb4", "g4", "c5"])
     ]);
 
     scored.render(staff, [voice1, voice2, voice3]).translate(25, 50);
