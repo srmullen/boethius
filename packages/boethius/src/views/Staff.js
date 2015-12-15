@@ -10,6 +10,7 @@ import {getTimeContexts, renderTimeContext, b} from "../utils/line";
 import {groupVoices, getLineItems, calculateMeasureLengths, nextTimes, iterateByTime} from "../utils/staff";
 import {map} from "../utils/common";
 import {getAccidentalContexts} from "../utils/accidental";
+import {calculateCursor} from "../utils/placement";
 
 const TYPE = constants.type.staff;
 
@@ -75,9 +76,17 @@ Staff.render = function render (staff, voices) {
 	_.reduce(staffTimes, (acc, ctxs, i) => {
 		const lineIndices = _.filter(_.map(ctxs, (ctx, i) => ctx ? i : undefined), _.isNumber);
 		const lineCenters = _.map(lineIndices, idx => b(lineGroups[idx]));
-		const previousMeasureNumber = staffTimes[i-1] ? _.find(staffTimes[i-1], x => x).time.measure : 0;
-		const cursor = _.last(acc);
-		let possibleNextPositions = _.map(lineIndices, (idx, i) => renderTimeContext(lineCenters[i], measures, previousMeasureNumber, cursor, ctxs[idx]));
+		const previousTime = staffTimes[i-1] ? _.find(staffTimes[i-1], x => x).time : 0;
+		const currentTime = ctxs[lineIndices[0]].time;
+		// update cursor if it's a new measure
+		let cursor;
+		if (currentTime.measure !== previousTime.measure) {
+			let measure = measures[currentTime.measure];
+			cursor = calculateCursor(measure);
+		} else {
+			cursor = _.last(acc);
+		}
+		let possibleNextPositions = _.map(lineIndices, (idx, i) => renderTimeContext(lineCenters[i], cursor, ctxs[idx]));
 		return acc.concat(_.min(possibleNextPositions));
 	}, [noteHeadWidth]);
 

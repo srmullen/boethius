@@ -59,7 +59,9 @@ function testThreeLines () {
     ]);
 
     var voice3 = scored.voice({name: "chords"}, [
-        c({value: 8}, ["c4", "eb4", "g4", "c5"]) //, c({value: 8}, ["c4", "eb4", "g4", "c5"])
+        c({value: 8}, ["c4", "eb4", "g4", "c5"]) , c({value: 8}, ["c4", "eb4", "g4", "c5"]),
+        n({value: 4, pitch: "b4"}), n({value: 4, pitch: "a4"}), n({value: 4, pitch: "g4"}), n({value: 4, pitch: "f4"})
+
     ]);
 
     scored.render(staff, [voice1, voice2, voice3]).translate(25, 50);

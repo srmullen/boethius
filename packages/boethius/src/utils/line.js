@@ -78,8 +78,7 @@ function calculateMeasureLengths (measures, times, noteHeadWidth, shortestDurati
 	return measureLengths;
 }
 
-function renderTimeContext (lineCenter, measures, previousMeasureNumber, cursor, {time, items, context}) {
-	let leftBarline = measures[time.measure].barlines[0];
+function renderTimeContext (lineCenter, cursor, {time, items, context}) {
 	let {
 		clef: clefs,
 		key: keys,
@@ -88,12 +87,6 @@ function renderTimeContext (lineCenter, measures, previousMeasureNumber, cursor,
 		rest: rests,
 		chord: chords
 	} = _.groupBy(items, item => item.type);
-
-	// update cursor if its a new measure.
-	if (time.measure !== previousMeasureNumber) {
-		let measure = measures[time.measure];
-		cursor = placement.calculateCursor(measure);
-	}
 
 	let placeMarking = marking => {
 		marking.group.translate(lineCenter.add([0, placement.getYOffset(marking)]));
@@ -152,8 +145,6 @@ function renderTimeContext (lineCenter, measures, previousMeasureNumber, cursor,
 
 	// next time is at smallest distance
 	cursor = _.min(possibleNextPositions);
-
-	previousMeasureNumber = time.measure;
 
 	return cursor;
 }

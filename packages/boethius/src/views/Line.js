@@ -91,8 +91,15 @@ Line.render = function (line, length, voices, numMeasures=1) {
 	const b = lineUtils.b(lineGroup);
 	_.reduce(times, (acc, ctx, i) => {
 		const previousMeasureNumber = times[i-1] ? times[i-1].time.measure : 0;
-		const cursor = _.last(acc);
-		return acc.concat(lineUtils.renderTimeContext(b, measures, previousMeasureNumber, cursor, ctx));
+		let cursor;
+		// update cursor if it's a new measure
+		if (ctx.time.measure !== previousMeasureNumber) {
+			let measure = measures[ctx.time.measure];
+			cursor = placement.calculateCursor(measure);
+		} else {
+			cursor = _.last(acc);
+		}
+		return acc.concat(lineUtils.renderTimeContext(b, cursor, ctx));
 	}, [noteHeadWidth]);
 
 	_.each(voices, voice => {
