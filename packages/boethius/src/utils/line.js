@@ -78,13 +78,6 @@ function calculateMeasureLengths (measures, times, noteHeadWidth, shortestDurati
 	return measureLengths;
 }
 
-function placeMarking (lineCenter, cursor, marking) {
-	marking.group.translate(lineCenter.add([0, placement.getYOffset(marking)]));
-	placement.placeAt(cursor, marking);
-	// since keys of C and a have no children calculateCursor return undefined.
-	return placement.calculateCursor(marking) || cursor;
-}
-
 function renderTimeContext (lineCenter, cursor, {time, items, context}) {
 	let {
 		clef: clefs,
@@ -97,9 +90,9 @@ function renderTimeContext (lineCenter, cursor, {time, items, context}) {
 
 	// place the markings
 	// Will there ever be more than one marking of a type at a time? Definately note for Line. Maybe for Staff.
-	if (clefs) cursor = placeMarking(lineCenter, cursor, clefs[0]);
-	if (keys) cursor = placeMarking(lineCenter, cursor, keys[0]);
-	if (timeSigs) cursor = placeMarking(lineCenter, cursor, timeSigs[0]);
+	if (clefs) cursor = placement.placeMarking(lineCenter, cursor, clefs[0]);
+	if (keys) cursor = placement.placeMarking(lineCenter, cursor, keys[0]);
+	if (timeSigs) cursor = placement.placeMarking(lineCenter, cursor, timeSigs[0]);
 
 	let possibleNextPositions = [];
 

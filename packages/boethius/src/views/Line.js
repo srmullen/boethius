@@ -96,7 +96,7 @@ Line.render = function (line, length, voices, numMeasures=1) {
 			let measure = measures[ctx.time.measure];
 			cursor = placement.calculateCursor(measure);
 		}
-		
+
 		return lineUtils.renderTimeContext(b, cursor, ctx);
 	}, noteHeadWidth);
 

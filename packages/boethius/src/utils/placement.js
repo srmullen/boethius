@@ -242,6 +242,13 @@ function calculateTimeLength (items, shortestDuration) {
 	return markingsLength + voiceItemsLength;
 }
 
+function placeMarking (lineCenter, cursor, marking) {
+	marking.group.translate(lineCenter.add([0, getYOffset(marking)]));
+	placeAt(cursor, marking);
+	// since keys of C and a have no children calculateCursor return undefined.
+	return calculateCursor(marking) || cursor;
+}
+
 export {
 	calculateNoteYpos,
 	calculateAccidentalYpos,
@@ -259,5 +266,6 @@ export {
 	getAccidentalTop,
 	getAccidentalBottom,
 	calculateDefaultAccidentalPosition,
-	calculateTimeLength
+	calculateTimeLength,
+	placeMarking
 }
