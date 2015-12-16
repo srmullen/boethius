@@ -73,22 +73,20 @@ Staff.render = function render (staff, voices) {
 
 	// place all items
 	const staffTimes = iterateByTime(x => x, lineTimes);
-	_.reduce(staffTimes, (acc, ctxs, i) => {
+	_.reduce(staffTimes, (cursor, ctxs, i) => {
 		const lineIndices = _.filter(_.map(ctxs, (ctx, i) => ctx ? i : undefined), _.isNumber);
 		const lineCenters = _.map(lineIndices, idx => b(lineGroups[idx]));
 		const previousTime = staffTimes[i-1] ? _.find(staffTimes[i-1], x => x).time : 0;
 		const currentTime = ctxs[lineIndices[0]].time;
 		// update cursor if it's a new measure
-		let cursor;
 		if (currentTime.measure !== previousTime.measure) {
 			let measure = measures[currentTime.measure];
 			cursor = calculateCursor(measure);
-		} else {
-			cursor = _.last(acc);
 		}
+		
 		let possibleNextPositions = _.map(lineIndices, (idx, i) => renderTimeContext(lineCenters[i], cursor, ctxs[idx]));
-		return acc.concat(_.min(possibleNextPositions));
-	}, [noteHeadWidth]);
+		return _.min(possibleNextPositions);
+	}, noteHeadWidth);
 
 	map((line, voice) => {
 		return voice.renderDecorations(line, measures);
