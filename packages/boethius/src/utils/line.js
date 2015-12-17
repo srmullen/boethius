@@ -89,7 +89,7 @@ function renderTimeContext (lineCenter, cursor, {time, items, context}) {
 	} = _.groupBy(items, item => item.type);
 
 	// place the markings
-	// Will there ever be more than one marking of a type at a time? Definately note for Line. Maybe for Staff.
+	// There will never be more than one marking of a type for a Line.
 	if (clefs) cursor = placement.placeMarking(lineCenter, cursor, clefs[0]);
 	if (keys) cursor = placement.placeMarking(lineCenter, cursor, keys[0]);
 	if (timeSigs) cursor = placement.placeMarking(lineCenter, cursor, timeSigs[0]);

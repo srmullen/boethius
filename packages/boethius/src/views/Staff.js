@@ -6,8 +6,8 @@ import {isLine, isMarking} from "../types";
 import engraver from "../engraver";
 import constants from "../constants";
 import Measure from "./Measure";
-import {getTimeContexts, renderTimeContext, b} from "../utils/line";
-import {groupVoices, getLineItems, calculateMeasureLengths, nextTimes, iterateByTime} from "../utils/staff";
+import {getTimeContexts, b} from "../utils/line";
+import {groupVoices, getLineItems, calculateMeasureLengths, nextTimes, iterateByTime, renderTimeContext, positionMarkings} from "../utils/staff";
 import {map} from "../utils/common";
 import {getAccidentalContexts} from "../utils/accidental";
 import {calculateCursor} from "../utils/placement";
@@ -65,8 +65,9 @@ Staff.render = function render (staff, voices) {
 	const noteHeadWidth = Scored.config.note.head.width;
 	const shortestDuration = 0.125; // need function to calculate this.
 
-	const measureLengths = calculateMeasureLengths(measures, lineTimes[0], noteHeadWidth, shortestDuration);
-
+	// const measureLengths = _.map(lineTimes, lineTimeCtx => calculateMeasureLengths(measures, lineTimeCtx, noteHeadWidth, shortestDuration));
+	const measureLengths = calculateMeasureLengths(measures, lineTimes, noteHeadWidth, shortestDuration)
+	console.log(measureLengths);
 	const measureGroups = staff.renderMeasures(measures, measureLengths, lineGroups);
 
 	staffGroup.addChildren(measureGroups);
@@ -83,8 +84,13 @@ Staff.render = function render (staff, voices) {
 			let measure = measures[currentTime.measure];
 			cursor = calculateCursor(measure);
 		}
-		
+
+		// place all the markings in the time context.
+		cursor = _.max(_.map(lineIndices, (idx, i) => positionMarkings(lineCenters[i], cursor, ctxs[idx])));
+
+		// place the items that have duration
 		let possibleNextPositions = _.map(lineIndices, (idx, i) => renderTimeContext(lineCenters[i], cursor, ctxs[idx]));
+
 		return _.min(possibleNextPositions);
 	}, noteHeadWidth);
 

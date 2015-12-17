@@ -1,6 +1,9 @@
 import _ from "lodash";
 
-import {calculateTimeLength} from "./placement";
+import * as placement from "./placement";
+import * as line from "./line";
+import {isNote} from "../types";
+import {map} from "./common";
 
 /*
  * Groups and indexes voices by the lines they are to be rendered on. Voice names take priority, then order.
@@ -33,17 +36,11 @@ function getLineItems (lines, voices) {
 }
 
 function calculateMeasureLengths (measures, times, noteHeadWidth, shortestDuration) {
-    // group items by measure.
-    let itemsInMeasure = _.groupBy(times, (item) => {
-        return item.time.measure;
-    });
-
-    let measureLengths = _.map(measures, (measure, i) => {
-        let measureLength = _.sum(_.map(itemsInMeasure[i], ({items}) => calculateTimeLength(items, shortestDuration)));
-        measureLength += noteHeadWidth;
-        return measureLength;
-    });
-
+    const lineMeasureLengths = times.map(lineTimes => line.calculateMeasureLengths(measures, lineTimes, noteHeadWidth, shortestDuration));
+    const measureLengths = new Array(measures.length);
+    for (let i = 0; i < measures.length; i++) {
+        measureLengths[i] = _.max(_.map(lineMeasureLengths, lineMeasureLength => lineMeasureLength[i]));
+    }
     return measureLengths;
 }
 
@@ -89,10 +86,86 @@ function iterateByTime (fn, times) {
     return ret;
 }
 
+function positionMarkings (lineCenter, cursor, {time, items, context}) {
+    let {
+		clef: clefs,
+		key: keys,
+		timeSig: timeSigs
+	} = _.groupBy(items, item => item.type);
+
+	// place the markings
+	if (clefs) cursor = placement.placeMarking(lineCenter, cursor, clefs[0]);
+	if (keys) cursor = placement.placeMarking(lineCenter, cursor, keys[0]);
+	if (timeSigs) cursor = placement.placeMarking(lineCenter, cursor, timeSigs[0]);
+
+    return cursor;
+}
+
+function renderTimeContext (lineCenter, cursor, {time, items, context}) {
+    let {
+		clef: clefs,
+		key: keys,
+		timeSig: timeSigs,
+		note: notes,
+		rest: rests,
+		chord: chords
+	} = _.groupBy(items, item => item.type);
+
+	let possibleNextPositions = [];
+
+	const pitchedItems = _.compact([].concat(notes, chords));
+
+	if (pitchedItems.length) {
+		// get widest note. that will be placed first.
+		let widestItem = _.max(pitchedItems, item => item.group.bounds.width),
+			placeY = (item) => {
+				let note = isNote(item) ? item : item.children[0];
+				let yPos = placement.calculateNoteYpos(note, Scored.config.lineSpacing/2, placement.getClefBase(context.clef.value));
+				item.group.translate(lineCenter.add([0, yPos]));
+			},
+			placeX = (item) => {
+				placement.placeAt(cursor, item);
+			},
+			place = (item) => {
+				placeY(item);
+				placeX(item);
+				return placement.calculateCursor(item);
+			};
+
+
+		possibleNextPositions = possibleNextPositions.concat(place(widestItem));
+
+		_.remove(pitchedItems, item => item === widestItem); // mutation of notes array
+
+		_.each(pitchedItems, placeY);
+
+		const alignToNoteHead = isNote(widestItem) ? widestItem.noteHead : widestItem.children[0].noteHead;
+		placement.alignNoteHeads(alignToNoteHead.bounds.center.x, pitchedItems);
+
+		possibleNextPositions = possibleNextPositions.concat(_.map(pitchedItems, placement.calculateCursor));
+	}
+
+	possibleNextPositions = possibleNextPositions.concat(_.map(rests, rest => {
+		let pos = placement.getYOffset(rest.group);
+
+		rest.group.translate(lineCenter.add(0, pos));
+		placement.placeAt(cursor, rest);
+
+		return placement.calculateCursor(rest);
+	}));
+
+	// next time is at smallest distance
+	cursor = _.min(possibleNextPositions);
+
+	return cursor;
+}
+
 export {
     groupVoices,
     getLineItems,
     calculateMeasureLengths,
     nextTimes,
-    iterateByTime
+    iterateByTime,
+    renderTimeContext,
+    positionMarkings
 };
