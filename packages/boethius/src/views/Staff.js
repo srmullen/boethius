@@ -67,7 +67,7 @@ Staff.render = function render (staff, voices) {
 
 	// const measureLengths = _.map(lineTimes, lineTimeCtx => calculateMeasureLengths(measures, lineTimeCtx, noteHeadWidth, shortestDuration));
 	const measureLengths = calculateMeasureLengths(measures, lineTimes, noteHeadWidth, shortestDuration)
-	console.log(measureLengths);
+
 	const measureGroups = staff.renderMeasures(measures, measureLengths, lineGroups);
 
 	staffGroup.addChildren(measureGroups);
