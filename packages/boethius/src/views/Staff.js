@@ -37,10 +37,10 @@ function Staff ({startMeasure=0, measures}, children=[]) {
 	// _.each(this.lines, line => line.addMarkings(this.markings));
 }
 
-Staff.render = function render (staff, voices) {
+Staff.render = function render (staff, {voices, length}) {
 	const staffGroup = staff.render();
 
-	const lineGroups = staff.renderLines();
+	const lineGroups = staff.renderLines(length);
 
 	staffGroup.addChildren(lineGroups);
 
@@ -65,7 +65,6 @@ Staff.render = function render (staff, voices) {
 	const noteHeadWidth = Scored.config.note.head.width;
 	const shortestDuration = 0.125; // need function to calculate this.
 
-	// const measureLengths = _.map(lineTimes, lineTimeCtx => calculateMeasureLengths(measures, lineTimeCtx, noteHeadWidth, shortestDuration));
 	const measureLengths = calculateMeasureLengths(measures, lineTimes, noteHeadWidth, shortestDuration)
 
 	const measureGroups = staff.renderMeasures(measures, measureLengths, lineGroups);
@@ -111,9 +110,9 @@ Staff.prototype.render = function (lines, startMeasure=0, numMeasures) {
 	return group;
 };
 
-Staff.prototype.renderLines = function () {
+Staff.prototype.renderLines = function (length) {
 	// draw each line
-	let lineGroups = this.lines.map(line => line.render(1000));
+	let lineGroups = this.lines.map(line => line.render(length));
 
 	_.each(lineGroups, (lineGroup, j) => {
 		lineGroup.translate([0, 120 * j]);
