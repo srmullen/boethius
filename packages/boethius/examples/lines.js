@@ -4,13 +4,8 @@ function run () {
 	// timeSigLines();
 	// keyLines();
 	// line = fourBars();
-	// createMeasures();
-	// interaction();
 
 	// simpleLine().translate(25, 50);
-	renderingNotesOnLine().translate(25, 50);
-	oneVoice().translate(25, 150);
-	twoVoices().translate(25, 250);
 
 	// eighthBeamings().translate(25, 50);
 	// sixteenthBeamings().translate(25, 150);
@@ -21,44 +16,13 @@ function run () {
 	// testChords().translate(25, 50);
 	// testChordsTwoVoices().translate(25, 150);
 
+	renderingNotesOnLine().translate(25, 50);
+	oneVoice().translate(25, 150);
+	twoVoices().translate(25, 250);
 	// testTriplets().translate(25, 100);
-	testTripletsTwoVoices().translate(25, 350);
-}
+	// testTripletsTwoVoices().translate(25, 350);
 
-function createMeasures () {
-	var treble = scored.clef({value: "treble", measure: 0});
-	var	bass = scored.clef({value: "bass"});
-	var	measure1 = scored.measure({index: 1, length: 400}, [bass]);
-	var	measure2 = scored.measure({index: 1}, [bass]);
-
-	line = scored.line({measures: 2}, [treble, measure2]);
-
-	scored.render(line, 750).translate(50, 500);
-}
-
-function interaction () {
-	var lineLength = 750,
-		measures = 4,
-		measureLength = lineLength / measures;
-
-	var treble = scored.clef({value: "treble", measure: 0}),
-		alto = scored.clef({value: "alto", measure: 1}),
-		tenor = scored.clef({value: "tenor", measure: 2})
-		bass = scored.clef({value: "bass", measure: 3})
-		line = scored.line({
-			measureLength: measureLength,
-			measures: measures
-		}, [treble, alto, tenor, bass]);
-
-	scored.render(line, lineLength).translate(50, 600);
-
-	// line needs to be rendered first because that's when the measures are created.
-	getMeasureFn = Scored.utils.line.getMeasure(line);
-
-	$("canvas").click(function (e) {
-		console.log(getMeasureFn(new paper.Point([e.offsetX, e.offsetY])));
-	});
-
+	// testMeasureRendering().translate(25, 50);
 }
 
 function clefLines () {
@@ -72,10 +36,10 @@ function clefLines () {
 	var	tenorLine = scored.line({}, [tenor]);
 	var lineLength = 150;
 
-	scored.render(trebleLine, lineLength).translate(20, 20);
-	scored.render(bassLine, lineLength).translate(200, 20);
-	scored.render(altoLine, lineLength).translate(400, 20);
-	scored.render(tenorLine, lineLength).translate(600, 20);
+	scored.render(trebleLine, {length: lineLength}).translate(20, 20);
+	scored.render(bassLine, {length: lineLength}).translate(200, 20);
+	scored.render(altoLine, {length: lineLength}).translate(400, 20);
+	scored.render(tenorLine, {length: lineLength}).translate(600, 20);
 }
 
 function timeSigLines () {
@@ -91,11 +55,11 @@ function timeSigLines () {
 		twelveeightLine = scored.line({}, [twelveeight]);
 	var lineLength = 150;
 
-	scored.render(commonLine, lineLength).translate(20, 100);
-	scored.render(halfLine, lineLength).translate(200, 100);
-	scored.render(fourfourLine, lineLength).translate(400, 100);
-	scored.render(sixeightLine, lineLength).translate(600, 100);
-	scored.render(twelveeightLine, lineLength).translate(800, 100);
+	scored.render(commonLine, {length: lineLength}).translate(20, 100);
+	scored.render(halfLine, {length: lineLength}).translate(200, 100);
+	scored.render(fourfourLine, {length: lineLength}).translate(400, 100);
+	scored.render(sixeightLine, {length: lineLength}).translate(600, 100);
+	scored.render(twelveeightLine, {length: lineLength}).translate(800, 100);
 }
 
 function keyLines () {
@@ -147,20 +111,20 @@ function keyLines () {
 
 	var linelength = 100;
 
-	scored.render(gLine, linelength).translate(20, 200);
-	scored.render(dLine, linelength).translate(150, 200);
-	scored.render(aLine, linelength).translate(300, 200);
-	scored.render(eLine, linelength).translate(450, 200);
-	scored.render(bLine, linelength).translate(600, 200);
-	scored.render(fsLine, linelength).translate(750, 200);
-	scored.render(csLine, linelength).translate(900, 200);
-	scored.render(fLine, linelength).translate(20, 300);
-	scored.render(bbLine, linelength).translate(150, 300);
-	scored.render(ebLine, linelength).translate(300, 300);
-	scored.render(abLine, linelength).translate(450, 300);
-	scored.render(dbLine, linelength).translate(600, 300);
-	scored.render(gbLine, linelength).translate(750, 300);
-	scored.render(cbLine, linelength).translate(900, 300);
+	scored.render(gLine, {length: linelength}).translate(20, 200);
+	scored.render(dLine, {length: linelength}).translate(150, 200);
+	scored.render(aLine, {length: linelength}).translate(300, 200);
+	scored.render(eLine, {length: linelength}).translate(450, 200);
+	scored.render(bLine, {length: linelength}).translate(600, 200);
+	scored.render(fsLine, {length: linelength}).translate(750, 200);
+	scored.render(csLine, {length: linelength}).translate(900, 200);
+	scored.render(fLine, {length: linelength}).translate(20, 300);
+	scored.render(bbLine, {length: linelength}).translate(150, 300);
+	scored.render(ebLine, {length: linelength}).translate(300, 300);
+	scored.render(abLine, {length: linelength}).translate(450, 300);
+	scored.render(dbLine, {length: linelength}).translate(600, 300);
+	scored.render(gbLine, {length: linelength}).translate(750, 300);
+	scored.render(cbLine, {length: linelength}).translate(900, 300);
 }
 
 function fourBars () {
@@ -170,7 +134,7 @@ function fourBars () {
 		tenor = scored.clef({value: "tenor", measure: 3}),
 		line = scored.line({measures: 4}, [treble, bass, alto, tenor]);
 
-	scored.render(line, 1000).translate(20, 400);
+	scored.render(line, {length: 1000}).translate(20, 400);
 	return line;
 }
 
@@ -183,7 +147,7 @@ function renderingNotesOnLine () {
 	var voice = scored.voice({}, [scored.note({pitch: "a4", value: 8}), scored.note({pitch: "c5", value: 4, dots: 1}), scored.note({pitch: "b4", value: 2}),
 								  scored.note({pitch: "c5", value: 2}), scored.note({pitch: "d4", value: 4}), scored.rest({value: 4})]);
 
-	return scored.render(trebleLine, 400, [voice], 2);
+	return scored.render(trebleLine, {length: 400, voices: [voice], numMeasures: 2});
 }
 
 function simpleLine () {
@@ -195,7 +159,7 @@ function simpleLine () {
 								  scored.note({pitch: "a4", value: 1})
 							  ]);
 
-	return scored.render(trebleLine, 400, [voice], 2);
+	return scored.render(trebleLine, {length: 400, voices: [voice], numMeasures: 2});
 }
 
 function oneVoice () {
@@ -219,7 +183,7 @@ function oneVoice () {
 		return scored.note({value: n.duration, pitch: n.pitch});
 	}));
 
-	return scored.render(line, 1000, [voice], 5);
+	return scored.render(line, {length: 1000, voices: [voice], numMeasures: 5});
 }
 
 function twoVoices () {
@@ -235,7 +199,7 @@ function twoVoices () {
 	var voice1 = scored.voice({stemDirection: "up"}, _.map(notes1, function (n) {return scored.note({value: n, pitch: "c#5"})}));
 	var voice2 = scored.voice({stemDirection: "down"}, _.map(notes2, function (n) {return scored.note({value: n})}));
 
-	return scored.render(line, 1000, [voice1, voice2], 5);
+	return scored.render(line, {length: 1000, voices: [voice1, voice2], numMeasures: 5});
 }
 
 function eighthBeamings () {
@@ -257,7 +221,7 @@ function eighthBeamings () {
 		return scored.note({value: n.duration, pitch: n.pitch});
 	}));
 
-	return scored.render(line, 1500, [voice], 4);
+	return scored.render(line, {length: 1500, voices: [voice], numMeasures: 4});
 }
 
 function sixteenthBeamings () {
@@ -279,7 +243,7 @@ function sixteenthBeamings () {
 		return scored.note({value: n.duration, pitch: n.pitch});
 	}));
 
-	return scored.render(line, 1500, [voice], 4);
+	return scored.render(line, {length: 1500, voices: [voice], numMeasures: 4});
 }
 
 function testAccidentals (key) {
@@ -302,7 +266,7 @@ function testAccidentals (key) {
 
 	]);
 
-	return scored.render(line, 1500, [voice], 2);
+	return scored.render(line, {length: 1500, voices: [voice], numMeasures: 2});
 }
 
 function testTimeSigs () {
@@ -328,7 +292,7 @@ function testTimeSigs () {
 		scored.rest({value: 4})
 	]);
 
-	return scored.render(line, 1500, [voice], 7);
+	return scored.render(line, {length: 1500, voices: [voice], numMeasures: 7});
 }
 
 function testChords () {
@@ -357,7 +321,7 @@ function testChords () {
 		c({value: 1}, ["g3", "d4", "b4", "g5"])
 	  ]);
 
-	return scored.render(trebleLine, 1500, [voice], 5);
+	return scored.render(trebleLine, {length: 1500, voices: [voice], numMeasures: 5});
 }
 
 function testChordsTwoVoices () {
@@ -378,7 +342,7 @@ function testChordsTwoVoices () {
 	var voice1 = scored.voice({stemDirection: "up"}, _.map(notes1, function (n) {return scored.chord({value: n}, ["a4", "c#5"])}));
 	var voice2 = scored.voice({stemDirection: "down"}, _.map(notes2, function (n) {return scored.note({value: n, pitch: "f#4"})}));
 
-	return scored.render(line, 1000, [voice1, voice2], 5);
+	return scored.render(line, {length: 1000, voices: [voice1, voice2], numMeasures: 5});
 }
 
 function testTriplets () {
@@ -410,7 +374,7 @@ function testTriplets () {
 
 	var voice = scored.voice({}, [].concat(quartersAndEights));
 
-	return scored.render(line, 1000, [voice], 5);
+	return scored.render(line, {length: 1000, voices: [voice], numMeasures: 5});
 }
 
 function testTripletsTwoVoices () {
@@ -445,5 +409,20 @@ function testTripletsTwoVoices () {
 	var voice1 = scored.voice({stemDirection: "up"}, [].concat(quarters));
 	var voice2 = scored.voice({stemDirection: "down"}, [].concat(eighths));
 
-	return scored.render(line, 1000, [voice1, voice2], 5);
+	return scored.render(line, {length: 1000, voices: [voice1, voice2], numMeasures: 5});
+}
+
+function testMeasureRendering (startMeasure, measures) {
+	var line = scored.line({}, [scored.clef({value: "treble", measure: 0}),
+								scored.key({value: "C", measure: 0}),
+								scored.timeSig({value: "4/4", measure: 0})]);
+	var n = scored.note;
+
+	var voice = scored.voice({}, [
+		n({value:1, pitch: "c4"}), n({value:1, pitch: "d4"}), n({value:1, pitch: "e4"}), n({value:1, pitch: "f4"}),
+		n({value:1, pitch: "g4"}), n({value:1, pitch: "a4"}), n({value:1, pitch: "b4"}), n({value:1, pitch: "c5"}),
+		n({value:1, pitch: "d5"}), n({value:1, pitch: "e5"}), n({value:1, pitch: "f5"}), n({value:1, pitch: "g5"})
+	]);
+
+	return scored.render(line, {length: 1000, voices: [voice], numMeasures: 12});
 }

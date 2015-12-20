@@ -52,7 +52,7 @@ Line.calculateAverageMeasureLength = function (staves, lineLength, measures) {
  * @param line - instance of Line.
  * @param length - the length of the line.
  */
-Line.render = function (line, length, voices, numMeasures=1) {
+Line.render = function (line, {length, voices=[], numMeasures=1}) {
 	// Steps for rendering a Line.
 	// 1. Find the minimum width of each measure given the items that need to be renderred in it.
 	// 2. Warn if there's not enough room on the line.
