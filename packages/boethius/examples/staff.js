@@ -25,7 +25,7 @@ function testTwoLines () {
         n({value: 8, pitch: "c3"}), n({value: 8, pitch: "c#3"}), n({value: 4, pitch: "d3"}), n({value: 4, pitch: "e3"})
     ]);
 
-    scored.render(staff, {voices: [voice1, voice2], length: 500}).translate(25, 50);
+    scored.render(staff, {voices: [voice1, voice2], length: 500, numMeasures: 2}).translate(25, 50);
 }
 
 function testThreeLines () {
@@ -64,5 +64,5 @@ function testThreeLines () {
 
     ]);
 
-    scored.render(staff, {voices: [voice1, voice2, voice3], length: 500}).translate(600, 50);
+    scored.render(staff, {voices: [voice1, voice2, voice3], length: 500, numMeasures: 2}).translate(600, 50);
 }

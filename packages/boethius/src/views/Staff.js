@@ -5,7 +5,7 @@ import * as timeUtils from "../utils/timeUtils";
 import {isLine, isMarking} from "../types";
 import engraver from "../engraver";
 import constants from "../constants";
-import Measure from "./Measure";
+import {createMeasures} from "../utils/measure";
 import {getTimeContexts, b} from "../utils/line";
 import {groupVoices, getLineItems, calculateMeasureLengths, nextTimes, iterateByTime, renderTimeContext, positionMarkings} from "../utils/staff";
 import {map} from "../utils/common";
@@ -37,7 +37,7 @@ function Staff ({startMeasure=0, measures}, children=[]) {
 	// _.each(this.lines, line => line.addMarkings(this.markings));
 }
 
-Staff.render = function render (staff, {voices, length}) {
+Staff.render = function render (staff, {voices, measures, length, numMeasures}) {
 	const staffGroup = staff.render();
 
 	const lineGroups = staff.renderLines(length);
@@ -46,7 +46,7 @@ Staff.render = function render (staff, {voices, length}) {
 
 	staffGroup.addChild(engraver.drawStaffBar(lineGroups));
 
-	const measures = Measure.createMeasures(5, staff.markings);
+	measures = measures || createMeasures(numMeasures, staff.markings);
 
 	// get the time contexts
 	const lineItems = getLineItems(staff.lines, voices);

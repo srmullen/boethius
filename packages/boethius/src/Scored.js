@@ -22,6 +22,7 @@ import * as noteUtils from "./utils/note";
 import * as accidental from './utils/accidental';
 import * as common from "./utils/common";
 import * as timeUtils from "./utils/timeUtils";
+import * as measureUtils from "./utils/measure";
 import constants from "./constants";
 import _ from "lodash";
 
@@ -37,7 +38,14 @@ Scored.prototype.setup = function (canvas) {
 
 // Scored.projects = paper.projects;
 
-Scored.utils = {note: noteUtils, line: lineUtils, time: timeUtils, common, accidental};
+Scored.utils = {
+	note: noteUtils,
+	line: lineUtils,
+	time: timeUtils,
+	measure: measureUtils,
+	common,
+	accidental
+};
 
 Scored.prototype.layout = function (layout) {
 	return _.bind(parse, this)({}, layout) || [];

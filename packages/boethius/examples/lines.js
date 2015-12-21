@@ -16,13 +16,13 @@ function run () {
 	// testChords().translate(25, 50);
 	// testChordsTwoVoices().translate(25, 150);
 
-	renderingNotesOnLine().translate(25, 50);
+	// renderingNotesOnLine().translate(25, 50);
 	oneVoice().translate(25, 150);
 	twoVoices().translate(25, 250);
 	// testTriplets().translate(25, 100);
 	// testTripletsTwoVoices().translate(25, 350);
 
-	// testMeasureRendering().translate(25, 50);
+	testMeasureRendering().translate(25, 50);
 }
 
 function clefLines () {
@@ -424,5 +424,6 @@ function testMeasureRendering (startMeasure, measures) {
 		n({value:1, pitch: "d5"}), n({value:1, pitch: "e5"}), n({value:1, pitch: "f5"}), n({value:1, pitch: "g5"})
 	]);
 
-	return scored.render(line, {length: 1000, voices: [voice], numMeasures: 12});
+	var measures = Scored.utils.measure.createMeasures(12, line.children);
+	return scored.render(line, {length: 1000, voices: [voice], measures: measures, numMeasures: 4});
 }

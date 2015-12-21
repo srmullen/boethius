@@ -1,10 +1,5 @@
 import constants from "../constants";
 import engraver from "../engraver";
-import * as timeUtils from "../utils/timeUtils";
-import * as placement from "../utils/placement";
-import * as lineUtils from "../utils/line";
-import * as common from "../utils/common";
-import {isMeasure, isTimeSignature, isMarking} from "../types";
 import _ from "lodash";
 
 const TYPE = constants.type.measure;
@@ -88,49 +83,6 @@ Measure.prototype.getLayoutListWidth = function () {
 		return acc + item.group.bounds.width;
 	}, 0);
 };
-
-// originally in Line
-/*
- * @param numMeasures - the number of measures to create.
- * @param children - Measures or Markings
- */
-Measure.createMeasures = function (numMeasures, children) {
-	let measures = new Array(numMeasures);
-
-	// get the Measures from children and add them to the measures array
-	let [explicitMeasures, markings] = _.partition(_.filter(children, c => !!c), isMeasure),
-		measureMarkings = _.groupBy(markings, marking => marking.measure || 0);
-
-	{ // Put each measure in the right position in the measures array.
-	  // If a measure does not have an index property put it in the next available location.
-		let cur = 0;
-		_.each(explicitMeasures, (measure) => {
-			if (_.isNumber(measure.index)) {
-				measures[measure.index] = measure;
-				cur = measure.index + 1;
-			} else {
-				measures[cur] = measure;
-				cur++;
-			}
-		});
-	}
-
-	_.each(measures, (measure, i) => {
-		let previousMeasure = measures[i-1],
-			startsAt = previousMeasure ? previousMeasure.startsAt + timeUtils.getMeasureDuration(previousMeasure) : 0;
-
-		if (!measure) {
-			let timeSig = _.find(measureMarkings[i], isTimeSignature) || previousMeasure.timeSig;
-			measure = new Measure(_.extend({}, {startsAt, timeSig}), measureMarkings[i]);
-		} else {
-			measure.startsAt = startsAt;
-		}
-
-		measures[i] = measure;
-	});
-
-	return measures;
-}
 
 Measure.addGroupEvents = function (group) {
 	_.extend(group, {

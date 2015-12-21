@@ -75,6 +75,10 @@ function nextTimes (times) {
     return [nexts, rests];
 }
 
+/*
+ * @param fn - function to apply to the time context
+ * @param times context[][]
+ */
 function iterateByTime (fn, times) {
     let [nexts, rests] = nextTimes(times);
     const ret = [];

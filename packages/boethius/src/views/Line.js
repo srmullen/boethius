@@ -1,6 +1,7 @@
 import constants from "../constants";
 import engraver from "../engraver";
-import Measure from "./Measure";
+// import Measure from "./Measure";
+import {createMeasures} from "../utils/measure";
 import {getMeasureNumber, getMeasureByTime} from "../utils/timeUtils";
 import * as placement from "../utils/placement";
 import {isMarking, concat} from "../utils/common";
@@ -52,25 +53,28 @@ Line.calculateAverageMeasureLength = function (staves, lineLength, measures) {
  * @param line - instance of Line.
  * @param length - the length of the line.
  */
-Line.render = function (line, {length, voices=[], numMeasures=1}) {
+Line.render = function (line, {length, measures, voices=[], startMeasure=0, numMeasures=1}) {
 	// Steps for rendering a Line.
 	// 1. Find the minimum width of each measure given the items that need to be renderred in it.
 	// 2. Warn if there's not enough room on the line.
 	// 3. Stretch the measures to accomodate the line length.
 	// 4. Place items with the same stretch factor.
 
-	let lineGroup = line.render(length), // draw the line
-		// create the measures
-		measures = Measure.createMeasures(numMeasures, line.children);
+	const lineGroup = line.render(length); // draw the line
+
+	// create the measures if they wern't passed in
+	// measures = Measure.createMeasures(numMeasures, line.children);
+	measures = measures || createMeasures(numMeasures, line.children);
 
 	// position voice children
 	const noteHeadWidth = Scored.config.note.head.width,
 		shortestDuration = 0.125; // need function to calculate this.
 
 	// group and sort voice items by time.
-	let times = lineUtils.getTimeContexts(line, measures, _.reduce(voices, (acc, voice) => {
+	const times = lineUtils.getTimeContexts(line, measures, _.reduce(voices, (acc, voice) => {
 		return acc.concat(voice.children);
 	}, []));
+	// const times = voices.map(voice => lineUtils.getTimeContexts(line, measures, voice.children));
 
 	let accidentals = getAccidentalContexts(times);
 	// add accidentals to times
