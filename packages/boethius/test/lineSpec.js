@@ -1,6 +1,6 @@
 import {expect} from "chai";
 import Line from "../src/views/Line";
-import Measure from "../src/views/Measure";
+import * as Measure from "../src/utils/measure";
 import Scored from "../src/Scored";
 import {getTimeContexts, getAccidentals} from "../src/utils/line";
 

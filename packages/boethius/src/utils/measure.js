@@ -35,9 +35,10 @@ function createMeasures (numMeasures, children) {
 
 		if (!measure) {
 			let timeSig = _.find(measureMarkings[i], isTimeSignature) || previousMeasure.timeSig;
-			measure = new Measure(_.extend({}, {startsAt, timeSig}), measureMarkings[i]);
+			measure = new Measure(_.extend({}, {startsAt, timeSig, value: i}), measureMarkings[i]);
 		} else {
 			measure.startsAt = startsAt;
+			measure.value = i;
 		}
 
 		measures[i] = measure;

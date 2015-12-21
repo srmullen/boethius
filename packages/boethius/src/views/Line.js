@@ -52,6 +52,9 @@ Line.calculateAverageMeasureLength = function (staves, lineLength, measures) {
  * Static render is a self-contained render method. Handles all render method calls but provids less flexability.
  * @param line - instance of Line.
  * @param length - the length of the line.
+ * @param voices - voices to render on the line.
+ * @param startMeasure - the index of the measure is measure at which to start rendering.
+ * @param numMeasures - the number of measures to render on the line.
  */
 Line.render = function (line, {length, measures, voices=[], startMeasure=0, numMeasures=1}) {
 	// Steps for rendering a Line.
@@ -63,7 +66,6 @@ Line.render = function (line, {length, measures, voices=[], startMeasure=0, numM
 	const lineGroup = line.render(length); // draw the line
 
 	// create the measures if they wern't passed in
-	// measures = Measure.createMeasures(numMeasures, line.children);
 	measures = measures || createMeasures(numMeasures, line.children);
 
 	// position voice children

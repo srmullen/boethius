@@ -2,7 +2,7 @@ import {expect} from "chai";
 import _ from "lodash";
 
 import {getBeat, getTime, getMeasureNumber, getMeasureByTime, calculateDuration, calculateTupletDuration} from "../src/utils/timeUtils";
-import Measure from "../src/views/Measure";
+import {createMeasures} from "../src/utils/measure";
 import Scored from "../src/Scored";
 
 describe("timeUtils", () => {
@@ -39,7 +39,7 @@ describe("timeUtils", () => {
             let trebleClef = scored.clef({value: "treble", measure: 0}),
                 bassClef = scored.clef({value: "bass", measure: 2}),
                 fourfour = scored.timeSig({value: "4/4", measure: 0}),
-                measures = Measure.createMeasures(4, [fourfour]);
+                measures = createMeasures(4, [fourfour]);
 
             let trebleTime = getTime(measures, trebleClef);
             expect(trebleTime).to.eql({time: 0, measure: 0, beat: 0});
@@ -53,7 +53,7 @@ describe("timeUtils", () => {
                 note2 = scored.note({value: 16, time: 1.625}),
                 rest2 = scored.rest({value: 2, time: 2.5}),
                 fourfour = scored.timeSig({value: "4/4", measure: 0}),
-                measures = Measure.createMeasures(4, [fourfour]);
+                measures = createMeasures(4, [fourfour]);
 
             expect(getTime(measures, note1)).to.eql({time: 0, measure: 0, beat: 0});
             expect(getTime(measures, rest1)).to.eql({time: 0.25, measure: 0, beat: 1});
@@ -69,7 +69,7 @@ describe("timeUtils", () => {
 
     describe("getMeasureNumber", () => {
         it("should return the index of the measure in the measures array given the time", () => {
-            let measures = Measure.createMeasures(4, [scored.timeSig({value: "4/4", measure: 0})]);
+            let measures = createMeasures(4, [scored.timeSig({value: "4/4", measure: 0})]);
             expect(getMeasureNumber(measures, 0)).to.equal(0);
             expect(getMeasureNumber(measures, 0.5)).to.equal(0);
             expect(getMeasureNumber(measures, 0.99)).to.equal(0);
@@ -81,7 +81,7 @@ describe("timeUtils", () => {
 
     describe("getMeasureByTime", () => {
         it("should return the measure that contains the given time", () => {
-            let measures = Measure.createMeasures(4, [scored.timeSig({value: "4/4", measure: 0})]);
+            let measures = createMeasures(4, [scored.timeSig({value: "4/4", measure: 0})]);
             expect(getMeasureByTime(measures, 0)).to.equal(measures[0]);
             expect(getMeasureByTime(measures, 0.5)).to.equal(measures[0]);
             expect(getMeasureByTime(measures, 0.99)).to.equal(measures[0]);

@@ -5,12 +5,16 @@ import _ from "lodash";
 const TYPE = constants.type.measure;
 
 /*
+ * @param value - The measure number.
  * @param timeSig - TimeSignature. Required.
+ * @param startsAt - Time the measure starts at.
  */
-function Measure ({timeSig, startsAt=0}, children=[]) {
+function Measure ({value, timeSig, startsAt=0}, children=[]) {
 	if (!timeSig) {
 		throw new Error("Time Signature is required when initializing Measure");
 	}
+
+	this.value = value;
 	this.timeSig = timeSig;
 	this.startsAt = startsAt;
 	this.children = children;

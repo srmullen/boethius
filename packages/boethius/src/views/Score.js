@@ -3,7 +3,7 @@ import _ from "lodash";
 import Line from "./Line";
 import Staff from "./Staff";
 import constants from "../constants";
-import Measure from "./Measure";
+import {createMeasures} from "../utils/measure";
 
 const TYPE = constants.type.score;
 
@@ -19,7 +19,7 @@ function Score ({measures=1}, children=[]) {
      */
     const types = _.groupBy(children, child => child.type);
 
-    this.measures = Measure.createMeasures(measures, types.timeSig);
+    this.measures = createMeasures(measures, types.timeSig);
     this.lines = types.line || [];
     this.staves = types.staff || [];
     _.each(this.lines, line => line.children = this.measures);

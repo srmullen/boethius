@@ -138,9 +138,7 @@ function renderTimeContext (lineCenter, cursor, {time, items, context}) {
 	}));
 
 	// next time is at smallest distance
-	cursor = _.min(possibleNextPositions);
-
-	return cursor;
+	return _.min(possibleNextPositions);
 }
 
 export {

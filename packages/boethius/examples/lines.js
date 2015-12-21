@@ -17,8 +17,8 @@ function run () {
 	// testChordsTwoVoices().translate(25, 150);
 
 	// renderingNotesOnLine().translate(25, 50);
-	oneVoice().translate(25, 150);
-	twoVoices().translate(25, 250);
+	// oneVoice().translate(25, 150);
+	// twoVoices().translate(25, 250);
 	// testTriplets().translate(25, 100);
 	// testTripletsTwoVoices().translate(25, 350);
 
