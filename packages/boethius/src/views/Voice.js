@@ -154,6 +154,8 @@ function getAllStemDirections (beamings, centerLineValue) {
 }
 
 /*
+ * Render decorations (beams, tuples, slurs, etc) on items. If an item doesn't belong to a
+ * measure in the measures array then decoration for it won't be rendered.
  * @param line - Line that the voice is being rendered on.
  * @param measures - Measure[]
  */
@@ -163,14 +165,19 @@ Voice.prototype.renderDecorations = function (line, measures) {
         itemsByMeasure = _.groupBy(this.children, child => getMeasureNumber(measures, child.time)),
         stemDirection = this.stemDirection;
 
-    _.map(itemsByMeasure, (items, measureNum) => {
+    _.map(measures, (measure) => {
+        const items = itemsByMeasure[measure.value];
         const pitched = _.filter(items, item => isNote(item) || isChord(item));
         pitched.map(note => note.drawLegerLines(b, Scored.config.lineSpacing));
     });
 
-    // beam the notes
-    _.map(itemsByMeasure, (items, measure) => {
-        let context = line.contextAt(measures, {measure: Number.parseInt(measure)});
+    _.map(measures, (measure) => {
+        const items = itemsByMeasure[measure.value];
+
+        // Nothing to do if there are no items in the measure.
+        if (!items) return;
+
+        const context = line.contextAt(measures, {measure: measure.value});
         let centerLineValue = getCenterLineValue(context.clef);
         // TODO: Should only iterate once for all grouping types. (beams, tuplets, etc.)
 

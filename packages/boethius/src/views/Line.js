@@ -68,6 +68,8 @@ Line.render = function (line, {length, measures, voices=[], startMeasure=0, numM
 	// create the measures if they wern't passed in
 	measures = measures || createMeasures(numMeasures, line.children);
 
+	const endMeasure = startMeasure + numMeasures;
+
 	// position voice children
 	const noteHeadWidth = Scored.config.note.head.width,
 		shortestDuration = 0.125; // need function to calculate this.
@@ -78,25 +80,33 @@ Line.render = function (line, {length, measures, voices=[], startMeasure=0, numM
 	}, []));
 	// const times = voices.map(voice => lineUtils.getTimeContexts(line, measures, voice.children));
 
-	let accidentals = getAccidentalContexts(times);
+	// get the times that are to be rendered on the line.
+	const timesToRender = _.filter(times, (time) => {
+		return time.time.measure >= startMeasure && time.time.measure < endMeasure
+	});
+	const measuresToRender = _.slice(measures, startMeasure, endMeasure);
+
+	let accidentals = getAccidentalContexts(timesToRender);
 	// add accidentals to times
-	_.each(times, (time, i) => time.context.accidentals = accidentals[i]);
+	_.each(timesToRender, (time, i) => time.context.accidentals = accidentals[i]);
 
 	// render all items
-	line.renderItems(times);
+	line.renderItems(timesToRender);
 
 	// calculating measure lengths
-	const measureLengths = lineUtils.calculateMeasureLengths(measures, times, noteHeadWidth, shortestDuration);
-
+	// const measureLengths = lineUtils.calculateMeasureLengths(measures, times, noteHeadWidth, shortestDuration);
+	const measureLengths = lineUtils.calculateMeasureLengths(measuresToRender, timesToRender, noteHeadWidth, shortestDuration);
+	console.log(measureLengths);
 	// render measures.
-	const measureGroups = line.renderMeasures(measures, measureLengths, lineGroup, length);
+	const measureGroups = line.renderMeasures(measuresToRender, measureLengths, lineGroup, length);
+	// const measureGroups = line.renderMeasures(measures, measureLengths, lineGroup, length);
 
 	lineGroup.addChildren(measureGroups);
 
 	// place all items
 	const b = lineUtils.b(lineGroup);
-	_.reduce(times, (cursor, ctx, i) => {
-		const previousMeasureNumber = times[i-1] ? times[i-1].time.measure : 0;
+	_.reduce(timesToRender, (cursor, ctx, i) => {
+		const previousMeasureNumber = timesToRender[i-1] ? timesToRender[i-1].time.measure : 0;
 		// update cursor if it's a new measure
 		if (ctx.time.measure !== previousMeasureNumber) {
 			let measure = measures[ctx.time.measure];
@@ -107,7 +117,7 @@ Line.render = function (line, {length, measures, voices=[], startMeasure=0, numM
 	}, noteHeadWidth);
 
 	_.each(voices, voice => {
-		voice.renderDecorations(line, measures);
+		voice.renderDecorations(line, measuresToRender);
 	});
 
 	return lineGroup;
@@ -148,10 +158,12 @@ Line.prototype.renderMeasures = function (measures, lengths, lineGroup, lineLeng
 }
 
 /*
- * returns the clef, time signature and accidentals at the given time.
+ * Returns the clef, time signature and accidentals at the given time.
+ * Currently requires that all measures starting from time 0 are given.
  */
 Line.prototype.contextAt = function (measures, time) {
 	let measure = measures[time.measure];
+	// const measure = _.find(measures, measure => measure.value = time.measure);
 
 	if (!measure) return null;
 
