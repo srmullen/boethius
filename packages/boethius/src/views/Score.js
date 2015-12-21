@@ -19,7 +19,6 @@ function Score ({measures=1}, children=[]) {
      */
     const types = _.groupBy(children, child => child.type);
 
-    this.measures = createMeasures(measures, types.timeSig);
     this.lines = types.line || [];
     this.staves = types.staff || [];
     _.each(this.lines, line => line.children = this.measures);
@@ -43,7 +42,11 @@ Score.prototype.voice = function (voice) {
 }
 
 Score.render = function (score) {
-    return score.render();
+    const scoreGroup = this.render();
+
+    // measures = createMeasures(measures, types.timeSig);
+
+    return scoreGroup;
 }
 
 Score.prototype.render = function () {
