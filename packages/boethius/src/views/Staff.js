@@ -37,10 +37,12 @@ function Staff ({startMeasure=0, measures}, children=[]) {
 	// _.each(this.lines, line => line.addMarkings(this.markings));
 }
 
-Staff.render = function render (staff, {voices, measures, length, numMeasures}) {
+Staff.render = function render (staff, {voices, measures, length, startMeasure=0, numMeasures}) {
 	const staffGroup = staff.render();
 
 	const lineGroups = staff.renderLines(length);
+
+	const endMeasure = startMeasure + numMeasures;
 
 	staffGroup.addChildren(lineGroups);
 
@@ -53,8 +55,16 @@ Staff.render = function render (staff, {voices, measures, length, numMeasures}) 
 
 	const lineTimes = map((line, items) => getTimeContexts(line, measures, items), staff.lines, lineItems);
 
+	// get the times that are to be rendered on the staff.
+	const lineTimesToRender = _.map(lineTimes, (line) => {
+		return _.filter(line, (time) => {
+			return time.time.measure >= startMeasure && time.time.measure < endMeasure
+		});
+	});
+	const measuresToRender = _.slice(measures, startMeasure, endMeasure);
+
 	// calculate the accidentals for each line.
-	_.each(lineTimes, (times, i) => {
+	_.each(lineTimesToRender, (times, i) => {
 		let accidentals = getAccidentalContexts(times);
 		// add accidentals to times
 		_.each(times, (time, i) => time.context.accidentals = accidentals[i]);
@@ -65,14 +75,14 @@ Staff.render = function render (staff, {voices, measures, length, numMeasures}) 
 	const noteHeadWidth = Scored.config.note.head.width;
 	const shortestDuration = 0.125; // need function to calculate this.
 
-	const measureLengths = calculateMeasureLengths(measures, lineTimes, noteHeadWidth, shortestDuration)
+	const measureLengths = calculateMeasureLengths(measuresToRender, lineTimesToRender, noteHeadWidth, shortestDuration)
 
-	const measureGroups = staff.renderMeasures(measures, measureLengths, lineGroups);
+	const measureGroups = staff.renderMeasures(measuresToRender, measureLengths, lineGroups);
 
 	staffGroup.addChildren(measureGroups);
 
 	// place all items
-	const staffTimes = iterateByTime(x => x, lineTimes);
+	const staffTimes = iterateByTime(x => x, lineTimesToRender);
 	_.reduce(staffTimes, (cursor, ctxs, i) => {
 		const lineIndices = _.filter(_.map(ctxs, (ctx, i) => ctx ? i : undefined), _.isNumber);
 		const lineCenters = _.map(lineIndices, idx => b(lineGroups[idx]));
@@ -94,7 +104,7 @@ Staff.render = function render (staff, {voices, measures, length, numMeasures}) 
 	}, noteHeadWidth);
 
 	map((line, voice) => {
-		return voice.renderDecorations(line, measures);
+		return voice.renderDecorations(line, measuresToRender);
 	}, staff.lines, voices);
 
 	return staffGroup;
