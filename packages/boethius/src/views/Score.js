@@ -3,7 +3,10 @@ import _ from "lodash";
 import Line from "./Line";
 import Staff from "./Staff";
 import constants from "../constants";
+import {map} from "../utils/common";
 import {createMeasures} from "../utils/measure";
+import {getTimeContexts, b} from "../utils/line";
+import {groupVoices, getLineItems, calculateMeasureLengths, nextTimes, iterateByTime, renderTimeContext, positionMarkings} from "../utils/staff";
 
 const TYPE = constants.type.score;
 
@@ -19,38 +22,33 @@ function Score ({measures=1}, children=[]) {
      */
     const types = _.groupBy(children, child => child.type);
 
+    this.timeSigs = types.timeSig || [];
     this.lines = types.line || [];
     this.staves = types.staff || [];
-    _.each(this.lines, line => line.children = this.measures);
+    // _.each(this.lines, line => line.children = this.measures);
 }
 
 Score.prototype.type = TYPE;
 
-Score.prototype.note = function (note) {
-    let line = getLineByVoice(note.voice, this.lines);
-    line.note(note, this.measures);
-}
+Score.render = function (score, {measures, voices=[], numMeasures}) {
+    const scoreGroup = score.render();
 
-Score.prototype.rest = function (rest) {
-    let line = getLineByVoice(rest.voice, this.lines);
-    line.rest(rest, this.measures);
-}
+    measures = measures || createMeasures(numMeasures, score.timeSigs);
 
-Score.prototype.voice = function (voice) {
-    let line = getLineByVoice(voice.value, this.lines);
-    voice.children.map((note) => line.note(note, this.measures));
-}
+    // get the time contexts
+	const lineItems = getLineItems(score.lines, voices);
+    
+	const lineTimes = map((line, items) => getTimeContexts(line, measures, items), score.lines, lineItems);
 
-Score.render = function (score) {
-    const scoreGroup = this.render();
-
-    // measures = createMeasures(measures, types.timeSig);
+    let staffGroups = _.map(score.staves, (staff) => {
+        console.log("staff");
+    });
 
     return scoreGroup;
 }
 
 Score.prototype.render = function () {
-    const group = this.group = new paper.Group({
+    const group = new paper.Group({
         name: TYPE
     });
 
@@ -65,6 +63,10 @@ Score.prototype.render = function () {
     group.addChildren(staves);
 
     return group;
+}
+
+Score.renderStaff = function (staff, lines) {
+
 }
 
 function getLineByVoice (voice, lines) {
