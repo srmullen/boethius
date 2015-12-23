@@ -29,18 +29,13 @@ function Staff ({startMeasure=0, measures}, children=[]) {
 
 	this.children = children;
 
-	this.lines = _.filter(children, isLine);
-
 	this.markings = _.filter(children, isMarking);
-
-	// add the markings to each line.
-	// _.each(this.lines, line => line.addMarkings(this.markings));
 }
 
-Staff.render = function render (staff, {voices, measures, length, startMeasure=0, numMeasures}) {
+Staff.render = function render (staff, {lines=[], voices=[], measures, length, startMeasure=0, numMeasures}) {
 	const staffGroup = staff.render();
 
-	const lineGroups = staff.renderLines(length);
+	const lineGroups = staff.renderLines(lines, length);
 
 	const endMeasure = startMeasure + numMeasures;
 
@@ -51,9 +46,9 @@ Staff.render = function render (staff, {voices, measures, length, startMeasure=0
 	measures = measures || createMeasures(numMeasures, staff.markings);
 
 	// get the time contexts
-	const lineItems = getLineItems(staff.lines, voices);
+	const lineItems = getLineItems(lines, voices);
 
-	const lineTimes = map((line, items) => getTimeContexts(line, measures, items), staff.lines, lineItems);
+	const lineTimes = map((line, items) => getTimeContexts(line, measures, items), lines, lineItems);
 
 	// get the times that are to be rendered on the staff.
 	const lineTimesToRender = _.map(lineTimes, (line) => {
@@ -69,7 +64,7 @@ Staff.render = function render (staff, {voices, measures, length, startMeasure=0
 		// add accidentals to times
 		_.each(times, (time, i) => time.context.accidentals = accidentals[i]);
 
-		staff.lines[i].renderItems(times);
+		lines[i].renderItems(times);
 	});
 
 	const noteHeadWidth = Scored.config.note.head.width;
@@ -105,7 +100,7 @@ Staff.render = function render (staff, {voices, measures, length, startMeasure=0
 
 	map((line, voice) => {
 		return voice.renderDecorations(line, measuresToRender);
-	}, staff.lines, voices);
+	}, lines, voices);
 
 	return staffGroup;
 }
@@ -113,16 +108,16 @@ Staff.render = function render (staff, {voices, measures, length, startMeasure=0
 Staff.prototype.type = TYPE;
 
 Staff.prototype.render = function (lines, startMeasure=0, numMeasures) {
-	const group = this.group = new paper.Group({
+	const group = new paper.Group({
 		name: TYPE
 	});
 
 	return group;
 };
 
-Staff.prototype.renderLines = function (length) {
+Staff.prototype.renderLines = function (lines, length) {
 	// draw each line
-	let lineGroups = this.lines.map(line => line.render(length));
+	let lineGroups = lines.map(line => line.render(length));
 
 	_.each(lineGroups, (lineGroup, j) => {
 		lineGroup.translate([0, 120 * j]);

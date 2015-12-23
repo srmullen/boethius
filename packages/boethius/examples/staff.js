@@ -1,7 +1,7 @@
 function run () {
-    // testTwoLines().translate(25, 50);
-    // testThreeLines().translate(600, 50);
-    testMeasureRendering().translate(25, 50);
+    testTwoLines().translate(25, 50);
+    testThreeLines().translate(600, 50);
+    testMeasureRendering().translate(25, 400);
 }
 
 function testTwoLines () {
@@ -14,7 +14,7 @@ function testTwoLines () {
                                  scored.timeSig({value: "4/4", measure: 0})
                              ]);
 
-    var staff = scored.staff({}, [scored.timeSig({value: "4/4", measure: 0}), line1, line2]);
+    var staff = scored.staff({}, [scored.timeSig({value: "4/4", measure: 0})]);
 
     var n = scored.note;
 
@@ -26,7 +26,7 @@ function testTwoLines () {
         n({value: 8, pitch: "c3"}), n({value: 8, pitch: "c#3"}), n({value: 4, pitch: "d3"}), n({value: 4, pitch: "e3"})
     ]);
 
-    return scored.render(staff, {voices: [voice1, voice2], length: 500, numMeasures: 2});
+    return scored.render(staff, {lines: [line1, line2], voices: [voice1, voice2], length: 500, numMeasures: 2});
 }
 
 function testThreeLines () {
@@ -44,7 +44,7 @@ function testThreeLines () {
                                 scored.timeSig({value: "4/4", measure: 0})
                             ]);
 
-    var staff = scored.staff({}, [scored.timeSig({value: "4/4", measure: 0}), line1, line2, line3]);
+    var staff = scored.staff({}, [scored.timeSig({value: "4/4", measure: 0})]);
 
     var n = scored.note;
     var c = scored.chord;
@@ -65,7 +65,7 @@ function testThreeLines () {
 
     ]);
 
-    return scored.render(staff, {voices: [voice1, voice2, voice3], length: 500, numMeasures: 2});
+    return scored.render(staff, {lines: [line1, line2, line3], voices: [voice1, voice2, voice3], length: 500, numMeasures: 2});
 }
 
 function testMeasureRendering () {
@@ -89,7 +89,7 @@ function testMeasureRendering () {
 		n({value:1, pitch: "b2"}), n({value:1, pitch: "a2"}), n({value:1, pitch: "g2"}), n({value:1, pitch: "f2"})
 	]);
 
-    var staff = scored.staff({}, [scored.timeSig({value: "4/4", measure: 0}), treble, bass]);
+    var staff = scored.staff({}, [scored.timeSig({value: "4/4", measure: 0})]);
 	var measures = Scored.utils.measure.createMeasures(12, staff.markings);
-	return scored.render(staff, {length: 1000, voices: [voice1, voice2], measures: measures, startMeasure: 4, numMeasures: 8});
+	return scored.render(staff, {length: 1000, lines: [treble, bass], voices: [voice1, voice2], measures: measures, startMeasure: 0, numMeasures: 12});
 }
