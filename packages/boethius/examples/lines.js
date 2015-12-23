@@ -16,13 +16,13 @@ function run () {
 	// testChords().translate(25, 50);
 	// testChordsTwoVoices().translate(25, 150);
 	//
-	// renderingNotesOnLine().translate(25, 50);
-	// oneVoice().translate(25, 150);
-	// twoVoices().translate(25, 250);
+	renderingNotesOnLine().translate(25, 50);
+	oneVoice().translate(25, 150);
+	twoVoices().translate(25, 250);
 	// testTriplets().translate(25, 100);
-	// testTripletsTwoVoices().translate(25, 350);
+	testTripletsTwoVoices().translate(25, 350);
 
-	testMeasureRendering().translate(25, 50);
+	// testMeasureRendering().translate(25, 50);
 }
 
 function clefLines () {

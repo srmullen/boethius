@@ -64,7 +64,8 @@ Staff.render = function render (staff, {lines=[], voices=[], measures, length, s
 		// add accidentals to times
 		_.each(times, (time, i) => time.context.accidentals = accidentals[i]);
 
-		lines[i].renderItems(times);
+		const children = lines[i].renderItems(times);
+		lineGroups[i].addChildren(children);
 	});
 
 	const noteHeadWidth = Scored.config.note.head.width;
@@ -77,10 +78,11 @@ Staff.render = function render (staff, {lines=[], voices=[], measures, length, s
 	staffGroup.addChildren(measureGroups);
 
 	// place all items
+	const lineCenters = _.map(lineGroups, b);
 	const staffTimes = iterateByTime(x => x, lineTimesToRender);
 	_.reduce(staffTimes, (cursor, ctxs, i) => {
 		const lineIndices = _.filter(_.map(ctxs, (ctx, i) => ctx ? i : undefined), _.isNumber);
-		const lineCenters = _.map(lineIndices, idx => b(lineGroups[idx]));
+		const centers = _.map(lineIndices, idx => lineCenters[idx]);
 		const previousTime = staffTimes[i-1] ? _.find(staffTimes[i-1], x => x).time : 0;
 		const currentTime = ctxs[lineIndices[0]].time;
 		// update cursor if it's a new measure
@@ -90,17 +92,19 @@ Staff.render = function render (staff, {lines=[], voices=[], measures, length, s
 		}
 
 		// place all the markings in the time context.
-		cursor = _.max(_.map(lineIndices, (idx, i) => positionMarkings(lineCenters[i], cursor, ctxs[idx])));
+		cursor = _.max(_.map(lineIndices, (idx, i) => positionMarkings(centers[i], cursor, ctxs[idx])));
 
 		// place the items that have duration
-		let possibleNextPositions = _.map(lineIndices, (idx, i) => renderTimeContext(lineCenters[i], cursor, ctxs[idx]));
+		let possibleNextPositions = _.map(lineIndices, (idx, i) => renderTimeContext(centers[i], cursor, ctxs[idx]));
 
 		return _.min(possibleNextPositions);
 	}, noteHeadWidth);
 
-	map((line, voice) => {
-		return voice.renderDecorations(line, measuresToRender);
-	}, lines, voices);
+	map((line, lineGroup, lineCenter, voice) => {
+		const children = voice.renderDecorations(line, lineCenter, measuresToRender);
+		lineGroup.addChildren(children);
+		return children;
+	}, lines, lineGroups, lineCenters, voices);
 
 	return staffGroup;
 }

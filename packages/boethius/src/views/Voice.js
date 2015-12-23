@@ -159,17 +159,19 @@ function getAllStemDirections (beamings, centerLineValue) {
  * @param line - Line that the voice is being rendered on.
  * @param measures - Measure[]
  */
-Voice.prototype.renderDecorations = function (line, measures) {
+Voice.prototype.renderDecorations = function (line, centerLine, measures) {
     // group children by measures
-    let b = lineUtils.b(line.group),
+    let //b = lineUtils.b(line.group),
         itemsByMeasure = _.groupBy(this.children, child => getMeasureNumber(measures, child.time)),
         stemDirection = this.stemDirection;
 
     _.map(measures, (measure) => {
         const items = itemsByMeasure[measure.value];
         const pitched = _.filter(items, item => isNote(item) || isChord(item));
-        pitched.map(note => note.drawLegerLines(b, Scored.config.lineSpacing));
+        pitched.map(note => note.drawLegerLines(centerLine, Scored.config.lineSpacing));
     });
+
+    let lineChildren = []; // array of groups to be added to the line group
 
     _.map(measures, (measure) => {
         const items = itemsByMeasure[measure.value];
@@ -190,16 +192,18 @@ Voice.prototype.renderDecorations = function (line, measures) {
         let beams = _.compact(mapDeep(_.partial(stemAndBeam, centerLineValue), beamings, stemDirections));
 
         if (beams && beams.length) {
-            line.group.addChildren(beams);
+            lineChildren = lineChildren.concat(beams);
         }
 
         // tuplets
         let tuplets = Voice.groupTuplets(items);
-        let tupletGroups = tuplets.map(tuplet => drawTuplets(tuplet, b, this.stemDirection));
+        let tupletGroups = tuplets.map(tuplet => drawTuplets(tuplet, centerLine, this.stemDirection));
         if (tupletGroups && tupletGroups.length) {
-            line.group.addChildren(tupletGroups);
+            lineChildren = lineChildren.concat(tupletGroups);
         }
     });
+
+    return lineChildren;
 }
 
 /*

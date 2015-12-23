@@ -91,15 +91,13 @@ Line.render = function (line, {length, measures, voices=[], startMeasure=0, numM
 	_.each(timesToRender, (time, i) => time.context.accidentals = accidentals[i]);
 
 	// render all items
-	line.renderItems(timesToRender);
+	lineGroup.addChildren(line.renderItems(timesToRender));
 
 	// calculating measure lengths
-	// const measureLengths = lineUtils.calculateMeasureLengths(measures, times, noteHeadWidth, shortestDuration);
 	const measureLengths = lineUtils.calculateMeasureLengths(measuresToRender, timesToRender, noteHeadWidth, shortestDuration);
-	console.log(measureLengths);
+
 	// render measures.
 	const measureGroups = line.renderMeasures(measuresToRender, measureLengths, lineGroup, length);
-	// const measureGroups = line.renderMeasures(measures, measureLengths, lineGroup, length);
 
 	lineGroup.addChildren(measureGroups);
 
@@ -117,24 +115,25 @@ Line.render = function (line, {length, measures, voices=[], startMeasure=0, numM
 	}, noteHeadWidth);
 
 	_.each(voices, voice => {
-		voice.renderDecorations(line, measuresToRender);
+		const children = voice.renderDecorations(line, b, measuresToRender);
+		lineGroup.addChildren(children);
 	});
 
 	return lineGroup;
 }
 
 Line.prototype.render = function (length) {
-	const group = this.group = engraver.drawLine(length);
+	const group = engraver.drawLine(length);
 	group.name = TYPE;
 	group.strokeColor = "black";
 	return group;
 }
 
 Line.prototype.renderItems = function (times) {
-	_.each(times, ({time, items, context}) => {
+	return _.reduce(times, (acc, {time, items, context}) => {
 		let groups = _.map(items, item => renderItem(item, context));
-		this.group.addChildren(groups);
-	});
+		return acc.concat(groups);
+	}, []);
 }
 
 /*
@@ -210,7 +209,6 @@ Line.renderNote = function (note, context) {
 Line.renderChord = function (chord, context) {
 	let group = chord.render();
 	Chord.renderAccidentals(chord, context);
-	// Chord.renderStem(chord);
 	return group;
 }
 
