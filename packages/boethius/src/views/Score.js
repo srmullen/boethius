@@ -37,12 +37,16 @@ Score.render = function (score, {measures, voices=[], numMeasures}) {
 
     // get the time contexts
 	const lineItems = getLineItems(score.lines, voices);
-    
+
 	const lineTimes = map((line, items) => getTimeContexts(line, measures, items), score.lines, lineItems);
 
-    let staffGroups = _.map(score.staves, (staff) => {
-        console.log("staff");
+    let staffGroups = _.map(score.staves, (staff, i) => {
+        const staffGroup = Staff.render(staff, {length: 1000, measures, voices, lines: score.lines, numMeasures});
+        staffGroup.translate(0, i * 250);
+        return staffGroup;
     });
+
+    scoreGroup.addChildren(staffGroups);
 
     return scoreGroup;
 }
@@ -51,16 +55,6 @@ Score.prototype.render = function () {
     const group = new paper.Group({
         name: TYPE
     });
-
-    let staves = _.map(this.staves, (staff) => {
-        let group = staff.render(this.lines, staff.startMeasure, staff.measures);
-        staff.renderMeasures(this.lines, group.children, staff.startMeasure, staff.measures);
-        return group;
-    });
-
-    staves.map((staff, i) => staff.translate(0, i * 300));
-
-    group.addChildren(staves);
 
     return group;
 }

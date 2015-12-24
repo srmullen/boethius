@@ -27,9 +27,10 @@ function testDoubleStaffScore () {
     var fourfour = scored.timeSig({value: "4/4", measure: 0});
 
     // create staves
-    var staff = scored.staff({});
+    var staff1 = scored.staff({});
+    var staff2 = scored.staff({});
 
-    var score = scored.score({}, [fourfour, staff, trebleLine, bassLine]);
+    var score = scored.score({}, [fourfour, staff1, staff2, trebleLine, bassLine]);
 
     // render it all as a score.
     return scored.render(score, {numMeasures: 12, voices: [soprano, bass]});
