@@ -22,7 +22,7 @@ const TYPE = constants.type.staff;
  // TODO: Should Staff implement lilypond types such as StaffGroup, ChoirStaff, GrandStaff, and PianoStaff?
  // @param children <Line, Measure, Marking>[] - A marking that is given to the staff will be rendered on all lines. If it is
  // 	given to a line it will only affect that line.
-function Staff ({startMeasure=0, measures}, children=[]) {
+function Staff ({startMeasure=0, measures=4}, children=[]) {
 	this.startMeasure = startMeasure;
 
 	this.measures = measures;

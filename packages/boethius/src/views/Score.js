@@ -30,8 +30,10 @@ function Score ({measures=1}, children=[]) {
 
 Score.prototype.type = TYPE;
 
-Score.render = function (score, {measures, voices=[], numMeasures}) {
+Score.render = function (score, {measures, voices=[]}) {
     const scoreGroup = score.render();
+
+    const numMeasures = _.sum(score.staves, staff => staff.measures);
 
     measures = measures || createMeasures(numMeasures, score.timeSigs);
 
@@ -40,9 +42,20 @@ Score.render = function (score, {measures, voices=[], numMeasures}) {
 
 	const lineTimes = map((line, items) => getTimeContexts(line, measures, items), score.lines, lineItems);
 
-    let staffGroups = _.map(score.staves, (staff, i) => {
-        const staffGroup = Staff.render(staff, {length: 1000, measures, voices, lines: score.lines, numMeasures});
+    let startMeasure = 0;
+    const staffGroups = _.map(score.staves, (staff, i) => {
+        const staffGroup = Staff.render(staff, {
+            length: 1000,
+            measures,
+            voices,
+            lines: score.lines,
+            startMeasure,
+            numMeasures: staff.measures
+        });
         staffGroup.translate(0, i * 250);
+
+        startMeasure += staff.measures;
+
         return staffGroup;
     });
 
