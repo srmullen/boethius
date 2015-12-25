@@ -232,14 +232,14 @@ function calculateDefaultAccidentalPosition (note) {
  * @param shortestDuration - Number
  * @return - pixel length of the time frame.
  */
-function calculateTimeLength (items, shortestDuration) {
+function calculateTimeLength (items, shortestDuration, scale = 1) {
 	const noteHeadWidth = Scored.config.note.head.width;
 	let [markings, voiceItems] = _.partition(items, isMarking),
 		markingsLength = _.sum(markings.map(marking => marking.group.bounds.width + noteHeadWidth)),
 		voiceItemsLength = _.min(_.map(voiceItems, item => {
 			return item.group.bounds.width + (noteHeadWidth * getStaffSpace(shortestDuration, item));
 		}));
-	return markingsLength + voiceItemsLength;
+	return markingsLength + (voiceItemsLength * scale);
 }
 
 function placeMarking (lineCenter, cursor, marking) {

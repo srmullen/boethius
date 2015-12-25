@@ -63,14 +63,14 @@ function getTimeContexts (line, measures, items) {
 	return times;
 }
 
-function calculateMeasureLengths (measures, times, noteHeadWidth, shortestDuration) {
+function calculateMeasureLengths (measures, times, noteHeadWidth, shortestDuration, scale = 1) {
 	// group items by measure.
 	let itemsInMeasure = _.groupBy(times, (item) => {
 		return item.time.measure;
 	});
 
 	let measureLengths = _.map(measures, (measure) => {
-		let measureLength = _.sum(_.map(itemsInMeasure[measure.value], ({items}) => calculateTimeLength(items, shortestDuration)));
+		let measureLength = _.sum(_.map(itemsInMeasure[measure.value], ({items}) => calculateTimeLength(items, shortestDuration, scale)));
 		measureLength += noteHeadWidth;
 		return measureLength;
 	});
@@ -78,21 +78,27 @@ function calculateMeasureLengths (measures, times, noteHeadWidth, shortestDurati
 	return measureLengths;
 }
 
-function renderTimeContext (lineCenter, cursor, {time, items, context}) {
-	let {
+function positionMarkings (lineCenter, cursor, {time, items, context}) {
+    let {
 		clef: clefs,
 		key: keys,
-		timeSig: timeSigs,
+		timeSig: timeSigs
+	} = _.groupBy(items, item => item.type);
+
+	// place the markings
+	if (clefs) cursor = placement.placeMarking(lineCenter, cursor, clefs[0]);
+	if (keys) cursor = placement.placeMarking(lineCenter, cursor, keys[0]);
+	if (timeSigs) cursor = placement.placeMarking(lineCenter, cursor, timeSigs[0]);
+
+    return cursor;
+}
+
+function renderTimeContext (lineCenter, cursor, {time, items, context}) {
+	const {
 		note: notes,
 		rest: rests,
 		chord: chords
 	} = _.groupBy(items, item => item.type);
-
-	// place the markings
-	// There will never be more than one marking of a type for a Line.
-	if (clefs) cursor = placement.placeMarking(lineCenter, cursor, clefs[0]);
-	if (keys) cursor = placement.placeMarking(lineCenter, cursor, keys[0]);
-	if (timeSigs) cursor = placement.placeMarking(lineCenter, cursor, timeSigs[0]);
 
 	let possibleNextPositions = [];
 
@@ -151,5 +157,6 @@ export {
 	getMeasure,
 	getTimeContexts,
 	calculateMeasureLengths,
-	renderTimeContext
+	renderTimeContext,
+	positionMarkings
 }

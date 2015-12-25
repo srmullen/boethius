@@ -32,11 +32,6 @@ function Line ({voices={}}, children=[]) {
 	this.voices = voices;
 }
 
-Line.prototype.addMarkings = function (markings) {
-	// FIXME: overwrites markings already on the line.
-	this.markings = _.sortBy(this.markings.concat(markings), m => m.measure);
-}
-
 Line.prototype.type = TYPE;
 
 /*
@@ -63,8 +58,6 @@ Line.render = function (line, {length, measures, voices=[], startMeasure=0, numM
 	// 3. Stretch the measures to accomodate the line length.
 	// 4. Place items with the same stretch factor.
 
-	const lineGroup = line.render(length); // draw the line
-
 	// create the measures if they wern't passed in
 	measures = measures || createMeasures(numMeasures, line.children);
 
@@ -90,14 +83,27 @@ Line.render = function (line, {length, measures, voices=[], startMeasure=0, numM
 	// add accidentals to times
 	_.each(timesToRender, (time, i) => time.context.accidentals = accidentals[i]);
 
-	// render all items
-	lineGroup.addChildren(line.renderItems(timesToRender));
+	// render the items. needed for calculating the measureLengths
+	const lineItems = line.renderItems(timesToRender);
 
-	// calculating measure lengths
-	const measureLengths = lineUtils.calculateMeasureLengths(measuresToRender, timesToRender, noteHeadWidth, shortestDuration);
+	// calculating minimum measure lengths
+	const minMeasureLengths = lineUtils.calculateMeasureLengths(measuresToRender, timesToRender, noteHeadWidth, shortestDuration);
+
+	const minLineLength = _.sum(minMeasureLengths);
+
+	const scale = length / minLineLength; // FIXME: need to calculate scale factor as measure lengths are being calculated.
+
+	const measureLengths = lineUtils.calculateMeasureLengths(measuresToRender, timesToRender, noteHeadWidth, shortestDuration, scale);
+
+	// draw the line
+	const lineGroup = line.render(length);
+
+	// add items to the line
+	lineGroup.addChildren(lineItems);
 
 	// render measures.
 	const measureGroups = line.renderMeasures(measuresToRender, measureLengths, lineGroup, length);
+	// const measureGroups = line.renderMeasures(measuresToRender, _.map(measureLengths, length => length * scale), lineGroup, length);
 
 	lineGroup.addChildren(measureGroups);
 
@@ -109,9 +115,15 @@ Line.render = function (line, {length, measures, voices=[], startMeasure=0, numM
 		if (ctx.time.measure !== previousMeasureNumber) {
 			let measure = measures[ctx.time.measure];
 			cursor = placement.calculateCursor(measure);
+			// cursor = scaleCursor(scale, cursor, placement.calculateCursor(measure));
 		}
 
-		return lineUtils.renderTimeContext(b, cursor, ctx);
+		// place markings
+		cursor = lineUtils.positionMarkings(b, cursor, ctx);
+
+		// renderTimeContext returns the next cursor position.
+		// return lineUtils.renderTimeContext(b, cursor, ctx);
+		return scaleCursor(scale, cursor, lineUtils.renderTimeContext(b, cursor, ctx));
 	}, noteHeadWidth);
 
 	_.each(voices, voice => {
@@ -120,6 +132,10 @@ Line.render = function (line, {length, measures, voices=[], startMeasure=0, numM
 	});
 
 	return lineGroup;
+}
+
+function scaleCursor (scale, oldCursor, newCursor) {
+	return oldCursor + (newCursor - oldCursor) * scale;
 }
 
 Line.prototype.render = function (length) {

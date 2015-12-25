@@ -147,7 +147,7 @@ function renderingNotesOnLine () {
 	var voice = scored.voice({}, [scored.note({pitch: "a4", value: 8}), scored.note({pitch: "c5", value: 4, dots: 1}), scored.note({pitch: "b4", value: 2}),
 								  scored.note({pitch: "c5", value: 2}), scored.note({pitch: "d4", value: 4}), scored.rest({value: 4})]);
 
-	return scored.render(trebleLine, {length: 400, voices: [voice], numMeasures: 2});
+	return scored.render(trebleLine, {length: 800, voices: [voice], numMeasures: 2});
 }
 
 function simpleLine () {
@@ -199,7 +199,7 @@ function twoVoices () {
 	var voice1 = scored.voice({stemDirection: "up"}, _.map(notes1, function (n) {return scored.note({value: n, pitch: "c#5"})}));
 	var voice2 = scored.voice({stemDirection: "down"}, _.map(notes2, function (n) {return scored.note({value: n})}));
 
-	return scored.render(line, {length: 1000, voices: [voice1, voice2], numMeasures: 5});
+	return scored.render(line, {length: 1300, voices: [voice1, voice2], numMeasures: 5});
 }
 
 function eighthBeamings () {
