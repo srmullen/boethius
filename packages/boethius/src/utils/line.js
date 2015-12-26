@@ -63,14 +63,14 @@ function getTimeContexts (line, measures, items) {
 	return times;
 }
 
-function calculateMeasureLengths (measures, times, noteHeadWidth, shortestDuration, scale = 1) {
+function calculateMeasureLengths (measures, times, noteHeadWidth, shortestDuration) {
 	// group items by measure.
 	let itemsInMeasure = _.groupBy(times, (item) => {
 		return item.time.measure;
 	});
 
 	let measureLengths = _.map(measures, (measure) => {
-		let measureLength = _.sum(_.map(itemsInMeasure[measure.value], ({items}) => calculateTimeLength(items, shortestDuration, scale)));
+		let measureLength = _.sum(_.map(itemsInMeasure[measure.value], ({items}) => _.sum(calculateTimeLength(items, shortestDuration))));
 		measureLength += noteHeadWidth;
 		return measureLength;
 	});

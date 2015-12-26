@@ -86,14 +86,17 @@ Line.render = function (line, {length, measures, voices=[], startMeasure=0, numM
 	// render the items. needed for calculating the measureLengths
 	const lineItems = line.renderItems(timesToRender);
 
+	const timeLengths = _.map(timesToRender, ({items}) => placement.calculateTimeLength(items, shortestDuration));
+
+	const totalMarkingLength = _.sum(timeLengths, ([markingLength,]) => markingLength);
+
 	// calculating minimum measure lengths
 	const minMeasureLengths = lineUtils.calculateMeasureLengths(measuresToRender, timesToRender, noteHeadWidth, shortestDuration);
 
 	const minLineLength = _.sum(minMeasureLengths);
 
-	const scale = length / minLineLength; // FIXME: need to calculate scale factor as measure lengths are being calculated.
-
-	const measureLengths = lineUtils.calculateMeasureLengths(measuresToRender, timesToRender, noteHeadWidth, shortestDuration, scale);
+	const measureScale = length / minLineLength; // TODO: Should each measure have it's own scale depending on if it has markings?
+	const noteScale = (length - totalMarkingLength) / (minLineLength - totalMarkingLength);
 
 	// draw the line
 	const lineGroup = line.render(length);
@@ -102,8 +105,7 @@ Line.render = function (line, {length, measures, voices=[], startMeasure=0, numM
 	lineGroup.addChildren(lineItems);
 
 	// render measures.
-	const measureGroups = line.renderMeasures(measuresToRender, measureLengths, lineGroup, length);
-	// const measureGroups = line.renderMeasures(measuresToRender, _.map(measureLengths, length => length * scale), lineGroup, length);
+	const measureGroups = line.renderMeasures(measuresToRender, _.map(minMeasureLengths, length => length * measureScale), lineGroup, length);
 
 	lineGroup.addChildren(measureGroups);
 
@@ -123,7 +125,7 @@ Line.render = function (line, {length, measures, voices=[], startMeasure=0, numM
 
 		// renderTimeContext returns the next cursor position.
 		// return lineUtils.renderTimeContext(b, cursor, ctx);
-		return scaleCursor(scale, cursor, lineUtils.renderTimeContext(b, cursor, ctx));
+		return scaleCursor(noteScale, cursor, lineUtils.renderTimeContext(b, cursor, ctx));
 	}, noteHeadWidth);
 
 	_.each(voices, voice => {
