@@ -6,11 +6,11 @@ import {isLine, isMarking} from "../types";
 import engraver from "../engraver";
 import constants from "../constants";
 import {createMeasures} from "../utils/measure";
-import {getTimeContexts, b} from "../utils/line";
-import {groupVoices, getLineItems, calculateMeasureLengths, nextTimes, iterateByTime, renderTimeContext, positionMarkings} from "../utils/staff";
+import {getTimeContexts, b, positionMarkings} from "../utils/line";
+import {groupVoices, getLineItems, calculateMeasureLengths, nextTimes, iterateByTime, renderTimeContext} from "../utils/staff";
 import {map} from "../utils/common";
 import {getAccidentalContexts} from "../utils/accidental";
-import {calculateCursor} from "../utils/placement";
+import {calculateCursor, calculateTimeLength, scaleCursor} from "../utils/placement";
 
 const TYPE = constants.type.staff;
 
@@ -56,6 +56,7 @@ Staff.render = function render (staff, {lines=[], voices=[], measures, length, s
 			return time.time.measure >= startMeasure && time.time.measure < endMeasure
 		});
 	});
+
 	const measuresToRender = _.slice(measures, startMeasure, endMeasure);
 
 	// calculate the accidentals for each line.
@@ -68,18 +69,36 @@ Staff.render = function render (staff, {lines=[], voices=[], measures, length, s
 		lineGroups[i].addChildren(children);
 	});
 
+	// Group in order the times on each line
+	const staffTimes = iterateByTime(x => x, lineTimesToRender);
+
 	const noteHeadWidth = Scored.config.note.head.width;
 	const shortestDuration = 0.125; // need function to calculate this.
 
-	const measureLengths = calculateMeasureLengths(measuresToRender, lineTimesToRender, noteHeadWidth, shortestDuration)
+	// calculate the length of every time
+	const timeLengths = _.map(staffTimes, (lines) => {
+		// get all items at the time
+		const allItems = lines.reduce((acc, line) => line ? acc.concat(line.items) : acc, []);
+		return calculateTimeLength(allItems, shortestDuration);
+	});
 
-	const measureGroups = staff.renderMeasures(measuresToRender, measureLengths, lineGroups);
+	const totalMarkingLength = _.sum(timeLengths, ([markingLength,]) => markingLength);
+
+	// calculate the minimum measure lengths
+	const measureLengths = calculateMeasureLengths(measuresToRender, lineTimesToRender, noteHeadWidth, shortestDuration);
+
+	// get the minimum length of the line
+	const minLineLength = _.sum(measureLengths);
+
+	const measureScale = length / minLineLength;
+	const noteScale = (length - totalMarkingLength) / (minLineLength - totalMarkingLength);
+
+	const measureGroups = staff.renderMeasures(measuresToRender, _.map(measureLengths, measureLength => measureLength * measureScale), lineGroups);
 
 	staffGroup.addChildren(measureGroups);
 
 	// place all items
 	const lineCenters = _.map(lineGroups, b);
-	const staffTimes = iterateByTime(x => x, lineTimesToRender);
 	_.reduce(staffTimes, (cursor, ctxs, i) => {
 		const lineIndices = _.filter(_.map(ctxs, (ctx, i) => ctx ? i : undefined), _.isNumber);
 		const centers = _.map(lineIndices, idx => lineCenters[idx]);
@@ -97,7 +116,7 @@ Staff.render = function render (staff, {lines=[], voices=[], measures, length, s
 		// place the items that have duration
 		let possibleNextPositions = _.map(lineIndices, (idx, i) => renderTimeContext(centers[i], cursor, ctxs[idx]));
 
-		return _.min(possibleNextPositions);
+		return scaleCursor(noteScale, cursor, _.min(possibleNextPositions));
 	}, noteHeadWidth);
 
 	map((line, lineGroup, lineCenter, voice) => {

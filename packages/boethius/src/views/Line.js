@@ -117,15 +117,13 @@ Line.render = function (line, {length, measures, voices=[], startMeasure=0, numM
 		if (ctx.time.measure !== previousMeasureNumber) {
 			let measure = measures[ctx.time.measure];
 			cursor = placement.calculateCursor(measure);
-			// cursor = scaleCursor(scale, cursor, placement.calculateCursor(measure));
 		}
 
 		// place markings
 		cursor = lineUtils.positionMarkings(b, cursor, ctx);
 
 		// renderTimeContext returns the next cursor position.
-		// return lineUtils.renderTimeContext(b, cursor, ctx);
-		return scaleCursor(noteScale, cursor, lineUtils.renderTimeContext(b, cursor, ctx));
+		return placement.scaleCursor(noteScale, cursor, lineUtils.renderTimeContext(b, cursor, ctx));
 	}, noteHeadWidth);
 
 	_.each(voices, voice => {
@@ -134,10 +132,6 @@ Line.render = function (line, {length, measures, voices=[], startMeasure=0, numM
 	});
 
 	return lineGroup;
-}
-
-function scaleCursor (scale, oldCursor, newCursor) {
-	return oldCursor + (newCursor - oldCursor) * scale;
 }
 
 Line.prototype.render = function (length) {

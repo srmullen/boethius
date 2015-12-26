@@ -90,20 +90,20 @@ function iterateByTime (fn, times) {
     return ret;
 }
 
-function positionMarkings (lineCenter, cursor, {time, items, context}) {
-    let {
-		clef: clefs,
-		key: keys,
-		timeSig: timeSigs
-	} = _.groupBy(items, item => item.type);
-
-	// place the markings
-	if (clefs) cursor = placement.placeMarking(lineCenter, cursor, clefs[0]);
-	if (keys) cursor = placement.placeMarking(lineCenter, cursor, keys[0]);
-	if (timeSigs) cursor = placement.placeMarking(lineCenter, cursor, timeSigs[0]);
-
-    return cursor;
-}
+// function positionMarkings (lineCenter, cursor, {time, items, context}) {
+//     let {
+// 		clef: clefs,
+// 		key: keys,
+// 		timeSig: timeSigs
+// 	} = _.groupBy(items, item => item.type);
+//
+// 	// place the markings
+// 	if (clefs) cursor = placement.placeMarking(lineCenter, cursor, clefs[0]);
+// 	if (keys) cursor = placement.placeMarking(lineCenter, cursor, keys[0]);
+// 	if (timeSigs) cursor = placement.placeMarking(lineCenter, cursor, timeSigs[0]);
+//
+//     return cursor;
+// }
 
 function renderTimeContext (lineCenter, cursor, {time, items, context}) {
     let {
@@ -170,6 +170,5 @@ export {
     calculateMeasureLengths,
     nextTimes,
     iterateByTime,
-    renderTimeContext,
-    positionMarkings
+    renderTimeContext
 };

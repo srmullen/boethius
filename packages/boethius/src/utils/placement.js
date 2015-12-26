@@ -234,12 +234,20 @@ function calculateDefaultAccidentalPosition (note) {
  */
 function calculateTimeLength (items, shortestDuration) {
 	const noteHeadWidth = Scored.config.note.head.width;
-	let [markings, voiceItems] = _.partition(items, isMarking),
-		markingsLength = _.sum(markings.map(marking => marking.group.bounds.width + noteHeadWidth)),
-		voiceItemsLength = _.min(_.map(voiceItems, item => {
+	const [markings, voiceItems] = _.partition(items, isMarking);
+	const {
+		clef: clefs,
+		key: keys,
+		timeSig: timeSigs
+	} = _.groupBy(markings, item => item.type);
+	const getMarkingWidth = (marking) => marking.group.bounds.width + noteHeadWidth;
+	const clefLength = clefs ? _.max(clefs.map(getMarkingWidth)) : 0;
+	const keyLength = keys ? _.max(keys.map(getMarkingWidth)) : 0;
+	const timeSigLength = timeSigs ? _.map(timeSigs.map(getMarkingWidth)) : 0;
+	const markingsLength = _.sum([clefLength, keyLength, timeSigLength]);
+	const voiceItemsLength = _.min(_.map(voiceItems, item => {
 			return item.group.bounds.width + (noteHeadWidth * getStaffSpace(shortestDuration, item));
 		}));
-	// return markingsLength + voiceItemsLength;
 	return [markingsLength, voiceItemsLength];
 }
 
@@ -248,6 +256,13 @@ function placeMarking (lineCenter, cursor, marking) {
 	placeAt(cursor, marking);
 	// since keys of C and a have no children calculateCursor return undefined.
 	return calculateCursor(marking) || cursor;
+}
+
+/*
+ * Increases the new cursors position by the scale factor.
+ */
+function scaleCursor (scale, oldCursor, newCursor) {
+	return oldCursor + (newCursor - oldCursor) * scale;
 }
 
 export {
@@ -268,5 +283,6 @@ export {
 	getAccidentalBottom,
 	calculateDefaultAccidentalPosition,
 	calculateTimeLength,
-	placeMarking
+	placeMarking,
+	scaleCursor
 }
