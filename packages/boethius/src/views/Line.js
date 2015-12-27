@@ -86,7 +86,6 @@ Line.render = function (line, {length, measures, voices=[], startMeasure=0, numM
 	// render the items. needed for calculating the measureLengths
 	const lineItems = line.renderItems(timesToRender);
 
-
 	// calculating minimum measure lengths
 	const minMeasureLengths = lineUtils.calculateMeasureLengths(measuresToRender, timesToRender, noteHeadWidth, shortestDuration);
 

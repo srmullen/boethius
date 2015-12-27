@@ -36,13 +36,7 @@ function Staff ({startMeasure=0, measures=4}, children=[]) {
 Staff.render = function render (staff, {lines=[], voices=[], measures, length, startMeasure=0, numMeasures}) {
 	const staffGroup = staff.render();
 
-	const lineGroups = staff.renderLines(lines, length);
-
 	const endMeasure = startMeasure + numMeasures;
-
-	staffGroup.addChildren(lineGroups);
-
-	staffGroup.addChild(engraver.drawStaffBar(lineGroups));
 
 	measures = measures || createMeasures(numMeasures, staff.markings);
 
@@ -61,13 +55,12 @@ Staff.render = function render (staff, {lines=[], voices=[], measures, length, s
 	const measuresToRender = _.slice(measures, startMeasure, endMeasure);
 
 	// calculate the accidentals for each line.
-	_.each(lineTimesToRender, (times, i) => {
+	const lineChildren = _.map(lineTimesToRender, (times, i) => {
 		let accidentals = getAccidentalContexts(times);
 		// add accidentals to times
 		_.each(times, (time, i) => time.context.accidentals = accidentals[i]);
 
-		const children = lines[i].renderItems(times);
-		lineGroups[i].addChildren(children);
+		return lines[i].renderItems(times);
 	});
 
 	// Group in order the times on each line
@@ -76,30 +69,71 @@ Staff.render = function render (staff, {lines=[], voices=[], measures, length, s
 	const noteHeadWidth = Scored.config.note.head.width;
 	const shortestDuration = 0.125; // need function to calculate this.
 
-	// calculate the length of every time
-	const timeLengths = _.map(staffTimes, (lines) => {
-		// get all items at the time
-		const allItems = lines.reduce((acc, line) => line ? acc.concat(line.items) : acc, []);
-		return calculateTimeLength(allItems, shortestDuration);
-	});
-
-	const totalMarkingLength = _.sum(timeLengths, ([markingLength,]) => markingLength);
-
 	// calculate the minimum measure lengths
 	const measureLengths = calculateMeasureLengths(measuresToRender, lineTimesToRender, noteHeadWidth, shortestDuration);
 
 	// get the minimum length of the line
 	const minLineLength = _.sum(measureLengths);
 
-	const measureScale = length / minLineLength;
-	const noteScale = (length - totalMarkingLength) / (minLineLength - totalMarkingLength);
+	let lineGroups, noteScale, cursorFn;
 
-	const measureGroups = staff.renderMeasures(measuresToRender, _.map(measureLengths, measureLength => measureLength * measureScale), lineGroups);
+	if (!length) {
+		lineGroups = staff.renderLines(lines, minLineLength);
 
-	staffGroup.addChildren(measureGroups);
+		const measureGroups = staff.renderMeasures(measuresToRender, measureLengths, lineGroups);
+
+		staffGroup.addChildren(measureGroups);
+
+		cursorFn = (possibleNextPositions) => {
+			return _.min(possibleNextPositions);
+		}
+
+	} else {
+		lineGroups = staff.renderLines(lines, length);
+
+		// calculate the length of every time
+		const timeLengths = _.map(staffTimes, (lines) => {
+			// get all items at the time
+			const allItems = lines.reduce((acc, line) => line ? acc.concat(line.items) : acc, []);
+			return calculateTimeLength(allItems, shortestDuration);
+		});
+
+		const totalMarkingLength = _.sum(timeLengths, ([markingLength,]) => markingLength);
+
+		const measureScale = length / minLineLength;
+
+		noteScale = (length - totalMarkingLength) / (minLineLength - totalMarkingLength);
+
+		const measureGroups = staff.renderMeasures(measuresToRender, _.map(measureLengths, measureLength => measureLength * measureScale), lineGroups);
+
+		staffGroup.addChildren(measureGroups);
+
+		cursorFn = (possibleNextPositions, cursor) => {
+			return scaleCursor(noteScale, cursor, _.min(possibleNextPositions));
+		}
+	}
+
+	// add the children to each line.
+	_.each(lineChildren, (children, i) => lineGroups[i].addChildren(children));
+
+	staffGroup.addChildren(lineGroups);
+
+	staffGroup.addChild(engraver.drawStaffBar(lineGroups));
 
 	// place all items
 	const lineCenters = _.map(lineGroups, b);
+	placeTimes(staffTimes, measures, lineCenters, cursorFn);
+
+	map((line, lineGroup, lineCenter, voice) => {
+		const children = voice.renderDecorations(line, lineCenter, measuresToRender);
+		lineGroup.addChildren(children);
+		return children;
+	}, lines, lineGroups, lineCenters, voices);
+
+	return staffGroup;
+}
+
+function placeTimes (staffTimes, measures, lineCenters, cursorFn) {
 	_.reduce(staffTimes, (cursor, ctxs, i) => {
 		const lineIndices = _.filter(_.map(ctxs, (ctx, i) => ctx ? i : undefined), _.isNumber);
 		const centers = _.map(lineIndices, idx => lineCenters[idx]);
@@ -117,16 +151,8 @@ Staff.render = function render (staff, {lines=[], voices=[], measures, length, s
 		// place the items that have duration
 		let possibleNextPositions = _.map(lineIndices, (idx, i) => renderTimeContext(centers[i], cursor, ctxs[idx]));
 
-		return scaleCursor(noteScale, cursor, _.min(possibleNextPositions));
-	}, noteHeadWidth);
-
-	map((line, lineGroup, lineCenter, voice) => {
-		const children = voice.renderDecorations(line, lineCenter, measuresToRender);
-		lineGroup.addChildren(children);
-		return children;
-	}, lines, lineGroups, lineCenters, voices);
-
-	return staffGroup;
+		return cursorFn(possibleNextPositions, cursor);
+	}, Scored.config.note.head.width);
 }
 
 Staff.prototype.type = TYPE;
