@@ -86,31 +86,63 @@ Line.render = function (line, {length, measures, voices=[], startMeasure=0, numM
 	// render the items. needed for calculating the measureLengths
 	const lineItems = line.renderItems(timesToRender);
 
-	const timeLengths = _.map(timesToRender, ({items}) => placement.calculateTimeLength(items, shortestDuration));
-
-	const totalMarkingLength = _.sum(timeLengths, ([markingLength,]) => markingLength);
 
 	// calculating minimum measure lengths
 	const minMeasureLengths = lineUtils.calculateMeasureLengths(measuresToRender, timesToRender, noteHeadWidth, shortestDuration);
 
 	const minLineLength = _.sum(minMeasureLengths);
 
-	const measureScale = length / minLineLength; // TODO: Should each measure have it's own scale depending on if it has markings?
-	const noteScale = (length - totalMarkingLength) / (minLineLength - totalMarkingLength);
+	let lineGroup, noteScale, cursorFn;
 
-	// draw the line
-	const lineGroup = line.render(length);
+	if (!length) { // no scaling needed
+		lineGroup = line.render(minLineLength);
+
+		const measureGroups = line.renderMeasures(measuresToRender, minMeasureLengths, lineGroup, length);
+
+		lineGroup.addChildren(measureGroups);
+
+		cursorFn = lineUtils.renderTimeContext;
+
+	} else { // scaling needed
+		const timeLengths = _.map(timesToRender, ({items}) => placement.calculateTimeLength(items, shortestDuration));
+
+		const totalMarkingLength = _.sum(timeLengths, ([markingLength,]) => markingLength);
+
+		const measureScale = length / minLineLength; // TODO: Should each measure have it's own scale depending on if it has markings?
+
+		noteScale = (length - totalMarkingLength) / (minLineLength - totalMarkingLength);
+
+		lineGroup = line.render(length);
+
+		const measureGroups = line.renderMeasures(measuresToRender, _.map(minMeasureLengths, length => length * measureScale), lineGroup, length);
+
+		lineGroup.addChildren(measureGroups);
+
+		cursorFn = (b, cursor, ctx) => {
+			return placement.scaleCursor(noteScale, cursor, lineUtils.renderTimeContext(b, cursor, ctx));
+		}
+	}
 
 	// add items to the line
 	lineGroup.addChildren(lineItems);
 
-	// render measures.
-	const measureGroups = line.renderMeasures(measuresToRender, _.map(minMeasureLengths, length => length * measureScale), lineGroup, length);
-
-	lineGroup.addChildren(measureGroups);
-
 	// place all items
 	const b = lineUtils.b(lineGroup);
+	placeTimes(timesToRender, measures, b, cursorFn);
+
+	_.each(voices, voice => {
+		const children = voice.renderDecorations(line, b, measuresToRender);
+		lineGroup.addChildren(children);
+	});
+
+	return lineGroup;
+}
+
+/*
+ * @param timesToRender times[] - Array of time contexts to place on the line.
+ * @param curosrFn - function for updating the cursor.
+ */
+function placeTimes (timesToRender, measures, b, cursorFn) {
 	_.reduce(timesToRender, (cursor, ctx, i) => {
 		const previousMeasureNumber = timesToRender[i-1] ? timesToRender[i-1].time.measure : 0;
 		// update cursor if it's a new measure
@@ -123,15 +155,10 @@ Line.render = function (line, {length, measures, voices=[], startMeasure=0, numM
 		cursor = lineUtils.positionMarkings(b, cursor, ctx);
 
 		// renderTimeContext returns the next cursor position.
-		return placement.scaleCursor(noteScale, cursor, lineUtils.renderTimeContext(b, cursor, ctx));
-	}, noteHeadWidth);
-
-	_.each(voices, voice => {
-		const children = voice.renderDecorations(line, b, measuresToRender);
-		lineGroup.addChildren(children);
-	});
-
-	return lineGroup;
+		// return placement.scaleCursor(noteScale, cursor, lineUtils.renderTimeContext(b, cursor, ctx));
+		// return lineUtils.renderTimeContext(b, cursor, ctx);
+		return cursorFn(b, cursor, ctx);
+	}, Scored.config.note.head.width);
 }
 
 Line.prototype.render = function (length) {
