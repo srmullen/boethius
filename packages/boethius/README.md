@@ -16,4 +16,15 @@ Should view render methods return a paper group, or should they return themselve
 - Rendering ofter requires multiple render methods for various parts intertwined with render method calls on other "templates".
 - subsequent render method calls require both the view and the group. Hard to keep explicit reference between view and group without group property on the view.
 
-TODO: There should be a segregation between files that require paper.js and those that do not.
+TODOS:
+    # High priority
+    - Slurs
+    - Draw staff ending.
+    - A Score should render the Clef, key and time signature at the beginning of every staff. (optional)
+
+    # Lower priority
+    - There should be a segregation between files that require paper.js and those that do not.
+    - Implement different staff type rendering. StaffGroup, ChoirStaff, GrandStaff, and PianoStaff.
+    - Line/Instrument Names.
+    - Instrument transpositions.
+    - Babel upgrade.

@@ -19,7 +19,6 @@ const TYPE = constants.type.staff;
  * @startMeasure - the index of the first measure on the stave.
  */
  // TODO: What are the children of a staff now? It's more of a view onto the lines, rather than something with children in it's own right.
- // TODO: Should Staff implement lilypond types such as StaffGroup, ChoirStaff, GrandStaff, and PianoStaff?
  // @param children <Line, Measure, Marking>[] - A marking that is given to the staff will be rendered on all lines. If it is
  // 	given to a line it will only affect that line.
 function Staff ({startMeasure=0, measures=4}, children=[]) {
