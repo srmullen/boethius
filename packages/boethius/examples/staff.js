@@ -19,11 +19,11 @@ function testTwoLines () {
     var n = scored.note;
 
     var voice1 = scored.voice({name: "soprano"}, [
-        n({value: 4, pitch: "c5"}), n({value: 4, pitch: "b4"}), n({value: 8, pitch: "a4"}), n({value: 8, pitch: "g4"}), n({value: 4, pitch: "f4"})
+        n({value: 4, pitch: "c5", slur: "1"}), n({value: 4, pitch: "b4", slur: "1"}), n({value: 8, pitch: "a4"}), n({value: 8, pitch: "g4"}), n({value: 4, pitch: "f4"})
     ]);
 
     var voice2 = scored.voice({name: "bass"}, [
-        n({value: 8, pitch: "c3"}), n({value: 8, pitch: "c#3"}), n({value: 4, pitch: "d3"}), n({value: 4, pitch: "e3"})
+        n({value: 8, pitch: "c3", slur: "2"}), n({value: 8, pitch: "c#3", slur: "2"}), n({value: 4, pitch: "d3"}), n({value: 4, pitch: "e3"})
     ]);
 
     // return scored.render(staff, {length: 500, lines: [line1, line2], voices: [voice1, voice2], numMeasures: 2});

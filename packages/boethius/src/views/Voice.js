@@ -6,7 +6,7 @@ import {isNote, isChord} from "../types";
 import {concat, partitionBy, partitionWhen, mapDeep} from "../utils/common";
 import {beam, drawTuplets} from "../engraver";
 import * as lineUtils from "../utils/line";
-import {getAverageStemDirection} from "../utils/note";
+import {getAverageStemDirection, slur} from "../utils/note";
 import {calculateDuration, getMeasureNumber, getBeat, parseSignature, calculateTupletDuration, sumDurations} from "../utils/timeUtils";
 import TimeSignature from "./TimeSignature";
 import Measure from "./Measure";
@@ -40,11 +40,11 @@ function Voice ({value, stemDirection}, children=[]) {
 
 Voice.prototype.type = constants.type.voice;
 
-Voice.prototype.renderChildren = function () {
-    return this.children.map((child, i) => {
-        return child.render();
-    });
-}
+// Voice.prototype.renderChildren = function () {
+//     return this.children.map((child, i) => {
+//         return child.render();
+//     });
+// }
 
 /*
  * Notes must have time properties for this function to work.
@@ -129,6 +129,10 @@ Voice.groupTuplets = function groupTuplets (items) {
     return groupings;
 }
 
+Voice.groupSlurs = function (items) {
+    return _.filter(partitionBy(items, item => item.slur), ([item]) => !!item.slur);
+}
+
 /*
  * @param centerLineValue - String representing note value.
  * @param notes <Note, Chord>[]
@@ -161,8 +165,7 @@ function getAllStemDirections (beamings, centerLineValue) {
  */
 Voice.prototype.renderDecorations = function (line, centerLine, measures) {
     // group children by measures
-    let //b = lineUtils.b(line.group),
-        itemsByMeasure = _.groupBy(this.children, child => getMeasureNumber(measures, child.time)),
+    let itemsByMeasure = _.groupBy(this.children, child => getMeasureNumber(measures, child.time)),
         stemDirection = this.stemDirection;
 
     _.map(measures, (measure) => {
@@ -202,6 +205,13 @@ Voice.prototype.renderDecorations = function (line, centerLine, measures) {
             lineChildren = lineChildren.concat(tupletGroups);
         }
     });
+
+    // slurs
+    const slurred = Voice.groupSlurs(this.children);
+    const slurs = _.map(slurred, slur);
+    if (slurs && slurs.length) {
+        lineChildren = lineChildren.concat(slurs);
+    }
 
     return lineChildren;
 }

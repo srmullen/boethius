@@ -15,14 +15,15 @@ function run () {
 
 	// testChords().translate(25, 50);
 	// testChordsTwoVoices().translate(25, 150);
-	//
-	renderingNotesOnLine().translate(25, 50);
-	oneVoice().translate(25, 150);
-	twoVoices().translate(25, 250);
-	// testTriplets().translate(25, 100);
-	testTripletsTwoVoices().translate(25, 350);
+	// testTriplets().translate(25, 250);
+
+	// renderingNotesOnLine().translate(25, 50);
+	// oneVoice().translate(25, 150);
+	// twoVoices().translate(25, 250);
+	// testTripletsTwoVoices().translate(25, 350);
 
 	// testMeasureRendering().translate(25, 50);
+	testSlurs().translate(25, 50);
 }
 
 function clefLines () {
@@ -427,4 +428,27 @@ function testMeasureRendering (startMeasure, measures) {
 
 	var measures = Scored.utils.measure.createMeasures(12, line.children);
 	return scored.render(line, {length: 1000, voices: [voice], measures: measures, startMeasure: 5, numMeasures: 6});
+}
+
+function testSlurs () {
+	var line = scored.line({}, [scored.clef({value: "treble", measure: 0}),
+								scored.key({value: "C", measure: 0}),
+								scored.timeSig({value: "4/4", measure: 0})]);
+
+	var n = scored.note;
+
+	var voice = scored.voice({}, [
+		// test groups of two, same direction stem.
+		n({value: 8, pitch: "a4", slur: "1"}), n({value: 8, pitch: "a4", slur: "1"}), n({value: 8, pitch: "c5", slur: "2"}), n({value: 8, pitch: "c5", slur: "2"}),
+		n({value: 8, pitch: "a4", slur: "3"}), n({value: 8, pitch: "b4", slur: "3"}), n({value: 8, pitch: "c5", slur: "4"}), n({value: 8, pitch: "b4", slur: "4"}),
+
+		// test groups of four, same direction stems
+		n({value: 8, pitch: "a4", slur: "5"}), n({value: 8, pitch: "a4", slur: "5"}), n({value: 8, pitch: "a4", slur: "5"}), n({value: 8, pitch: "f4", slur: "5"}),
+		n({value: 8, pitch: "c5", slur: "6"}), n({value: 8, pitch: "c5", slur: "6"}), n({value: 8, pitch: "c5", slur: "6"}), n({value: 8, pitch: "b4", slur: "6"}),
+
+		// groups of two, oposite direction stems
+		n({slur: "7", pitch: "a4"}), n({slur: "7", pitch: "c5"}), n({slur: "8", pitch: "c5"}), n({slur: "8", pitch: "a4"})
+	]);
+
+	return scored.render(line, {voices: [voice], numMeasures: 4});
 }

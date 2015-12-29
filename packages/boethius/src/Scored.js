@@ -88,6 +88,7 @@ Scored.prototype.render = function (composition, ...args) {
 };
 
 /*
+ * @deprecated
  * @param music - hierarchical description of music.
  * @return - array of music events with all info needed to add to a score.
  */

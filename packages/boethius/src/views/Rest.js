@@ -4,12 +4,13 @@ import constants from "../constants";
 
 const TYPE = constants.type.rest;
 
-function Rest ({voice=0, value=4, dots=0, tuplet, time}) {
+function Rest ({voice=0, value=4, dots=0, tuplet, time, slur}) {
 	this.voice = voice;
 	this.value = value;
 	this.dots = dots;
 	this.tuplet = tuplet;
 	this.time = time;
+	this.slur = slur;
 }
 
 Rest.prototype.type = TYPE;

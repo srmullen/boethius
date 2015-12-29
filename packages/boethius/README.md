@@ -18,9 +18,13 @@ Should view render methods return a paper group, or should they return themselve
 
 TODOS:
     # High priority
-    - Slurs
+    - Slurs / Ties, rendering improvements
     - Draw staff ending.
+    - Remove this.group from markings.
     - A Score should render the Clef, key and time signature at the beginning of every staff. (optional)
+    - Stacato and legato
+    - Finish tuplet rendering
+    - Implement more beat structures.
 
     # Lower priority
     - There should be a segregation between files that require paper.js and those that do not.
@@ -28,3 +32,5 @@ TODOS:
     - Line/Instrument Names.
     - Instrument transpositions.
     - Babel upgrade.
+    - ES6 Linting
+    - optional rendering of measure numbers.

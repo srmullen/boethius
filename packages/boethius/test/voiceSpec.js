@@ -4,6 +4,8 @@ import Scored from "../src/Scored";
 
 describe("Voice", () => {
     const scored = new Scored();
+    const n = scored.note;
+
     describe("findBeaming", () => {
         const findBeaming = Voice.findBeaming,
             fourfour = scored.timeSig();
@@ -45,7 +47,6 @@ describe("Voice", () => {
 
     describe("groupTuplets", () => {
         const groupTuplets = Voice.groupTuplets;
-        const n = scored.note;
 
         it("should group consecutive tuplet items together", () => {
             const eighthTriplet = n({value: 8, tuplet: "3/2"});
@@ -81,6 +82,35 @@ describe("Voice", () => {
                 [n({value: 16, tuplet: "7/12"})],
                 [sixteenthQuintuplet, sixteenthQuintuplet, sixteenthQuintuplet, sixteenthQuintuplet, sixteenthQuintuplet]
             ]);
+        });
+    });
+
+    describe("groupSlurs", () => {
+        const groupSlurs = Voice.groupSlurs;
+
+        it("should return an empty array if there are no notes to slur", () => {
+            expect(groupSlurs([])).to.eql([]);
+            expect(groupSlurs([n(), n()])).to.eql([]);
+        });
+
+        it("should group slured items in an array", () => {
+            const n1 = n({slur: "s1"});
+            const n2 = n({slur: "s1"});
+            expect(groupSlurs([n1, n2])).to.eql([[n1, n2]]);
+        });
+
+        it("should group different slurs into different arrays", () => {
+            const n1 = n({slur: "s1"}), n2 = n({slur: "s1"});
+            const n3 = n({slur: "s2"}), n4 = n({slur: "s2"}), n5 = n({slur: "s2"});
+            expect(groupSlurs([n1, n2, n3, n4, n5])).to.eql([[n1, n2], [n3, n4, n5]]);
+        });
+
+        it("should remove notes that don't have a slur IDs", () => {
+            const n1 = n({slur: "s1"}), n2 = n({slur: "s1"});
+            const n3 = n({pitch: "d5", value: "16"});
+            const n4 = n({slur: "s2"}), n5 = n({slur: "s2"}), n6 = n({slur: "s2"});
+            const n7 = n({pitch: "b4"});
+            expect(groupSlurs([n1, n2, n3, n4, n5, n6, n7])).to.eql([[n1, n2], [n4, n5, n6]]);
         });
     });
 

@@ -114,6 +114,8 @@ function slur (notes) {
 
 	path.segments[0].handleOut = handle;
 	path.segments[1].handleIn = handle;
+
+	return path;
 }
 
 const arrayToString = (arr) => _.reduce(arr, (acc, c) => acc + c, "");

@@ -15,9 +15,8 @@ describe("Scored", () => {
 			expect(note.pitch).to.equal("a4");
 			expect(note.dots).to.equal(0);
 
-			note = scored.note({pitch: "g#6", value: 8, voice: 1, dots: 2});
+			note = scored.note({pitch: "g#6", value: 8, dots: 2});
 			expect(note.type).to.equal("note");
-			expect(note.voice).to.equal(1);
 			expect(note.value).to.equal(8);
 			expect(note.pitch).to.equal("g#6");
 			expect(note.dots).to.equal(2);
@@ -290,14 +289,7 @@ describe("Scored", () => {
 			let voice = ["voice", {value: 2}, ["note"]];
 			expect(scored.createEvents(voice)).to.eql([scored.note({time: 0, voice: 2})]);
 		});
-		it("should handle multiple voices", () => {
-			let voices = [["voice", {value: 3}, ["note", {pitch: "c3"}]],
-			              ["voice", {value: 4}, [["note", {pitch: "d3"}],
-						                         ["note", {pitch: "e3"}]]]];
-			expect(scored.createEvents(voices)).to.eql([scored.note({pitch: "c3", voice: 3, time: 0}),
-			                                            scored.note({pitch: "d3", voice: 4, time: 0}),
-														scored.note({pitch: "e3", voice: 4, time: 0.25})]);
-		});
+		
 	});
 
 });
