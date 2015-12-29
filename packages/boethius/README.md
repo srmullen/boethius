@@ -27,6 +27,7 @@ TODOS:
     - Implement more beat structures.
 
     # Lower priority
+    - Score title, tempo, composer.
     - There should be a segregation between files that require paper.js and those that do not.
     - Implement different staff type rendering. StaffGroup, ChoirStaff, GrandStaff, and PianoStaff.
     - Line/Instrument Names.

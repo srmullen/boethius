@@ -1,5 +1,5 @@
 import constants from "../constants";
-import engraver from "../engraver";
+import {drawBarline} from "../engraver";
 import _ from "lodash";
 
 const TYPE = constants.type.measure;
@@ -30,9 +30,9 @@ Measure.prototype.render = function (lines, leftBarline, width) {
 		name: TYPE
 	});
 
-	leftBarline = leftBarline || engraver.drawBarline(lines);
+	leftBarline = leftBarline || drawBarline(lines);
 	let previousBarlinePosition = leftBarline.position.x,
-		rightBarline = engraver.drawBarline(lines, previousBarlinePosition + width),
+		rightBarline = drawBarline(lines, previousBarlinePosition + width),
 		bounds = this.drawGroupBounds(previousBarlinePosition, rightBarline);
 
 	group.addChildren([bounds, leftBarline, rightBarline]);

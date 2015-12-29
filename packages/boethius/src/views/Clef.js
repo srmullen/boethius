@@ -1,4 +1,4 @@
-import engraver from "../engraver";
+import {drawClef} from "../engraver";
 import common from "../utils/common";
 import constants from "../constants";
 
@@ -24,7 +24,7 @@ Clef.prototype.render = function () {
 		name: TYPE
 	});
 
-	const symbol = engraver.drawClef(this.value, margin);
+	const symbol = drawClef(this.value, margin);
 
 	group.addChild(symbol.place());
 

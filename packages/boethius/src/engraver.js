@@ -590,7 +590,7 @@ function drawTuplets (items, centerLine, voiceDirection) {
 }
 
 
-export default {
+export {
 	drawLegerLines,
 	drawBarline,
 	drawLine,

@@ -1,5 +1,5 @@
 import constants from "../constants";
-import engraver from "../engraver";
+import {drawLine} from "../engraver";
 // import Measure from "./Measure";
 import {createMeasures} from "../utils/measure";
 import {getMeasureNumber, getMeasureByTime} from "../utils/timeUtils";
@@ -161,7 +161,7 @@ function placeTimes (timesToRender, measures, b, cursorFn) {
 }
 
 Line.prototype.render = function (length) {
-	const group = engraver.drawLine(length);
+	const group = drawLine(length);
 	group.name = TYPE;
 	group.strokeColor = "black";
 	return group;

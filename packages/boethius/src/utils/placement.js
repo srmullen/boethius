@@ -142,7 +142,8 @@ const offsets = {
  *
  */
 function getYOffset (item) {
-	let offsetFn = offsets[item.type] || () => 0;
+	const offsetFn = offsets[item.type] || (() => 0);
+
 	return offsetFn(item);
 }
 

@@ -1,4 +1,4 @@
-import engraver from "../engraver";
+import {drawAccidental} from "../engraver";
 import * as placement from "../utils/placement";
 import {parsePitch} from "../utils/note";
 import _ from "lodash";
@@ -178,7 +178,7 @@ Key.prototype.render = function ({context} = {}) {
 
 	let symbol, item, yTranslate;
 	for (var i = 0; i < signature.length; i++) {
-		symbol = engraver.drawAccidental(accidental);
+		symbol = drawAccidental(accidental);
 
 		yTranslate = placement.calculateAccidentalYpos(signature[i], Scored.config.lineSpacing/2);
 

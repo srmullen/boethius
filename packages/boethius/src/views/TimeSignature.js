@@ -1,4 +1,4 @@
-import engraver from "../engraver";
+import {drawTimeSig} from "../engraver";
 import constants from "../constants";
 
 const TYPE = constants.type.timeSig;
@@ -39,7 +39,7 @@ TimeSignature.prototype.render = function () {
 		name: TYPE
 	});
 
-	const symbol = engraver.drawTimeSig(this.value, margin);
+	const symbol = drawTimeSig(this.value, margin);
 
 	// this.group.removeChildren();
 

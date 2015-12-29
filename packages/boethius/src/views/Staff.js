@@ -3,7 +3,7 @@ import _ from "lodash";
 import * as paperUtils from "../utils/paperUtils";
 import * as timeUtils from "../utils/timeUtils";
 import {isLine, isMarking} from "../types";
-import engraver from "../engraver";
+import {drawStaffBar} from "../engraver";
 import constants from "../constants";
 import {createMeasures} from "../utils/measure";
 import {getTimeContexts, b, positionMarkings} from "../utils/line";
@@ -117,7 +117,7 @@ Staff.render = function render (staff, {lines=[], voices=[], measures, length, s
 
 	staffGroup.addChildren(lineGroups);
 
-	staffGroup.addChild(engraver.drawStaffBar(lineGroups));
+	staffGroup.addChild(drawStaffBar(lineGroups));
 
 	// place all items
 	const lineCenters = _.map(lineGroups, b);

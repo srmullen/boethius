@@ -1,7 +1,7 @@
 import teoria from "teoria";
 import _ from "lodash";
 
-import engraver from "../engraver";
+import * as engraver from "../engraver";
 import {concat, partitionBy} from "../utils/common";
 import {getLinePoint} from "../utils/geometry";
 import * as placement from "../utils/placement";
