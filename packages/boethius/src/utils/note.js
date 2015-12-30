@@ -1,7 +1,5 @@
-import {doTimes, concat, map, partitionBy} from "../utils/common";
+import {partitionBy} from "../utils/common";
 import {isNote, isChord} from "../types";
-import {getLinePoint} from "./geometry";
-import * as placement from "../utils/placement";
 import teoria from "teoria";
 import _ from "lodash";
 
@@ -39,7 +37,7 @@ function getStemLength (note, centerLineValue) {
 }
 
 function defaultStemPoint (note, stemDirection, stemLength) {
-	var frm, to;
+	let frm, to;
 	if (stemDirection === "up") {
 		frm = note.noteHead.bounds.rightCenter.add(0, Scored.config.note.head.yOffset);
 		to = frm.subtract([0, stemLength]);
@@ -74,7 +72,7 @@ function getAverageStemDirection (items, centerLineValue) {
 		}
 	})) < 0 ? "up" : "down";
 
-	return items.map(item => averageDirection);
+	return items.map(() => averageDirection);
 }
 
 /*
@@ -103,8 +101,8 @@ function slur (notes) {
 		firstStem = firstNote.getStemDirection(),
 		begin = getSlurPoint(firstNote, null, firstStem),
 		handle = getSlurHandle(firstStem),
-		end = getSlurPoint(lastNote, handle),
-		center = begin.add(end.subtract(begin).divide(2)).add([0, 4]);
+		end = getSlurPoint(lastNote, handle);
+		// center = begin.add(end.subtract(begin).divide(2)).add([0, 4]);
 
 	let path = new paper.Path({
 		segments: [begin, end],

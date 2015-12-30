@@ -1,4 +1,4 @@
-import engraver from "../engraver";
+import {drawRest} from "../engraver";
 import * as common from "../utils/common";
 import constants from "../constants";
 
@@ -22,8 +22,7 @@ Rest.prototype.render = function () {
 
 	common.addEvents(this);
 
-	// this.symbol = engraver.drawRest(this.context.type);
-	this.symbol = engraver.drawRest(this.value);
+	this.symbol = drawRest(this.value);
 
 	group.removeChildren();
 
@@ -35,9 +34,7 @@ Rest.prototype.render = function () {
 };
 
 Rest.prototype.drawGroupBounds = function (group) {
-	var rectangle = new paper.Rectangle(group.bounds);
-
-	rectangle = new paper.Path.Rectangle(rectangle);
+	const rectangle = new paper.Path.Rectangle(new paper.Rectangle(group.bounds));
 	rectangle.name = "bounds";
 	// rectangle.fillColor = "blue"; // create a fill so the center can be clicked
 	// rectangle.opacity = 0.2;

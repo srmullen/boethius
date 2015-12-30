@@ -9,21 +9,20 @@ function run () {
 
 	// eighthBeamings().translate(25, 50);
 	// sixteenthBeamings().translate(25, 150);
-	//
-	// testAccidentals("c").translate(25, 350);
-	// testTimeSigs().translate(25, 450);
+	// testAccidentals("c").translate(25, 250);
+	// testTimeSigs().translate(25, 350);
 
 	// testChords().translate(25, 50);
 	// testChordsTwoVoices().translate(25, 150);
 	// testTriplets().translate(25, 250);
 
-	// renderingNotesOnLine().translate(25, 50);
-	// oneVoice().translate(25, 150);
-	// twoVoices().translate(25, 250);
-	// testTripletsTwoVoices().translate(25, 350);
+	renderingNotesOnLine().translate(25, 50);
+	oneVoice().translate(25, 150);
+	twoVoices().translate(25, 250);
+	testTripletsTwoVoices().translate(25, 350);
 
 	// testMeasureRendering().translate(25, 50);
-	testSlurs().translate(25, 50);
+	// testSlurs().translate(25, 50);
 }
 
 function clefLines () {
@@ -223,7 +222,7 @@ function eighthBeamings () {
 		return scored.note({value: n.duration, pitch: n.pitch});
 	}));
 
-	return scored.render(line, {length: 1500, voices: [voice], numMeasures: 4});
+	return scored.render(line, {voices: [voice], numMeasures: 4});
 }
 
 function sixteenthBeamings () {
@@ -241,11 +240,17 @@ function sixteenthBeamings () {
 		measure4 = palestrina.melody.phrase(_.fill(new Array(16), 16),
 			["g4", "a4", "d5", "c5", "e5", "e4", "d5", "f4", "e4", "d5", "f4", "e5", "g3", "g4", "g5", "b4"]);
 
-	var voice = scored.voice({}, _.map([].concat(measure2, measure1, measure4, measure3), function (n) {
+	// broken beamings
+	var measure5 = palestrina.melody.phrase(
+		[16, 16, 8, 16, 8, 16, 8, 16, 16, 16, 8, 16],
+		_.fill(new Array(16), "a4")
+	)
+
+	var voice = scored.voice({}, _.map([].concat(measure5, measure2, measure1, measure4, measure3), function (n) {
 		return scored.note({value: n.duration, pitch: n.pitch});
 	}));
 
-	return scored.render(line, {length: 1500, voices: [voice], numMeasures: 4});
+	return scored.render(line, {voices: [voice], numMeasures: 5});
 }
 
 function testAccidentals (key) {
@@ -268,11 +273,11 @@ function testAccidentals (key) {
 
 	]);
 
-	return scored.render(line, {length: 1500, voices: [voice], numMeasures: 2});
+	return scored.render(line, {voices: [voice], numMeasures: 2});
 }
 
 function testTimeSigs () {
-	var line = scored.line({}, [scored.clef({value: "treble", measure: 0}),
+	var line = scored.line({}, [scored.clef({value: "bass", measure: 0}),
 								scored.key({value: "c", measure: 0}),
 								scored.timeSig({value: "3/4", measure: 0}),
 								scored.timeSig({value: "4/4", measure: 2}),
@@ -294,7 +299,7 @@ function testTimeSigs () {
 		scored.rest({value: 4})
 	]);
 
-	return scored.render(line, {length: 1500, voices: [voice], numMeasures: 7});
+	return scored.render(line, {voices: [voice], numMeasures: 7});
 }
 
 function testChords () {
@@ -305,7 +310,7 @@ function testChords () {
 	var c = scored.chord;
 	var n = scored.note;
 	var voice = scored.voice({}, [
-		c({value: 8}, ["c4", "e4", "g4"]), c({value: 8}, ["d4", "f4", "a4"]), n({pitch: "d5"}), c({}, ["d4", "e4", "f4"]), n({pitch: "c5"}),
+		c({value: 8}, ["c4", "e4", "g4"]), c({value: 8}, ["d4", "f4", "a4"]), n({pitch: "d5"}), c({dots: 1}, ["d4", "e4", "f4"]), c({value: 8}, ["c5", "a4"]),
 
 		n({pitch: "g4", value: 16}), c({value: 16}, ["f4", "ab4"]), n({pitch: "b4", value: 16}), c({value: 16}, ["ab4", "c5"]),
 		n({pitch: "a4", value: 16}), c({value: 16}, ["g4", "bb4"]), n({pitch: "c#5", value: 16}), c({value: 16}, ["b4", "d5"]),

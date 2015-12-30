@@ -1,10 +1,10 @@
 import _ from "lodash";
 
-var Config = (function () {
-	var FONT_SIZE = 32,
-		FONT_FAMILY = "gonville";
+const Config = (function () {
+	const FONT_SIZE = 32;
+	const FONT_FAMILY = "gonville";
 
-	var defaultConfig = {
+	const defaultConfig = {
 		fontSize: FONT_SIZE,
 		fontFamily: FONT_FAMILY,
 		note: {
@@ -28,14 +28,14 @@ var Config = (function () {
 		},
 		maxBeamAngle: 13, // angle in degrees. angle can range from -maxBeamAngle to +maxBeamAngle
 		minStemLength: 10
-	}
+	};
 
 	function Config (configuration) {
 
-		var config = _.extend({}, defaultConfig, configuration);
+		const config = _.extend({}, defaultConfig, configuration);
 
 		return processConfig(config);
-	};
+	}
 
 	function processConfig (config) {
 		config.note.head.width = fontSizeToNoteHeadWidth(config.fontSize);
@@ -43,30 +43,37 @@ var Config = (function () {
 		config.layout.lineSpacing = config.lineSpacing = fontSizeToLineSpacing(config.fontSize, config.fontFamily);
 		config.layout.stepSpacing = config.stepSpacing = config.layout.lineSpacing / 2;
 
-		return config
-	};
+		return config;
+	}
 
-	function fontSizeToLineSpacing(fontSize, fontFamily) {
+	function fontSizeToLineSpacing(fontSize) {
 		// Can't access paper at this point because the context hasn't been setup.
 		// The height of the noteHead font is 1.2 * fontSize. This was figured out just by experimenting in the browser console.
 		// var height = fontSize * 1.2;
-		var height = fontSize;
+		const height = fontSize;
 
 		return (5 * height) / 18;
-	};
+	}
 
 	/*
+	 * @param fontSize - unimplemented
 	 * returns the y distance between the center of the font bounds and the center of the note head.
 	 */
-	function fontSizeToNoteHeadYOffset (fontSize) {
+	function fontSizeToNoteHeadYOffset () {
 		return 9; // FIXME: This will not scale. Needs to change based on different font sizes.
-	};
+	}
 
-	function fontSizeToNoteHeadWidth (fontSize) {
+	/*
+	 * @param fontSize - unimplemented
+	 */
+	function fontSizeToNoteHeadWidth () {
 		return 10.5;
-	};
+	}
 
-	function fontSizeToNoteHeadHeight (fontSize) {
+	/*
+	 * @param fontSize - unimplemented
+	 */
+	function fontSizeToNoteHeadHeight () {
 		return 10;
 	}
 

@@ -1,12 +1,12 @@
 import _ from "lodash";
 
-import Line from "./Line";
 import Staff from "./Staff";
 import constants from "../constants";
-import {map} from "../utils/common";
 import {createMeasures} from "../utils/measure";
-import {getTimeContexts, b} from "../utils/line";
-import {groupVoices, getLineItems, calculateMeasureLengths, nextTimes, iterateByTime, renderTimeContext, positionMarkings} from "../utils/staff";
+// the following will be uncommented when line 39 fixme is addressed.
+// import {map} from "../utils/common";
+// import {getTimeContexts} from "../utils/line";
+// import {getLineItems} from "../utils/staff";
 
 const TYPE = constants.type.score;
 
@@ -37,10 +37,10 @@ Score.render = function (score, {measures, voices=[]}) {
 
     measures = measures || createMeasures(numMeasures, score.timeSigs);
 
+    // FIXME: Score should pass the time contexts to the staves rather than letting each stave figure it out.
     // get the time contexts
-	const lineItems = getLineItems(score.lines, voices);
-
-	const lineTimes = map((line, items) => getTimeContexts(line, measures, items), score.lines, lineItems);
+	// const lineItems = getLineItems(score.lines, voices);
+	// const lineTimes = map((line, items) => getTimeContexts(line, measures, items), score.lines, lineItems);
 
     let startMeasure = 0;
     const staffGroups = _.map(score.staves, (staff, i) => {
@@ -62,7 +62,7 @@ Score.render = function (score, {measures, voices=[]}) {
     scoreGroup.addChildren(staffGroups);
 
     return scoreGroup;
-}
+};
 
 Score.prototype.render = function () {
     const group = new paper.Group({
@@ -70,11 +70,7 @@ Score.prototype.render = function () {
     });
 
     return group;
-}
-
-Score.renderStaff = function (staff, lines) {
-
-}
+};
 
 function getLineByVoice (voice, lines) {
     return _.find(lines, (line) => {

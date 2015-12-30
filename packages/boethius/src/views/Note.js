@@ -2,14 +2,11 @@ import teoria from "teoria";
 import _ from "lodash";
 
 import * as engraver from "../engraver";
-import {concat, partitionBy} from "../utils/common";
 import {getLinePoint} from "../utils/geometry";
 import * as placement from "../utils/placement";
 import * as noteUtils from "../utils/note";
-import * as timeUtils from "../utils/timeUtils";
 import {getAccidental} from "../utils/accidental";
 import constants from "../constants";
-import TimeSignature from "./TimeSignature";
 
 const TYPE = constants.type.note;
 
@@ -26,6 +23,7 @@ function Note ({pitch="a4", value=4, dots=0, slur, tuplet, time, voice}) {
 	this.dots = dots;
 	this.tuplet = tuplet;
 	this.time = time;
+	this.voice = voice;
 	this.slur = slur;
 }
 
@@ -36,7 +34,7 @@ Note.render = function (note, context={}) {
 	Note.renderAccidental(note, context.accidentals, context.key);
 	note.renderStem();
 	return group;
-}
+};
 
 Note.renderAccidental = function (note, accidentals, key) {
 	let parsedPitch = noteUtils.parsePitch(note.pitch);
@@ -46,7 +44,7 @@ Note.renderAccidental = function (note, accidentals, key) {
 		let accidentalGroup = note.drawAccidental(accidental);
 		accidentalGroup.translate(position);
 	}
-}
+};
 
 Note.prototype.renderStem = function (centerLineValue, stemDirection) {
 	if (this.needsStem()) {
@@ -55,9 +53,9 @@ Note.prototype.renderStem = function (centerLineValue, stemDirection) {
 		this.drawStem(stemPoint, stemDirection);
 		this.drawFlag();
 	}
-}
+};
 
-Note.prototype.render = function (context = {}) {
+Note.prototype.render = function () {
 	const group = this.group = new paper.Group({
 		name: TYPE
 	});
@@ -70,13 +68,13 @@ Note.prototype.render = function (context = {}) {
 	group.removeChildren();
 
 	// xPos and yPos are the center of the font item, not the noteHead. placement will take care of handling the offset for now.
-	var offset = placement.getNoteHeadOffset([0, 0]),
-		noteHead = this.noteHead = this.symbol.place(offset);
+	const offset = placement.getNoteHeadOffset([0, 0]);
+	const noteHead = this.noteHead = this.symbol.place(offset);
 
 	group.addChild(noteHead);
 
 	if (this.note.duration.dots) {
-		let dots = engraver.drawDots(noteHead, this.note.duration.dots);
+		const dots = engraver.drawDots(noteHead, this.note.duration.dots);
 		group.addChild(dots);
 	}
 
@@ -100,29 +98,29 @@ Note.prototype.render = function (context = {}) {
  */
 Note.prototype.needsStem = function () {
 	return this.note.duration.value >= 2;
-}
+};
 
 /*
  * @return Boolean - true if the note needs a flag drawn, False otherwise.
  */
 Note.prototype.needsFlag = function () {
 	return this.note.duration.value >= 8;
-}
+};
 
 Note.prototype.drawLegerLines = function (centerLine, lineSpacing) {
-	var legerLines = engraver.drawLegerLines(this.noteHead, centerLine, lineSpacing);
+	const legerLines = engraver.drawLegerLines(this.noteHead, centerLine, lineSpacing);
 	if (legerLines){
 		this.group.addChild(legerLines);
 	}
 };
 
 Note.prototype.drawGroupBounds = function () {
-	var rectangle = new paper.Rectangle(this.group.bounds);
+	const rect = new paper.Rectangle(this.group.bounds);
 	rectangle.right += 5;
 
-	rectangle = new paper.Path.Rectangle({
+	const rectangle = new paper.Path.Rectangle({
 		name: "bounds",
-		rectangle: rectangle
+		rectangle: rect
 	});
 	rectangle.fillColor = "#FFF"; // create a fill so the center can be clicked
 	rectangle.opacity = 0;
@@ -131,7 +129,7 @@ Note.prototype.drawGroupBounds = function () {
 };
 
 Note.prototype.drawStem = function (to, stemDirection) {
-	var frm, stem;
+	let frm, stem;
 
 	if (stemDirection === "up") {
 		this.stemDirection = "up";
@@ -152,14 +150,13 @@ Note.prototype.drawStem = function (to, stemDirection) {
 	this.group.addChild(stem);
 
 	return stem;
-}
+};
 
 /*
  * The Stem must already be rendered for this to work.
- * @param point - optional point to draw the flag to.
  * @return paper.Group
  */
-Note.prototype.drawFlag = function (point) {
+Note.prototype.drawFlag = function () {
 	let dur = this.value,
 		stem = this.group.children.stem,
 		flag, position;
@@ -184,7 +181,7 @@ Note.prototype.drawAccidental = function (accidental) {
 	this.group.addChild(accidentalGroup);
 
 	return accidentalGroup;
-}
+};
 
 /*
  * @param centerLineValue - String note pitch of center line.
@@ -197,15 +194,11 @@ Note.prototype.getStemDirection = function (centerLineValue) {
 	} else {
 		return "up";
 	}
-}
+};
 
 Note.prototype.calculateStemPoint = function (fulcrum, vector, direction) {
 	// get the beam point at the center of the noteHead
-	let noteHead = placement.getNoteHeadCenter(this.noteHead.position),
-		centerPoint = getLinePoint(noteHead.x, fulcrum, vector),
-		point = getLinePoint((direction === "up" ? this.noteHead.bounds.right : this.noteHead.bounds.left), fulcrum, vector);
-
-	return point;
-}
+	return getLinePoint((direction === "up" ? this.noteHead.bounds.right : this.noteHead.bounds.left), fulcrum, vector);
+};
 
 export default Note;

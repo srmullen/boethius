@@ -1,9 +1,9 @@
 import _ from "lodash";
 import {getTime} from "./timeUtils";
-import {isMarking, isNote} from "../types";
+import {isNote} from "../types";
 import * as placement from "./placement";
 
-const {getStaffSpace, calculateTimeLength} = placement;
+const {calculateTimeLength} = placement;
 
 function lineGetter (name) {
 	return function (lineGroup) {
@@ -12,25 +12,25 @@ function lineGetter (name) {
 		} else {
 			return lineGroup.children[name].segments[0].point;
 		}
-	}
+	};
 }
 
-const f = lineGetter("F"),
-	  d = lineGetter("D"),
-	  b = lineGetter("B"),
-	  g = lineGetter("G"),
-	  e = lineGetter("E");
+const f = lineGetter("F");
+const d = lineGetter("D");
+const b = lineGetter("B");
+const g = lineGetter("G");
+const e = lineGetter("E");
 
 /*
  * getClosestLine :: line -> (point -> noteName)
  */
 function getClosestLine (line) {
-	const lineGroup = line.staves[0],
-	      positions = [f(lineGroup), d(lineGroup), b(lineGroup), g(lineGroup), e(lineGroup)];
+	const lineGroup = line.staves[0];
+	const positions = [f(lineGroup), d(lineGroup), b(lineGroup), g(lineGroup), e(lineGroup)];
 	return function (point) {
 		let diffs = _.map(positions, (p) => Math.abs(point.y - p.y));
 		return _.indexOf(diffs, _.min(diffs));
-	}
+	};
 }
 
 /*
@@ -41,7 +41,7 @@ function getMeasure (line) {
 	return function (point) {
 		let diffs = _.map(positions, p => point.x - p.x);
 		return line.children[_.indexOf(diffs, _.min(_.filter(diffs, diff => diff >= 0)))];
-	}
+	};
 }
 
 /*
@@ -55,7 +55,7 @@ function getTimeContexts (line, measures, items) {
 
 	let times = _.sortBy(_.map(_.groupBy(allItems, (item) => {
 		return getTime(measures, item).time;
-	}), (v, k) => {
+	}), (v) => {
 		let time = getTime(measures, v[0]);
 		return {time, items: v, context: line.contextAt(measures, time)};
 	}), ({time}) => time.time);
@@ -78,7 +78,7 @@ function calculateMeasureLengths (measures, times, noteHeadWidth, shortestDurati
 	return measureLengths;
 }
 
-function positionMarkings (lineCenter, cursor, {time, items, context}) {
+function positionMarkings (lineCenter, cursor, {items}) {
     let {
 		clef: clefs,
 		key: keys,
@@ -93,7 +93,7 @@ function positionMarkings (lineCenter, cursor, {time, items, context}) {
     return cursor;
 }
 
-function renderTimeContext (lineCenter, cursor, {time, items, context}) {
+function renderTimeContext (lineCenter, cursor, {items, context}) {
 	const {
 		note: notes,
 		rest: rests,
@@ -159,4 +159,4 @@ export {
 	calculateMeasureLengths,
 	renderTimeContext,
 	positionMarkings
-}
+};

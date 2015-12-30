@@ -1,0 +1,39 @@
+{
+    "rules": {
+        "indent": [
+            0,
+            "tab"
+        ],
+        "quotes": [
+            0,
+            "double"
+        ],
+        "linebreak-style": [
+            2,
+            "unix"
+        ],
+        "semi": [
+            2,
+            "always"
+        ],
+        "comma-dangle": [
+            0
+        ],
+        "no-var": [
+            2
+        ]
+    },
+    "env": {
+        "es6": true,
+        "browser": true
+    },
+    "ecmaFeatures": {
+        "modules": true
+    },
+    "globals": {
+        "paper": true,
+        "Scored": true
+    },
+    "extends": "eslint:recommended"
+
+}

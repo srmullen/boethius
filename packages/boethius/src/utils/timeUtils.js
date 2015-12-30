@@ -18,10 +18,9 @@ function parseSignature (signature) {
 }
 
 /*
- * Still need to add in offset
  * @return {number} - the measure number as an integer
  */
-function getMeasure (time=0, [beats, value], offset=0) {
+function getMeasure (time=0, [beats, value]) {
 	let measureDuration = beats * (1/value);
 	return Math.floor(time/measureDuration);
 }
@@ -107,7 +106,7 @@ function getMeasureByTime (measures, time) {
 function getTimeSigDuration (timeSig) {
 	let [beats, value] = parseSignature(timeSig);
 	return beats * (1/value);
-};
+}
 
 /*
  * @param tuplet - String representing the tuplet (ex. "3/2")
@@ -152,10 +151,10 @@ function compareByTime ({time: t1=0}, {time: t2=0}) {
 }
 
 function splitByMeasure (events) {
-	var measures = _.mapValues(_.groupBy(events, function ([e, ctx]) {
+	const measures = _.mapValues(_.groupBy(events, function ([, ctx]) {
 		return ctx.measure || 0;
 	}), function (measure) {
-		return _.groupBy(measure, function ([e, ctx]) {
+		return _.groupBy(measure, function ([, ctx]) {
 			return ctx.beat;
 		});
 	});
@@ -195,9 +194,9 @@ function calculateDuration (item) {
 }
 
 function sortByKey (obj) {
-	var times = _.keys(obj);
+	const times = _.keys(obj);
 
-	var sortedTimes = _.sortBy(times, function (t) {
+	const sortedTimes = _.sortBy(times, function (t) {
 		return parseFloat(t);
 	});
 
@@ -233,4 +232,4 @@ export {
 	calculateDuration,
 	parseSignature,
 	sumDurations
-}
+};

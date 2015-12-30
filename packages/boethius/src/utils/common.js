@@ -3,21 +3,21 @@ import constants from "../constants";
 
 const debugEvents = {
 	onMouseEnter: () => {
-		console.log("entered");
+		// console.log("entered");
 	},
 
 	onMouseLeave: () => {
-		console.log("left");
+		// console.log("left");
 	},
 
 	onMouseDown: () => {
-		console.log("down");
+		// console.log("down");
 	},
 
 	onMouseUp: () => {
-		console.log("up");
+		// console.log("up");
 	}
-}
+};
 
 function getEventHandlers (group) {
 	if (group.name === constants.type.note ||
@@ -48,7 +48,7 @@ function getEventHandlers (group) {
 				let bounds = group.children.bounds || group.bounds;
 				bounds.fillColor = "blue";
 			}
-		}
+		};
 	} else {
 		return debugEvents;
 	}
@@ -56,10 +56,6 @@ function getEventHandlers (group) {
 
 function addEvents (group) {
 	_.extend(group, getEventHandlers(group));
-}
-
-function debugGroupEvents (group) {
-	_.extend(item.group, debugEvents);
 }
 
 function concat (a = [], b) {
@@ -90,7 +86,6 @@ function partitionBy (coll, f) {
  */
 function partitionWhen (coll, f) {
 	return _.reduce(coll, (acc, el) => {
-		let newValue = f(el);
 		if (f(el) || !acc[acc.length-1]) {
 			let partition = [el];
 			acc.push(partition);
@@ -102,8 +97,8 @@ function partitionWhen (coll, f) {
 }
 
 function doTimes (times, fn) {
-	var ret = [], i = 0;
-	for (; i < times; i++) {
+	const ret = [];
+	for (let i = 0; i < times; i++) {
 		ret.push(fn(i));
 	}
 	return ret;
@@ -167,7 +162,7 @@ function isMarking (item) {
 function reductions (reducer, coll, init) {
 	let ret, idx = 1, i = 0;
 	if (!_.isUndefined(init)) {
-		ret = new Array(coll.length + 1)
+		ret = new Array(coll.length + 1);
 		ret[0] = init;
 	} else {
 		ret = new Array(coll.length);
@@ -192,7 +187,6 @@ export {
 	concat,
 	doTimes,
 	addEvents,
-	debugGroupEvents,
 	serialize,
 	partitionBy,
 	partitionWhen,
@@ -203,4 +197,4 @@ export {
 	reductions,
 	isEven,
 	isOdd
-}
+};

@@ -3,7 +3,6 @@ import _ from "lodash";
 import * as placement from "./placement";
 import * as line from "./line";
 import {isNote} from "../types";
-import {map} from "./common";
 
 /*
  * Groups and indexes voices by the lines they are to be rendered on. Voice names take priority, then order.
@@ -69,7 +68,7 @@ function nextTimes (times) {
             rests.push(_.rest(times[i]));
         } else {
             nexts.push(null);
-            rests.push(times[i])
+            rests.push(times[i]);
         }
     }
     return [nexts, rests];
@@ -90,26 +89,8 @@ function iterateByTime (fn, times) {
     return ret;
 }
 
-// function positionMarkings (lineCenter, cursor, {time, items, context}) {
-//     let {
-// 		clef: clefs,
-// 		key: keys,
-// 		timeSig: timeSigs
-// 	} = _.groupBy(items, item => item.type);
-//
-// 	// place the markings
-// 	if (clefs) cursor = placement.placeMarking(lineCenter, cursor, clefs[0]);
-// 	if (keys) cursor = placement.placeMarking(lineCenter, cursor, keys[0]);
-// 	if (timeSigs) cursor = placement.placeMarking(lineCenter, cursor, timeSigs[0]);
-//
-//     return cursor;
-// }
-
-function renderTimeContext (lineCenter, cursor, {time, items, context}) {
+function renderTimeContext (lineCenter, cursor, {items, context}) {
     let {
-		clef: clefs,
-		key: keys,
-		timeSig: timeSigs,
 		note: notes,
 		rest: rests,
 		chord: chords

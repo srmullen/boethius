@@ -1,6 +1,6 @@
 import _ from "lodash";
 import {parsePitch, hasPitch} from "./note";
-import {concat, partitionBy} from "./common";
+import {partitionBy} from "./common";
 
 /*
  * Converts accidental representations to a consistent representation.
@@ -88,17 +88,17 @@ function createAccidentalContext (c1, c2) {
 		diatonics2 = _.map(c2, dropAccidental);
 
 	// 1. union of diatonics1 diatonics2 - intersection of diatonics1 diatonics2
-	return _.union(_.map(_.difference(_.union(diatonics1, diatonics2),
-				 	_.intersection(diatonics1, diatonics2)),
-			 (diatonic) => {
-				 let accidental = _.findWhere(c2, diatonic);
-				 if (accidental) {
+	return _.union(
+		_.map(_.difference(_.union(diatonics1, diatonics2), _.intersection(diatonics1, diatonics2)),
+			(diatonic) => {
+				let accidental = _.findWhere(c2, diatonic);
+				if (accidental) {
 					return accidental;
-				 } else {
+				} else {
 					return _.findWhere(c1, diatonic);
-				 }
-			 }), c2);
-
+				}
+			}),
+		c2);
 }
 
 function createAccidentalContexts (times) {
@@ -126,4 +126,4 @@ export {
     getAccidental,
 	createAccidentalContext,
     getAccidentalContexts
-}
+};

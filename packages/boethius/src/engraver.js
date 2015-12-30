@@ -1,4 +1,3 @@
-import * as paperUtils from "./utils/paperUtils";
 import {isNote, isChord} from "./types";
 import constants from "./constants";
 import * as placement from "./utils/placement";
@@ -7,6 +6,7 @@ import * as noteUtils from "./utils/note";
 import * as chordUtils from "./utils/chord";
 import {parseSignature} from "./utils/timeUtils";
 import {map, doTimes, concat} from "./utils/common";
+import {getLinePoint} from "./utils/geometry";
 import _ from "lodash";
 
 
@@ -40,16 +40,16 @@ function drawLegerLines (noteHead, centerLine, lineSpacing) {
 	// get the distance from the center line.
 	// var distance = noteHead.bounds.center.y - centerLine.y,
 	// rounding to fix issue with leger lines not showing up
-	var distance = Math.round(placement.getNoteHeadCenter(noteHead.bounds.center).y - centerLine.y),
-		legerLines = [];
-	var yPositionFunc = getYpositionFunc(distance, centerLine.y, lineSpacing);
+	const distance = Math.round(placement.getNoteHeadCenter(noteHead.bounds.center).y - centerLine.y);
+	const legerLines = [];
+	const yPositionFunc = getYpositionFunc(distance, centerLine.y, lineSpacing);
 
 	if (Math.abs(distance) >= lineSpacing * 3) {
 		// Added Math.ceil to help with issues doing floating point math. Not sure if it's the perfect solution.
-		for (var i = 0; i <= Math.ceil(Math.abs(distance) - (lineSpacing * 3)) / lineSpacing; i++) {
-			var yPos = yPositionFunc(i);
-			var point1 = new paper.Point(noteHead.bounds.leftCenter.x - Scored.config.note.head.width/2, yPos);
-			var point2 = new paper.Point(noteHead.bounds.rightCenter.x + Scored.config.note.head.width/2, yPos);
+		for (let i = 0; i <= Math.ceil(Math.abs(distance) - (lineSpacing * 3)) / lineSpacing; i++) {
+			const yPos = yPositionFunc(i);
+			const point1 = new paper.Point(noteHead.bounds.leftCenter.x - Scored.config.note.head.width/2, yPos);
+			const point2 = new paper.Point(noteHead.bounds.rightCenter.x + Scored.config.note.head.width/2, yPos);
 			legerLines.push(new paper.Path.Line(point1, point2));
 		}
 	}
@@ -131,10 +131,10 @@ function drawLine (width) {
 // });
 
 function drawStaffBar (lines) {
-	var firstLine = lines[0],
-		lastLine = lines[lines.length - 1];
+	const firstLine = lines[0];
+	const lastLine = lines[lines.length - 1];
 
-	let bar = new paper.Path.Line(lineUtils.f(firstLine), lineUtils.e(lastLine));
+	const bar = new paper.Path.Line(lineUtils.f(firstLine), lineUtils.e(lastLine));
 	bar.strokeColor = "black";
 	bar.strokeWidth = 2;
 
@@ -164,7 +164,7 @@ const drawClef = _.memoize(function (clef, margin={}) {
 });
 
 const drawTimeSig = _.memoize(function (timeSig, margin) {
-	var item;
+	let item;
 
 	if (timeSig === "c") { // common time
 		item = new paper.PointText({
@@ -229,7 +229,7 @@ const drawTimeSig = _.memoize(function (timeSig, margin) {
 // });
 
 function drawBounds (item, {top=0, left=0, bottom=0, right=0}) {
-	var rect = new paper.Path.Rectangle(item.bounds.topLeft.subtract([left, top]), item.bounds.bottomRight.add([right, bottom]));
+	const rect = new paper.Path.Rectangle(item.bounds.topLeft.subtract([left, top]), item.bounds.bottomRight.add([right, bottom]));
 
 	rect.fillColor = "#FFFFFF";
 	rect.opacity = 0;
@@ -245,7 +245,7 @@ function drawBounds (item, {top=0, left=0, bottom=0, right=0}) {
 ///////////////////
 
 const drawHead = _.memoize(function (type) {
-	var noteHead, noteheadChar;
+	let noteHead, noteheadChar;
 
 	if (type >= 1) {
 		noteheadChar = constants.font.noteheads.whole;
@@ -271,15 +271,13 @@ const drawHead = _.memoize(function (type) {
  */
 function drawDots (noteHead, dots) {
 	if (dots) {
-		var dotArr = [],
-			distance = noteHead.bounds.width / 2,
-			// point = noteHead.bounds.rightCenter,
-			point = placement.getNoteHeadOffset(noteHead.bounds.bottomRight),
-			dot;
+		const dotArr = [];
+		const distance = noteHead.bounds.width / 2;
+		let point = placement.getNoteHeadOffset(noteHead.bounds.bottomRight);
 
-		for (var i = 0; i < dots; i++) {
+		for (let i = 0; i < dots; i++) {
 			point = point.add(distance, 0);
-			dot = new paper.Path.Circle(point, 1.5);
+			const dot = new paper.Path.Circle(point, 1.5);
 			dot.fillColor = 'black';
 			// this.group.addChild(dot); // TODO: might need a way to refer to the dots later
 			dotArr.push(dot);
@@ -300,35 +298,34 @@ function drawLegato () {
 }
 
 const drawAccidental = _.memoize(function (accidental) {
-	var content = {
+	const content = {
 			"#": constants.font.accidentals.sharp,
 			"b": constants.font.accidentals.flat,
 			"bb": constants.font.accidentals.doubleFlat,
 			"x": constants.font.accidentals.doubleSharp,
 			"n": constants.font.accidentals.natural,
-		}[accidental],
-		item = new paper.PointText({
-			content: content,
-			fontFamily: 'gonville',
-			fontSize: Scored.config.fontSize,
-			fillColor: 'black'
-		});
+		}[accidental];
+	const item = new paper.PointText({
+		content: content,
+		fontFamily: 'gonville',
+		fontSize: Scored.config.fontSize,
+		fillColor: 'black'
+	});
 
 	return new paper.Symbol(item);
 });
 
 const drawFlag = _.memoize(function (dur, stemDirection) {
-	var flagName = {
+	const flagName = {
 			8: "eighth",
 			16: "sixteenth",
 			32: "thirtysecond",
 			64: "sixtyfourth",
 			128: "onehundredtwentyeighth"
-		}[dur],
-		flag;
+		}[dur];
 
 	if (flagName) {
-		flag = new paper.PointText({
+		const flag = new paper.PointText({
 			content: constants.font.flags[flagName][stemDirection],
 			fontFamily: 'gonville',
 			fontSize: Scored.config.fontSize,
@@ -339,13 +336,14 @@ const drawFlag = _.memoize(function (dur, stemDirection) {
 	}
 }, (dur, stemDirection) => "" + dur + stemDirection);
 
+const flagOffsets = {up: [4, -9], down: [5, -11]};
+
 function getFlagOffset (point, direction) {
-	return point.add({up: [4, -9],
-					  down: [5, -11]}[direction]);
+	return point.add(flagOffsets[direction]);
 }
 
 const drawRest = _.memoize(function (type) {
-	var rest = new paper.PointText({
+	const rest = new paper.PointText({
 		content: constants.font.rests[type],
 		fontFamily: 'gonville',
 		fontSize: Scored.config.fontSize,
@@ -438,8 +436,10 @@ const durationToBeams = {
  * @param fulcrum - a point that the bar passes through
  * @param vector - the vector of the bar
  * @param line - String value of center line
+ * @param kneeGap=5.5 unimplemented - see lilypond knee gap
  */
-function beam (items, {line="b4", fulcrum, vector, kneeGap=5.5, stemDirections}) {
+ /*esline-disable*/
+function beam (items, {line="b4", fulcrum, vector, stemDirections}) {
 
 	let numBeams = durationToBeams[_.max(_.map(items, item => item.value))];
 
@@ -469,73 +469,74 @@ function beam (items, {line="b4", fulcrum, vector, kneeGap=5.5, stemDirections})
 	}
 
 	// beams is an array of arrays of segments, beams[0] are eighth segments, beams[1] sixteenths, etc.
-	let beams = doTimes(numBeams, () => [[]]),
-		segments = _.reduce(items, (acc, item, i) => {
-			let point = _.last(acc),
-				duration = durations[i],
-				direction = stemDirections[i],
-				current = _.last(acc),
-				previous = acc[i-1],
-				previousDuration = durations[i-1],
-				nextDuration = durations[i+1],
-				nextItem = items[i+1],
-				next = nextItem ? nextItem.calculateStemPoint(fulcrum, vector, stemDirections[i+1]) : null;
+	let beams = doTimes(numBeams, () => [[]]);
 
-			_.last(beams[0]).push(point);
+	_.reduce(items, (acc, item, i) => {
+		let point = _.last(acc),
+			duration = durations[i],
+			direction = stemDirections[i],
+			current = _.last(acc),
+			// previous = acc[i-1],
+			previousDuration = durations[i-1],
+			nextDuration = durations[i+1],
+			nextItem = items[i+1],
+			next = nextItem ? nextItem.calculateStemPoint(fulcrum, vector, stemDirections[i+1]) : null;
 
-			if (duration >= 16) {
-				handleBeam(beams[1], current, duration, previousDuration, nextDuration, fulcrum, vector, direction, 5);
-			}
+		_.last(beams[0]).push(point);
 
-			if (duration >= 32) {
-				handleBeam(beams[2], current, duration, previousDuration, nextDuration, fulcrum, vector, direction, 10);
-			}
+		if (duration >= 16) {
+			handleBeam(beams[1], current, duration, previousDuration, nextDuration, fulcrum, vector, direction, 5);
+		}
 
-			if (duration >= 64) {
-				handleBeam(beams[3], current, duration, previousDuration, nextDuration, fulcrum, vector, direction, 15);
-			}
+		if (duration >= 32) {
+			handleBeam(beams[2], current, duration, previousDuration, nextDuration, fulcrum, vector, direction, 10);
+		}
 
-			if (duration >= 128) {
-				handleBeam(beams[4], current, duration, previousDuration, nextDuration, fulcrum, vector, direction, 20);
-			}
+		if (duration >= 64) {
+			handleBeam(beams[3], current, duration, previousDuration, nextDuration, fulcrum, vector, direction, 15);
+		}
 
-			if (duration >= 256) {
-				handleBeam(beams[5], current, duration, previousDuration, nextDuration, fulcrum, vector, direction, 25);
-			}
+		if (duration >= 128) {
+			handleBeam(beams[4], current, duration, previousDuration, nextDuration, fulcrum, vector, direction, 20);
+		}
 
-			// Break beams
-			if (duration < 16 && beams[1]) {
-				beams[1].push([]);
-			}
+		if (duration >= 256) {
+			handleBeam(beams[5], current, duration, previousDuration, nextDuration, fulcrum, vector, direction, 25);
+		}
 
-			if (duration < 32 && beams[2]) {
-				beams[2].push([]);
-			}
+		// Break beams
+		if (duration < 16 && beams[1]) {
+			beams[1].push([]);
+		}
 
-			if (duration < 64 && beams[3]) {
-				beams[3].push([]);
-			}
+		if (duration < 32 && beams[2]) {
+			beams[2].push([]);
+		}
 
-			if (duration < 128 && beams[4]) {
-				beams[4].push([]);
-			}
+		if (duration < 64 && beams[3]) {
+			beams[3].push([]);
+		}
 
-			if (duration < 256 && beams[5]) {
-				beams[5].push([]);
-			}
+		if (duration < 128 && beams[4]) {
+			beams[4].push([]);
+		}
 
-			item.drawStem(point, direction);
+		if (duration < 256 && beams[5]) {
+			beams[5].push([]);
+		}
 
-			return concat(acc, next);
-		}, [items[0].calculateStemPoint(fulcrum, vector, stemDirections[0])]), // initialize the accumulator with the first point
+		item.drawStem(point, direction);
 
-		paths = _.map(_.flatten(beams), (bar) => {
-			return new paper.Path({
-				segments: bar,
-				strokeColor: "black",
-				strokeWidth: 3
-			});
+		return concat(acc, next);
+	}, [items[0].calculateStemPoint(fulcrum, vector, stemDirections[0])]); // initialize the accumulator with the first point
+
+	const paths = _.map(_.flatten(beams), (bar) => {
+		return new paper.Path({
+			segments: bar,
+			strokeColor: "black",
+			strokeWidth: 3
 		});
+	});
 
 	// what group should this be added to?
 	return new paper.Group({

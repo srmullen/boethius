@@ -1,15 +1,11 @@
 import constants from "../constants";
 import {drawLine} from "../engraver";
-// import Measure from "./Measure";
 import {createMeasures} from "../utils/measure";
-import {getMeasureNumber, getMeasureByTime} from "../utils/timeUtils";
 import * as placement from "../utils/placement";
-import {isMarking, concat} from "../utils/common";
 import * as lineUtils from "../utils/line";
 import {getAccidentalContexts} from "../utils/accidental";
 import {isNote, isChord} from "../types";
 import Note from "./Note";
-import Rest from "./Rest";
 import Chord from "./Chord";
 import _ from "lodash";
 
@@ -41,7 +37,7 @@ Line.prototype.type = TYPE;
  */
 Line.calculateAverageMeasureLength = function (staves, lineLength, measures) {
 	return lineLength * (staves / measures);
-}
+};
 
 /*
  * Static render is a self-contained render method. Handles all render method calls but provids less flexability.
@@ -75,7 +71,7 @@ Line.render = function (line, {length, measures, voices=[], startMeasure=0, numM
 
 	// get the times that are to be rendered on the line.
 	const timesToRender = _.filter(times, (time) => {
-		return time.time.measure >= startMeasure && time.time.measure < endMeasure
+		return time.time.measure >= startMeasure && time.time.measure < endMeasure;
 	});
 	const measuresToRender = _.slice(measures, startMeasure, endMeasure);
 
@@ -119,7 +115,7 @@ Line.render = function (line, {length, measures, voices=[], startMeasure=0, numM
 
 		cursorFn = (b, cursor, ctx) => {
 			return placement.scaleCursor(noteScale, cursor, lineUtils.renderTimeContext(b, cursor, ctx));
-		}
+		};
 	}
 
 	// add items to the line
@@ -135,7 +131,7 @@ Line.render = function (line, {length, measures, voices=[], startMeasure=0, numM
 	});
 
 	return lineGroup;
-}
+};
 
 /*
  * @param timesToRender times[] - Array of time contexts to place on the line.
@@ -165,14 +161,14 @@ Line.prototype.render = function (length) {
 	group.name = TYPE;
 	group.strokeColor = "black";
 	return group;
-}
+};
 
 Line.prototype.renderItems = function (times) {
-	return _.reduce(times, (acc, {time, items, context}) => {
+	return _.reduce(times, (acc, {items, context}) => {
 		let groups = _.map(items, item => renderItem(item, context));
 		return acc.concat(groups);
 	}, []);
-}
+};
 
 /*
  * @param lineGroup - the group returned by line.render
@@ -180,7 +176,7 @@ Line.prototype.renderItems = function (times) {
 Line.prototype.renderMeasures = function (measures, lengths, lineGroup, lineLength) {
 	let averageMeasureLength = Line.calculateAverageMeasureLength(1, lineLength, measures.length);
 
-	let measureGroups = _.reduce(measures, (groups, measure, i, children) => {
+	let measureGroups = _.reduce(measures, (groups, measure, i) => {
 		let measureLength = lengths[i] || averageMeasureLength,
 			previousGroup = _.last(groups),
 			leftBarline;
@@ -192,7 +188,7 @@ Line.prototype.renderMeasures = function (measures, lengths, lineGroup, lineLeng
 		return groups;
 	}, []);
 	return measureGroups;
-}
+};
 
 /*
  * Returns the clef, time signature and accidentals at the given time.
@@ -209,19 +205,19 @@ Line.prototype.contextAt = function (measures, time) {
 		// Reverse mutates the array. Filtering first give a new array so no need to worry about mutating markings.
 		let markingsOfType = _.filter(markings, (marking) => marking.type === type).reverse();
 		return _.find(markingsOfType, getMarking(time));
-	}
+	};
 
 	let clef = getMarkingAtTime(this.markings, constants.type.clef, time) || {},
 		timeSig = getMarkingAtTime(this.markings, constants.type.timeSig, time) || {},
 		key = getMarkingAtTime(this.markings, constants.type.key, time) || {};
 
 	return {clef, timeSig, key};
-}
+};
 
 function renderItem (item, context) {
-	if (item.type === constants.type.note) {
+	if (isNote(item)) {
 		return Line.renderNote(item, context);
-	} else if (item.type === constants.type.chord) {
+	} else if (isChord(item)) {
 		return Line.renderChord(item, context);
 	} else {
 		return item.render(context);
@@ -237,7 +233,7 @@ Line.renderNote = function (note, context) {
 	let group = note.render(context);
 	Note.renderAccidental(note, context.accidentals, context.key);
 	return group;
-}
+};
 
 /*
  * @param Chord - Chord
@@ -248,6 +244,6 @@ Line.renderChord = function (chord, context) {
 	let group = chord.render();
 	Chord.renderAccidentals(chord, context);
 	return group;
-}
+};
 
 export default Line;

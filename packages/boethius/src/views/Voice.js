@@ -3,13 +3,10 @@ import F from "fraction.js";
 
 import constants from "../constants";
 import {isNote, isChord} from "../types";
-import {concat, partitionBy, partitionWhen, mapDeep} from "../utils/common";
+import {concat, partitionBy, mapDeep} from "../utils/common";
 import {beam, drawTuplets} from "../engraver";
-import * as lineUtils from "../utils/line";
 import {getAverageStemDirection, slur} from "../utils/note";
 import {calculateDuration, getMeasureNumber, getBeat, parseSignature, calculateTupletDuration, sumDurations} from "../utils/timeUtils";
-import TimeSignature from "./TimeSignature";
-import Measure from "./Measure";
 import {getCenterLineValue} from "./Clef";
 
 /*
@@ -40,12 +37,6 @@ function Voice ({value, stemDirection}, children=[]) {
 
 Voice.prototype.type = constants.type.voice;
 
-// Voice.prototype.renderChildren = function () {
-//     return this.children.map((child, i) => {
-//         return child.render();
-//     });
-// }
-
 /*
  * Notes must have time properties for this function to work.
  * Should this function just calculate their times from the first note instead?
@@ -68,23 +59,23 @@ Voice.findBeaming = function findBeaming (timeSig, items) {
    });
 
    let groupings = [];
-   for (let i = 0, beat = 0; i < timeSig.beatStructure.length; i++) { // count down through the beats for each
-								                                        // beat structure and add the notes to be beamed.
-       for (let beats = timeSig.beatStructure[i]; beats > 0; beats--) {
-           if (stemmedItems[beat]) {
-               let breakNum = 0; // for causing splits between quater notes in the same beat (i.e. tuplets);
-               let beatSubdivisions = partitionBy(stemmedItems[beat], item => {
-                   return item.needsFlag() ? "flag" : breakNum++;
-               });
-               _.each(beatSubdivisions, subdivision => groupings.push(subdivision));
-           }
+   // count down through the beats for each beat structure and add the notes to be beamed.
+   for (let i = 0, beat = 0; i < timeSig.beatStructure.length; i++) {
+        for (let beats = timeSig.beatStructure[i]; beats > 0; beats--) {
+            if (stemmedItems[beat]) {
+                let breakNum = 0; // for causing splits between quater notes in the same beat (i.e. tuplets);
+                let beatSubdivisions = partitionBy(stemmedItems[beat], item => {
+                    return item.needsFlag() ? "flag" : breakNum++;
+                });
+                _.each(beatSubdivisions, subdivision => groupings.push(subdivision));
+            }
 
-           beat++;
-       }
+            beat++;
+        }
    }
 
    return groupings;
-}
+};
 
 /*
  * items must have time properties.
@@ -98,12 +89,9 @@ Voice.groupTuplets = function groupTuplets (items) {
     }
 
     // filter out items that don't have a tuplet after partitioning them.
-    let currentTuplet;
 
     const groupings = [];
     let previousTuplet = null;
-    let tupletType = null;
-    let tupletDuration = 0;
     for (let i = 0; i < items.length; i++) {
         let item = items[i];
         if (!item.tuplet) { // skip this item
@@ -111,7 +99,6 @@ Voice.groupTuplets = function groupTuplets (items) {
         } else if (item.tuplet !== previousTuplet || !_.last(groupings)) { // create a new tuplet grouping
             groupings.push([item]);
             previousTuplet = item.tuplet;
-            tupletType = item.value;
         } else { // add the item to the previous grouping.
             let grouping = _.last(groupings);
             let longestDuration = _.min(grouping, item => item.value).value;
@@ -127,11 +114,11 @@ Voice.groupTuplets = function groupTuplets (items) {
     }
 
     return groupings;
-}
+};
 
 Voice.groupSlurs = function (items) {
     return _.filter(partitionBy(items, item => item.slur), ([item]) => !!item.slur);
-}
+};
 
 /*
  * @param centerLineValue - String representing note value.
@@ -214,7 +201,7 @@ Voice.prototype.renderDecorations = function (line, centerLine, measures) {
     }
 
     return lineChildren;
-}
+};
 
 /*
  * The given times must be a number because a Voice doesn't know about the measures or beats.
@@ -233,6 +220,6 @@ Voice.prototype.getTimeFrame = function getTimeFrame(frm, to) {
         }
     }
     return timeFrame;
-}
+};
 
 export default Voice;

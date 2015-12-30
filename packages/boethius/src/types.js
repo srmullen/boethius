@@ -38,4 +38,4 @@ export {
     isTimeSignature,
     isVoice,
     isMarking
-}
+};

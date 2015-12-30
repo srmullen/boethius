@@ -15,8 +15,8 @@ function createMeasures (numMeasures, children) {
 	let [explicitMeasures, markings] = _.partition(_.filter(children, c => !!c), isMeasure),
 		measureMarkings = _.groupBy(markings, marking => marking.measure || 0);
 
-	{ // Put each measure in the right position in the measures array.
-	  // If a measure does not have an index property put it in the next available location.
+	{	// Put each measure in the right position in the measures array.
+		// If a measure does not have an index property put it in the next available location.
 		let cur = 0;
 		_.each(explicitMeasures, (measure) => {
 			if (_.isNumber(measure.index)) {
@@ -49,4 +49,4 @@ function createMeasures (numMeasures, children) {
 
 export {
 	createMeasures
-}
+};

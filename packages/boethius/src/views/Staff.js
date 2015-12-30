@@ -1,13 +1,11 @@
 import _ from "lodash";
 
-import * as paperUtils from "../utils/paperUtils";
-import * as timeUtils from "../utils/timeUtils";
-import {isLine, isMarking} from "../types";
+import {isMarking} from "../types";
 import {drawStaffBar} from "../engraver";
 import constants from "../constants";
 import {createMeasures} from "../utils/measure";
 import {getTimeContexts, b, positionMarkings} from "../utils/line";
-import {groupVoices, getLineItems, calculateMeasureLengths, nextTimes, iterateByTime, renderTimeContext} from "../utils/staff";
+import {getLineItems, calculateMeasureLengths, iterateByTime, renderTimeContext} from "../utils/staff";
 import {map} from "../utils/common";
 import {getAccidentalContexts} from "../utils/accidental";
 import {calculateCursor, calculateTimeLength, scaleCursor} from "../utils/placement";
@@ -47,7 +45,7 @@ Staff.render = function render (staff, {lines=[], voices=[], measures, length, s
 	// get the times that are to be rendered on the staff.
 	const lineTimesToRender = _.map(lineTimes, (line) => {
 		return _.filter(line, (time) => {
-			return time.time.measure >= startMeasure && time.time.measure < endMeasure
+			return time.time.measure >= startMeasure && time.time.measure < endMeasure;
 		});
 	});
 
@@ -85,7 +83,7 @@ Staff.render = function render (staff, {lines=[], voices=[], measures, length, s
 
 		cursorFn = (possibleNextPositions) => {
 			return _.min(possibleNextPositions);
-		}
+		};
 
 	} else {
 		lineGroups = staff.renderLines(lines, length);
@@ -109,7 +107,7 @@ Staff.render = function render (staff, {lines=[], voices=[], measures, length, s
 
 		cursorFn = (possibleNextPositions, cursor) => {
 			return scaleCursor(noteScale, cursor, _.min(possibleNextPositions));
-		}
+		};
 	}
 
 	// add the children to each line.
@@ -130,7 +128,7 @@ Staff.render = function render (staff, {lines=[], voices=[], measures, length, s
 	}, lines, lineGroups, lineCenters, voices);
 
 	return staffGroup;
-}
+};
 
 function placeTimes (staffTimes, measures, lineCenters, cursorFn) {
 	_.reduce(staffTimes, (cursor, ctxs, i) => {
@@ -156,7 +154,7 @@ function placeTimes (staffTimes, measures, lineCenters, cursorFn) {
 
 Staff.prototype.type = TYPE;
 
-Staff.prototype.render = function (lines, startMeasure=0, numMeasures) {
+Staff.prototype.render = function () {
 	const group = new paper.Group({
 		name: TYPE
 	});
@@ -173,10 +171,10 @@ Staff.prototype.renderLines = function (lines, length) {
 	});
 
 	return lineGroups;
-}
+};
 
 Staff.prototype.renderMeasures = function (measures, lengths, staffGroup) {
-	let measureGroups = _.reduce(measures, (groups, measure, i, children) => {
+	let measureGroups = _.reduce(measures, (groups, measure, i) => {
 		let measureLength = lengths[i],
 			previousGroup = _.last(groups),
 			leftBarline;
@@ -189,6 +187,6 @@ Staff.prototype.renderMeasures = function (measures, lengths, staffGroup) {
 	}, []);
 
 	return measureGroups;
-}
+};
 
 export default Staff;

@@ -8,7 +8,8 @@
     "build": "browserify src/Scored.js -t babelify --outfile dist/boethius.js",
     "es6compile": "babel --modules umd src/ --out-dir lib/ -s",
     "es6watch": "babel --modules umd src/ --watch --out-dir lib/ -s",
-    "test": "mocha --compilers js:babel-register"
+    "test": "mocha --compilers js:babel-register",
+    "line": "eslint src"
   },
   "keywords": [
     "music",

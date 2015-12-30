@@ -1,10 +1,10 @@
 import _ from "lodash";
 
-import engraver from "../engraver";
+import {drawFlag, getFlagOffset} from "../engraver";
 import {getSteps, parsePitch} from "../utils/note";
 import {defaultStemPoint, getStemLength, getOverlappingNotes, getAccidentalOrdering} from "../utils/chord";
 import {map, isEven} from "../utils/common";
-import {getAccidentalTop, getAccidentalBottom, getNoteHeadCenter, calculateDefaultAccidentalPosition} from "../utils/placement";
+import {getAccidentalTop, getAccidentalBottom, calculateDefaultAccidentalPosition} from "../utils/placement";
 import {getAccidental} from "../utils/accidental";
 import constants from "../constants";
 import Note from "./Note";
@@ -38,7 +38,7 @@ Chord.render = function (chord, context) {
 	Chord.renderAccidentals(chord, context);
 	chord.renderStem();
 	return group;
-}
+};
 
 // render accidentals from outside in. Closest accidental always starts at highest note.
 // translate the accidental left based on the number of accidental overlaps.
@@ -84,7 +84,7 @@ Chord.renderAccidentals = function (chord, context={}) {
 			}
 		}
 	});
-}
+};
 
 Chord.prototype.renderStem = function (centerLineValue, stemDirection) {
 	if (this.needsStem()) {
@@ -93,9 +93,9 @@ Chord.prototype.renderStem = function (centerLineValue, stemDirection) {
 		this.drawStem(stemPoint, stemDirection);
 		this.drawFlag();
 	}
-}
+};
 
-Chord.prototype.render = function ({accidentals = [], context = {}} = {}) {
+Chord.prototype.render = function () {
 	const group = this.group = new paper.Group({name: TYPE});
 
 	let stemDirection = this.getStemDirection(),
@@ -119,7 +119,7 @@ Chord.prototype.render = function ({accidentals = [], context = {}} = {}) {
 					translated.push(lower);
 				}
 			});
-		}
+		};
 	} else {
 		const xTranslation = Scored.config.note.head.width;
 		translationFn = (overlaps) => {
@@ -130,11 +130,11 @@ Chord.prototype.render = function ({accidentals = [], context = {}} = {}) {
 					translated.push(higher);
 				}
 			});
-		}
+		};
 	}
 
 	if (overlaps.length) {
-		translationFn(overlaps)
+		translationFn(overlaps);
 	}
 
 	_.each(rest, note => {
@@ -145,7 +145,7 @@ Chord.prototype.render = function ({accidentals = [], context = {}} = {}) {
 	group.addChildren(noteGroups);
 
 	return group;
-}
+};
 
 Chord.prototype.drawStem = function (to, stemDirection) {
 	let frm, stem;
@@ -169,28 +169,28 @@ Chord.prototype.drawStem = function (to, stemDirection) {
 	this.group.addChild(stem);
 
 	return stem;
-}
+};
 
 /*
  * The stem must already be rendered for this to work.
- * @param point - optional point to draw the flag to.
  * @return paper.Group
  */
-Chord.prototype.drawFlag = function (point) {
+Chord.prototype.drawFlag = function () {
 	let dur = this.value,
 		stem = this.group.children.stem,
 		flag, position;
 
-	let flagSymbol = engraver.drawFlag(dur, this.stemDirection);
+	let flagSymbol = drawFlag(dur, this.stemDirection);
 
 	if (flagSymbol) {
-		position = engraver.getFlagOffset(stem.segments[1].point, this.stemDirection);
+		// FIXME: getFlagOffset should probably be in placement rather than engraver.
+		position = getFlagOffset(stem.segments[1].point, this.stemDirection);
 		flag = flagSymbol.place(position);
 		this.group.addChild(flag);
 	}
 
 	return flag;
-}
+};
 
 /*
  * Draws leger lines on the notes that need them
@@ -199,21 +199,21 @@ Chord.prototype.drawFlag = function (point) {
  */
 Chord.prototype.drawLegerLines = function (centerLine, lineSpacing) {
 	this.children.map(note => note.drawLegerLines(centerLine, lineSpacing));
-}
+};
 
 /*
  * @return Boolean - true if the note needs a stem drawn, False otherwise.
  */
 Chord.prototype.needsStem = function () {
 	return this.value >= 2;
-}
+};
 
 /*
  * @return Boolean - true if the note needs a flag drawn, False otherwise.
  */
 Chord.prototype.needsFlag = function () {
 	return this.value >= 8;
-}
+};
 
 /*
  * @param centerLineValue - String note pitch of center line.
@@ -240,7 +240,7 @@ Chord.prototype.getStemDirection = function (centerLineValue) {
 	} else {
 		return UP;
 	}
-}
+};
 
 /*
  * @param children - Array<Note representations>
@@ -267,6 +267,6 @@ function parseChildren (children, defaults={}) {
 Chord.prototype.calculateStemPoint = function (fulcrum, vector, direction) {
 	let baseNote = direction === "up" ? this.children[0] : _.last(this.children);
 	return baseNote.calculateStemPoint(fulcrum, vector, direction);
-}
+};
 
 export default Chord;

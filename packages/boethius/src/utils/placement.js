@@ -1,9 +1,10 @@
+import _ from "lodash";
 import * as timeUtils from "./timeUtils";
 import {isMarking} from "./common";
 import constants from "../constants";
-import {isNote, isChord} from "../types";
+import {isNote} from "../types";
 
-let noteNameToDegreeObj = {
+const noteNameToDegreeObj = {
 		"c": 0,
 		"d": 1,
 		"e": 2,
@@ -23,7 +24,7 @@ let noteNameToDegreeObj = {
 		base:   ["a", "g", "f", "e", "d", "c", "b", "a", "g"],
 		alto:   ["g", "f", "e", "d", "c", "b", "a", "g", "f"],
 		tenor:  ["e", "d", "c", "b", "a", "g", "f", "e", "d"]
-	}
+	};
 
 
 function noteNameToDegree (name) {
@@ -92,12 +93,12 @@ function getNoteHeadCenter (position) {
  * left bound of the right item.
  */
 function lineup (items) {
-	var left, right, offset;
+	let left, right, offset;
 	// items needs to have at least two items.
-	for (var i = 1; i < items.length; i++) {
+	for (let i = 1; i < items.length; i++) {
 		left = items[i-1]; right = items[i];
 		offset = (right.bounds.center.x - right.bounds.left) +
-				 (left.bounds.right - left.bounds.center.x);
+				(left.bounds.right - left.bounds.center.x);
 		right.position.x = left.position.x + offset;
 	}
 }
@@ -126,7 +127,7 @@ const offsets = {
 			tenor: -18
 		}[value];
 	},
-	key: function (item) {
+	key: function () {
 		return -9;
 	},
 	timeSig: function ({value}) {
@@ -136,7 +137,7 @@ const offsets = {
 			return 0;
 		}
 	}
-}
+};
 
 /*
  *
@@ -183,7 +184,10 @@ function alignNoteHeads (xPos, items) {
 // The most common shortest duration is determined as follows: in every measure, the shortest duration is determined.
 // The most common shortest duration is taken as the basis for the spacing, with the stipulation that this shortest
 // duration should always be equal to or shorter than an 8th note.
-function commonShortestDuration (notes) {
+/*
+ * @param notes
+ */
+function commonShortestDuration () {
 
 }
 
@@ -286,4 +290,4 @@ export {
 	calculateTimeLength,
 	placeMarking,
 	scaleCursor
-}
+};

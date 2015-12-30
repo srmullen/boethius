@@ -1,9 +1,5 @@
 import Config from "./config";
-import Context from "./base/Context";
 import * as events from "./events";
-import processor from "./Processor";
-import midi from "./midi";
-import MoveTool from "./tools/MoveTool";
 
 import Voice from "./views/Voice";
 import Note from "./views/Note";
@@ -26,15 +22,13 @@ import * as measureUtils from "./utils/measure";
 import constants from "./constants";
 import _ from "lodash";
 
-import * as types from "./types";
-
 const Scored = function (options={}) {
 	Scored.config = new Config(options.config);
 };
 
 Scored.prototype.setup = function (canvas) {
 	this.project = paper.setup(canvas).project;
-}
+};
 
 // Scored.projects = paper.projects;
 
@@ -60,7 +54,7 @@ Scored.prototype.compose = function (layout, music) {
 };
 
 Scored.prototype.render = function (composition, ...args) {
-	var view;
+	let view;
 	// return view;
 	switch (composition.type) {
 		case constants.type.note:
@@ -102,62 +96,60 @@ Scored.prototype.serialize = function (item) {
 
 Scored.prototype.note = function note (context={}) {
 	return new Note(context);
-}
+};
 
 Scored.prototype.rest = function rest (context={}) {
 	return new Rest(context);
-}
+};
 
 Scored.prototype.clef = function clef (context={}) {
 	return new Clef(context);
-}
+};
 
 Scored.prototype.key = function key (context={}) {
 	return new Key(context);
-}
+};
 
 Scored.prototype.timeSig = function timeSignature (context={}) {
 	return new TimeSignature(context);
-}
+};
 
 Scored.prototype.chord = function chord (context={}, children=[]) {
 	return new Chord(context, children);
-}
+};
 
 Scored.prototype.voice = function voice (context={}, children=[]) {
 	return new Voice(context, children);
-}
+};
 
 Scored.prototype.measure = function measure (context={}, children) {
 	return new Measure(context, children);
-}
+};
 
 Scored.prototype.line = function line (context={}, children) {
 	return new Line(context, children);
-}
+};
 
 Scored.prototype.staff = function staff (context={}, children) {
 	return new Staff(context, children);
-}
+};
 
 Scored.prototype.score = function score (context={}, children) {
 	return new Score(context, children);
-}
+};
 
 function parse (parentContext={}, [type, context={}, elements=[]]) {
 	const data = arguments[1],
 		handler = _.isString(type) ? this[type] : null;
 
 	if (handler) {
-		var mergedContext = _.extend({}, parentContext, context),
-			mappableParse = _.bind(parse, this, mergedContext);
+		const mergedContext = _.extend({}, parentContext, context);
+		const mappableParse = _.bind(parse, this, mergedContext);
 		return handler(mergedContext, mappableParse(elements));
 	} else if (_.isArray(type)) {
 		return _.map(data, _.partial(parse, parentContext), this);
 	}
-};
-
-Scored.parseMidi = midi.parseMidi;
+}
 
 export default Scored;
 

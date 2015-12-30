@@ -1,7 +1,6 @@
 import {drawAccidental} from "../engraver";
 import * as placement from "../utils/placement";
-import {parsePitch} from "../utils/note";
-import _ from "lodash";
+// import _ from "lodash";
 import constants from "../constants";
 
 const TYPE = constants.type.key,
@@ -89,12 +88,13 @@ const TYPE = constants.type.key,
 		[-4, -1, -5, -2, 1, -3, 0]
 	],
 
-	clefTransform = {
-			treble: _.identity,
-			bass: _.partialRight(_.map, x => x + 2),
-			alto: _.partialRight(_.map, x => x + 1),
-			tenor: _.partialRight(_.map, x => x + -1)
-		},
+	// FIXME: need to translate key based on clef
+	// clefTransform = {
+	// 		treble: _.identity,
+	// 		bass: _.partialRight(_.map, x => x + 2),
+	// 		alto: _.partialRight(_.map, x => x + 1),
+	// 		tenor: _.partialRight(_.map, x => x + -1)
+	// 	},
 		SHARP = "#",
 		FLAT = "b",
 
@@ -137,7 +137,7 @@ const TYPE = constants.type.key,
 		"bb": [flatSteps[5], FLAT],
 		"eb": [flatSteps[6], FLAT],
 		"ab": [flatSteps[7], FLAT]
-	}
+	};
 
 function Key ({value="C", measure, beat}) {
 	this.value = value;
@@ -151,18 +151,9 @@ Key.prototype.type = TYPE;
  * @param position {Point} - the location to draw the first accidental
  */
 Key.prototype.render = function ({context} = {}) {
-	const margin = {
-		top: 0,
-		left: 2,
-		bottom: 0,
-		right: 10
-	}
-
 	const group = this.group = new paper.Group({
 		name: TYPE
 	});
-
-	// group.removeChildren();
 
 	let clefValue = context && context.clef ? context.clef.value : "treble";
 
@@ -177,7 +168,7 @@ Key.prototype.render = function ({context} = {}) {
 		position = new paper.Point(clefToPosition[clefValue]);
 
 	let symbol, item, yTranslate;
-	for (var i = 0; i < signature.length; i++) {
+	for (let i = 0; i < signature.length; i++) {
 		symbol = drawAccidental(accidental);
 
 		yTranslate = placement.calculateAccidentalYpos(signature[i], Scored.config.lineSpacing/2);
@@ -190,10 +181,10 @@ Key.prototype.render = function ({context} = {}) {
 	}
 
 	return group;
-}
+};
 
 Key.prototype.getPitches = function () {
 	return keyToPitches[this.value];
-}
+};
 
 export default Key;

@@ -16,16 +16,12 @@ TimeSignature.createBeatStructure = function (value) {
 	switch (value) {
 		case "4/4":
 			return [2,2];
-			break;
 		case "c":
 			return [2,2];
-			break;
 		case "3/4":
 			return [1, 1, 1];
-			break;
 	}
-
-}
+};
 
 TimeSignature.prototype.render = function () {
 	const margin = {
@@ -33,7 +29,7 @@ TimeSignature.prototype.render = function () {
 		left: 2,
 		bottom: 0,
 		right: 10
-	}
+	};
 
 	const group = this.group = new paper.Group({
 		name: TYPE
@@ -41,11 +37,9 @@ TimeSignature.prototype.render = function () {
 
 	const symbol = drawTimeSig(this.value, margin);
 
-	// this.group.removeChildren();
-
 	group.addChild(symbol.place());
 
 	return group;
-}
+};
 
 export default TimeSignature;

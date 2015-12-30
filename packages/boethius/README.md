@@ -18,6 +18,9 @@ Should view render methods return a paper group, or should they return themselve
 
 TODOS:
     # High priority
+    - Translate key depending on clef.
+    - Render dots on chords and rests.
+    - Slur chords.
     - Slurs / Ties, rendering improvements
     - Draw staff ending.
     - Remove this.group from markings.
@@ -25,6 +28,7 @@ TODOS:
     - Stacato and legato
     - Finish tuplet rendering
     - Implement more beat structures.
+    - Score should pass the time contexts to the staves rather than letting each stave figure it out. src/views/Score.js line #42.
 
     # Lower priority
     - Score title, tempo, composer.
@@ -32,6 +36,8 @@ TODOS:
     - Implement different staff type rendering. StaffGroup, ChoirStaff, GrandStaff, and PianoStaff.
     - Line/Instrument Names.
     - Instrument transpositions.
-    - Babel upgrade.
-    - ES6 Linting
     - optional rendering of measure numbers.
+    - Logger
+    - Remove "magic" strings/numbers.
+    - Vary stem direction of beamed notes. aka kneed beams
+    - Stricter ES6 Linting
