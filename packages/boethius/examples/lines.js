@@ -1,9 +1,6 @@
 var line;
 function run () {
-	// clefLines();
-	// timeSigLines();
-	// keyLines();
-	// line = fourBars();
+	testMarkings();
 
 	// simpleLine().translate(25, 50);
 
@@ -16,115 +13,48 @@ function run () {
 	// testChordsTwoVoices().translate(25, 150);
 	// testTriplets().translate(25, 250);
 
-	renderingNotesOnLine().translate(25, 50);
-	oneVoice().translate(25, 150);
-	twoVoices().translate(25, 250);
-	testTripletsTwoVoices().translate(25, 350);
+	// renderingNotesOnLine().translate(25, 50);
+	// oneVoice().translate(25, 150);
+	// twoVoices().translate(25, 250);
+	// testTripletsTwoVoices().translate(25, 350);
 
 	// testMeasureRendering().translate(25, 50);
 	// testSlurs().translate(25, 50);
 }
 
-function clefLines () {
-	var treble = scored.clef({value: "treble", measure: 0});
-	var	bass = scored.clef({value: "bass", measure: 0});
-	var	alto = scored.clef({value: "alto", measure: 0});
-	var	tenor = scored.clef({value: "tenor", measure: 0});
-	var	trebleLine = scored.line({}, [treble]);
-	var	bassLine = scored.line({}, [bass]);
-	var	altoLine = scored.line({}, [alto]);
-	var	tenorLine = scored.line({}, [tenor]);
-	var lineLength = 150;
-
-	scored.render(trebleLine, {length: lineLength}).translate(20, 20);
-	scored.render(bassLine, {length: lineLength}).translate(200, 20);
-	scored.render(altoLine, {length: lineLength}).translate(400, 20);
-	scored.render(tenorLine, {length: lineLength}).translate(600, 20);
+function testClefKeyTimeSig (clefValue, keyValue, timeSigValue) {
+	var clef = scored.clef({value: clefValue, measure: 0});
+	var key = scored.key({value: keyValue, measure: 0});
+	var timeSig = scored.timeSig({value: timeSigValue, measure: 0});
+	var line = scored.line({}, [clef, key, timeSig]);
+	return scored.render(line, {});
 }
 
-function timeSigLines () {
-	var common = scored.timeSig({value: "c", measure: 0}),
-		half = scored.timeSig({value: "h", measure: 0}),
-		fourfour = scored.timeSig({value: "4/4", measure: 0}),
-		sixeight = scored.timeSig({value: "6/8", measure: 0}),
-		twelveeight = scored.timeSig({value: "12/8", measure: 0}),
-		commonLine = scored.line({}, [common]),
-		halfLine = scored.line({}, [half]),
-		fourfourLine = scored.line({}, [fourfour]),
-		sixeightLine = scored.line({}, [sixeight]),
-		twelveeightLine = scored.line({}, [twelveeight]);
-	var lineLength = 150;
-
-	scored.render(commonLine, {length: lineLength}).translate(20, 100);
-	scored.render(halfLine, {length: lineLength}).translate(200, 100);
-	scored.render(fourfourLine, {length: lineLength}).translate(400, 100);
-	scored.render(sixeightLine, {length: lineLength}).translate(600, 100);
-	scored.render(twelveeightLine, {length: lineLength}).translate(800, 100);
+function testKey (key, yPos) {
+	testClefKeyTimeSig("treble", key, "4/4").translate(25, yPos);
+	testClefKeyTimeSig("bass", key, "4/4").translate(200, yPos);
+	testClefKeyTimeSig("alto", key, "4/4").translate(350, yPos);
+	testClefKeyTimeSig("tenor", key, "4/4").translate(500, yPos);
 }
 
-function keyLines () {
-	var treb1 = scored.clef({value: "treble", measure: 0}),
-		treb2 = scored.clef({value: "treble", measure: 0}),
-		treb3 = scored.clef({value: "treble", measure: 0}),
-		treb4 = scored.clef({value: "treble", measure: 0}),
-		treb5 = scored.clef({value: "treble", measure: 0}),
-		treb6 = scored.clef({value: "treble", measure: 0}),
-		treb7 = scored.clef({value: "treble", measure: 0}),
-		bass1 = scored.clef({value: "bass", measure: 0}),
-		bass2 = scored.clef({value: "bass", measure: 0}),
-		bass3 = scored.clef({value: "bass", measure: 0}),
-		bass4 = scored.clef({value: "bass", measure: 0}),
-		bass5 = scored.clef({value: "bass", measure: 0}),
-		bass6 = scored.clef({value: "bass", measure: 0}),
-		bass7 = scored.clef({value: "bass", measure: 0}),
-		c = scored.key({value: "C", measure: 0}),
-		g = scored.key({value: "G", measure: 0}),
-		d = scored.key({value: "D", measure: 0}),
-		a = scored.key({value: "A", measure: 0}),
-		e = scored.key({value: "E", measure: 0}),
-		b = scored.key({value: "B", measure: 0}),
-		fs = scored.key({value: "F#", measure: 0}),
-		cs = scored.key({value: "C#", measure: 0}),
-		f = scored.key({value: "F", measure: 0}),
-		bb = scored.key({value: "Bb", measure: 0}),
-		eb = scored.key({value: "Eb", measure: 0}),
-		ab = scored.key({value: "Ab", measure: 0}),
-		db = scored.key({value: "Db", measure: 0}),
-		gb = scored.key({value: "Gb", measure: 0}),
-		cb = scored.key({value: "Cb", measure: 0}),
+function testMarkings () {
+	var yPos = 50;
 
-		cLine = scored.line({}, [c]),
-		gLine = scored.line({}, [treb1, g]),
-		dLine = scored.line({}, [treb2, d]),
-		aLine = scored.line({}, [treb3, a]),
-		eLine = scored.line({}, [treb4, e]),
-		bLine = scored.line({}, [bass5, b]),
-		fsLine = scored.line({}, [bass6, fs]),
-		csLine = scored.line({}, [bass7, cs]),
-		fLine = scored.line({}, [bass1, f]),
-		bbLine = scored.line({}, [bass2, bb]),
-		ebLine = scored.line({}, [bass3, eb]),
-		abLine = scored.line({}, [bass4, ab]),
-		dbLine = scored.line({}, [treb5, db]),
-		gbLine = scored.line({}, [treb6, gb]),
-		cbLine = scored.line({}, [treb7, cb]);
-
-	var linelength = 100;
-
-	scored.render(gLine, {length: linelength}).translate(20, 200);
-	scored.render(dLine, {length: linelength}).translate(150, 200);
-	scored.render(aLine, {length: linelength}).translate(300, 200);
-	scored.render(eLine, {length: linelength}).translate(450, 200);
-	scored.render(bLine, {length: linelength}).translate(600, 200);
-	scored.render(fsLine, {length: linelength}).translate(750, 200);
-	scored.render(csLine, {length: linelength}).translate(900, 200);
-	scored.render(fLine, {length: linelength}).translate(20, 300);
-	scored.render(bbLine, {length: linelength}).translate(150, 300);
-	scored.render(ebLine, {length: linelength}).translate(300, 300);
-	scored.render(abLine, {length: linelength}).translate(450, 300);
-	scored.render(dbLine, {length: linelength}).translate(600, 300);
-	scored.render(gbLine, {length: linelength}).translate(750, 300);
-	scored.render(cbLine, {length: linelength}).translate(900, 300);
+	testKey("C", yPos); yPos += 75;
+	testKey("G", yPos); yPos += 75;
+	testKey("D", yPos); yPos += 75;
+	testKey("A", yPos); yPos += 75;
+	testKey("E", yPos); yPos += 75;
+	testKey("B", yPos); yPos += 75;
+	testKey("F#", yPos); yPos += 75;
+	testKey("C#", yPos); yPos += 75;
+	testKey("F", yPos); yPos += 75;
+	testKey("Bb", yPos); yPos += 75;
+	testKey("Eb", yPos); yPos += 75;
+	testKey("Ab", yPos); yPos += 75;
+	testKey("Db", yPos); yPos += 75;
+	testKey("Gb", yPos); yPos += 75;
+	testKey("Cb", yPos); yPos += 75;
 }
 
 function fourBars () {

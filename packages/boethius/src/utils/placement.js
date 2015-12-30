@@ -250,10 +250,12 @@ function calculateTimeLength (items, shortestDuration) {
 	const keyLength = keys ? _.max(keys.map(getMarkingWidth)) : 0;
 	const timeSigLength = timeSigs ? _.map(timeSigs.map(getMarkingWidth)) : 0;
 	const markingsLength = _.sum([clefLength, keyLength, timeSigLength]);
-	const voiceItemsLength = _.min(_.map(voiceItems, item => {
-			return item.group.bounds.width + (noteHeadWidth * getStaffSpace(shortestDuration, item));
-		}));
-	return [markingsLength, voiceItemsLength];
+	const voiceItemLengths = _.map(voiceItems, item => {
+		return item.group.bounds.width + (noteHeadWidth * getStaffSpace(shortestDuration, item));
+	});
+	const totalVoiceItemsLength = voiceItemLengths.length ? _.min(voiceItemsLength) : 0;
+
+	return [markingsLength, totalVoiceItemsLength];
 }
 
 function placeMarking (lineCenter, cursor, marking) {
