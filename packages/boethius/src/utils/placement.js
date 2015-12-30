@@ -253,7 +253,7 @@ function calculateTimeLength (items, shortestDuration) {
 	const voiceItemLengths = _.map(voiceItems, item => {
 		return item.group.bounds.width + (noteHeadWidth * getStaffSpace(shortestDuration, item));
 	});
-	const totalVoiceItemsLength = voiceItemLengths.length ? _.min(voiceItemsLength) : 0;
+	const totalVoiceItemsLength = voiceItemLengths.length ? _.min(voiceItemLengths) : 0;
 
 	return [markingsLength, totalVoiceItemsLength];
 }
