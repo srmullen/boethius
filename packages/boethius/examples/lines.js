@@ -400,10 +400,10 @@ function testStacatoLegato () {
 
 	var voice = scored.voice({}, [
 		n({pitch: "a4", staccato: true}), n({pitch: "a4", tenuto: true}), n({pitch: "c5", staccato: true}), n({pitch: "c5", tenuto: true}),
-		n({value: 2, pitch: "a4", staccato: true, tenuto: true}), n({value: 2, pitch: "c5", staccato: true, tenuto: true}),
+		n({value: 2, pitch: "a4", portato: true}), n({value: 2, pitch: "c5", portato: true}),
 		c({staccato: true}, ["f4", "g4", "a4"]), c({tenuto: true}, ["f4", "g4", "a4"]),
 		c({staccato: true}, ["c5", "d5", "e5"]), c({tenuto: true}, ["c5", "d5", "e5"]),
-		c({value: 2, staccato: true, tenuto: true}, ["f4", "g4", "a4"]), c({value: 2, tenuto: true, tenuto: true}, ["c5", "d5", "e5"])
+		c({value: 2, portato: true}, ["f4", "g4", "a4"]), c({value: 2, portato: true}, ["c5", "d5", "e5"])
 	]);
 
 	return scored.render(line, {voices: [voice], numMeasures: 4});

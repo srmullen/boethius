@@ -15,7 +15,7 @@ const TYPE = constants.type.note;
  * Only items on the context will be saved back to the music json.
  * All other properties on the view will need to be calculated at runtime.
  */
-function Note ({pitch="a4", value=4, dots=0, slur, tuplet, time, staccato, tenuto, voice}) {
+function Note ({pitch="a4", value=4, dots=0, slur, tuplet, time, staccato, tenuto, portato, voice}) {
 
 	this.note = teoria.note(pitch || "a4", {value: value, dots: dots});
 	this.value = value;
@@ -25,8 +25,11 @@ function Note ({pitch="a4", value=4, dots=0, slur, tuplet, time, staccato, tenut
 	this.time = time;
 	this.voice = voice;
 	this.slur = slur;
+
+	// articulations
 	this.staccato = staccato;
 	this.tenuto = tenuto;
+	this.portato = portato;
 }
 
 Note.prototype.type = TYPE;
@@ -172,18 +175,24 @@ Note.prototype.drawAccidental = function (accidental) {
 };
 
 Note.prototype.drawArticulations = function () {
+	const point = (this.staccato || this.tenuto || this.portato) ? placement.getArticulationPoint(this, this.stemDirection) : null;
+
 	if (this.staccato) {
-		const offset = this.stemDirection === "up" ? Scored.config.layout.lineSpacing : -Scored.config.layout.lineSpacing;
-		const point = this.noteHead.bounds.center.add(0, Scored.config.note.head.yOffset + offset);
 		const stacato = engraver.drawStaccato(point);
 		this.group.addChild(stacato);
 	}
 
 	if (this.tenuto) {
-		const offset = this.stemDirection === "up" ? Scored.config.layout.lineSpacing : -Scored.config.layout.lineSpacing;
-		const point = this.noteHead.bounds.center.add(0, Scored.config.note.head.yOffset + offset);
 		const legato = engraver.drawTenuto(point);
 		this.group.addChild(legato);
+	}
+
+	if (this.portato) {
+		const stacato = engraver.drawStaccato(point);
+		this.group.addChild(stacato);
+		if (!this.slur) {
+			// draw tenuto
+		}
 	}
 };
 

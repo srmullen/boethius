@@ -88,6 +88,15 @@ function getNoteHeadCenter (position) {
 }
 
 /*
+ * @param note - Note
+ * @return Point
+ */
+function getArticulationPoint (note, stemDirection) {
+	const offset = stemDirection === "up" ? Scored.config.layout.lineSpacing : -Scored.config.layout.lineSpacing;
+	return note.noteHead.bounds.center.add(0, Scored.config.note.head.yOffset + offset);
+}
+
+/*
  * Could probably use a better name.
  * takes an array of items and translates them so the right bound of the left item lines up with the
  * left bound of the right item.
@@ -291,5 +300,6 @@ export {
 	calculateDefaultAccidentalPosition,
 	calculateTimeLength,
 	placeMarking,
-	scaleCursor
+	scaleCursor,
+	getArticulationPoint
 };

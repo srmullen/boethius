@@ -4,7 +4,7 @@ import {drawFlag, getFlagOffset, drawStaccato, drawTenuto} from "../engraver";
 import {getSteps, parsePitch} from "../utils/note";
 import {defaultStemPoint, getStemLength, getOverlappingNotes, getAccidentalOrdering} from "../utils/chord";
 import {map, isEven} from "../utils/common";
-import {getAccidentalTop, getAccidentalBottom, calculateDefaultAccidentalPosition} from "../utils/placement";
+import {getAccidentalTop, getAccidentalBottom, calculateDefaultAccidentalPosition, getArticulationPoint} from "../utils/placement";
 import {getAccidental} from "../utils/accidental";
 import constants from "../constants";
 import Note from "./Note";
@@ -16,7 +16,7 @@ const DOWN = "down";
 /*
  * @param children - Array of notes. Can take several representations. String, Object, or Note.
  */
-function Chord ({value=4, dots=0, tuplet, time, root, name, inversion, staccato, tenuto, stemDirection}, children=[]) {
+function Chord ({value=4, dots=0, tuplet, time, root, name, inversion, staccato, tenuto, portato, stemDirection}, children=[]) {
 	this.value = value;
 	this.dots = dots;
 	this.tuplet = tuplet;
@@ -24,8 +24,12 @@ function Chord ({value=4, dots=0, tuplet, time, root, name, inversion, staccato,
 	this.root = root;
 	this.name = name;
 	this.inversion = inversion;
+
+	// articulations
 	this.staccato = staccato;
 	this.tenuto = tenuto;
+	this.portato = portato;
+
 	this.stemDirection = stemDirection;
 
 	this.children = parseChildren(children, {value});
@@ -242,19 +246,27 @@ Chord.prototype.getStemDirection = function (centerLineValue) {
 	}
 };
 
-Note.prototype.drawArticulations = function () {
+Chord.prototype.drawArticulations = function () {
+	const point = (this.staccato || this.tenuto || this.portato) ?
+		getArticulationPoint(this.getBaseNote(this.stemDirection), this.stemDirection)
+		: null;
+
 	if (this.staccato) {
-		const offset = this.stemDirection === UP ? Scored.config.layout.lineSpacing : -Scored.config.layout.lineSpacing;
-		const point = this.noteHead.bounds.center.add(0, Scored.config.note.head.yOffset + offset);
 		const stacato = drawStaccato(point);
 		this.group.addChild(stacato);
 	}
 
 	if (this.tenuto) {
-		const offset = this.stemDirection === UP ? Scored.config.layout.lineSpacing : -Scored.config.layout.lineSpacing;
-		const point = this.noteHead.bounds.center.add(0, Scored.config.note.head.yOffset + offset);
 		const legato = drawTenuto(point);
 		this.group.addChild(legato);
+	}
+
+	if (this.portato) {
+		const stacato = drawStaccato(point);
+		this.group.addChild(stacato);
+		if (!this.slur) {
+			// draw tenuto
+		}
 	}
 };
 
@@ -280,8 +292,16 @@ function parseChildren (children, defaults={}) {
 	return _.sortBy(notes, note => note.note.midi());
 }
 
+/*
+ * @param direction - UP DOWN
+ * @return Note that is at the end of the stem. either lowest or highet note.
+ */
+Chord.prototype.getBaseNote = function (direction) {
+	return direction === UP ? this.children[0] : _.last(this.children);
+}
+
 Chord.prototype.calculateStemPoint = function (fulcrum, vector, direction) {
-	let baseNote = direction === UP ? this.children[0] : _.last(this.children);
+	const baseNote = this.getBaseNote(direction);
 	return baseNote.calculateStemPoint(fulcrum, vector, direction);
 };
 
