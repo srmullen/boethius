@@ -25,10 +25,11 @@ TODOS:
     - Draw staff ending.
     - Remove this.group from markings.
     - A Score should render the Clef, key and time signature at the beginning of every staff. (optional)
-    - Stacato and legato
+    - Stacato and tenuto
     - Finish tuplet rendering
     - Implement more beat structures.
     - Score should pass the time contexts to the staves rather than letting each stave figure it out. src/views/Score.js line #42.
+    - Dynamics
 
     # Lower priority
     - Score title, tempo, composer.
@@ -41,3 +42,4 @@ TODOS:
     - Remove "magic" strings/numbers.
     - Vary stem direction of beamed notes. aka kneed beams
     - Stricter ES6 Linting
+    - Additional articulations/ornaments

@@ -200,6 +200,11 @@ Voice.prototype.renderDecorations = function (line, centerLine, measures) {
         lineChildren = lineChildren.concat(slurs);
     }
 
+    // articulations
+    _.each(this.children, (child) => {
+        if (child.drawArticulations) child.drawArticulations();
+    });
+
     return lineChildren;
 };
 

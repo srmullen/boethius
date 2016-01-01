@@ -32,7 +32,7 @@ function getYpositionFunc (num, centerY, lineSpacing) {
 
 /*
  * @centerLine {Point} the leftmost point of the center line in the measure.
- * @lineSpaceing {Integer} distance between lines in a measure.
+ * @lineSpacing {Integer} distance between lines in a measure.
  */
 // FIXME: This could be improved by using a string i.e. "b4", rather than an Point to represent the center line.
 function drawLegerLines (noteHead, centerLine, lineSpacing) {
@@ -289,12 +289,25 @@ function drawDots (noteHead, dots) {
 	}
 }
 
-function drawStacato () {
-	return new paper.Path.Circle();
+/*
+ * @param point - center of the staccato dot.
+ * @return Path
+ */
+function drawStaccato (point) {
+	const staccato = new paper.Path.Circle(point, 1.5);
+	staccato.fillColor = "black";
+	return staccato;
 }
 
-function drawLegato () {
-	return new paper.path.Line();
+/*
+ * @param point - center of the tenuto dot.
+ * @return Path
+ */
+function drawTenuto (point) {
+	const halfWidth = Scored.config.note.head.width/2;
+	const tenuto = new paper.Path.Line(point.subtract(halfWidth, 0), point.add(halfWidth, 0));
+	tenuto.strokeColor = "black";
+	return tenuto;
 }
 
 const drawAccidental = _.memoize(function (accidental) {
@@ -600,8 +613,8 @@ export {
 	drawTimeSig,
 	drawHead,
 	drawDots,
-	drawStacato,
-	drawLegato,
+	drawStaccato,
+	drawTenuto,
 	drawAccidental,
 	drawFlag,
 	getFlagOffset,

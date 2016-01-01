@@ -4,10 +4,12 @@ function run () {
 
 	// simpleLine().translate(25, 50);
 
-	eighthBeamings().translate(25, 50);
-	sixteenthBeamings().translate(25, 150);
-	testAccidentals("c").translate(25, 250);
-	testTimeSigs().translate(25, 350);
+	testStacatoLegato().translate(25, 50);
+
+	// eighthBeamings().translate(25, 50);
+	// sixteenthBeamings().translate(25, 150);
+	// testAccidentals("c").translate(25, 250);
+	// testTimeSigs().translate(25, 350);
 
 	// testChords().translate(25, 50);
 	// testChordsTwoVoices().translate(25, 150);
@@ -383,6 +385,25 @@ function testSlurs () {
 
 		// groups of two, oposite direction stems
 		n({slur: "7", pitch: "a4"}), n({slur: "7", pitch: "c5"}), n({slur: "8", pitch: "c5"}), n({slur: "8", pitch: "a4"})
+	]);
+
+	return scored.render(line, {voices: [voice], numMeasures: 4});
+}
+
+function testStacatoLegato () {
+	var line = scored.line({}, [scored.clef({value: "treble", measure: 0}),
+								scored.key({value: "C", measure: 0}),
+								scored.timeSig({value: "4/4", measure: 0})]);
+
+	var n = scored.note;
+	var c = scored.chord;
+
+	var voice = scored.voice({}, [
+		n({pitch: "a4", staccato: true}), n({pitch: "a4", tenuto: true}), n({pitch: "c5", staccato: true}), n({pitch: "c5", tenuto: true}),
+		n({value: 2, pitch: "a4", staccato: true, tenuto: true}), n({value: 2, pitch: "c5", staccato: true, tenuto: true}),
+		c({staccato: true}, ["f4", "g4", "a4"]), c({tenuto: true}, ["f4", "g4", "a4"]),
+		c({staccato: true}, ["c5", "d5", "e5"]), c({tenuto: true}, ["c5", "d5", "e5"]),
+		c({value: 2, staccato: true, tenuto: true}, ["f4", "g4", "a4"]), c({value: 2, tenuto: true, tenuto: true}, ["c5", "d5", "e5"])
 	]);
 
 	return scored.render(line, {voices: [voice], numMeasures: 4});

@@ -1,6 +1,6 @@
 import _ from "lodash";
 
-import {drawFlag, getFlagOffset} from "../engraver";
+import {drawFlag, getFlagOffset, drawStaccato, drawTenuto} from "../engraver";
 import {getSteps, parsePitch} from "../utils/note";
 import {defaultStemPoint, getStemLength, getOverlappingNotes, getAccidentalOrdering} from "../utils/chord";
 import {map, isEven} from "../utils/common";
@@ -16,7 +16,7 @@ const DOWN = "down";
 /*
  * @param children - Array of notes. Can take several representations. String, Object, or Note.
  */
-function Chord ({value=4, dots=0, tuplet, time, root, name, inversion, stacato, legato, stemDirection}, children=[]) {
+function Chord ({value=4, dots=0, tuplet, time, root, name, inversion, staccato, tenuto, stemDirection}, children=[]) {
 	this.value = value;
 	this.dots = dots;
 	this.tuplet = tuplet;
@@ -24,8 +24,8 @@ function Chord ({value=4, dots=0, tuplet, time, root, name, inversion, stacato, 
 	this.root = root;
 	this.name = name;
 	this.inversion = inversion;
-	this.stacato = stacato;
-	this.legato = legato;
+	this.staccato = staccato;
+	this.tenuto = tenuto;
 	this.stemDirection = stemDirection;
 
 	this.children = parseChildren(children, {value});
@@ -102,14 +102,14 @@ Chord.prototype.render = function () {
 		overlaps = getOverlappingNotes(this);
 
 	// get steps
-	let [root, ...rest] = stemDirection === "up" ? this.children : _.clone(this.children).reverse();
+	let [root, ...rest] = stemDirection === UP ? this.children : _.clone(this.children).reverse();
 
 	let noteGroups = this.children.map(note => note.render());
 
 	let translationFn;
 
 	// translate note if they overlap
-	if (stemDirection === "down") {
+	if (stemDirection === DOWN) {
 		const xTranslation = -Scored.config.note.head.width;
 		translationFn = (overlaps) => {
 			let translated = [];
@@ -150,11 +150,11 @@ Chord.prototype.render = function () {
 Chord.prototype.drawStem = function (to, stemDirection) {
 	let frm, stem;
 
-	if (stemDirection === "up") {
-		this.stemDirection = "up";
+	if (stemDirection === UP) {
+		this.stemDirection = UP;
 		frm = this.children[0].noteHead.bounds.rightCenter.add(0, Scored.config.note.head.yOffset);
 	} else {
-		this.stemDirection = "down";
+		this.stemDirection = DOWN;
 		frm = _.last(this.children).noteHead.bounds.leftCenter.add(0, Scored.config.note.head.yOffset);
 	}
 
@@ -242,6 +242,22 @@ Chord.prototype.getStemDirection = function (centerLineValue) {
 	}
 };
 
+Note.prototype.drawArticulations = function () {
+	if (this.staccato) {
+		const offset = this.stemDirection === UP ? Scored.config.layout.lineSpacing : -Scored.config.layout.lineSpacing;
+		const point = this.noteHead.bounds.center.add(0, Scored.config.note.head.yOffset + offset);
+		const stacato = drawStaccato(point);
+		this.group.addChild(stacato);
+	}
+
+	if (this.tenuto) {
+		const offset = this.stemDirection === UP ? Scored.config.layout.lineSpacing : -Scored.config.layout.lineSpacing;
+		const point = this.noteHead.bounds.center.add(0, Scored.config.note.head.yOffset + offset);
+		const legato = drawTenuto(point);
+		this.group.addChild(legato);
+	}
+};
+
 /*
  * @param children - Array<Note representations>
  * @return Note[]
@@ -265,7 +281,7 @@ function parseChildren (children, defaults={}) {
 }
 
 Chord.prototype.calculateStemPoint = function (fulcrum, vector, direction) {
-	let baseNote = direction === "up" ? this.children[0] : _.last(this.children);
+	let baseNote = direction === UP ? this.children[0] : _.last(this.children);
 	return baseNote.calculateStemPoint(fulcrum, vector, direction);
 };
 

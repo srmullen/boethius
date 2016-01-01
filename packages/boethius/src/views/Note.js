@@ -15,7 +15,7 @@ const TYPE = constants.type.note;
  * Only items on the context will be saved back to the music json.
  * All other properties on the view will need to be calculated at runtime.
  */
-function Note ({pitch="a4", value=4, dots=0, slur, tuplet, time, voice}) {
+function Note ({pitch="a4", value=4, dots=0, slur, tuplet, time, staccato, tenuto, voice}) {
 
 	this.note = teoria.note(pitch || "a4", {value: value, dots: dots});
 	this.value = value;
@@ -25,6 +25,8 @@ function Note ({pitch="a4", value=4, dots=0, slur, tuplet, time, voice}) {
 	this.time = time;
 	this.voice = voice;
 	this.slur = slur;
+	this.staccato = staccato;
+	this.tenuto = tenuto;
 }
 
 Note.prototype.type = TYPE;
@@ -62,8 +64,6 @@ Note.prototype.render = function () {
 
 	this.symbol = engraver.drawHead(1/this.note.duration.value);
 
-	// common.addEvents(this);
-
 	// If the note has already been rendered remove any children so it is ready to be rendered again.
 	group.removeChildren();
 
@@ -77,18 +77,6 @@ Note.prototype.render = function () {
 		const dots = engraver.drawDots(noteHead, this.note.duration.dots);
 		group.addChild(dots);
 	}
-
-	// if (this.stacato) {
-	// 	let stacato = engraver.drawStacato();
-	// 	group.addChild(stacato);
-	// }
-	//
-	// if (this.legato) {
-	// 	let legato = engraver.drawLegato();
-	// 	group.addChild(legato);
-	// }
-
-	// this.drawGroupBounds();
 
 	return group;
 };
@@ -181,6 +169,22 @@ Note.prototype.drawAccidental = function (accidental) {
 	this.group.addChild(accidentalGroup);
 
 	return accidentalGroup;
+};
+
+Note.prototype.drawArticulations = function () {
+	if (this.staccato) {
+		const offset = this.stemDirection === "up" ? Scored.config.layout.lineSpacing : -Scored.config.layout.lineSpacing;
+		const point = this.noteHead.bounds.center.add(0, Scored.config.note.head.yOffset + offset);
+		const stacato = engraver.drawStaccato(point);
+		this.group.addChild(stacato);
+	}
+
+	if (this.tenuto) {
+		const offset = this.stemDirection === "up" ? Scored.config.layout.lineSpacing : -Scored.config.layout.lineSpacing;
+		const point = this.noteHead.bounds.center.add(0, Scored.config.note.head.yOffset + offset);
+		const legato = engraver.drawTenuto(point);
+		this.group.addChild(legato);
+	}
 };
 
 /*
