@@ -150,7 +150,7 @@ Key.prototype.type = TYPE;
 /*
  * @param position {Point} - the location to draw the first accidental
  */
-Key.prototype.render = function ({context} = {}) {
+Key.prototype.render = function (context = {}) {
 	const group = this.group = new paper.Group({
 		name: TYPE
 	});

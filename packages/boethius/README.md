@@ -18,7 +18,6 @@ Should view render methods return a paper group, or should they return themselve
 
 TODOS:
     # High priority
-    - Translate key depending on clef.
     - Render dots on chords and rests.
     - Slur chords.
     - Slurs / Ties, rendering improvements
