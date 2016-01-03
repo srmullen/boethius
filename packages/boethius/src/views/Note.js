@@ -7,6 +7,7 @@ import * as placement from "../utils/placement";
 import * as noteUtils from "../utils/note";
 import {getAccidental} from "../utils/accidental";
 import constants from "../constants";
+import {getCenterLineValue} from "./Clef";
 
 const TYPE = constants.type.note;
 
@@ -60,15 +61,12 @@ Note.prototype.renderStem = function (centerLineValue, stemDirection) {
 	}
 };
 
-Note.prototype.render = function () {
+Note.prototype.render = function (context) {
 	const group = this.group = new paper.Group({
 		name: TYPE
 	});
 
-	this.symbol = engraver.drawHead(1/this.note.duration.value);
-
-	// If the note has already been rendered remove any children so it is ready to be rendered again.
-	group.removeChildren();
+	this.symbol = engraver.drawHead(1/this.value);
 
 	// xPos and yPos are the center of the font item, not the noteHead. placement will take care of handling the offset for now.
 	const offset = placement.getNoteHeadOffset([0, 0]);
@@ -76,9 +74,14 @@ Note.prototype.render = function () {
 
 	group.addChild(noteHead);
 
-	if (this.note.duration.dots) {
-		const dots = engraver.drawDots(noteHead, this.note.duration.dots);
-		group.addChild(dots);
+	if (this.dots) {
+		const centerLineValue = getCenterLineValue(context.clef);
+		const steps = noteUtils.getSteps(centerLineValue, this.pitch);
+		// if steps is odd then the note is on a line. needs to be position so it doesn't overlap with the line.
+		const distance = noteHead.bounds.width / 2;
+		const point = placement.getNoteHeadOffset(noteHead.bounds.bottomRight);
+		const dots = engraver.drawDots(point, this.dots);
+		group.addChildren(dots);
 	}
 
 	return group;

@@ -268,25 +268,21 @@ const drawHead = _.memoize(function (type) {
 
 /*
  * Draw the duration dots on the note
+ * @param point - paper.Point
+ * @param dots -
  */
-function drawDots (noteHead, dots) {
-	if (dots) {
-		const dotArr = [];
-		const distance = noteHead.bounds.width / 2;
-		let point = placement.getNoteHeadOffset(noteHead.bounds.bottomRight);
+function drawDots (point, dots) {
+	const dotArr = [];
+	const distance = Scored.config.note.head.width / 2;
 
-		for (let i = 0; i < dots; i++) {
-			point = point.add(distance, 0);
-			const dot = new paper.Path.Circle(point, 1.5);
-			dot.fillColor = 'black';
-			// this.group.addChild(dot); // TODO: might need a way to refer to the dots later
-			dotArr.push(dot);
-		}
-
-		return new paper.Group({
-			children: dotArr
-		});
+	for (let i = 0; i < dots; i++) {
+		point = point.add(distance, 0);
+		const dot = new paper.Path.Circle(point, 2);
+		dot.fillColor = 'black';
+		dotArr.push(dot);
 	}
+
+	return dotArr;
 }
 
 /*

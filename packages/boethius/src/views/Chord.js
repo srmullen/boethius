@@ -39,7 +39,7 @@ function Chord ({value=4, dots=0, tuplet, time, root, name, inversion, staccato,
 Chord.prototype.type = TYPE;
 
 Chord.render = function (chord, context) {
-	let group = chord.render();
+	const group = chord.render(context);
 	Chord.renderAccidentals(chord, context);
 	chord.renderStem();
 	return group;
@@ -103,13 +103,13 @@ Chord.prototype.renderStem = function (centerLineValue, stemDirection) {
 Chord.prototype.render = function (context) {
 	const group = this.group = new paper.Group({name: TYPE});
 
-	let stemDirection = this.getStemDirection(getCenterLineValue(context.clef)),
-		overlaps = getOverlappingNotes(this);
+	const stemDirection = this.getStemDirection(getCenterLineValue(context.clef));
+	const overlaps = getOverlappingNotes(this);
 
 	// get steps
-	let [root, ...rest] = stemDirection === UP ? this.children : _.clone(this.children).reverse();
+	const [root, ...rest] = this.children;
 
-	let noteGroups = this.children.map(note => note.render());
+	let noteGroups = this.children.map(note => note.render(context));
 
 	let translationFn;
 
