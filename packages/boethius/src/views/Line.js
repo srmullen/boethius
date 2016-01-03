@@ -241,7 +241,7 @@ Line.renderNote = function (note, context) {
  * @return Paper.Group
  */
 Line.renderChord = function (chord, context) {
-	let group = chord.render();
+	let group = chord.render(context);
 	Chord.renderAccidentals(chord, context);
 	return group;
 };

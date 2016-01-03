@@ -8,6 +8,7 @@ import {getAccidentalTop, getAccidentalBottom, calculateDefaultAccidentalPositio
 import {getAccidental} from "../utils/accidental";
 import constants from "../constants";
 import Note from "./Note";
+import {getCenterLineValue} from "./Clef";
 
 const TYPE = constants.type.chord;
 const UP = "up";
@@ -99,10 +100,10 @@ Chord.prototype.renderStem = function (centerLineValue, stemDirection) {
 	}
 };
 
-Chord.prototype.render = function () {
+Chord.prototype.render = function (context) {
 	const group = this.group = new paper.Group({name: TYPE});
 
-	let stemDirection = this.getStemDirection(),
+	let stemDirection = this.getStemDirection(getCenterLineValue(context.clef)),
 		overlaps = getOverlappingNotes(this);
 
 	// get steps
