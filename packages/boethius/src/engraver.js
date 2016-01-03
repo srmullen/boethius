@@ -276,10 +276,10 @@ function drawDots (point, dots) {
 	const distance = Scored.config.note.head.width / 2;
 
 	for (let i = 0; i < dots; i++) {
-		point = point.add(distance, 0);
 		const dot = new paper.Path.Circle(point, 2);
 		dot.fillColor = 'black';
 		dotArr.push(dot);
+		point = point.add(distance, 0);
 	}
 
 	return dotArr;

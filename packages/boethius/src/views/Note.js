@@ -8,6 +8,7 @@ import * as noteUtils from "../utils/note";
 import {getAccidental} from "../utils/accidental";
 import constants from "../constants";
 import {getCenterLineValue} from "./Clef";
+import {isEven} from "../utils/common";
 
 const TYPE = constants.type.note;
 
@@ -52,6 +53,12 @@ Note.renderAccidental = function (note, accidentals, key) {
 	}
 };
 
+Note.renderDots = function (note, clef) {
+	if (note.dots) {
+		note.drawDots(note.dots, clef);
+	}
+};
+
 Note.prototype.renderStem = function (centerLineValue, stemDirection) {
 	if (this.needsStem()) {
 		stemDirection = stemDirection || this.getStemDirection(centerLineValue);
@@ -73,16 +80,6 @@ Note.prototype.render = function (context) {
 	const noteHead = this.noteHead = this.symbol.place(offset);
 
 	group.addChild(noteHead);
-
-	if (this.dots) {
-		const centerLineValue = getCenterLineValue(context.clef);
-		const steps = noteUtils.getSteps(centerLineValue, this.pitch);
-		// if steps is odd then the note is on a line. needs to be position so it doesn't overlap with the line.
-		const distance = noteHead.bounds.width / 2;
-		const point = placement.getNoteHeadOffset(noteHead.bounds.bottomRight);
-		const dots = engraver.drawDots(point, this.dots);
-		group.addChildren(dots);
-	}
 
 	return group;
 };
@@ -169,12 +166,36 @@ Note.prototype.drawFlag = function () {
 Note.prototype.drawAccidental = function (accidental) {
 	let accidentalSymbol = engraver.drawAccidental(accidental);
 
-	// accidentalGroup = accidentalSymbol.place(position);
 	let accidentalGroup = accidentalSymbol.place();
 
 	this.group.addChild(accidentalGroup);
 
 	return accidentalGroup;
+};
+
+/*
+ * @param dots - the number of dots to draw.
+ * @param clef - the Clef the note is placed on
+ * @param xPos - Number representing the xPosition of the note.
+ */
+Note.prototype.drawDots = function (dots, clef, xPos) {
+	const centerLineValue = getCenterLineValue(clef);
+	const steps = noteUtils.getSteps(centerLineValue, this.pitch);
+	const noteHeadCenterY = this.noteHead.bounds.center.y + Scored.config.note.head.yOffset;
+	// if steps is odd then the note is on a line. needs to be position so it doesn't overlap with the line.
+	const yPos = isEven(steps) ?
+		noteHeadCenterY - Scored.config.layout.stepSpacing :
+		noteHeadCenterY;
+
+	let point;
+	if (xPos) {
+		point = new paper.Point(xPos, yPos);
+	} else {
+		point = new paper.Point(this.noteHead.bounds.right + (Scored.config.note.head.width / 2), yPos);
+	}
+
+	const dotGroups = engraver.drawDots(point, dots);
+	this.group.addChildren(dotGroups);
 };
 
 Note.prototype.drawArticulations = function () {

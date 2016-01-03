@@ -117,37 +117,51 @@ Chord.prototype.render = function (context) {
 	if (stemDirection === DOWN) {
 		const xTranslation = -Scored.config.note.head.width;
 		translationFn = (overlaps) => {
-			let translated = [];
+			const translated = [];
 			_.each(_.clone(overlaps).reverse(), ([lower, higher]) => {
 				if (!_.some(translated, n => n === higher)) {
 					lower.group.translate(xTranslation, 0);
 					translated.push(lower);
 				}
 			});
+			return translated;
 		};
 	} else {
 		const xTranslation = Scored.config.note.head.width;
 		translationFn = (overlaps) => {
-			let translated = [];
+			const translated = [];
 			_.each(overlaps, ([lower, higher]) => {
 				if (!_.some(translated, n => n === lower)) {
 					higher.group.translate(xTranslation, 0);
 					translated.push(higher);
 				}
 			});
+			return translated;
 		};
 	}
 
+	let translated;
 	if (overlaps.length) {
-		translationFn(overlaps);
+		translated = translationFn(overlaps);
 	}
 
 	_.each(rest, note => {
-		let steps = getSteps(note.pitch, root.pitch);
+		const steps = getSteps(note.pitch, root.pitch);
 		note.group.translate(0, steps * Scored.config.layout.stepSpacing);
 	});
 
 	group.addChildren(noteGroups);
+
+	if (this.dots) {
+		const rightMostNote = (translated && translated.length && stemDirection === UP) ?
+			translated[0] :
+			this.getBaseNote(stemDirection);
+		const xPos = rightMostNote.noteHead.bounds.right + Scored.config.note.head.width / 2;
+
+		_.each(this.children, (note) => {
+			note.drawDots(this.dots, context.clef, xPos);
+		});
+	}
 
 	return group;
 };

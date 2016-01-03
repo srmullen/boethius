@@ -28,6 +28,7 @@ TODOS:
     - Implement more beat structures.
     - Score should pass the time contexts to the staves rather than letting each stave figure it out. src/views/Score.js line #42.
     - Dynamics
+    - Voices crossing lines.
 
     # Lower priority
     - Score title, tempo, composer.

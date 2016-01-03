@@ -232,6 +232,7 @@ function renderItem (item, context) {
 Line.renderNote = function (note, context) {
 	let group = note.render(context);
 	Note.renderAccidental(note, context.accidentals, context.key);
+	Note.renderDots(note, context.clef);
 	return group;
 };
 
