@@ -68,7 +68,7 @@ Note.prototype.renderStem = function (centerLineValue, stemDirection) {
 	}
 };
 
-Note.prototype.render = function (context) {
+Note.prototype.render = function () {
 	const group = this.group = new paper.Group({
 		name: TYPE
 	});

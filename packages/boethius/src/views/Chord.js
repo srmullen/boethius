@@ -313,7 +313,7 @@ function parseChildren (children, defaults={}) {
  */
 Chord.prototype.getBaseNote = function (direction) {
 	return direction === UP ? this.children[0] : _.last(this.children);
-}
+};
 
 Chord.prototype.calculateStemPoint = function (fulcrum, vector, direction) {
 	const baseNote = this.getBaseNote(direction);
