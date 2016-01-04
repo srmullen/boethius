@@ -1,5 +1,4 @@
 import {drawRest} from "../engraver";
-import * as common from "../utils/common";
 import constants from "../constants";
 
 const TYPE = constants.type.rest;
@@ -20,17 +19,19 @@ Rest.prototype.render = function () {
 		name: TYPE
 	});
 
-	common.addEvents(this);
-
 	this.symbol = drawRest(this.value);
 
 	group.removeChildren();
 
 	group.addChild(this.symbol.place());
 
-	this.drawGroupBounds(group);
+	// this.drawGroupBounds(group);
 
 	return group;
+};
+
+Rest.prototype.drawDots = function () {
+
 };
 
 Rest.prototype.drawGroupBounds = function (group) {

@@ -135,7 +135,7 @@ function renderTimeContext (lineCenter, cursor, {items, context}) {
 	}
 
 	possibleNextPositions = possibleNextPositions.concat(_.map(rests, rest => {
-		let pos = placement.getYOffset(rest.group);
+		const pos = placement.getYOffset(rest);
 
 		rest.group.translate(lineCenter.add(0, pos));
 		placement.placeAt(cursor, rest);

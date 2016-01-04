@@ -145,6 +145,9 @@ const offsets = {
 		} else {
 			return 0;
 		}
+	},
+	rest: function () {
+		return -Scored.config.layout.lineSpacing;
 	}
 };
 
