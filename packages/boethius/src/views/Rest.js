@@ -1,4 +1,4 @@
-import {drawRest} from "../engraver";
+import {drawRest, drawDots} from "../engraver";
 import constants from "../constants";
 
 const TYPE = constants.type.rest;
@@ -14,24 +14,30 @@ function Rest ({voice=0, value=4, dots=0, tuplet, time, slur}) {
 
 Rest.prototype.type = TYPE;
 
-Rest.prototype.render = function () {
+Rest.prototype.render = function (context) {
 	const group = this.group = new paper.Group({
 		name: TYPE
 	});
 
 	this.symbol = drawRest(this.value);
 
-	group.removeChildren();
-
 	group.addChild(this.symbol.place());
 
-	// this.drawGroupBounds(group);
+	if (this.dots) {
+		this.drawDots(this.dots, context.clef);
+	}
 
 	return group;
 };
 
-Rest.prototype.drawDots = function () {
+Rest.prototype.drawDots = function (dots, clef) {
+	const noteHeadCenterY = this.group.bounds.center.y + Scored.config.note.head.yOffset;
+	const yPos = noteHeadCenterY - Scored.config.layout.stepSpacing;
 
+	const point = new paper.Point(this.group.bounds.right + (Scored.config.note.head.width / 2), yPos);
+
+	const dotGroups = drawDots(point, dots);
+	this.group.addChildren(dotGroups);
 };
 
 Rest.prototype.drawGroupBounds = function (group) {

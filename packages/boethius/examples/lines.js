@@ -430,7 +430,7 @@ function testDots () {
 	// ]);
 
 	var voice = scored.voice({}, [
-		r({value: 4}), r({value: 8}), r({value: 8}), r({value: 16}), r({value: 16}),
+		r({value: 4, dots: 1}), r({value: 8}), r({value: 8, dots: 1}), r({value: 16}), r({value: 16}),
 	]);
 
 	return scored.render(line, {voices: [voice], numMeasures: 4});
