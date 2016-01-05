@@ -5,7 +5,8 @@ function run () {
 	// simpleLine().translate(25, 50);
 
 	// testStacatoLegato().translate(25, 50);
-	testDots().translate(25, 50);
+	// testDots().translate(25, 50);
+	testDynamics().translate(25, 50);
 
 	// eighthBeamings().translate(25, 50);
 	// sixteenthBeamings().translate(25, 150);
@@ -428,6 +429,30 @@ function testDots () {
 		c({value: 4, dots: 1}, ["a4", "b4", "c5"]), r({value: 8}),
 		c({value: 4, dots: 1}, ["f4", "f5"]), r({value: 8}),
 		r({value: 4, dots: 1}), r({value: 8}), r({value: 8, dots: 1}), r({value: 16}), r({value: 16}),
+	]);
+
+	return scored.render(line, {voices: [voice], numMeasures: 4});
+}
+
+function testDynamics () {
+	var line = scored.line({}, [scored.clef({value: "treble", measure: 0}),
+								scored.key({value: "C", measure: 0}),
+								scored.timeSig({value: "4/4", measure: 0})]);
+
+	var n = scored.note;
+	var c = scored.chord;
+	var d = scored.dynamic;
+
+	// need to test notes, chords and rests with at least two dots each.
+	var voice = scored.voice({}, [
+		n({pitch: "a4", value: 4}), n({pitch: "b4", value: 4}),
+		// d({value: "p"}),
+		c({value: 4}, ["a4", "c5"]),
+		c({value: 4}, ["a4", "b4"]),
+		c({value: 4}, ["a4", "b4", "c5"]),
+		c({value: 4}, ["f4", "f5"]),
+		c({value: 4}, ["a4", "b4", "c5"]),
+		c({value: 4}, ["f4", "f5"])
 	]);
 
 	return scored.render(line, {voices: [voice], numMeasures: 4});
