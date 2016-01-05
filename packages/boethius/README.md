@@ -20,7 +20,6 @@ TODOS:
     # High priority
     - Slur chords.
     - Slurs / Ties, rendering improvements
-    - Draw staff ending.
     - Remove this.group from markings.
     - A Score should render the Clef, key and time signature at the beginning of every staff. (optional)
     - Finish tuplet rendering
@@ -30,6 +29,8 @@ TODOS:
     - Voices crossing lines.
 
     # Lower priority
+    - SMuFL
+    - MusicXML
     - Score title, tempo, composer.
     - There should be a segregation between files that require paper.js and those that do not.
     - Implement different staff type rendering. StaffGroup, ChoirStaff, GrandStaff, and PianoStaff.

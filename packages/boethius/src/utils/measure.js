@@ -30,16 +30,18 @@ function createMeasures (numMeasures, children) {
 	}
 
 	_.each(measures, (measure, i) => {
-		let previousMeasure = measures[i-1],
-			startsAt = previousMeasure ? previousMeasure.startsAt + timeUtils.getMeasureDuration(previousMeasure) : 0;
+		const previousMeasure = measures[i-1];
+		const startsAt = previousMeasure ? previousMeasure.startsAt + timeUtils.getMeasureDuration(previousMeasure) : 0;
 
 		if (!measure) {
-			let timeSig = _.find(measureMarkings[i], isTimeSignature) || previousMeasure.timeSig;
+			const timeSig = _.find(measureMarkings[i], isTimeSignature) || previousMeasure.timeSig;
 			measure = new Measure(_.extend({}, {startsAt, timeSig, value: i}), measureMarkings[i]);
 		} else {
 			measure.startsAt = startsAt;
 			measure.value = i;
 		}
+
+		if (i === numMeasures - 1) measure.barType = "final";
 
 		measures[i] = measure;
 	});

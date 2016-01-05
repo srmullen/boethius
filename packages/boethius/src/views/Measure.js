@@ -26,14 +26,14 @@ Measure.prototype.type = TYPE;
  * @param lines Group<Line>[]
  */
 Measure.prototype.render = function (lines, leftBarline, width) {
-	const group = this.group = new paper.Group({
+	const group = new paper.Group({
 		name: TYPE
 	});
 
 	leftBarline = leftBarline || drawBarline(lines);
-	let previousBarlinePosition = leftBarline.position.x,
-		rightBarline = drawBarline(lines, previousBarlinePosition + width),
-		bounds = this.drawGroupBounds(previousBarlinePosition, rightBarline);
+	const previousBarlinePosition = leftBarline.position.x;
+	const rightBarline = drawBarline(lines, previousBarlinePosition + width, this.barType);
+	const bounds = this.drawGroupBounds(previousBarlinePosition, rightBarline);
 
 	group.addChildren([bounds, leftBarline, rightBarline]);
 

@@ -60,29 +60,46 @@ function drawLegerLines (noteHead, centerLine, lineSpacing) {
 	});
 }
 
-function drawBarline (staves, xPos=0) {
-	let firstLine = staves[0],
-		lastLine = staves[staves.length - 1],
-		margin = 2,
-		barGroup = new paper.Group({name: "barline"});
-	let bar = new paper.Path.Line(lineUtils.f(firstLine).add(xPos, 0), lineUtils.e(lastLine).add(xPos, 0));
+// TODO: Are bounds needed on barlines?
+const barlineTypes = {
+	final: (staves, xPos) => {
+		const firstLine = staves[0];
+		const lastLine = staves[staves.length - 1];
+		const barGroup = new paper.Group({name: "barline"});
+		const thickBar = new paper.Path.Line(lineUtils.f(firstLine).add(xPos, 0), lineUtils.e(lastLine).add(xPos, 0));
+		const thinBar = new paper.Path.Line(lineUtils.f(firstLine).add(xPos-5, 0), lineUtils.e(lastLine).add(xPos-5, 0));
 
-	// draw the bar line
-	barGroup.addChild(bar);
-	bar.strokeColor = "black";
-	bar.strokeWidth = 1;
+		// draw the bar line
+		barGroup.addChildren([thickBar, thinBar]);
+		barGroup.strokeColor = "black";
+		thickBar.strokeWidth = 3;
+		thinBar.strokeWidth = 1;
 
-	// draw the bounds
-	let bounds = new paper.Path.Rectangle(bar.bounds.topLeft.subtract([margin, 0]), bar.bounds.bottomRight.add([margin, 0]));
+		return barGroup;
+	},
+	default: (staves, xPos) => {
+		const firstLine = staves[0];
+		const lastLine = staves[staves.length - 1];
+		const barGroup = new paper.Group({name: "barline"});
+		const bar = new paper.Path.Line(lineUtils.f(firstLine).add(xPos, 0), lineUtils.e(lastLine).add(xPos, 0));
 
-	bounds.fillColor = "#FFFFFF";
-	bounds.opacity = 0;
-	// bounds.fillColor = paperUtils.randomColor();
-	// bounds.opacity = 0.3;
+		// draw the bar line
+		barGroup.addChild(bar);
+		bar.strokeColor = "black";
+		bar.strokeWidth = 1;
 
-	barGroup.addChild(bounds);
+		return barGroup;
+	}
+};
 
-	return barGroup;
+/*
+ * @param staves - Array of Line groups.
+ * @param xPos - Number representing the xposition on the staves to draw the barline.
+ * @param type - (optional) type of barline to draw.
+ */
+function drawBarline (staves, xPos=0, type="default") {
+	const barlineFn = barlineTypes[type];
+	return barlineFn(staves, xPos);
 }
 
 ///////////////////

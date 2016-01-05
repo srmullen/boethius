@@ -420,16 +420,13 @@ function testDots () {
 	var r = scored.rest;
 
 	// need to test notes, chords and rests with at least two dots each.
-	// var voice = scored.voice({}, [
-	// 	n({pitch: "a4", value: 4, dots: 1}), r({value: 8}), n({pitch: "b4", value: 4, dots: 1}), r({value: 8}),
-	//
-	// 	c({value: 4, dots: 1}, ["a4", "c5"]), r({value: 8}),
-	// 	c({value: 4, dots: 1}, ["a4", "b4"]), r({value: 8}),
-	// 	c({value: 4, dots: 1}, ["a4", "b4", "c5"]), r({value: 8}),
-	// 	c({value: 4, dots: 1}, ["f4", "f5"]), r({value: 8})
-	// ]);
-
 	var voice = scored.voice({}, [
+		n({pitch: "a4", value: 4, dots: 1}), r({value: 8}), n({pitch: "b4", value: 4, dots: 1}), r({value: 8}),
+
+		c({value: 4, dots: 1}, ["a4", "c5"]), r({value: 8}),
+		c({value: 4, dots: 1}, ["a4", "b4"]), r({value: 8}),
+		c({value: 4, dots: 1}, ["a4", "b4", "c5"]), r({value: 8}),
+		c({value: 4, dots: 1}, ["f4", "f5"]), r({value: 8}),
 		r({value: 4, dots: 1}), r({value: 8}), r({value: 8, dots: 1}), r({value: 16}), r({value: 16}),
 	]);
 

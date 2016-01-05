@@ -29,7 +29,6 @@ function Staff ({startMeasure=0, measures=4}, children=[]) {
 	this.markings = _.filter(children, isMarking);
 }
 
-// TODO: render the length as sum of min measure lengths if not passed in.
 Staff.render = function render (staff, {lines=[], voices=[], measures, length, startMeasure=0, numMeasures}) {
 	const staffGroup = staff.render();
 

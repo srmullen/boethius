@@ -30,7 +30,7 @@ Rest.prototype.render = function (context) {
 	return group;
 };
 
-Rest.prototype.drawDots = function (dots, clef) {
+Rest.prototype.drawDots = function (dots) {
 	const noteHeadCenterY = this.group.bounds.center.y + Scored.config.note.head.yOffset;
 	const yPos = noteHeadCenterY - Scored.config.layout.stepSpacing;
 
