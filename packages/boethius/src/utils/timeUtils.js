@@ -1,18 +1,18 @@
 import _ from "lodash";
 import F from "fraction.js";
-import constants from "../constants";
+import {isNote, isChord, isRest, isTimeSignature} from "../types";
 
 /*
  * @param signature - TimeSignaure or time signature value or tuplet represented as a String. ex. TimeSig({value: "4/4"}) or "4/4", "h"
  * @return Number[]
  */
 function parseSignature (signature) {
-	let sig = signature.type === constants.type.timeSig ? signature.value : signature;
+	const sig = isTimeSignature(signature) ? signature.value : signature;
 
 	if (sig === "c" || sig === "h") {
 		return [4, 4];
 	} else {
-		let nums = sig.split("/");
+		const nums = sig.split("/");
 		return [+nums[0], +nums[1]]; // convert strings to numbers
 	}
 }
@@ -21,7 +21,7 @@ function parseSignature (signature) {
  * @return {number} - the measure number as an integer
  */
 function getMeasure (time=0, [beats, value]) {
-	let measureDuration = beats * (1/value);
+	const measureDuration = beats * (1/value);
 	return Math.floor(time/measureDuration);
 }
 
@@ -57,7 +57,7 @@ function getTime (measures, item) {
 	measureView = measures[measure];
 
 	// time signatures are always at the beginning of a measure.
-	if (item.type === constants.type.timeSig) {
+	if (isTimeSignature(item)) {
 		time = measureView.startsAt;
 		beat = 0;
 	}
@@ -175,7 +175,8 @@ function splitByTime (events) {
 function calculateDuration (item) {
 
 	// If the event has no type it has no duration.
-	if (!item.type) return 0;
+	// if (!item.type) return 0;
+	if (!(isNote(item) || isChord(item) || isRest(item))) return 0;
 
 	let s = item.tuplet ? item.tuplet.split("/") : null,
 		tuplet = s ? new F(s[0], s[1]) : null,

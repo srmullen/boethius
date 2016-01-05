@@ -145,7 +145,7 @@ function placeTimes (staffTimes, measures, lineCenters, cursorFn) {
 		cursor = _.max(_.map(lineIndices, (idx, i) => positionMarkings(centers[i], cursor, ctxs[idx])));
 
 		// place the items that have duration
-		let possibleNextPositions = _.map(lineIndices, (idx, i) => renderTimeContext(centers[i], cursor, ctxs[idx]));
+		const possibleNextPositions = _.map(lineIndices, (idx, i) => renderTimeContext(centers[i], cursor, ctxs[idx]));
 
 		return cursorFn(possibleNextPositions, cursor);
 	}, Scored.config.note.head.width);

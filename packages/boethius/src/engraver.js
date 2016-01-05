@@ -60,7 +60,6 @@ function drawLegerLines (noteHead, centerLine, lineSpacing) {
 	});
 }
 
-// TODO: Are bounds needed on barlines?
 const barlineTypes = {
 	final: (staves, xPos) => {
 		const firstLine = staves[0];
@@ -616,6 +615,18 @@ function drawTuplets (items, centerLine, voiceDirection) {
 	return new paper.Group({children: [line, num]});
 }
 
+/*
+ * @param dyanmicValue - String representation of the dynamic.
+ */
+function drawDynamic (dynamicValue) {
+	const dynamicText = new paper.PointText({
+		content: dynamicValue,
+		fontFamily: 'gonvillealpha',
+		fontSize: Scored.config.fontSize,
+		fillColor: 'black',
+	});
+	return dynamicText
+}
 
 export {
 	drawLegerLines,
@@ -633,5 +644,6 @@ export {
 	getFlagOffset,
 	drawRest,
 	beam,
-	drawTuplets
+	drawTuplets,
+	drawDynamic
 };

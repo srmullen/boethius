@@ -49,20 +49,24 @@ function testThreeLines () {
 
     var n = scored.note;
     var c = scored.chord;
+    var d = scored.dynamic;
 
     var voice1 = scored.voice({name: "soprano"}, [
+        d({value: "ff"}),
         n({value: 4, pitch: "c5"}), n({value: 4, pitch: "b4"}), n({value: 8, pitch: "a4"}), n({value: 8, pitch: "g4"}), n({value: 4, pitch: "f4"}),
         n({value: 8})
     ]);
 
     var voice2 = scored.voice({name: "bass"}, [
+        d({value: "mf"}),
         n({value: 8, pitch: "c3"}), n({value: 8, pitch: "c#3"}), n({value: 4, pitch: "d3"}), n({value: 4, pitch: "e3"}), n({value: 4, pitch: "f3"}),
         n({value: 8})
     ]);
 
     var voice3 = scored.voice({name: "chords"}, [
+        d({value: "p"}),
         c({value: 8}, ["c4", "eb4", "g4", "c5"]) , c({value: 8}, ["c4", "eb4", "g4", "c5"]),
-        n({value: 4, pitch: "b4"}), n({value: 4, pitch: "a4"}), n({value: 4, pitch: "g4"}), n({value: 4, pitch: "f4"})
+        n({value: 4, pitch: "b4"}), n({value: 4, pitch: "a4"}), n({value: 4, pitch: "g4"}), d({value: "f"}), n({value: 4, pitch: "f4"})
 
     ]);
 

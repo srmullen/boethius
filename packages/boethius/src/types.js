@@ -14,6 +14,7 @@ function isType (type, item) {
 
 const isChord = _.partial(isType, constants.type.chord);
 const isClef = _.partial(isType, constants.type.clef);
+const isDynamic = _.partial(isType, constants.type.dynamic);
 const isKey = _.partial(isType, constants.type.key);
 const isLine = _.partial(isType, constants.type.line);
 const isMeasure = _.partial(isType, constants.type.measure);
@@ -28,6 +29,7 @@ const isMarking = item => isClef(item) || isKey(item) || isTimeSignature(item);
 export {
     isChord,
     isClef,
+    isDynamic,
     isKey,
     isLine,
     isMeasure,

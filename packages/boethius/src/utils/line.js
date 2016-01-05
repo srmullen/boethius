@@ -97,13 +97,15 @@ function renderTimeContext (lineCenter, cursor, {items, context}) {
 	const {
 		note: notes,
 		rest: rests,
-		chord: chords
+		chord: chords,
+		dynamic: dynamics
 	} = _.groupBy(items, item => item.type);
 
 	let possibleNextPositions = [];
 
 	const pitchedItems = _.compact([].concat(notes, chords));
 
+	// place pitched items
 	if (pitchedItems.length) {
 		// get widest note. that will be placed first.
 		let widestItem = _.max(pitchedItems, item => item.group.bounds.width),
@@ -124,16 +126,17 @@ function renderTimeContext (lineCenter, cursor, {items, context}) {
 
 		possibleNextPositions = possibleNextPositions.concat(place(widestItem));
 
-		_.remove(pitchedItems, item => item === widestItem); // mutation of notes array
+		const sansWidestItem = _.reject(pitchedItems, item => item === widestItem); // mutation of notes array
 
-		_.each(pitchedItems, placeY);
+		_.each(sansWidestItem, placeY);
 
 		const alignToNoteHead = isNote(widestItem) ? widestItem.noteHead : widestItem.children[0].noteHead;
-		placement.alignNoteHeads(alignToNoteHead.bounds.center.x, pitchedItems);
+		placement.alignNoteHeads(alignToNoteHead.bounds.center.x, sansWidestItem);
 
-		possibleNextPositions = possibleNextPositions.concat(_.map(pitchedItems, placement.calculateCursor));
+		possibleNextPositions = possibleNextPositions.concat(_.map(sansWidestItem, placement.calculateCursor));
 	}
 
+	// place rests
 	possibleNextPositions = possibleNextPositions.concat(_.map(rests, rest => {
 		const pos = placement.getYOffset(rest);
 
@@ -142,6 +145,14 @@ function renderTimeContext (lineCenter, cursor, {items, context}) {
 
 		return placement.calculateCursor(rest);
 	}));
+
+	// place dynamics.
+	// Stems and slurs are not rendered at this point so it's hard to get the best position for the dynamic.
+	_.each(dynamics, (dynamic) => {
+		// const lowestPoint = _.max(_.map(pitchedItems, item => item.group.bounds.bottom));
+		dynamic.group.translate(lineCenter.add(0, Scored.config.layout.lineSpacing * 5.5));
+		placement.placeAt(cursor, dynamic);
+	});
 
 	// next time is at smallest distance
 	return _.min(possibleNextPositions);

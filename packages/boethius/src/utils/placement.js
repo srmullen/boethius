@@ -1,8 +1,8 @@
 import _ from "lodash";
 import * as timeUtils from "./timeUtils";
-import {isMarking} from "./common";
+// import {isMarking} from "./common";
 import constants from "../constants";
-import {isNote} from "../types";
+import {isNote, isDynamic, isMarking} from "../types";
 
 const noteNameToDegreeObj = {
 		"c": 0,
@@ -118,11 +118,14 @@ function lineup (items) {
  * @param item - Scored item.
  */
 function placeAt (cursor, item) {
-	if (item.type === constants.type.note && item.note.accidental()) {
-		let offset = (item.noteHead.bounds.center.x - item.noteHead.bounds.left);
+	if (isNote(item) && item.note.accidental()) {
+		const offset = (item.noteHead.bounds.center.x - item.noteHead.bounds.left);
 		item.group.position.x = cursor + offset;
+	} else if (isDynamic(item)){
+		const xOffset = 5;
+		item.group.bounds.center.x = cursor + xOffset;
 	} else {
-		let offset = (item.group.bounds.center.x - item.group.bounds.left);
+		const offset = (item.group.bounds.center.x - item.group.bounds.left);
 		item.group.position.x = cursor + offset;
 	}
 }
@@ -262,7 +265,8 @@ function calculateTimeLength (items, shortestDuration) {
 	const keyLength = keys ? _.max(keys.map(getMarkingWidth)) : 0;
 	const timeSigLength = timeSigs ? _.map(timeSigs.map(getMarkingWidth)) : 0;
 	const markingsLength = _.sum([clefLength, keyLength, timeSigLength]);
-	const voiceItemLengths = _.map(voiceItems, item => {
+	// dynamics should affect measure length. remove them.
+	const voiceItemLengths = _.map(_.reject(voiceItems, isDynamic), item => {
 		return item.group.bounds.width + (noteHeadWidth * getStaffSpace(shortestDuration, item));
 	});
 	const totalVoiceItemsLength = voiceItemLengths.length ? _.min(voiceItemLengths) : 0;

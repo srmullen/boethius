@@ -90,10 +90,11 @@ function iterateByTime (fn, times) {
 }
 
 function renderTimeContext (lineCenter, cursor, {items, context}) {
-    let {
+    const {
 		note: notes,
 		rest: rests,
-		chord: chords
+		chord: chords,
+        dynamic: dynamics
 	} = _.groupBy(items, item => item.type);
 
 	let possibleNextPositions = [];
@@ -138,6 +139,14 @@ function renderTimeContext (lineCenter, cursor, {items, context}) {
 
 		return placement.calculateCursor(rest);
 	}));
+
+    // place dynamics.
+	// Stems and slurs are not rendered at this point so it's hard to get the best position for the dynamic.
+	_.map(dynamics, (dynamic) => {
+		// const lowestPoint = _.max(_.map(pitchedItems, item => item.group.bounds.bottom));
+		dynamic.group.translate(lineCenter.add(0, Scored.config.layout.lineSpacing * 5.5));
+		placement.placeAt(cursor, dynamic);
+	});
 
 	// next time is at smallest distance
 	cursor = _.min(possibleNextPositions);

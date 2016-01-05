@@ -67,6 +67,16 @@ describe("Scored", () => {
 			expect(timeSig.value).to.equal("h");
 		});
 	});
+	describe("dynamic", () => {
+		it("should have a type of dynamic.", () => {
+			const dynamic = scored.dynamic();
+			expect(dynamic.type).to.equal("dynamic");
+		});
+		it("should have no default value", () => {
+			const dynamic = scored.dynamic({value: "fff"});
+			expect(dynamic.value).not.to.be.defined;
+		});
+	});
 	describe("measure", () => {
 		it("should return a Measure object", () => {
 			let fourfour = scored.timeSig(),
@@ -289,7 +299,7 @@ describe("Scored", () => {
 			let voice = ["voice", {value: 2}, ["note"]];
 			expect(scored.createEvents(voice)).to.eql([scored.note({time: 0, voice: 2})]);
 		});
-		
+
 	});
 
 });

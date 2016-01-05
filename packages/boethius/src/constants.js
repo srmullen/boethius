@@ -10,7 +10,8 @@ let constants = {
 		chord: "chord",
 		clef: "clef",
 		key: "key",
-		timeSig: "timeSig"
+		timeSig: "timeSig",
+		dynamic: "dynamic"
 	},
 	font: {
 		clefs: {

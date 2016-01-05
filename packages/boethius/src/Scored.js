@@ -11,6 +11,7 @@ import Measure from "./views/Measure";
 import Clef from "./views/Clef";
 import Key from "./views/Key";
 import TimeSignature from "./views/TimeSignature";
+import Dynamic from "./views/Dynamic";
 import Score from "./views/Score";
 
 import * as lineUtils from "./utils/line";
@@ -112,6 +113,10 @@ Scored.prototype.key = function key (context={}) {
 
 Scored.prototype.timeSig = function timeSignature (context={}) {
 	return new TimeSignature(context);
+};
+
+Scored.prototype.dynamic = function dynamic (context={}) {
+	return new Dynamic(context);
 };
 
 Scored.prototype.chord = function chord (context={}, children=[]) {

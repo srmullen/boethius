@@ -12,7 +12,8 @@ import {
     isStaff,
     isTimeSignature,
     isVoice,
-    isMarking
+    isMarking,
+    isDynamic
 } from "../src/types";
 
 import Scored from "../src/Scored";
@@ -31,6 +32,13 @@ describe("types", () => {
         it("should return true if the given item is a Clef, false otherwise", () => {
             expect(isClef(scored.clef())).to.be.true;
             expect(isClef(scored.key())).to.be.false;
+        });
+    });
+
+    describe("isDynamic", () => {
+        it("should return true if the given item is a Dynamic, false otherwise", () => {
+            expect(isDynamic(scored.dynamic({value: "f"}))).to.be.true;
+            expect(isDynamic(scored.rest())).to.be.false;
         });
     });
 

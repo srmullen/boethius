@@ -146,13 +146,6 @@ function juxt (...fns) {
 	return (x) => fns.map(fn => fn(x));
 }
 
-function isMarking (item) {
-	return item.type === constants.type.clef ||
-			item.type === constants.type.key ||
-			item.type === constants.type.timeSig ||
-			false;
-}
-
 /*
  * @param reducer - Function
  * @param coll - collection to reduce over.
@@ -193,7 +186,6 @@ export {
 	map,
 	mapDeep,
 	juxt,
-	isMarking,
 	reductions,
 	isEven,
 	isOdd

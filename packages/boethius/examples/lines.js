@@ -446,9 +446,10 @@ function testDynamics () {
 	// need to test notes, chords and rests with at least two dots each.
 	var voice = scored.voice({}, [
 		n({pitch: "a4", value: 4}), n({pitch: "b4", value: 4}),
-		// d({value: "p"}),
+		d({value: "p"}),
 		c({value: 4}, ["a4", "c5"]),
 		c({value: 4}, ["a4", "b4"]),
+		d({value: "ffff"}),
 		c({value: 4}, ["a4", "b4", "c5"]),
 		c({value: 4}, ["f4", "f5"]),
 		c({value: 4}, ["a4", "b4", "c5"]),
