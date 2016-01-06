@@ -7,8 +7,10 @@ describe("Voice", () => {
     const n = scored.note;
 
     describe("findBeaming", () => {
-        const findBeaming = Voice.findBeaming,
-            fourfour = scored.timeSig();
+        const findBeaming = Voice.findBeaming;
+        const n = scored.note;
+        const fourfour = scored.timeSig({value: "4/4", beatStructure: [2, 2]});
+        const nineeight = scored.timeSig({value: "9/8", beatStructure: [3, 3, 3]});
 
         it("should return an empty array if there are no notes in the collection", () => {
             expect(findBeaming(fourfour, [])).to.eql([]);
@@ -41,7 +43,11 @@ describe("Voice", () => {
         });
 
         it("should split collection of notes into groups that need to be beamed", () => {
-
+            const notes = [n({value: 8}), n({value: 8}), n({value: 8}), n({value: 8}), n({value: 8}), n({value: 8}), n({value: 8}), n({value: 8})];
+            const voice = scored.voice({}, notes);
+            expect(findBeaming(fourfour, voice.children)).to.eql([
+                [notes[0], notes[1], notes[2], notes[3]], [notes[4], notes[5], notes[6], notes[7]]
+            ]);
         });
     });
 

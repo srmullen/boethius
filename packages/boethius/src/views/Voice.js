@@ -3,7 +3,7 @@ import F from "fraction.js";
 
 import constants from "../constants";
 import {isNote, isChord} from "../types";
-import {concat, partitionBy, mapDeep} from "../utils/common";
+import {concat, partitionBy, mapDeep, reductions} from "../utils/common";
 import {beam, drawTuplets} from "../engraver";
 import {getAverageStemDirection, slur} from "../utils/note";
 import {calculateDuration, getMeasureNumber, getBeat, parseSignature, calculateTupletDuration, sumDurations} from "../utils/timeUtils";
@@ -45,36 +45,25 @@ Voice.prototype.type = constants.type.voice;
  * @return - array of note groupings.
  */
 Voice.findBeaming = function findBeaming (timeSig, items) {
-   if (!items.length) {
-       return [];
-   }
+    if (!items.length) {
+        return [];
+    }
 
-   // get the beat type
-   const sig = parseSignature(timeSig);
-   const baseTime = items[0].time; // the time from which the groupings are reckoned.
+    const [numerator, denominator] = parseSignature(timeSig);
+    const groupingDurations = timeSig.beatStructure.map(beats => beats * (1/denominator));
+    const baseTime = items[0].time; // the time from which the groupings are reckoned.
+    const groupingTimes = _.rest(reductions((acc, el) => acc + el, groupingDurations, baseTime));
+    let remainingItems = items;
+    let beatGroup;
+    const beatGroups = _.map(groupingTimes, (groupingTime) => {
+        const [beatGroup, rem] = _.partition(remainingItems, item => item.time < groupingTime);
+        remainingItems = rem;
+        return beatGroup;
+    });
 
-   // remove notes that don't need beaming or flags (i.e. quarter notes and greater)
-   let stemmedItems = _.groupBy(_.filter(items, item => (isNote(item) || isChord(item))), item => {
-       return Math.floor(getBeat(item.time, sig, baseTime));
-   });
-
-   let groupings = [];
-   // count down through the beats for each beat structure and add the notes to be beamed.
-   for (let i = 0, beat = 0; i < timeSig.beatStructure.length; i++) {
-        for (let beats = timeSig.beatStructure[i]; beats > 0; beats--) {
-            if (stemmedItems[beat]) {
-                let breakNum = 0; // for causing splits between quater notes in the same beat (i.e. tuplets);
-                let beatSubdivisions = partitionBy(stemmedItems[beat], item => {
-                    return item.needsFlag() ? "flag" : breakNum++;
-                });
-                _.each(beatSubdivisions, subdivision => groupings.push(subdivision));
-            }
-
-            beat++;
-        }
-   }
-
-   return groupings;
+    return _.reject(_.map(beatGroups, beatGroup => {
+        return _.filter(beatGroup, item => isNote(item) || isChord(item));
+    }), _.isEmpty);
 };
 
 /*

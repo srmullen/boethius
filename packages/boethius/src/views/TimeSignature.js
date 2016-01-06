@@ -3,25 +3,26 @@ import constants from "../constants";
 
 const TYPE = constants.type.timeSig;
 
+const beatStructures = {
+	"4/4": [1, 1, 1, 1],
+	"2/4": [1, 1],
+	"c": [2,2],
+	"h": [2,2],
+	"3/4": [1, 1, 1],
+	"12/8": [3, 3, 3, 3],
+	"9/8": [3, 3, 3],
+	"6/8": [3, 3],
+	"3/8": [3]
+}
+
 function TimeSignature ({value="4/4", measure, beatStructure}) {
 	this.value = value;
 	this.measure = measure;
-	this.beatStructure = beatStructure || TimeSignature.createBeatStructure(value);
+	// this.beatStructure = beatStructure || TimeSignature.createBeatStructure(value);
+	this.beatStructure = beatStructure || beatStructures[value];
 }
 
 TimeSignature.prototype.type = TYPE;
-
-TimeSignature.createBeatStructure = function (value) {
-	// handle common time signatures first
-	switch (value) {
-		case "4/4":
-			return [2,2];
-		case "c":
-			return [2,2];
-		case "3/4":
-			return [1, 1, 1];
-	}
-};
 
 TimeSignature.prototype.render = function () {
 	const margin = {

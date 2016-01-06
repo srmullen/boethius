@@ -22,9 +22,9 @@ TODOS:
     - Slurs / Ties, rendering improvements
     - A Score should render the Clef, key and time signature at the beginning of every staff. (optional)
     - Finish tuplet rendering
-    - Implement more beat structures.
     - Score should pass the time contexts to the staves rather than letting each stave figure it out. src/views/Score.js line #42.
     - Voices crossing lines.
+    - placement.commonShortestDuration implementation.
 
     # Lower priority
     - SMuFL

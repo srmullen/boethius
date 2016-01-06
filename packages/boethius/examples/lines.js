@@ -1,12 +1,13 @@
 var line;
 function run () {
 	// testMarkings();
+	testBeatStructures();
 
 	// simpleLine().translate(25, 50);
 
 	// testStacatoLegato().translate(25, 50);
 	// testDots().translate(25, 50);
-	testDynamics().translate(25, 50);
+	// testDynamics().translate(25, 50);
 
 	// eighthBeamings().translate(25, 50);
 	// sixteenthBeamings().translate(25, 150);
@@ -457,4 +458,56 @@ function testDynamics () {
 	]);
 
 	return scored.render(line, {voices: [voice], numMeasures: 4});
+}
+
+function testSimpleBeatStructure (timeSig, value, num) {
+	var line = scored.line({}, [scored.clef({value: "treble", measure: 0}),
+								scored.key({value: "C", measure: 0}),
+								timeSig]);
+
+	var n = scored.note;
+
+	var notes = [];
+	for (var i = 0; i < num; i++) {
+		notes.push(n({value: value}));
+	}
+
+	var voice = scored.voice({}, notes);
+
+	return scored.render(line, {voices: [voice], numMeasures: 2});
+}
+
+function testComplexBeatStructure (timeSig, pattern, repeats) {
+	var line = scored.line({}, [scored.clef({value: "treble", measure: 0}),
+								scored.key({value: "C", measure: 0}),
+								timeSig]);
+
+	var n = scored.note;
+
+	var notes = [];
+	for (var i = 0; i < repeats; i++) {
+		_.each(pattern, function (value) {
+			notes.push(n({value: value}));
+		});
+	}
+
+	var voice = scored.voice({}, notes);
+
+	return scored.render(line, {voices: [voice], numMeasures: 2});
+}
+
+function testBeatStructures () {
+	testSimpleBeatStructure(scored.timeSig({value: "4/4", measure: 0}), 8, 8).translate(25, 50);
+	testSimpleBeatStructure(scored.timeSig({value: "c", measure: 0}), 8, 8).translate(25, 150);
+	testSimpleBeatStructure(scored.timeSig({value: "h", measure: 0}), 8, 8).translate(25, 250);
+	testSimpleBeatStructure(scored.timeSig({value: "3/4", measure: 0}), 8, 6).translate(25, 350);
+	testSimpleBeatStructure(scored.timeSig({value: "12/8", measure: 0}), 8, 12).translate(25, 450);
+
+	testSimpleBeatStructure(scored.timeSig({value: "4/4", measure: 0}), 16, 16).translate(400, 50);
+	testSimpleBeatStructure(scored.timeSig({value: "c", measure: 0}), 16, 16).translate(400, 150);
+	testSimpleBeatStructure(scored.timeSig({value: "h", measure: 0}), 16, 16).translate(400, 250);
+	testSimpleBeatStructure(scored.timeSig({value: "3/4", measure: 0}), 16, 16).translate(400, 350);
+	testSimpleBeatStructure(scored.timeSig({value: "12/8", measure: 0}), 16, 24).translate(400, 450);
+
+	// testComplexBeatStructure(scored.timeSig({value: "c", measure: 0}), [16, 8, 16], 4).translate(25, 50);
 }
