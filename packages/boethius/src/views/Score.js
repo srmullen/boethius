@@ -3,10 +3,9 @@ import _ from "lodash";
 import Staff from "./Staff";
 import constants from "../constants";
 import {createMeasures} from "../utils/measure";
-// the following will be uncommented when line 39 fixme is addressed.
-// import {map} from "../utils/common";
-// import {getTimeContexts} from "../utils/line";
-// import {getLineItems} from "../utils/staff";
+import {map, reductions} from "../utils/common";
+import {getTimeContexts} from "../utils/line";
+import {getLineItems} from "../utils/staff";
 
 const TYPE = constants.type.score;
 
@@ -26,7 +25,6 @@ function Score ({measures=1, length}, children=[]) {
     this.lines = types.line || [];
     this.staves = types.staff || [];
     this.length = length;
-    // _.each(this.lines, line => line.children = this.measures);
 }
 
 Score.prototype.type = TYPE;
@@ -38,10 +36,13 @@ Score.render = function (score, {measures, voices=[]}) {
 
     measures = measures || createMeasures(numMeasures, score.timeSigs);
 
-    // FIXME: Score should pass the time contexts to the staves rather than letting each stave figure it out.
     // get the time contexts
-	// const lineItems = getLineItems(score.lines, voices);
-	// const lineTimes = map((line, items) => getTimeContexts(line, measures, items), score.lines, lineItems);
+	const lineItems = getLineItems(score.lines, voices);
+	const lineTimes = map((line, items) => getTimeContexts(line, measures, items), score.lines, lineItems);
+    console.log(lineTimes);
+    // get the start measure for each Staff.
+    const startMeasures = reductions((acc, stave) => acc + stave.measures, score.staves, 0);
+    console.log(startMeasures);
 
     let startMeasure = 0;
     const staffGroups = _.map(score.staves, (staff, i) => {

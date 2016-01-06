@@ -54,14 +54,18 @@ Staff.render = function render (staff, {lines=[], voices=[], measures, length, s
 		// add accidentals to times
 		_.each(times, (time, i) => time.context.accidentals = accidentals[i]);
 	});
-	// const lineTimesToRender = createTimeContexts(lines, measures, voices);
 
 	const measuresToRender = _.slice(measures, startMeasure, endMeasure); // used in render and placement phases
+
+	// Group in order the times on each line
+	const staffTimes = iterateByTime(x => x, lineTimesToRender); // used in renderand placement phases
+	// console.log(staffTimes);
 
 	//////////////////
 	// Render Phase //
 	//////////////////
-	return Staff.renderTimeContexts(staff, lines, measuresToRender, voices, lineTimesToRender, length);
+	// return Staff.renderTimeContexts(staff, lines, measuresToRender, voices, lineTimesToRender, length);
+	return Staff.renderTimeContexts(staff, lines, measuresToRender, voices, staffTimes, length);
 };
 
 /*
@@ -71,8 +75,15 @@ Staff.render = function render (staff, {lines=[], voices=[], measures, length, s
 Staff.renderTimeContexts = function (staff, lines, measures, voices, timeContexts, length) {
 	const staffGroup = staff.render();
 
-	const lineChildren = _.map(timeContexts, (times, i) => {
-		return lines[i].renderItems(times);
+	// const lineChildren = _.map(timeContexts, (times, i) => {
+	// 	return lines[i].renderItems(times);
+	// });
+
+	// returns an array of arrays. The index of each inner array maps the rendered items to the line they need to be added to.
+	const lineChildren = _.map(timeContexts, (timeContext) => {
+		return _.map(timeContext, (lineTimeContext, i) => {
+			if (lineTimeContext) return lines[i].renderTime(lineTimeContext);
+		});
 	});
 
 	const noteHeadWidth = Scored.config.note.head.width;
@@ -84,8 +95,8 @@ Staff.renderTimeContexts = function (staff, lines, measures, voices, timeContext
 	// get the minimum length of the line
 	const minLineLength = _.sum(measureLengths);
 
-	// Group in order the times on each line
-	const staffTimes = iterateByTime(x => x, timeContexts); // used in renderand placement phases
+	// // Group in order the times on each line
+	// const staffTimes = iterateByTime(x => x, timeContexts); // used in renderand placement phases
 
 	let lineGroups, noteScale, cursorFn;
 
@@ -126,7 +137,11 @@ Staff.renderTimeContexts = function (staff, lines, measures, voices, timeContext
 	}
 
 	// add the children to each line.
-	_.each(lineChildren, (children, i) => lineGroups[i].addChildren(children));
+	_.each(lineChildren, (staffItems) => {
+		_.each(staffItems, (lineItems, i) => {
+			if (lineItems) lineGroups[i].addChildren(lineItems)
+		});
+	});
 
 	staffGroup.addChildren(lineGroups);
 
