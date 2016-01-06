@@ -1,6 +1,6 @@
 function run () {
     testTwoLines().translate(25, 50);
-    testThreeLines().translate(600, 50);
+    // testThreeLines().translate(600, 50);
     // testMeasureRendering().translate(25, 400);
 }
 
