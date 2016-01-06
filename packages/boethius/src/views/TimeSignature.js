@@ -13,7 +13,7 @@ const beatStructures = {
 	"9/8": [3, 3, 3],
 	"6/8": [3, 3],
 	"3/8": [3]
-}
+};
 
 function TimeSignature ({value="4/4", measure, beatStructure}) {
 	this.value = value;

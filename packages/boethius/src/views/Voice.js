@@ -6,7 +6,7 @@ import {isNote, isChord} from "../types";
 import {concat, partitionBy, mapDeep, reductions} from "../utils/common";
 import {beam, drawTuplets} from "../engraver";
 import {getAverageStemDirection, slur} from "../utils/note";
-import {calculateDuration, getMeasureNumber, getBeat, parseSignature, calculateTupletDuration, sumDurations} from "../utils/timeUtils";
+import {calculateDuration, getMeasureNumber, parseSignature, calculateTupletDuration, sumDurations} from "../utils/timeUtils";
 import {getCenterLineValue} from "./Clef";
 
 /*
@@ -49,12 +49,11 @@ Voice.findBeaming = function findBeaming (timeSig, items) {
         return [];
     }
 
-    const [numerator, denominator] = parseSignature(timeSig);
+    const [, denominator] = parseSignature(timeSig);
     const groupingDurations = timeSig.beatStructure.map(beats => beats * (1/denominator));
     const baseTime = items[0].time; // the time from which the groupings are reckoned.
     const groupingTimes = _.rest(reductions((acc, el) => acc + el, groupingDurations, baseTime));
     let remainingItems = items;
-    let beatGroup;
     const beatGroups = _.map(groupingTimes, (groupingTime) => {
         const [beatGroup, rem] = _.partition(remainingItems, item => item.time < groupingTime);
         remainingItems = rem;

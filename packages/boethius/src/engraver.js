@@ -625,7 +625,7 @@ function drawDynamic (dynamicValue) {
 		fontSize: Scored.config.fontSize,
 		fillColor: 'black',
 	});
-	return dynamicText
+	return dynamicText;
 }
 
 export {

@@ -49,7 +49,7 @@ Staff.render = function render (staff, {lines=[], voices=[], measures, length, s
 	});
 
 	// calculate the accidentals for each line.
-	_.each(lineTimesToRender, (times, i) => {
+	_.each(lineTimesToRender, (times) => {
 		const accidentals = getAccidentalContexts(times);
 		// add accidentals to times
 		_.each(times, (time, i) => time.context.accidentals = accidentals[i]);
