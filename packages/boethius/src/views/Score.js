@@ -14,7 +14,7 @@ const TYPE = constants.type.score;
  * Class for managing Staves and Lines.
  * Meta data such as title/composer could also be attached here.
  */
-function Score ({measures=1}, children=[]) {
+function Score ({measures=1, length}, children=[]) {
     /*
      * A score should have both staves and lines.
      * A line represents all measures from 0 to the end of the score. It is one-dimentional.
@@ -25,6 +25,7 @@ function Score ({measures=1}, children=[]) {
     this.timeSigs = types.timeSig || [];
     this.lines = types.line || [];
     this.staves = types.staff || [];
+    this.length = length;
     // _.each(this.lines, line => line.children = this.measures);
 }
 
@@ -45,7 +46,7 @@ Score.render = function (score, {measures, voices=[]}) {
     let startMeasure = 0;
     const staffGroups = _.map(score.staves, (staff, i) => {
         const staffGroup = Staff.render(staff, {
-            length: 1000,
+            length: score.length,
             measures,
             voices,
             lines: score.lines,

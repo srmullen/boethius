@@ -42,3 +42,5 @@ TODOS:
     - Better articulation placement
     - Additional articulations/ornaments
     - improved dynamic positioning
+    - Line spacing.
+    - Staff spacing.

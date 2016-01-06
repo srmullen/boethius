@@ -30,7 +30,7 @@ function testDoubleStaffScore () {
     var staff1 = scored.staff({measures: 6});
     var staff2 = scored.staff({measures: 6});
 
-    var score = scored.score({}, [fourfour, staff1, staff2, trebleLine, bassLine]);
+    var score = scored.score({length: 1000}, [fourfour, staff1, staff2, trebleLine, bassLine]);
 
     // render it all as a score.
     return scored.render(score, {voices: [soprano, bass]});
