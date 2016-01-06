@@ -33,23 +33,20 @@ Staff.render = function render (staff, {lines=[], voices=[], measures, length, s
 	/////////////////////////
 	// Time Contexts Phase //
 	/////////////////////////
-	const endMeasure = startMeasure + numMeasures;
-
 	measures = measures || createMeasures(numMeasures, staff.markings);
 
-	// get the time contexts
-	const lineItems = getLineItems(lines, voices);
+	const endMeasure = startMeasure + numMeasures; // only time contexts
 
-	const lineTimes = map((line, items) => getTimeContexts(line, measures, items), lines, lineItems);
+	const lineItems = getLineItems(lines, voices); // only time contexts
+
+	const lineTimes = map((line, items) => getTimeContexts(line, measures, items), lines, lineItems); // only time contexts
 
 	// get the times that are to be rendered on the staff.
-	const lineTimesToRender = _.map(lineTimes, (line) => {
+	const lineTimesToRender = _.map(lineTimes, (line) => { // used in render phase
 		return _.filter(line, (time) => {
 			return time.time.measure >= startMeasure && time.time.measure < endMeasure;
 		});
 	});
-
-	const measuresToRender = _.slice(measures, startMeasure, endMeasure);
 
 	// calculate the accidentals for each line.
 	_.each(lineTimesToRender, (times, i) => {
@@ -57,16 +54,24 @@ Staff.render = function render (staff, {lines=[], voices=[], measures, length, s
 		// add accidentals to times
 		_.each(times, (time, i) => time.context.accidentals = accidentals[i]);
 	});
+	// const lineTimesToRender = createTimeContexts(lines, measures, voices);
 
-	// Group in order the times on each line
-	const staffTimes = iterateByTime(x => x, lineTimesToRender);
+	const measuresToRender = _.slice(measures, startMeasure, endMeasure); // used in render and placement phases
 
 	//////////////////
 	// Render Phase //
 	//////////////////
+	return Staff.renderTimeContexts(staff, lines, measuresToRender, voices, lineTimesToRender, length);
+};
+
+/*
+ * @param staff - Staff
+ * @param timeContexts - array of time contexts
+ */
+Staff.renderTimeContexts = function (staff, lines, measures, voices, timeContexts, length) {
 	const staffGroup = staff.render();
 
-	const lineChildren = _.map(lineTimesToRender, (times, i) => {
+	const lineChildren = _.map(timeContexts, (times, i) => {
 		return lines[i].renderItems(times);
 	});
 
@@ -74,17 +79,20 @@ Staff.render = function render (staff, {lines=[], voices=[], measures, length, s
 	const shortestDuration = 0.125; // need function to calculate this.
 
 	// calculate the minimum measure lengths
-	const measureLengths = calculateMeasureLengths(measuresToRender, lineTimesToRender, noteHeadWidth, shortestDuration);
+	const measureLengths = calculateMeasureLengths(measures, timeContexts, noteHeadWidth, shortestDuration);
 
 	// get the minimum length of the line
 	const minLineLength = _.sum(measureLengths);
+
+	// Group in order the times on each line
+	const staffTimes = iterateByTime(x => x, timeContexts); // used in renderand placement phases
 
 	let lineGroups, noteScale, cursorFn;
 
 	if (!length) {
 		lineGroups = staff.renderLines(lines, minLineLength);
 
-		const measureGroups = staff.renderMeasures(measuresToRender, measureLengths, lineGroups);
+		const measureGroups = staff.renderMeasures(measures, measureLengths, lineGroups);
 
 		staffGroup.addChildren(measureGroups);
 
@@ -108,7 +116,7 @@ Staff.render = function render (staff, {lines=[], voices=[], measures, length, s
 
 		noteScale = (length - totalMarkingLength) / (minLineLength - totalMarkingLength);
 
-		const measureGroups = staff.renderMeasures(measuresToRender, _.map(measureLengths, measureLength => measureLength * measureScale), lineGroups);
+		const measureGroups = staff.renderMeasures(measures, _.map(measureLengths, measureLength => measureLength * measureScale), lineGroups);
 
 		staffGroup.addChildren(measureGroups);
 
@@ -131,20 +139,12 @@ Staff.render = function render (staff, {lines=[], voices=[], measures, length, s
 	placeTimes(staffTimes, measures, lineCenters, cursorFn);
 
 	map((line, lineGroup, lineCenter, voice) => {
-		const children = voice.renderDecorations(line, lineCenter, measuresToRender);
+		const children = voice.renderDecorations(line, lineCenter, measures);
 		lineGroup.addChildren(children);
 		return children;
 	}, lines, lineGroups, lineCenters, voices);
 
 	return staffGroup;
-};
-
-/*
- * @param staff - Staff
- * @param timeContexts - array of time contexts
- */
-Staff.renderTimeContexts = function (staff, timeContexts) {
-
 };
 
 function placeTimes (staffTimes, measures, lineCenters, cursorFn) {
@@ -155,7 +155,7 @@ function placeTimes (staffTimes, measures, lineCenters, cursorFn) {
 		const currentTime = ctxs[lineIndices[0]].time;
 		// update cursor if it's a new measure
 		if (currentTime.measure !== previousTime.measure) {
-			let measure = measures[currentTime.measure];
+			const measure = _.find(measures, measure => measure.value === currentTime.measure);
 			cursor = calculateCursor(measure);
 		}
 
