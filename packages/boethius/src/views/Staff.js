@@ -30,8 +30,9 @@ function Staff ({startMeasure=0, measures=4}, children=[]) {
 }
 
 Staff.render = function render (staff, {lines=[], voices=[], measures, length, startMeasure=0, numMeasures}) {
-	const staffGroup = staff.render();
-
+	/////////////////////////
+	// Time Contexts Phase //
+	/////////////////////////
 	const endMeasure = startMeasure + numMeasures;
 
 	measures = measures || createMeasures(numMeasures, staff.markings);
@@ -51,16 +52,23 @@ Staff.render = function render (staff, {lines=[], voices=[], measures, length, s
 	const measuresToRender = _.slice(measures, startMeasure, endMeasure);
 
 	// calculate the accidentals for each line.
-	const lineChildren = _.map(lineTimesToRender, (times, i) => {
-		let accidentals = getAccidentalContexts(times);
+	_.each(lineTimesToRender, (times, i) => {
+		const accidentals = getAccidentalContexts(times);
 		// add accidentals to times
 		_.each(times, (time, i) => time.context.accidentals = accidentals[i]);
-
-		return lines[i].renderItems(times);
 	});
 
 	// Group in order the times on each line
 	const staffTimes = iterateByTime(x => x, lineTimesToRender);
+
+	//////////////////
+	// Render Phase //
+	//////////////////
+	const staffGroup = staff.render();
+
+	const lineChildren = _.map(lineTimesToRender, (times, i) => {
+		return lines[i].renderItems(times);
+	});
 
 	const noteHeadWidth = Scored.config.note.head.width;
 	const shortestDuration = 0.125; // need function to calculate this.
@@ -116,7 +124,9 @@ Staff.render = function render (staff, {lines=[], voices=[], measures, length, s
 
 	staffGroup.addChild(drawStaffBar(lineGroups));
 
-	// place all items
+	/////////////////////
+	// Placement Phase //
+	/////////////////////
 	const lineCenters = _.map(lineGroups, b);
 	placeTimes(staffTimes, measures, lineCenters, cursorFn);
 
@@ -127,6 +137,14 @@ Staff.render = function render (staff, {lines=[], voices=[], measures, length, s
 	}, lines, lineGroups, lineCenters, voices);
 
 	return staffGroup;
+};
+
+/*
+ * @param staff - Staff
+ * @param timeContexts - array of time contexts
+ */
+Staff.renderTimeContexts = function (staff, timeContexts) {
+
 };
 
 function placeTimes (staffTimes, measures, lineCenters, cursorFn) {
