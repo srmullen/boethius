@@ -1,16 +1,16 @@
 function run () {
     testTwoLines().translate(25, 50);
-    // testThreeLines().translate(600, 50);
-    // testMeasureRendering().translate(25, 400);
+    testThreeLines().translate(600, 50);
+    testMeasureRendering().translate(25, 400);
 }
 
 function testTwoLines () {
     var line1 = scored.line({voices: ["soprano"]}, [scored.clef({value: "treble", measure: 0}),
-                                 scored.key({value: "C", measure: 0}),
+                                 scored.key({value: "c", measure: 0}),
                                  scored.timeSig({value: "4/4", measure: 0})
                              ]);
     var line2 = scored.line({voices: ["bass"]}, [scored.clef({value: "bass", measure: 0}),
-                                 scored.key({value: "C", measure: 0}),
+                                 scored.key({value: "c", measure: 0}),
                                  scored.timeSig({value: "4/4", measure: 0})
                              ]);
 
@@ -19,11 +19,13 @@ function testTwoLines () {
     var n = scored.note;
 
     var voice1 = scored.voice({name: "soprano"}, [
-        n({value: 4, pitch: "c5", slur: "1"}), n({value: 4, pitch: "b4", slur: "1"}), n({value: 8, pitch: "a4"}), n({value: 8, pitch: "g4"}), n({value: 4, pitch: "f4"})
+        n({value: 4, pitch: "c5", slur: "1"}), n({value: 4, pitch: "b4", slur: "1"}), n({value: 8, pitch: "a4"}), n({value: 8, pitch: "g4"}), n({value: 4, pitch: "f4"}),
+        n({value: 4, pitch: "f4"})
     ]);
 
     var voice2 = scored.voice({name: "bass"}, [
-        n({value: 8, pitch: "c3", slur: "2"}), n({value: 8, pitch: "c#3", slur: "2"}), n({value: 4, pitch: "d3"}), n({value: 4, pitch: "e3"})
+        n({value: 8, pitch: "c3", slur: "2"}), n({value: 8, pitch: "c#3", slur: "2"}), n({value: 4, pitch: "d3"}), n({value: 4, pitch: "e3"}), n({value: 4, pitch: "e3"}),
+        n({value: 4, pitch: "e3"})
     ]);
 
     // return scored.render(staff, {length: 500, lines: [line1, line2], voices: [voice1, voice2], numMeasures: 2});
@@ -70,7 +72,7 @@ function testThreeLines () {
 
     ]);
 
-    return scored.render(staff, {lines: [line1, line2, line3], voices: [voice1, voice2, voice3], length: 500, numMeasures: 2});
+    return scored.render(staff, {lines: [line1, line2, line3], voices: [voice1, voice2, voice3], numMeasures: 2});
 }
 
 function testMeasureRendering () {

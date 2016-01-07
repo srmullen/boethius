@@ -263,7 +263,7 @@ function calculateTimeLength (items, shortestDuration) {
 	const getMarkingWidth = (marking) => marking.group.bounds.width + noteHeadWidth;
 	const clefLength = clefs ? _.max(clefs.map(getMarkingWidth)) : 0;
 	const keyLength = keys ? _.max(keys.map(getMarkingWidth)) : 0;
-	const timeSigLength = timeSigs ? _.map(timeSigs.map(getMarkingWidth)) : 0;
+	const timeSigLength = timeSigs ? _.max(timeSigs.map(getMarkingWidth)) : 0;
 	const markingsLength = _.sum([clefLength, keyLength, timeSigLength]);
 	// dynamics should affect measure length. remove them.
 	const voiceItemLengths = _.map(_.reject(voiceItems, isDynamic), item => {

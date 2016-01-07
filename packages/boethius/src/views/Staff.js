@@ -59,12 +59,10 @@ Staff.render = function render (staff, {lines=[], voices=[], measures, length, s
 
 	// Group in order the times on each line
 	const staffTimes = iterateByTime(x => x, lineTimesToRender); // used in renderand placement phases
-	// console.log(staffTimes);
 
 	//////////////////
 	// Render Phase //
 	//////////////////
-	// return Staff.renderTimeContexts(staff, lines, measuresToRender, voices, lineTimesToRender, length);
 	return Staff.renderTimeContexts(staff, lines, measuresToRender, voices, staffTimes, length);
 };
 
@@ -85,11 +83,6 @@ Staff.renderTimeContexts = function (staff, lines, measures, voices, timeContext
 	const noteHeadWidth = Scored.config.note.head.width;
 	const shortestDuration = 0.125; // need function to calculate this.
 
-	// const measureContexts = partitionBy(timeContexts, (lineContexts) => {
-	// 	return _.find(lineContexts, ctx => !!ctx).time.measure
-	// });
-	// console.log(measureContexts);
-
 	// calculate the length of every time
 	// TODO: create a calculateTimeLengths function
 	const timeLengths = _.map(timeContexts, (lineContexts) => {
@@ -101,20 +94,23 @@ Staff.renderTimeContexts = function (staff, lines, measures, voices, timeContext
 			return line ? acc.concat(line.items) : acc;
 		}, []);
 
-		return {time, length: calculateTimeLength(allItems, shortestDuration)};
+		const timeLength = calculateTimeLength(allItems, shortestDuration);
+
+		return {time, length: timeLength};
 	});
 
 	// calculate the minimum measure lengths
+
 	// TODO: Move to calculateMeasureLengths function
 	const measureLengths = _.map(partitionBy(timeLengths, ({time}) => time.measure), (measureTimes) => {
-		return _.sum(measureTimes, ({length}) => _.sum(length));
+		return _.sum(measureTimes, ({length}) => {
+			// sum the marking and duration item lengths
+			return _.sum(length);
+		}) + noteHeadWidth;
 	});
 
 	// get the minimum length of the line
 	const minLineLength = _.sum(measureLengths);
-
-	// // Group in order the times on each line
-	// const staffTimes = iterateByTime(x => x, timeContexts); // used in renderand placement phases
 
 	let lineGroups, noteScale, cursorFn;
 

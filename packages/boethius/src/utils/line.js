@@ -70,7 +70,14 @@ function calculateMeasureLengths (measures, times, noteHeadWidth, shortestDurati
 	});
 
 	let measureLengths = _.map(measures, (measure) => {
-		let measureLength = _.sum(_.map(itemsInMeasure[measure.value], ({items}) => _.sum(calculateTimeLength(items, shortestDuration))));
+		// sum the length of all times in the measure.
+		let measureLength = _.sum(_.map(itemsInMeasure[measure.value], ({items}) => {
+			// calculate the length of each time in the measure and sum the markings and duration items
+			const timeLength = calculateTimeLength(items, shortestDuration);
+			return _.sum(timeLength);
+		}));
+
+		// pad the measure length
 		measureLength += noteHeadWidth;
 		return measureLength;
 	});
