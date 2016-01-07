@@ -5,10 +5,10 @@ import {drawStaffBar} from "../engraver";
 import constants from "../constants";
 import {createMeasures} from "../utils/measure";
 import {getTimeContexts, b, positionMarkings} from "../utils/line";
-import {getLineItems, calculateMeasureLengths, iterateByTime, renderTimeContext} from "../utils/staff";
-import {map, partitionBy} from "../utils/common";
+import {getLineItems, calculateTimeLengths, calculateMeasureLengths, iterateByTime, renderTimeContext} from "../utils/staff";
+import {map} from "../utils/common";
 import {getAccidentalContexts} from "../utils/accidental";
-import {calculateCursor, calculateTimeLength, scaleCursor} from "../utils/placement";
+import {calculateCursor, scaleCursor} from "../utils/placement";
 
 const TYPE = constants.type.staff;
 
@@ -80,34 +80,11 @@ Staff.renderTimeContexts = function (staff, lines, measures, voices, timeContext
 		});
 	});
 
-	const noteHeadWidth = Scored.config.note.head.width;
 	const shortestDuration = 0.125; // need function to calculate this.
 
-	// calculate the length of every time
-	// TODO: create a calculateTimeLengths function
-	const timeLengths = _.map(timeContexts, (lineContexts) => {
-		// get the time
-		const time = _.find(lineContexts, ctx => !!ctx).time;
+	const timeLengths = calculateTimeLengths(timeContexts, shortestDuration);
 
-		// get all items at the time
-		const allItems = lineContexts.reduce((acc, line) => {
-			return line ? acc.concat(line.items) : acc;
-		}, []);
-
-		const timeLength = calculateTimeLength(allItems, shortestDuration);
-
-		return {time, length: timeLength};
-	});
-
-	// calculate the minimum measure lengths
-
-	// TODO: Move to calculateMeasureLengths function
-	const measureLengths = _.map(partitionBy(timeLengths, ({time}) => time.measure), (measureTimes) => {
-		return _.sum(measureTimes, ({length}) => {
-			// sum the marking and duration item lengths
-			return _.sum(length);
-		}) + noteHeadWidth;
-	});
+	const measureLengths = calculateMeasureLengths(timeLengths);
 
 	// get the minimum length of the line
 	const minLineLength = _.sum(measureLengths);
@@ -146,7 +123,7 @@ Staff.renderTimeContexts = function (staff, lines, measures, voices, timeContext
 	// add the children to each line.
 	_.each(lineChildren, (staffItems) => {
 		_.each(staffItems, (lineItems, i) => {
-			if (lineItems) lineGroups[i].addChildren(lineItems)
+			if (lineItems) lineGroups[i].addChildren(lineItems);
 		});
 	});
 

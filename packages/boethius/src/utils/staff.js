@@ -1,7 +1,7 @@
 import _ from "lodash";
 
+import {partitionBy} from "./common";
 import * as placement from "./placement";
-import * as line from "./line";
 import {isNote} from "../types";
 
 /*
@@ -34,13 +34,39 @@ function getLineItems (lines, voices) {
     return lineItems;
 }
 
-function calculateMeasureLengths (measures, times, noteHeadWidth, shortestDuration) {
-    const lineMeasureLengths = times.map(lineTimes => line.calculateMeasureLengths(measures, lineTimes, noteHeadWidth, shortestDuration));
-    const measureLengths = new Array(measures.length);
-    for (let i = 0; i < measures.length; i++) {
-        measureLengths[i] = _.max(_.map(lineMeasureLengths, lineMeasureLength => lineMeasureLength[i]));
-    }
-    return measureLengths;
+/*
+ * @param timeContexts - array of lineContexts.
+ * @param shortestDuration - float representation of shortest duration in the measure.
+ * @return {time: Time, [markingLength, durationedLength]}
+ */
+function calculateTimeLengths (timeContexts, shortestDuration) {
+    return _.map(timeContexts, (lineContexts) => {
+		// get the time
+		const time = _.find(lineContexts, ctx => !!ctx).time;
+
+		// get all items at the time
+		const allItems = lineContexts.reduce((acc, line) => {
+			return line ? acc.concat(line.items) : acc;
+		}, []);
+
+		const timeLength = placement.calculateTimeLength(allItems, shortestDuration);
+
+		return {time, length: timeLength};
+	});
+}
+
+/*
+ * @param timeLengths - {time, length[]}[]
+ * @return length[]
+ */
+function calculateMeasureLengths (timeLengths) {
+    const noteHeadWidth = Scored.config.note.head.width;
+    return _.map(partitionBy(timeLengths, ({time}) => time.measure), (measureTimes) => {
+		return _.sum(measureTimes, ({length}) => {
+			// sum the marking and duration item lengths
+			return _.sum(length);
+		}) + noteHeadWidth;
+	});
 }
 
 /*
@@ -157,6 +183,7 @@ function renderTimeContext (lineCenter, cursor, {items, context}) {
 export {
     groupVoices,
     getLineItems,
+    calculateTimeLengths,
     calculateMeasureLengths,
     nextTimes,
     iterateByTime,
