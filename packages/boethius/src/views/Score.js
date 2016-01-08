@@ -5,7 +5,8 @@ import constants from "../constants";
 import {createMeasures} from "../utils/measure";
 import {map, reductions} from "../utils/common";
 import {getTimeContexts} from "../utils/line";
-import {getLineItems} from "../utils/staff";
+import {getLineItems, iterateByTime} from "../utils/staff";
+import {getAccidentalContexts} from "../utils/accidental";
 
 const TYPE = constants.type.score;
 
@@ -39,21 +40,40 @@ Score.render = function (score, {measures, voices=[]}) {
     // get the time contexts
 	const lineItems = getLineItems(score.lines, voices);
 	const lineTimes = map((line, items) => getTimeContexts(line, measures, items), score.lines, lineItems);
-    console.log(lineTimes);
+
+    // calculate the accidentals for each line.
+	_.each(lineTimes, (times) => {
+		const accidentals = getAccidentalContexts(times);
+		// add accidentals to times
+		_.each(times, (time, i) => time.context.accidentals = accidentals[i]);
+	});
+
+    const timeContexts = iterateByTime(x => x, lineTimes);
+
     // get the start measure for each Staff.
     const startMeasures = reductions((acc, stave) => acc + stave.measures, score.staves, 0);
-    console.log(startMeasures);
+
+    // split staffTimes and measures
+    let staffIdx = 0;
+    const staffTimeContexts = [[]];
+    for (let i = 0; i < timeContexts.length; i++) {
+        const timeContext = timeContexts[i];
+        const measure = _.find(timeContext, ctx => !!ctx).time.measure;
+        if (measure < startMeasures[staffIdx + 1]) {
+            // staffTimeContexts[staffIdx].push(timeContext);
+            _.last(staffTimeContexts).push(timeContext);
+        } else {
+            staffIdx++;
+            staffTimeContexts.push([timeContext]);
+        }
+    }
 
     let startMeasure = 0;
     const staffGroups = _.map(score.staves, (staff, i) => {
-        const staffGroup = Staff.render(staff, {
-            length: score.length,
-            measures,
-            voices,
-            lines: score.lines,
-            startMeasure,
-            numMeasures: staff.measures
-        });
+        const endMeasure = startMeasure + staff.measures;
+        const staffMeasures = _.slice(measures, startMeasure, endMeasure);
+
+        const staffGroup = Staff.renderTimeContexts(staff, score.lines, staffMeasures, voices, staffTimeContexts[i], score.length);
         staffGroup.translate(0, i * 250);
 
         startMeasure += staff.measures;
