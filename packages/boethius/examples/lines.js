@@ -1,7 +1,7 @@
 var line;
 function run () {
 	// testMarkings();
-	testBeatStructures();
+	// testBeatStructures();
 
 	// simpleLine().translate(25, 50);
 
@@ -24,7 +24,7 @@ function run () {
 	// testTripletsTwoVoices().translate(25, 350);
 
 	// testMeasureRendering().translate(25, 50);
-	// testSlurs().translate(25, 50);
+	testSlurs().translate(25, 50);
 }
 
 function testClefKeyTimeSig (clefValue, keyValue, timeSigValue) {

@@ -139,7 +139,9 @@ Staff.renderTimeContexts = function (staff, lines, measures, voices, timeContext
 
 	map((line, lineGroup, lineCenter, voice) => {
 		const children = voice.renderDecorations(line, lineCenter, measures);
+		const slurGroups = voice.renderSlurs();
 		lineGroup.addChildren(children);
+		lineGroup.addChildren(slurGroups);
 		return children;
 	}, lines, lineGroups, lineCenters, voices);
 

@@ -183,19 +183,17 @@ Voice.prototype.renderDecorations = function (line, centerLine, measures) {
         }
     });
 
-    // slurs
-    const slurred = Voice.groupSlurs(this.children);
-    const slurs = _.map(slurred, slur);
-    if (slurs && slurs.length) {
-        lineChildren = lineChildren.concat(slurs);
-    }
-
     // articulations
     _.each(this.children, (child) => {
         if (child.drawArticulations) child.drawArticulations();
     });
 
     return lineChildren;
+};
+
+Voice.prototype.renderSlurs = function () {
+    const slurred = Voice.groupSlurs(this.children);
+    return _.map(slurred, slur);
 };
 
 /*

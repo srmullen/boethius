@@ -24,6 +24,8 @@ TODOS:
     - Finish tuplet rendering
     - Voices crossing lines.
     - placement.commonShortestDuration implementation.
+    - Line spacing.
+    - Staff spacing.
 
     # Lower priority
     - SMuFL
@@ -41,5 +43,3 @@ TODOS:
     - Better articulation placement
     - Additional articulations/ornaments
     - improved dynamic positioning
-    - Line spacing.
-    - Staff spacing.

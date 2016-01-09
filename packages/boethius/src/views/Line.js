@@ -128,6 +128,8 @@ Line.render = function (line, {length, measures, voices=[], startMeasure=0, numM
 	_.each(voices, voice => {
 		const children = voice.renderDecorations(line, b, measuresToRender);
 		lineGroup.addChildren(children);
+		const slurGroups = voice.renderSlurs();
+		lineGroup.addChildren(slurGroups);
 	});
 
 	return lineGroup;
