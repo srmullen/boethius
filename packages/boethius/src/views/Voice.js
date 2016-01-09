@@ -27,8 +27,10 @@ function calculateAndSetTimes (items, offset=0) {
     }, []);
 }
 
-function Voice ({value, stemDirection}, children=[]) {
+function Voice ({value, name, stemDirection}, children=[]) {
     this.value = value;
+
+    this.name = name;
 
     this.children = calculateAndSetTimes(children);
 
@@ -140,8 +142,8 @@ function getAllStemDirections (beamings, centerLineValue) {
  */
 Voice.prototype.renderDecorations = function (line, centerLine, measures) {
     // group children by measures
-    let itemsByMeasure = _.groupBy(this.children, child => getMeasureNumber(measures, child.time)),
-        stemDirection = this.stemDirection;
+    const itemsByMeasure = _.groupBy(this.children, child => getMeasureNumber(measures, child.time));
+    const stemDirection = this.stemDirection;
 
     _.map(measures, (measure) => {
         const items = itemsByMeasure[measure.value];

@@ -2,6 +2,7 @@ function run () {
     testTwoLines().translate(25, 50);
     testThreeLines().translate(600, 50);
     testMeasureRendering().translate(25, 400);
+    // testLineSwitching().translate(25, 50);
 }
 
 function testTwoLines () {
@@ -76,21 +77,21 @@ function testThreeLines () {
 }
 
 function testMeasureRendering () {
-    var treble = scored.line({}, [scored.clef({value: "treble", measure: 0}),
+    var treble = scored.line({voices: ["treble"]}, [scored.clef({value: "treble", measure: 0}),
 								scored.key({value: "C", measure: 0}),
 								scored.timeSig({value: "4/4", measure: 0})]);
-    var bass = scored.line({}, [scored.clef({value: "bass", measure: 0}),
+    var bass = scored.line({voices: ["bass"]}, [scored.clef({value: "bass", measure: 0}),
 								scored.key({value: "C", measure: 0}),
 								scored.timeSig({value: "4/4", measure: 0})]);
 	var n = scored.note;
 
-	var voice1 = scored.voice({}, [
+	var voice1 = scored.voice({name: "treble"}, [
 		n({value:1, pitch: "c4"}), n({value:1, pitch: "d4"}), n({value:1, pitch: "e4"}), n({value:1, pitch: "f4"}),
 		n({value:1, pitch: "g4"}), n({value:1, pitch: "a4"}), n({value:1, pitch: "b4"}), n({value:1, pitch: "c5"}),
 		n({value:1, pitch: "d5"}), n({value:1, pitch: "e5"}), n({value:1, pitch: "f5"}), n({value:1, pitch: "g5"})
 	]);
 
-    var voice2 = scored.voice({}, [
+    var voice2 = scored.voice({name: "bass"}, [
 		n({value:1, pitch: "c4"}), n({value:1, pitch: "b3"}), n({value:1, pitch: "a3"}), n({value:1, pitch: "g3"}),
 		n({value:1, pitch: "f3"}), n({value:1, pitch: "e3"}), n({value:1, pitch: "d3"}), n({value:1, pitch: "c3"}),
 		n({value:1, pitch: "b2"}), n({value:1, pitch: "a2"}), n({value:1, pitch: "g2"}), n({value:1, pitch: "f2"})
@@ -99,4 +100,35 @@ function testMeasureRendering () {
     var staff = scored.staff({}, [scored.timeSig({value: "4/4", measure: 0})]);
 	var measures = Scored.utils.measure.createMeasures(12, staff.markings);
 	return scored.render(staff, {length: 1000, lines: [treble, bass], voices: [voice1, voice2], measures: measures, startMeasure: 0, numMeasures: 12});
+}
+
+function testLineSwitching () {
+    var treble = scored.line({voices: ["soprano", "alto"]}, [scored.clef({value: "treble", measure: 0}),
+								scored.key({value: "C", measure: 0}),
+								scored.timeSig({value: "4/4", measure: 0})]);
+    var bass = scored.line({voices: ["bass"]}, [scored.clef({value: "bass", measure: 0}),
+								scored.key({value: "C", measure: 0}),
+								scored.timeSig({value: "4/4", measure: 0})]);
+	var n = scored.note;
+
+	var voice1 = scored.voice({name: "soprano"}, [
+		n({pitch: "c5"}), n({pitch: "d5"}), n({pitch: "e5"}), n({pitch: "f5"}),
+		n({pitch: "g5"}), n({pitch: "a5"}), n({pitch: "b5"}), n({pitch: "c6"}),
+		n({pitch: "d6"}), n({pitch: "e6"}), n({pitch: "f6"}), n({pitch: "g6"})
+	]);
+
+    var voice2 = scored.voice({name: "alto"}, [
+		n({pitch: "c5"}), n({pitch: "b4"}), n({pitch: "a4"}), n({pitch: "g4"}),
+		n({pitch: "f4"}), n({pitch: "e4"}), n({pitch: "d4"}), n({pitch: "c4"}),
+		n({pitch: "b3"}), n({pitch: "a3"}), n({pitch: "g3"}), n({pitch: "f3"})
+	]);
+
+    var voice3 = scored.voice({name: "bass"}, [
+        n({pitch: "c4"}), n({pitch: "b3"}), n({pitch: "a3"}), n({pitch: "g3"}),
+		n({pitch: "f3"}), n({pitch: "e3"}), n({pitch: "d3"}), n({pitch: "c3"}),
+		n({pitch: "b2"}), n({pitch: "a2"}), n({pitch: "g2"}), n({pitch: "f2"})
+    ]);
+
+    var staff = scored.staff({}, [scored.timeSig({value: "4/4", measure: 0})]);
+	return scored.render(staff, {lines: [treble, bass], voices: [voice1, voice2, voice3], numMeasures: 4});
 }

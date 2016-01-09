@@ -135,7 +135,6 @@ Staff.renderTimeContexts = function (staff, lines, measures, voices, timeContext
 	// Placement Phase //
 	/////////////////////
 	const lineCenters = _.map(lineGroups, b);
-	// placeTimes(staffTimes, measures, lineCenters, cursorFn);
 	placeTimes(timeContexts, measures, lineCenters, cursorFn);
 
 	map((line, lineGroup, lineCenter, voice) => {
