@@ -9,10 +9,10 @@ function run () {
 	// testDots().translate(25, 50);
 	// testDynamics().translate(25, 50);
 
-	// eighthBeamings().translate(25, 50);
-	// sixteenthBeamings().translate(25, 150);
-	// testAccidentals("c").translate(25, 250);
-	// testTimeSigs().translate(25, 350);
+	eighthBeamings().translate(25, 50);
+	sixteenthBeamings().translate(25, 150);
+	testAccidentals("c").translate(25, 250);
+	testTimeSigs().translate(25, 350);
 
 	// testChords().translate(25, 50);
 	// testChordsTwoVoices().translate(25, 150);
@@ -24,7 +24,7 @@ function run () {
 	// testTripletsTwoVoices().translate(25, 350);
 
 	// testMeasureRendering().translate(25, 50);
-	testSlurs().translate(25, 50);
+	// testSlurs().translate(25, 50);
 }
 
 function testClefKeyTimeSig (clefValue, keyValue, timeSigValue) {
@@ -88,6 +88,7 @@ function renderingNotesOnLine () {
 
 function simpleLine () {
 	var trebleLine = scored.line({}, [scored.clef({measure: 0}),
+									  scored.key({measure: 0}),
 									  scored.timeSig({value: "4/4", measure: 0})
 								  ]);
 	var voice = scored.voice({}, [scored.note({pitch: "a4", value: 4}), scored.note({pitch: "a4", value: 4}),
@@ -231,7 +232,7 @@ function testTimeSigs () {
 		n({pitch: "c#4", value: 4}), n({pitch: "c4", value: 4}), n({pitch: "c4", value: 4}), n({pitch: "c4", value: 4}),
 		n({pitch: "e4", value: 4}), n({pitch: "c4", value: 4}), n({pitch: "c4", value: 4}), n({pitch: "c4", value: 4}),
 
-		scored.rest({value: 4})
+		scored.rest({value: 4}), scored.rest({value: 4}), scored.rest({value: 4})
 	]);
 
 	return scored.render(line, {voices: [voice], numMeasures: 7});

@@ -49,6 +49,14 @@ describe("Voice", () => {
                 [notes[0], notes[1], notes[2], notes[3]], [notes[4], notes[5], notes[6], notes[7]]
             ]);
         });
+
+        it("should split notes that don't need a flag even if the fit into a beat group", () => {
+            const notes = [n({pitch: "g4", value: 4, tuplet: "3/2"}), n({pitch: "a4", value: 4, tuplet: "3/2"}), n({pitch: "b4", value: 4, tuplet: "3/2"})];
+            const voice = scored.voice({}, notes);
+            expect(findBeaming(fourfour, voice.children)).to.eql([
+                [notes[0]], [notes[1]], [notes[2]]
+            ]);
+        });
     });
 
     describe("groupTuplets", () => {

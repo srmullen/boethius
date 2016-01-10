@@ -25,6 +25,7 @@ const isStaff = _.partial(isType, constants.type.staff);
 const isTimeSignature = _.partial(isType, constants.type.timeSig);
 const isVoice = _.partial(isType, constants.type.voice);
 const isMarking = item => isClef(item) || isKey(item) || isTimeSignature(item);
+const isPitched = item => isNote(item) || isChord(item);
 
 export {
     isChord,
@@ -39,5 +40,6 @@ export {
     isStaff,
     isTimeSignature,
     isVoice,
-    isMarking
+    isMarking,
+    isPitched
 };

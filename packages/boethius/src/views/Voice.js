@@ -2,7 +2,7 @@ import _ from "lodash";
 import F from "fraction.js";
 
 import constants from "../constants";
-import {isNote, isChord} from "../types";
+import {isPitched} from "../types";
 import {concat, partitionBy, mapDeep, reductions} from "../utils/common";
 import {beam, drawTuplets} from "../engraver";
 import {getAverageStemDirection, slur} from "../utils/note";
@@ -40,6 +40,22 @@ function Voice ({value, name, stemDirection}, children=[]) {
 Voice.prototype.type = constants.type.voice;
 
 /*
+ * @param items - Array of items to be grouped
+ * @param groupingTime - the time the grouping should end at.
+ * @return [beaming, remainingItems]
+ */
+function nextBeaming (items, groupingTime) {
+    const item = _.first(items);
+    if (!isPitched(item)) {
+        return [null, _.rest(items)];
+    } else if (items[0].value <= 4) { // and item doesn't get beamed if it is a quarter note or greater.
+        return [[_.first(items)], _.rest(items)];
+    } else {
+        return _.partition(items, item => item.time < groupingTime);
+    }
+}
+
+/*
  * Notes must have time properties for this function to work.
  * Should this function just calculate their times from the first note instead?
  * @param timeSig - TimeSignature
@@ -55,16 +71,18 @@ Voice.findBeaming = function findBeaming (timeSig, items) {
     const groupingDurations = timeSig.beatStructure.map(beats => beats * (1/denominator));
     const baseTime = items[0].time; // the time from which the groupings are reckoned.
     const groupingTimes = _.rest(reductions((acc, el) => acc + el, groupingDurations, baseTime));
-    let remainingItems = items;
-    const beatGroups = _.map(groupingTimes, (groupingTime) => {
-        const [beatGroup, rem] = _.partition(remainingItems, item => item.time < groupingTime);
-        remainingItems = rem;
-        return beatGroup;
-    });
 
-    return _.reject(_.map(beatGroups, beatGroup => {
-        return _.filter(beatGroup, item => isNote(item) || isChord(item));
-    }), _.isEmpty);
+    const beamings = [];
+    let groupingTimeIndex = 0;
+    let [beaming, remainingItems] = nextBeaming(items, groupingTimes[groupingTimeIndex]);
+    beamings.push(beaming);
+    while (remainingItems.length) {
+        if (remainingItems[0].time >= groupingTimes[groupingTimeIndex]) groupingTimeIndex++;
+        [beaming, remainingItems] = nextBeaming(remainingItems, groupingTimes[groupingTimeIndex]);
+        if (beaming) beamings.push(beaming);
+    }
+
+    return _.reject(beamings, _.isEmpty);
 };
 
 /*
@@ -147,7 +165,7 @@ Voice.prototype.renderDecorations = function (line, centerLine, measures) {
 
     _.map(measures, (measure) => {
         const items = itemsByMeasure[measure.value];
-        const pitched = _.filter(items, item => isNote(item) || isChord(item));
+        const pitched = _.filter(items, isPitched);
         pitched.map(note => note.drawLegerLines(centerLine, Scored.config.lineSpacing));
     });
 
@@ -189,6 +207,10 @@ Voice.prototype.renderDecorations = function (line, centerLine, measures) {
     });
 
     return lineChildren;
+};
+
+Voice.prototype.renderTuplets = function () {
+
 };
 
 Voice.prototype.renderSlurs = function () {
