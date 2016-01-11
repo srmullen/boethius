@@ -133,7 +133,7 @@ Voice.groupSlurs = function (items) {
  * @param notes <Note, Chord>[]
  * @param stemDirections - optional String specifying the direction of all note stems.
  */
-function stemAndBeam (centerLineValue, items, stemDirections) {
+Voice.stemAndBeam = function stemAndBeam (centerLineValue, items, stemDirections) {
 	if (items.length === 1) {
 		items[0].renderStem(centerLineValue, stemDirections[0]);
 	} else {
@@ -146,7 +146,7 @@ function stemAndBeam (centerLineValue, items, stemDirections) {
  * @param centerLineValue - String
  * @return String[] - stem direction of every note.
  */
-function getAllStemDirections (beamings, centerLineValue) {
+Voice.getAllStemDirections = function getAllStemDirections (beamings, centerLineValue) {
     return _.reduce(beamings, (acc, beaming) => {
         return acc.concat(getAverageStemDirection(beaming, centerLineValue));
     }, []);
@@ -163,42 +163,30 @@ Voice.prototype.renderDecorations = function (line, centerLine, measures) {
     const itemsByMeasure = _.groupBy(this.children, child => getMeasureNumber(measures, child.time));
     const stemDirection = this.stemDirection;
 
-    _.map(measures, (measure) => {
-        const items = itemsByMeasure[measure.value];
-        const pitched = _.filter(items, isPitched);
-        pitched.map(note => note.drawLegerLines(centerLine, Scored.config.lineSpacing));
-    });
-
     let lineChildren = []; // array of groups to be added to the line group
 
     _.map(measures, (measure) => {
-        const items = itemsByMeasure[measure.value];
+        // const items = itemsByMeasure[measure.value];
 
         // Nothing to do if there are no items in the measure.
-        if (!items) return;
+        // if (!items) return;
 
-        const context = line.contextAt(measures, {measure: measure.value});
-        let centerLineValue = getCenterLineValue(context.clef);
+        // const context = line.contextAt(measures, {measure: measure.value});
+        // let centerLineValue = getCenterLineValue(context.clef);
         // TODO: Should only iterate once for all grouping types. (beams, tuplets, etc.)
 
         // beams
-        let beamings = Voice.findBeaming(context.timeSig, items);
+        // let beamings = Voice.findBeaming(context.timeSig, items);
 
         // get all the stemDirections
-        let stemDirections = this.stemDirection ? _.fill(new Array(items.length), stemDirection) : getAllStemDirections(beamings, centerLineValue);
+        // let stemDirections = this.stemDirection ? _.fill(new Array(items.length), stemDirection) : getAllStemDirections(beamings, centerLineValue);
 
-        let beams = _.compact(mapDeep(_.partial(stemAndBeam, centerLineValue), beamings, stemDirections));
+        // let beams = _.compact(mapDeep(_.partial(stemAndBeam, centerLineValue), beamings, stemDirections));
 
-        if (beams && beams.length) {
-            lineChildren = lineChildren.concat(beams);
-        }
+        // if (beams && beams.length) {
+        //     lineChildren = lineChildren.concat(beams);
+        // }
 
-        // tuplets
-        let tuplets = Voice.groupTuplets(items);
-        let tupletGroups = tuplets.map(tuplet => drawTuplets(tuplet, centerLine, this.stemDirection));
-        if (tupletGroups && tupletGroups.length) {
-            lineChildren = lineChildren.concat(tupletGroups);
-        }
     });
 
     // articulations
@@ -209,8 +197,9 @@ Voice.prototype.renderDecorations = function (line, centerLine, measures) {
     return lineChildren;
 };
 
-Voice.prototype.renderTuplets = function () {
-
+Voice.prototype.renderTuplets = function (items, centerLine) {
+    let tuplets = Voice.groupTuplets(items);
+    return tuplets.map(tuplet => drawTuplets(tuplet, centerLine, this.stemDirection));
 };
 
 Voice.prototype.renderSlurs = function () {

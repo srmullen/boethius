@@ -43,3 +43,4 @@ TODOS:
     - Better articulation placement
     - Additional articulations/ornaments
     - improved dynamic positioning
+    - Ability to turn features on/off for performance reasons.

@@ -1,6 +1,6 @@
 import _ from "lodash";
 
-import {isMarking} from "../types";
+import {isMarking, isPitched} from "../types";
 import {drawStaffBar} from "../engraver";
 import constants from "../constants";
 import {createMeasures} from "../utils/measure";
@@ -9,6 +9,7 @@ import {getLineItems, calculateTimeLengths, calculateMeasureLengths, iterateByTi
 import {map} from "../utils/common";
 import {getAccidentalContexts} from "../utils/accidental";
 import {calculateCursor, scaleCursor} from "../utils/placement";
+import {getMeasureNumber} from "../utils/timeUtils";
 
 const TYPE = constants.type.staff;
 
@@ -139,14 +140,29 @@ Staff.renderTimeContexts = function (staff, lines, measures, voices, timeContext
 
 	map((line, lineGroup, lineCenter, voice) => {
 		const children = voice.renderDecorations(line, lineCenter, measures);
-		const slurGroups = voice.renderSlurs();
 		lineGroup.addChildren(children);
+
+		const itemsByMeasure = _.groupBy(voice.children, child => getMeasureNumber(measures, child.time));
+		_.each(measures, (measure) => {
+			const items = itemsByMeasure[measure.value] || [];
+			renderLegerLines(items, lineCenter);
+			const tupletGroups = voice.renderTuplets(items, b);
+			lineGroup.addChildren(tupletGroups);
+		});
+
+		const slurGroups = voice.renderSlurs();
 		lineGroup.addChildren(slurGroups);
+
 		return children;
 	}, lines, lineGroups, lineCenters, voices);
 
 	return staffGroup;
 };
+
+function renderLegerLines (items, centerLine) {
+	const pitched = _.filter(items, isPitched);
+    pitched.map(note => note.drawLegerLines(centerLine, Scored.config.lineSpacing));
+}
 
 function placeTimes (staffTimes, measures, lineCenters, cursorFn) {
 	_.reduce(staffTimes, (cursor, ctxs, i) => {

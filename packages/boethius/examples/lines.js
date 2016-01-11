@@ -9,14 +9,14 @@ function run () {
 	// testDots().translate(25, 50);
 	// testDynamics().translate(25, 50);
 
-	eighthBeamings().translate(25, 50);
-	sixteenthBeamings().translate(25, 150);
-	testAccidentals("c").translate(25, 250);
-	testTimeSigs().translate(25, 350);
+	// eighthBeamings().translate(25, 50);
+	// sixteenthBeamings().translate(25, 150);
+	// testAccidentals("c").translate(25, 250);
+	// testTimeSigs().translate(25, 350);
 
-	// testChords().translate(25, 50);
-	// testChordsTwoVoices().translate(25, 150);
-	// testTriplets().translate(25, 250);
+	testChords().translate(25, 50);
+	testChordsTwoVoices().translate(25, 150);
+	testTriplets().translate(25, 250);
 
 	// renderingNotesOnLine().translate(25, 50);
 	// oneVoice().translate(25, 150);

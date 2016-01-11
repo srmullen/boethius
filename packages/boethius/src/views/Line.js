@@ -1,12 +1,16 @@
 import constants from "../constants";
+import {mapDeep} from "../utils/common";
 import {drawLine} from "../engraver";
+import {getMeasureNumber} from "../utils/timeUtils";
 import {createMeasures} from "../utils/measure";
 import * as placement from "../utils/placement";
 import * as lineUtils from "../utils/line";
 import {getAccidentalContexts} from "../utils/accidental";
-import {isNote, isChord} from "../types";
+import {isNote, isChord, isPitched} from "../types";
 import Note from "./Note";
 import Chord from "./Chord";
+import Voice from "./Voice";
+import {getCenterLineValue} from "./Clef";
 import _ from "lodash";
 
 const TYPE = constants.type.line;
@@ -126,14 +130,42 @@ Line.render = function (line, {length, measures, voices=[], startMeasure=0, numM
 	placeTimes(timesToRender, measures, b, cursorFn);
 
 	_.each(voices, voice => {
+		const itemsByMeasure = _.groupBy(voice.children, child => getMeasureNumber(measuresToRender, child.time));
 		const children = voice.renderDecorations(line, b, measuresToRender);
 		lineGroup.addChildren(children);
+		_.each(measuresToRender, (measure) => {
+			const items = itemsByMeasure[measure.value] || [];
+
+			// Nothing to do if there are no items in the measure.
+	        if (!items) return;
+
+			// stems and beams
+			const context = line.contextAt(measuresToRender, {measure: measure.value});
+	        const centerLineValue = getCenterLineValue(context.clef);
+			const beamings = Voice.findBeaming(context.timeSig, items);
+			const stemDirections = voice.stemDirection ?
+				_.fill(new Array(items.length), voice.stemDirection) :
+				Voice.getAllStemDirections(beamings, centerLineValue);
+			const beams = _.compact(mapDeep(_.partial(Voice.stemAndBeam, centerLineValue), beamings, stemDirections));
+			lineGroup.addChildren(beams);
+
+			renderLegerLines(items, b);
+
+			const tupletGroups = voice.renderTuplets(items, b);
+			lineGroup.addChildren(tupletGroups);
+		});
 		const slurGroups = voice.renderSlurs();
 		lineGroup.addChildren(slurGroups);
+
 	});
 
 	return lineGroup;
 };
+
+function renderLegerLines (items, centerLine) {
+	const pitched = _.filter(items, isPitched);
+    pitched.map(note => note.drawLegerLines(centerLine, Scored.config.lineSpacing));
+}
 
 /*
  * @param timesToRender times[] - Array of time contexts to place on the line.
@@ -152,8 +184,6 @@ function placeTimes (timesToRender, measures, b, cursorFn) {
 		cursor = lineUtils.positionMarkings(b, cursor, ctx);
 
 		// renderTimeContext returns the next cursor position.
-		// return placement.scaleCursor(noteScale, cursor, lineUtils.renderTimeContext(b, cursor, ctx));
-		// return lineUtils.renderTimeContext(b, cursor, ctx);
 		return cursorFn(b, cursor, ctx);
 	}, Scored.config.note.head.width);
 }
