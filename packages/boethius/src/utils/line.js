@@ -46,6 +46,24 @@ function getMeasure (line) {
 
 /*
  * @param line - Line
+ * @param voices - Voice[]
+ * @return
+ */
+function getLineItems (line, voices) {
+    return _.reduce(line.voices, (acc, voiceConfig) => {
+        if (_.isString(voiceConfig)) {
+            const voice = _.find(voices, voice => voice.name === voiceConfig);
+            return acc.concat(voice.children);
+        } else if (_.isObject(voiceConfig)) {
+            // TODO: get the time frame from the voice
+        } else {
+            return acc;
+        }
+    }, []);
+}
+
+/*
+ * @param line - Line
  * @param measures - Measure[]
  * @param voices - Item[]
  * @return [...{time, items, context}] Array ordered by time
@@ -173,6 +191,7 @@ export {
 	e,
 	getClosestLine,
 	getMeasure,
+	getLineItems,
 	getTimeContexts,
 	calculateMeasureLengths,
 	renderTimeContext,

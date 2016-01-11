@@ -1,14 +1,14 @@
 import {expect} from "chai";
 import Staff from "../src/views/Staff";
-import {getLineItems} from "../src/utils/staff";
+import {getStaffItems} from "../src/utils/staff";
 import Scored from "../src/Scored";
 
 describe("Staff", () => {
     const scored = new Scored();
-    describe("getLineItems", () => {
+    describe("getStaffItems", () => {
         xit("should map one voice to one line", () => {
             let n1 = scored.note();
-            expect(getLineItems([scored.line()], [scored.voice({}, [n1])])).to.eql([[n1]]);
+            expect(getStaffItems([scored.line()], [scored.voice({}, [n1])])).to.eql([[n1]]);
         });
 
         it("should map line.voices strings to voice names", () => {
@@ -20,12 +20,12 @@ describe("Staff", () => {
             let l2 = scored.line({voices: ["voice2"]});
             let l3 = scored.line({voices: ["voice1", "voice2"]});
 
-            expect(getLineItems([l1, l2], [v1, v2])).to.eql([
+            expect(getStaffItems([l1, l2], [v1, v2])).to.eql([
                 [n1],
                 [n2]
             ]);
 
-            expect(getLineItems([l3], [v1, v2])).to.eql([
+            expect(getStaffItems([l3], [v1, v2])).to.eql([
                 [n1, n2]
             ]);
         });

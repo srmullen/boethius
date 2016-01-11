@@ -10,7 +10,7 @@ import {isNote} from "../types";
  * @param voices- Voice[]
  * @return Items[][]
  */
-function getLineItems (lines, voices) {
+function getStaffItems (lines, voices) {
     return _.map(lines, (line) => {
         return _.reduce(line.voices, (acc, voiceConfig) => {
             if (_.isString(voiceConfig)) {
@@ -172,7 +172,7 @@ function renderTimeContext (lineCenter, cursor, {items, context}) {
 }
 
 export {
-    getLineItems,
+    getStaffItems,
     calculateTimeLengths,
     calculateMeasureLengths,
     nextTimes,

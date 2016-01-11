@@ -5,7 +5,7 @@ import constants from "../constants";
 import {createMeasures} from "../utils/measure";
 import {map, reductions} from "../utils/common";
 import {getTimeContexts} from "../utils/line";
-import {getLineItems, iterateByTime} from "../utils/staff";
+import {getStaffItems, iterateByTime} from "../utils/staff";
 import {getAccidentalContexts} from "../utils/accidental";
 
 const TYPE = constants.type.score;
@@ -38,7 +38,7 @@ Score.render = function (score, {measures, voices=[]}) {
     measures = measures || createMeasures(numMeasures, score.timeSigs);
 
     // get the time contexts
-	const lineItems = getLineItems(score.lines, voices);
+	const lineItems = getStaffItems(score.lines, voices);
 	const lineTimes = map((line, items) => getTimeContexts(line, measures, items), score.lines, lineItems);
 
     // calculate the accidentals for each line.
@@ -60,7 +60,6 @@ Score.render = function (score, {measures, voices=[]}) {
         const timeContext = timeContexts[i];
         const measure = _.find(timeContext, ctx => !!ctx).time.measure;
         if (measure < startMeasures[staffIdx + 1]) {
-            // staffTimeContexts[staffIdx].push(timeContext);
             _.last(staffTimeContexts).push(timeContext);
         } else {
             staffIdx++;

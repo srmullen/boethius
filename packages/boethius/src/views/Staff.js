@@ -4,8 +4,8 @@ import {isMarking, isPitched} from "../types";
 import {drawStaffBar} from "../engraver";
 import constants from "../constants";
 import {createMeasures} from "../utils/measure";
-import {getTimeContexts, b, positionMarkings} from "../utils/line";
-import {getLineItems, calculateTimeLengths, calculateMeasureLengths, iterateByTime, renderTimeContext} from "../utils/staff";
+import {getLineItems, getTimeContexts, b, positionMarkings} from "../utils/line";
+import {getStaffItems, calculateTimeLengths, calculateMeasureLengths, iterateByTime, renderTimeContext} from "../utils/staff";
 import {map, mapDeep} from "../utils/common";
 import {getAccidentalContexts} from "../utils/accidental";
 import {calculateCursor, scaleCursor} from "../utils/placement";
@@ -40,7 +40,7 @@ Staff.render = function render (staff, {lines=[], voices=[], measures, length, s
 
 	const endMeasure = startMeasure + numMeasures; // only time contexts
 
-	const lineItems = getLineItems(lines, voices); // only time contexts
+	const lineItems = getStaffItems(lines, voices); // only time contexts
 
 	const lineTimes = map((line, items) => getTimeContexts(line, measures, items), lines, lineItems); // only time contexts
 
@@ -142,6 +142,9 @@ Staff.renderTimeContexts = function (staff, lines, measures, voices, timeContext
 
 	map((line, lineGroup, lineCenter, voice) => {
 		const itemsByMeasure = _.groupBy(voice.children, child => getMeasureNumber(measures, child.time));
+
+		console.log(getLineItems(line, voices));
+
 		_.each(measures, (measure) => {
 			const items = itemsByMeasure[measure.value] || [];
 
@@ -163,7 +166,7 @@ Staff.renderTimeContexts = function (staff, lines, measures, voices, timeContext
 			renderLedgerLines(items, lineCenter);
 
 			// tuplet groups need to know voice and line
-			const tupletGroups = voice.renderTuplets(items, b);
+			const tupletGroups = voice.renderTuplets(items, lineCenter);
 			lineGroup.addChildren(tupletGroups);
 		});
 
