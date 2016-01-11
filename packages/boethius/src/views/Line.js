@@ -131,17 +131,16 @@ Line.render = function (line, {length, measures, voices=[], startMeasure=0, numM
 
 	_.each(voices, voice => {
 		const itemsByMeasure = _.groupBy(voice.children, child => getMeasureNumber(measuresToRender, child.time));
-		const children = voice.renderDecorations(line, b, measuresToRender);
-		lineGroup.addChildren(children);
+
 		_.each(measuresToRender, (measure) => {
 			const items = itemsByMeasure[measure.value] || [];
 
 			// Nothing to do if there are no items in the measure.
-	        if (!items) return;
+			if (!items) return;
 
 			// stems and beams
-			const context = line.contextAt(measuresToRender, {measure: measure.value});
-	        const centerLineValue = getCenterLineValue(context.clef);
+			const context = line.contextAt({measure: measure.value});
+			const centerLineValue = getCenterLineValue(context.clef);
 			const beamings = Voice.findBeaming(context.timeSig, items);
 			const stemDirections = voice.stemDirection ?
 				_.fill(new Array(items.length), voice.stemDirection) :
@@ -229,14 +228,8 @@ Line.prototype.renderMeasures = function (measures, lengths, lineGroup, lineLeng
 
 /*
  * Returns the clef, time signature and accidentals at the given time.
- * Currently requires that all measures starting from time 0 are given.
  */
-Line.prototype.contextAt = function (measures, time) {
-	let measure = measures[time.measure];
-	// const measure = _.find(measures, measure => measure.value = time.measure);
-
-	if (!measure) return null;
-
+Line.prototype.contextAt = function (time) {
 	const getMarking = _.curry((time, marking) => marking.measure <= time.measure && (marking.beat || 0) <= (time.beat || 0));
 	const getMarkingAtTime = (markings, type, time) => {
 		// Reverse mutates the array. Filtering first give a new array so no need to worry about mutating markings.
@@ -244,9 +237,9 @@ Line.prototype.contextAt = function (measures, time) {
 		return _.find(markingsOfType, getMarking(time));
 	};
 
-	let clef = getMarkingAtTime(this.markings, constants.type.clef, time) || {},
-		timeSig = getMarkingAtTime(this.markings, constants.type.timeSig, time) || {},
-		key = getMarkingAtTime(this.markings, constants.type.key, time) || {};
+	const clef = getMarkingAtTime(this.markings, constants.type.clef, time) || {};
+	const timeSig = getMarkingAtTime(this.markings, constants.type.timeSig, time) || {};
+	const key = getMarkingAtTime(this.markings, constants.type.key, time) || {};
 
 	return {clef, timeSig, key};
 };

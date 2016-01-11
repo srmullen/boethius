@@ -6,10 +6,12 @@ import constants from "../constants";
 import {createMeasures} from "../utils/measure";
 import {getTimeContexts, b, positionMarkings} from "../utils/line";
 import {getLineItems, calculateTimeLengths, calculateMeasureLengths, iterateByTime, renderTimeContext} from "../utils/staff";
-import {map} from "../utils/common";
+import {map, mapDeep} from "../utils/common";
 import {getAccidentalContexts} from "../utils/accidental";
 import {calculateCursor, scaleCursor} from "../utils/placement";
 import {getMeasureNumber} from "../utils/timeUtils";
+import Voice from "./Voice";
+import {getCenterLineValue} from "./Clef";
 
 const TYPE = constants.type.staff;
 
@@ -139,13 +141,25 @@ Staff.renderTimeContexts = function (staff, lines, measures, voices, timeContext
 	placeTimes(timeContexts, measures, lineCenters, cursorFn);
 
 	map((line, lineGroup, lineCenter, voice) => {
-		const children = voice.renderDecorations(line, lineCenter, measures);
-		lineGroup.addChildren(children);
-
 		const itemsByMeasure = _.groupBy(voice.children, child => getMeasureNumber(measures, child.time));
 		_.each(measures, (measure) => {
 			const items = itemsByMeasure[measure.value] || [];
+
+			// Nothing to do if there are no items in the measure.
+			if (!items) return;
+
+			// stems and beams
+			const context = line.contextAt({measure: measure.value});
+			const centerLineValue = getCenterLineValue(context.clef);
+			const beamings = Voice.findBeaming(context.timeSig, items);
+			const stemDirections = voice.stemDirection ?
+				_.fill(new Array(items.length), voice.stemDirection) :
+				Voice.getAllStemDirections(beamings, centerLineValue);
+			const beams = _.compact(mapDeep(_.partial(Voice.stemAndBeam, centerLineValue), beamings, stemDirections));
+			lineGroup.addChildren(beams);
+
 			renderLegerLines(items, lineCenter);
+
 			const tupletGroups = voice.renderTuplets(items, b);
 			lineGroup.addChildren(tupletGroups);
 		});
@@ -153,7 +167,6 @@ Staff.renderTimeContexts = function (staff, lines, measures, voices, timeContext
 		const slurGroups = voice.renderSlurs();
 		lineGroup.addChildren(slurGroups);
 
-		return children;
 	}, lines, lineGroups, lineCenters, voices);
 
 	return staffGroup;

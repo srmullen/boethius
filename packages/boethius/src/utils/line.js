@@ -57,7 +57,7 @@ function getTimeContexts (line, measures, items) {
 		return getTime(measures, item).time;
 	}), (v) => {
 		let time = getTime(measures, v[0]);
-		return {time, items: v, context: line.contextAt(measures, time)};
+		return {time, items: v, context: line.contextAt(time)};
 	}), ({time}) => time.time);
 
 	return times;
