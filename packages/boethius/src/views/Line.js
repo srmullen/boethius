@@ -148,12 +148,12 @@ Line.render = function (line, {length, measures, voices=[], startMeasure=0, numM
 			const beams = _.compact(mapDeep(_.partial(Voice.stemAndBeam, centerLineValue), beamings, stemDirections));
 			lineGroup.addChildren(beams);
 
-			renderLegerLines(items, b);
+			renderLedgerLines(items, b);
 
 			const tupletGroups = voice.renderTuplets(items, b);
 			lineGroup.addChildren(tupletGroups);
 		});
-		
+
 		voice.renderArticulations();
 
 		const slurGroups = voice.renderSlurs();
@@ -164,7 +164,7 @@ Line.render = function (line, {length, measures, voices=[], startMeasure=0, numM
 	return lineGroup;
 };
 
-function renderLegerLines (items, centerLine) {
+function renderLedgerLines (items, centerLine) {
 	const pitched = _.filter(items, isPitched);
     pitched.map(note => note.drawLegerLines(centerLine, Scored.config.lineSpacing));
 }

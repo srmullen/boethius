@@ -1,8 +1,8 @@
 function run () {
-    testTwoLines().translate(25, 50);
-    testThreeLines().translate(600, 50);
-    testMeasureRendering().translate(25, 400);
-    // testLineSwitching().translate(25, 50);
+    // testTwoLines().translate(25, 50);
+    // testThreeLines().translate(600, 50);
+    // testMeasureRendering().translate(25, 400);
+    testLineSwitching().translate(25, 50);
 }
 
 function testTwoLines () {
@@ -103,10 +103,12 @@ function testMeasureRendering () {
 }
 
 function testLineSwitching () {
-    var treble = scored.line({voices: ["soprano", "alto"]}, [scored.clef({value: "treble", measure: 0}),
+    var line1Voices = ["soprano", "alto"];
+    var line2Voices = ["bass"];
+    var treble = scored.line({voices: line1Voices}, [scored.clef({value: "treble", measure: 0}),
 								scored.key({value: "C", measure: 0}),
 								scored.timeSig({value: "4/4", measure: 0})]);
-    var bass = scored.line({voices: ["bass"]}, [scored.clef({value: "bass", measure: 0}),
+    var bass = scored.line({voices: line2Voices}, [scored.clef({value: "bass", measure: 0}),
 								scored.key({value: "C", measure: 0}),
 								scored.timeSig({value: "4/4", measure: 0})]);
 	var n = scored.note;

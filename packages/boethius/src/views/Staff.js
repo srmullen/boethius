@@ -148,7 +148,7 @@ Staff.renderTimeContexts = function (staff, lines, measures, voices, timeContext
 			// Nothing to do if there are no items in the measure.
 			if (!items) return;
 
-			// stems and beams
+			// stems and beams need to know both line and voice
 			const context = line.contextAt({measure: measure.value});
 			const centerLineValue = getCenterLineValue(context.clef);
 			const beamings = Voice.findBeaming(context.timeSig, items);
@@ -158,14 +158,18 @@ Staff.renderTimeContexts = function (staff, lines, measures, voices, timeContext
 			const beams = _.compact(mapDeep(_.partial(Voice.stemAndBeam, centerLineValue), beamings, stemDirections));
 			lineGroup.addChildren(beams);
 
-			renderLegerLines(items, lineCenter);
+			// Ledger lines only need to know which line.
+			// They do not need to know which voice they belong to.
+			renderLedgerLines(items, lineCenter);
 
+			// tuplet groups need to know voice and line
 			const tupletGroups = voice.renderTuplets(items, b);
 			lineGroup.addChildren(tupletGroups);
 		});
 
 		voice.renderArticulations();
 
+		// slurs only need to know voice
 		const slurGroups = voice.renderSlurs();
 		lineGroup.addChildren(slurGroups);
 
@@ -174,7 +178,7 @@ Staff.renderTimeContexts = function (staff, lines, measures, voices, timeContext
 	return staffGroup;
 };
 
-function renderLegerLines (items, centerLine) {
+function renderLedgerLines (items, centerLine) {
 	const pitched = _.filter(items, isPitched);
     pitched.map(note => note.drawLegerLines(centerLine, Scored.config.lineSpacing));
 }
