@@ -153,6 +153,9 @@ Line.render = function (line, {length, measures, voices=[], startMeasure=0, numM
 			const tupletGroups = voice.renderTuplets(items, b);
 			lineGroup.addChildren(tupletGroups);
 		});
+		
+		voice.renderArticulations();
+
 		const slurGroups = voice.renderSlurs();
 		lineGroup.addChildren(slurGroups);
 

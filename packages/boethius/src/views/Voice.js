@@ -151,14 +151,7 @@ Voice.getAllStemDirections = function getAllStemDirections (beamings, centerLine
     }, []);
 };
 
-/*
- * Render decorations (beams, tuples, slurs, etc) on items. If an item doesn't belong to a
- * measure in the measures array then decoration for it won't be rendered.
- * @param line - Line that the voice is being rendered on.
- * @param measures - Measure[]
- */
 Voice.prototype.renderArticulations = function () {
-    // articulations
     _.each(this.children, (child) => {
         if (child.drawArticulations) child.drawArticulations();
     });

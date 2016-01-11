@@ -164,6 +164,8 @@ Staff.renderTimeContexts = function (staff, lines, measures, voices, timeContext
 			lineGroup.addChildren(tupletGroups);
 		});
 
+		voice.renderArticulations();
+
 		const slurGroups = voice.renderSlurs();
 		lineGroup.addChildren(slurGroups);
 
