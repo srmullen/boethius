@@ -23,15 +23,22 @@ function getSteps (n1, n2) {
 
 /*
  * @param note - Note to find the stem length for.
- * @param centerLineValue - String representing note value at the center line.
+ * @param centerLineValue - String representing note value at the center line. (optional)
+ * @param stemDirection - String representation of the stem direction. (optional)
+ * @return - the length of the stem.
  */
-function getStemLength (note, centerLineValue) {
-	let octaveHeight = Scored.config.lineSpacing * 3.5;
+function getStemLength (note, centerLineValue, stemDirection) {
+	const octaveHeight = Scored.config.lineSpacing * 3.5;
 
 	if (!centerLineValue) return octaveHeight;
 
-	let steps = getSteps(centerLineValue, note.pitch),
-		noteDistance = steps * Scored.config.stepSpacing;
+	const steps = getSteps(centerLineValue, note.pitch);
+	
+	// handle stem directions for notes that don't have default direction
+	if (stemDirection === "up" && steps >= 0) return octaveHeight;
+	if (stemDirection === "down" && steps < 0) return octaveHeight;
+
+	const noteDistance = steps * Scored.config.stepSpacing;
 
 	return Math.max(octaveHeight, Math.abs(noteDistance));
 }

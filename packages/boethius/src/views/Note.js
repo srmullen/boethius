@@ -62,7 +62,7 @@ Note.renderDots = function (note, clef) {
 Note.prototype.renderStem = function (centerLineValue, stemDirection) {
 	if (this.needsStem()) {
 		stemDirection = stemDirection || this.getStemDirection(centerLineValue);
-		let stemPoint = noteUtils.defaultStemPoint(this, stemDirection, noteUtils.getStemLength(this, centerLineValue));
+		const stemPoint = noteUtils.defaultStemPoint(this, stemDirection, noteUtils.getStemLength(this, centerLineValue, stemDirection));
 		this.drawStem(stemPoint, stemDirection);
 		this.drawFlag();
 	}

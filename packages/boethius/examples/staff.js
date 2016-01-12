@@ -116,7 +116,9 @@ function testLineSwitching () {
 	var voice1 = scored.voice({name: "soprano"}, [
 		n({pitch: "c5"}), n({pitch: "d5"}), n({pitch: "e5"}), n({pitch: "f5"}),
 		n({pitch: "g5"}), n({pitch: "a5"}), n({pitch: "b5"}), n({pitch: "c6"}),
-		n({value: 8, pitch: "d6"}), n({value: 8, pitch: "e6"}), n({value: 8, pitch: "f6"}), n({value: 8, pitch: "g6"}),
+		// n({value: 8, pitch: "d6"}), n({value: 8, pitch: "e6"}),
+        n({value: 4, pitch: "g6"}),
+        n({value: 8, pitch: "f6"}), n({value: 8, pitch: "g6"}),
         n({value: 8, pitch: "f6"}), n({value: 8, pitch: "e6"}), n({value: 8, pitch: "d6"}), n({value: 8, pitch: "c6"})
 	]);
 

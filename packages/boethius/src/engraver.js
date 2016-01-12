@@ -471,7 +471,7 @@ function beam (items, {line="b4", fulcrum, vector, stemDirections}) {
 	let durations = items.map(item => item.value),
 		stemLengths = map((item, stemDirection) => {
 			if (isNote(item)) {
-				return noteUtils.getStemLength(item, line);
+				return noteUtils.getStemLength(item, line, stemDirection);
 			} else if (isChord) {
 				return chordUtils.getStemLength(item, line, stemDirection);
 			}
