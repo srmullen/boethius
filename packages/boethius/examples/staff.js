@@ -1,8 +1,8 @@
 function run () {
-    // testTwoLines().translate(25, 50);
-    // testThreeLines().translate(600, 50);
-    // testMeasureRendering().translate(25, 400);
-    testLineSwitching().translate(25, 50);
+    testTwoLines().translate(25, 50);
+    testThreeLines().translate(600, 50);
+    testMeasureRendering().translate(25, 400);
+    // testLineSwitching().translate(25, 50);
 }
 
 function testTwoLines () {
@@ -20,12 +20,12 @@ function testTwoLines () {
     var n = scored.note;
 
     var voice1 = scored.voice({name: "soprano"}, [
-        n({value: 4, pitch: "c5", slur: "1"}), n({value: 4, pitch: "b4", slur: "1"}), n({value: 8, pitch: "a4"}), n({value: 8, pitch: "g4"}), n({value: 4, pitch: "f4"}),
-        n({value: 4, pitch: "f4"})
+        n({value: 4, pitch: "c5", slur: "1"}), n({value: 4, pitch: "b4", slur: "1"}), n({value: 8, pitch: "a4", staccato: true}), n({value: 8, pitch: "g4"}), n({value: 4, pitch: "f4"}),
+        n({value: 4, pitch: "f4"}), scored.rest({value: 8})
     ]);
 
     var voice2 = scored.voice({name: "bass"}, [
-        n({value: 8, pitch: "c3", slur: "2"}), n({value: 8, pitch: "c#3", slur: "2"}), n({value: 4, pitch: "d3"}), n({value: 4, pitch: "e3"}), n({value: 4, pitch: "e3"}),
+        n({value: 8, pitch: "c3", slur: "2"}), n({value: 8, pitch: "c#3", slur: "2"}), n({value: 4, pitch: "d3"}), n({value: 4, pitch: "e3", tenuto: true}), scored.rest({value: 4}),
         n({value: 4, pitch: "e3"})
     ]);
 

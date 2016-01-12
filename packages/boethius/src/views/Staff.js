@@ -143,7 +143,8 @@ Staff.renderTimeContexts = function (staff, lines, measures, voices, timeContext
 	map((line, lineGroup, lineCenter, voice) => {
 		const itemsByMeasure = _.groupBy(voice.children, child => getMeasureNumber(measures, child.time));
 
-		console.log(getLineItems(line, voices));
+		// FIXME: needs to take staff time range into account.
+		const lineItems = getLineItems(line, voices);
 
 		_.each(measures, (measure) => {
 			const items = itemsByMeasure[measure.value] || [];
@@ -161,16 +162,16 @@ Staff.renderTimeContexts = function (staff, lines, measures, voices, timeContext
 			const beams = _.compact(mapDeep(_.partial(Voice.stemAndBeam, centerLineValue), beamings, stemDirections));
 			lineGroup.addChildren(beams);
 
-			// Ledger lines only need to know which line.
-			// They do not need to know which voice they belong to.
-			renderLedgerLines(items, lineCenter);
-
 			// tuplet groups need to know voice and line
 			const tupletGroups = voice.renderTuplets(items, lineCenter);
 			lineGroup.addChildren(tupletGroups);
 		});
 
-		voice.renderArticulations();
+		// render decorations that only require knowledge of the line.
+		_.each(lineItems, voiceItems => {
+			renderLedgerLines(voiceItems, lineCenter);
+			voice.renderArticulations(voiceItems); // items must have stem direction already
+		});
 
 		// slurs only need to know voice
 		const slurGroups = voice.renderSlurs();

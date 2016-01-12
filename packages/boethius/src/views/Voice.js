@@ -151,9 +151,9 @@ Voice.getAllStemDirections = function getAllStemDirections (beamings, centerLine
     }, []);
 };
 
-Voice.prototype.renderArticulations = function () {
-    _.each(this.children, (child) => {
-        if (child.drawArticulations) child.drawArticulations();
+Voice.prototype.renderArticulations = function (items) {
+    _.each(items, (item) => {
+        if (item.drawArticulations) item.drawArticulations();
     });
 };
 
