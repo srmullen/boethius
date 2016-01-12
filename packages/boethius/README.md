@@ -44,3 +44,4 @@ TODOS:
     - Additional articulations/ornaments
     - improved dynamic positioning
     - Ability to turn features on/off for performance reasons.
+    - Fix double rendering of ledger lines.

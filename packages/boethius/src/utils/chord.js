@@ -23,14 +23,19 @@ function defaultStemPoint (chord, stemDirection, stemLength) {
  * @param chord - Chord to find the stem length for.
  * @param centerLineValue - String representing note value at the center line.
  */
-function getStemLength (chord, centerLineValue) {
-	let octaveHeight = Scored.config.lineSpacing * 3.5,
-        diff = Math.abs(noteUtils.getSteps(chord.children[0].pitch, _.last(chord.children).pitch) * Scored.config.layout.stepSpacing);
+function getStemLength (chord, centerLineValue, stemDirection) {
+	const octaveHeight = Scored.config.lineSpacing * 3.5;
+    const diff = Math.abs(noteUtils.getSteps(chord.children[0].pitch, _.last(chord.children).pitch) * Scored.config.layout.stepSpacing);
 
     if (!centerLineValue) return octaveHeight + diff;
 
-    let steps = noteUtils.getSteps(centerLineValue, chord.children[0].pitch),
-        noteDistance = steps * Scored.config.stepSpacing;
+    const steps = noteUtils.getSteps(centerLineValue, chord.children[0].pitch);
+
+    // handle stem directions for chords that don't have default direction
+	if (stemDirection === "up" && steps >= 0) return octaveHeight + diff;
+	if (stemDirection === "down" && steps < 0) return octaveHeight + diff;
+
+    const noteDistance = steps * Scored.config.stepSpacing;
 
 	return Math.max(octaveHeight, Math.abs(noteDistance)) + diff;
 }

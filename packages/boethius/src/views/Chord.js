@@ -94,7 +94,7 @@ Chord.renderAccidentals = function (chord, context={}) {
 Chord.prototype.renderStem = function (centerLineValue, stemDirection) {
 	if (this.needsStem()) {
 		stemDirection = stemDirection || this.getStemDirection(centerLineValue);
-		let stemPoint = defaultStemPoint(this, stemDirection, getStemLength(this, centerLineValue));
+		const stemPoint = defaultStemPoint(this, stemDirection, getStemLength(this, centerLineValue, stemDirection));
 		this.drawStem(stemPoint, stemDirection);
 		this.drawFlag();
 	}

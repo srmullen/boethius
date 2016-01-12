@@ -112,18 +112,18 @@ function testLineSwitching () {
 								scored.key({value: "C", measure: 0}),
 								scored.timeSig({value: "4/4", measure: 0})]);
 	var n = scored.note;
+    var c = scored.chord;
 
 	var voice1 = scored.voice({name: "soprano"}, [
-		n({pitch: "c5"}), n({pitch: "d5"}), n({pitch: "e5"}), n({pitch: "f5"}),
+        c({}, ["f6", "a6"]), c({}, ["f6", "a6"]), c({}, ["f6", "a6"]), c({}, ["f6", "a6"]),
 		n({pitch: "g5"}), n({pitch: "a5"}), n({pitch: "b5"}), n({pitch: "c6"}),
-		// n({value: 8, pitch: "d6"}), n({value: 8, pitch: "e6"}),
         n({value: 4, pitch: "g6"}),
         n({value: 8, pitch: "f6"}), n({value: 8, pitch: "g6"}),
         n({value: 8, pitch: "f6"}), n({value: 8, pitch: "e6"}), n({value: 8, pitch: "d6"}), n({value: 8, pitch: "c6"})
 	]);
 
     var voice2 = scored.voice({name: "alto"}, [
-		n({pitch: "c5"}), n({pitch: "b4"}), n({pitch: "a4"}), n({pitch: "g4"}),
+		c({}, ["g3", "e3"]), c({}, ["b4", "a4"]), n({pitch: "a4"}), n({pitch: "g4"}),
 		n({pitch: "f4"}), n({pitch: "e4"}), n({pitch: "d4"}), n({pitch: "c4"}),
 		n({pitch: "b3"}), n({pitch: "a3"}), n({pitch: "g3"}), n({pitch: "f3"})
 	]);
