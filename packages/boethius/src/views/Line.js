@@ -150,11 +150,11 @@ Line.render = function (line, {length, measures, voices=[], startMeasure=0, numM
 
 			renderLedgerLines(items, b);
 
-			const tupletGroups = voice.renderTuplets(items, b);
+			const tupletGroups = Voice.renderTuplets(items, b);
 			lineGroup.addChildren(tupletGroups);
 		});
 
-		voice.renderArticulations();
+		Voice.renderArticulations();
 
 		const slurGroups = voice.renderSlurs();
 		lineGroup.addChildren(slurGroups);

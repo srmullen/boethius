@@ -151,13 +151,13 @@ Voice.getAllStemDirections = function getAllStemDirections (beamings, centerLine
     }, []);
 };
 
-Voice.prototype.renderArticulations = function (items) {
+Voice.renderArticulations = function (items) {
     _.each(items, (item) => {
         if (item.drawArticulations) item.drawArticulations();
     });
 };
 
-Voice.prototype.renderTuplets = function (items, centerLine) {
+Voice.renderTuplets = function (items, centerLine) {
     const tuplets = Voice.groupTuplets(items);
     return tuplets.map(tuplet => drawTuplets(tuplet, centerLine, this.stemDirection));
 };
