@@ -22,7 +22,7 @@ const TYPE = constants.type.staff;
  // TODO: What are the children of a staff now? It's more of a view onto the lines, rather than something with children in it's own right.
  // @param children <Line, Measure, Marking>[] - A marking that is given to the staff will be rendered on all lines. If it is
  // 	given to a line it will only affect that line.
-function Staff ({startMeasure=0, measures=4}, children=[]) {
+function Staff ({startMeasure=0, measures=4, lineHeights=[]}, children=[]) {
 	this.startMeasure = startMeasure;
 
 	this.measures = measures;
@@ -30,6 +30,8 @@ function Staff ({startMeasure=0, measures=4}, children=[]) {
 	this.children = children;
 
 	this.markings = _.filter(children, isMarking);
+
+	this.lineHeights = lineHeights;
 }
 
 Staff.render = function render (staff, {lines=[], voices=[], measures, length, startMeasure=0, numMeasures}) {
@@ -236,10 +238,13 @@ Staff.prototype.render = function () {
 
 Staff.prototype.renderLines = function (lines, length) {
 	// draw each line
-	let lineGroups = lines.map(line => line.render(length));
-
-	_.each(lineGroups, (lineGroup, j) => {
-		lineGroup.translate([0, 120 * j]);
+	let lineHeight = this.lineHeights[0] || 0;
+	const defaultHeight = 120;
+	const lineGroups = lines.map((line, i) => {
+		const group = line.render(length);
+		group.translate([0, lineHeight]);
+		lineHeight = (this.lineHeights[i+1] || defaultHeight) + lineHeight;
+		return group;
 	});
 
 	return lineGroups;

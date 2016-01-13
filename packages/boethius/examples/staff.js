@@ -15,7 +15,7 @@ function testTwoLines () {
                                  scored.timeSig({value: "4/4", measure: 0})
                              ]);
 
-    var staff = scored.staff({}, [scored.timeSig({value: "4/4", measure: 0})]);
+    var staff = scored.staff({lineHeights: [0, 200]}, [scored.timeSig({value: "4/4", measure: 0})]);
 
     var n = scored.note;
 
@@ -48,7 +48,7 @@ function testThreeLines () {
                                 scored.timeSig({value: "4/4", measure: 0})
                             ]);
 
-    var staff = scored.staff({}, [scored.timeSig({value: "4/4", measure: 0})]);
+    var staff = scored.staff({lineHeights: [0, 100, 100]}, [scored.timeSig({value: "4/4", measure: 0})]);
 
     var n = scored.note;
     var c = scored.chord;

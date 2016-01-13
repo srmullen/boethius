@@ -24,7 +24,6 @@ TODOS:
     - Finish tuplet rendering
     - Voices crossing lines.
     - placement.commonShortestDuration implementation.
-    - Line spacing.
     - Staff spacing.
 
     # Lower priority
