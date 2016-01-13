@@ -48,13 +48,15 @@ function getMeasure (line) {
 /*
  * @param line - Line
  * @param voices - Voice[]
+ * @param start - Number start time of the line.
+ * @param end - Number end time of the line
  * @return - items of each voice that are on the line. Item[][] - first array is the top voice, second array is the lower voice.
  */
-function getLineItems (line, voices) {
+function getLineItems (line, voices, start, end) {
     return _.reduce(line.voices, (acc, voiceConfig) => {
         if (_.isString(voiceConfig)) {
             const voice = _.find(voices, voice => voice.name === voiceConfig);
-            return concat(acc, voice.children);
+            return concat(acc, voice.getTimeFrame(start, end, true));
         } else if (_.isObject(voiceConfig)) {
             // TODO: get the time frame from the voice
         } else {

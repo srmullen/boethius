@@ -167,17 +167,27 @@ Voice.prototype.renderSlurs = function () {
     return _.map(slurred, slur);
 };
 
+function gt (n1, n2) {
+    return n1 > n2;
+}
+
+function gte (n1, n2) {
+    return n1 >= n2;
+}
+
 /*
  * The given times must be a number because a Voice doesn't know about the measures or beats.
  * @param frm - Time to start collecting items at.
  * @param to - Time up to but not including collected items.
+ * @param inclusive - Boolean, true if to time is to be included in returned items.
  * @return Item[]
  */
-Voice.prototype.getTimeFrame = function getTimeFrame(frm, to) {
+Voice.prototype.getTimeFrame = function getTimeFrame(frm, to, inclusive) {
     const timeFrame = [];
+    const comparison = inclusive ? gt : gte;
     for (let i = 0; i < this.children.length; i++) {
         let item = this.children[i];
-        if (item.time >= to) {
+        if (comparison(item.time, to)) {
             break;
         } else if (item.time >= frm) {
             timeFrame.push(item);

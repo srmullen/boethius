@@ -143,10 +143,9 @@ Staff.renderTimeContexts = function (staff, lines, measures, voices, timeContext
 	placeTimes(timeContexts, measures, lineCenters, cursorFn);
 
 	map((line, lineGroup, lineCenter) => {
-		// const itemsByMeasure = _.groupBy(voice.children, child => getMeasureNumber(measures, child.time));
-
-		// FIXME: needs to take staff time range into account.
-		const lineItems = getLineItems(line, voices);
+		const startTime = _.find(_.first(timeContexts), ctx => !!ctx).time;
+		const endTime = _.find(_.last(timeContexts), ctx => !!ctx).time;
+		const lineItems = getLineItems(line, voices, startTime.time, endTime.time);
 
 		_.each(lineItems, (lineVoice, i) => {
 			const itemsByMeasure = _.groupBy(lineVoice, child => getMeasureNumber(measures, child.time));
