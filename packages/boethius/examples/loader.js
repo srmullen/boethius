@@ -1,10 +1,12 @@
 var scored;
 
 function start (cb) {
-    var fontLoader = new FontLoader(['gonville', "gonvillealpha"], {
-        fontsLoaded: cb
+    var fontLoader = WebFont.load({
+        custom: {
+            families: ["gonville", "gonvillealpha"]
+        },
+        active: cb
     });
-    fontLoader.loadFonts();
 }
 
 function drawCircle (point, radius, color) {
@@ -24,7 +26,6 @@ function createCanvas ($el) {
 }
 
 start(function () {
-    console.log("Fonts Loaded")
     var $canvas = createCanvas($(".music"));
     scored = new Scored();
     scored.setup($canvas[0]);
