@@ -30,7 +30,6 @@
     "palestrina.js": "^1.3.2"
   },
   "dependencies": {
-    "fontloader": "^1.2.1",
     "fraction.js": "^3.0.0",
     "lodash": "^3.10.1",
     "teoria": "^1.12.0",
