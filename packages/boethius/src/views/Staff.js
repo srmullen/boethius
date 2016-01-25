@@ -34,13 +34,13 @@ function Staff ({startMeasure=0, measures=4, lineHeights=[]}, children=[]) {
 	this.lineHeights = lineHeights;
 }
 
-Staff.render = function render (staff, {lines=[], voices=[], measures, length, startMeasure=0, numMeasures}) {
+Staff.render = function render (staff, {lines=[], voices=[], measures, length, startMeasure=0}) {
 	/////////////////////////
 	// Time Contexts Phase //
 	/////////////////////////
-	measures = measures || createMeasures(numMeasures, staff.markings);
+	measures = measures || createMeasures(staff.measures, staff.markings);
 
-	const endMeasure = startMeasure + numMeasures; // only time contexts
+	const endMeasure = startMeasure + staff.measures; // only time contexts
 
 	const lineItems = getStaffItems(lines, voices); // only time contexts
 
