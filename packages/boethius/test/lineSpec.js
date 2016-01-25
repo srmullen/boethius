@@ -2,7 +2,7 @@ import {expect} from "chai";
 import Line from "../src/views/Line";
 import * as Measure from "../src/utils/measure";
 import Scored from "../src/Scored";
-import {getTimeContexts, getAccidentals} from "../src/utils/line";
+import {getTimeContexts, getAccidentals, getLineItems} from "../src/utils/line";
 
 describe("Line", () => {
     const scored = new Scored();
@@ -113,6 +113,13 @@ describe("Line", () => {
         xdescribe("getTimeContexts", () => {
             it("should return an array", () => {
                 expect(getTimeContexts()).to.eql([]);
+            });
+        });
+
+        describe("getLineItems", () => {
+            it("should return empty arrays if there are no voices", () => {
+                let line = scored.line();
+                expect(getLineItems(line, [])).to.eql([]);
             });
         });
     });

@@ -24,6 +24,7 @@ TODOS:
     - Finish tuplet rendering
     - Voices crossing lines.
     - placement.commonShortestDuration implementation.
+    - Chord Symbols
 
     # Lower priority
     - SMuFL

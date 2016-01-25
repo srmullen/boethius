@@ -29,5 +29,13 @@ describe("Staff", () => {
                 [n1, n2]
             ]);
         });
+
+        it("should return an empty arrays if there are no voices", () => {
+            let l1 = scored.line({voices: ["voice1"]});
+            let l2 = scored.line({voices: ["voice2"]});
+
+            expect(getStaffItems([l1], [])).to.eql([[]]);
+            expect(getStaffItems([l1, l2], [])).to.eql([[], []]);
+        });
     });
 });
