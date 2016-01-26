@@ -1,6 +1,6 @@
 import {expect} from "chai";
 
-import {concat, partitionBy, partitionWhen, map, mapDeep, juxt, reductions, isEven, isOdd, nexts} from "../src/utils/common";
+import {concat, partitionBy, partitionWhen, map, mapDeep, juxt, reductions, isEven, isOdd, nexts, clone} from "../src/utils/common";
 import Scored from "../src/Scored";
 
 describe("common", () => {
@@ -111,6 +111,43 @@ describe("common", () => {
             expect(isOdd(-0)).to.be.false;
             expect(isOdd(-1)).to.be.true;
             expect(isOdd(-2)).to.be.false;
+        });
+    });
+
+    describe("clone", () => {
+        it("should return a new instance of the given item type", () => {
+            let timeSig = scored.timeSig({value: "3/8", measure: 1});
+            let key = scored.key({value: "F"});
+            let clef = scored.clef({value: "bass", measure: 4, beat: 1});
+
+            let timeSigClone = clone(timeSig);
+            let keyClone = clone(key);
+            let clefClone = clone(clef);
+
+            expect(timeSigClone).to.eql(timeSig); // deep equal
+            expect(timeSigClone).not.to.equal(timeSig); // but not the same object
+            expect(keyClone).to.eql(key); // deep equal
+            expect(keyClone).not.to.equal(key); // but not the same object
+            expect(clefClone).to.eql(clef); // deep equal
+            expect(clefClone).not.to.equal(clef); // but not the same object
+        });
+
+        it("should only have properties set in the constructor", () => {
+            let timeSig = scored.timeSig({value: "3/8", measure: 1});
+            let key = scored.key({value: "F"});
+            let clef = scored.clef({value: "bass", measure: 4, beat: 1});
+
+            timeSig.group = {name: "timeSigGroup"};
+            key.randomProperty = "hopefully there aren't random properties";
+            clef.otherProp = 123;
+
+            let timeSigClone = clone(timeSig);
+            let keyClone = clone(key);
+            let clefClone = clone(clef);
+
+            expect(timeSigClone.group).not.to.be.defined;
+            expect(keyClone.randomProperty).not.to.be.defined;
+            expect(clefClone.otherProp).not.to.be.defined;
         });
     });
 });

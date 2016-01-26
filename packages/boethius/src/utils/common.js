@@ -176,6 +176,11 @@ function isOdd (n) {
 	return !isEven(n);
 }
 
+function clone (item) {
+	const Constructor = item.constructor;
+	return new Constructor(item);
+}
+
 export {
 	concat,
 	doTimes,
@@ -188,5 +193,6 @@ export {
 	juxt,
 	reductions,
 	isEven,
-	isOdd
+	isOdd,
+	clone
 };
