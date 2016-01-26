@@ -8,6 +8,7 @@ import {getTimeContexts} from "../utils/line";
 import {getStaffItems, iterateByTime} from "../utils/staff";
 import {getAccidentalContexts} from "../utils/accidental";
 import {getTime} from "../utils/timeUtils";
+import {isClef, isKey, isTimeSignature} from "../types";
 
 const TYPE = constants.type.score;
 
@@ -75,15 +76,26 @@ Score.render = function (score, {measures, voices=[]}) {
     map((staffContext, startContext, startTime) => {
         const firstTime = _.first(staffContext);
         if (firstTime) {
-            // create markings.
-            // merge the markings if the start time is the same as the first time.
-            // create a new timeContext if the startTime is earlier than firstTime.
-            console.log("firstTime", firstTime);
+            const time = _.find(firstTime, ctx => !!ctx).time;
+            if (startTime.time < time.time) {
+                throw new Error("Gap in time");
+            } else {
+                _.each(firstTime, (timeContext, i) => {
+                    if (timeContext) { // there are items at the time.
+                        // add markings to the items list if they don't exist.
+                        const {context, items} = timeContext;
+                        if (!_.find(timeContext.items, isClef)) items.push(clone(context.clef));
+                        if (!_.find(timeContext.items, isKey)) items.push(clone(context.key));
+                        if (!_.find(timeContext.items, isTimeSignature)) items.push(clone(context.timeSig));
+                    } else { // create a context and marking items for the line
+                        firstTime[i] = createLineTimeContext(startTime, startContext[i]);
+                    }
+                });
+            }
         } else {
             // create a timeContext with the cloned startContext markings
-            const items = [clone(startContext[0].clef), clone(startContext[0].key), clone(startContext[0].timeSig)];
-            staffContext.push([{context: startContext[0], items, time: startTime}]);
-            console.log("staffContext", staffContext);
+            const staffTimeContext = _.map(startContext, _.partial(createLineTimeContext, startTime));
+            staffContext.push(staffTimeContext);
         }
         // console.log(staffContext, startContext, startTime);
     }, staffTimeContexts, startContexts, startTimes);
@@ -109,6 +121,16 @@ Score.render = function (score, {measures, voices=[]}) {
 
     return scoreGroup;
 };
+
+/*
+ * @param time - Time object.
+ * @param context - Return value of line.contextAt.
+ * @return TimeContext object {context, time, items}
+ */
+function createLineTimeContext (time, context) {
+    const items = [clone(context.clef), clone(context.key), clone(context.timeSig)];
+    return {context, items, time};
+}
 
 Score.prototype.render = function () {
     const group = new paper.Group({

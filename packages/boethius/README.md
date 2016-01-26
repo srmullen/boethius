@@ -20,7 +20,6 @@ TODOS:
     # High priority
     - Slur chords.
     - Slurs / Ties, rendering improvements
-    - A Score should render the Clef, key and time signature at the beginning of every staff. (optional)
     - Finish tuplet rendering
     - Voices crossing lines.
     - placement.commonShortestDuration implementation.
@@ -45,3 +44,4 @@ TODOS:
     - Ability to turn features on/off for performance reasons.
     - Fix double rendering of ledger lines.
     - Time and/or TimeContext classes
+    - Lyrics

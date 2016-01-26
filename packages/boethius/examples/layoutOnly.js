@@ -80,8 +80,8 @@ function testScoreMultipleStaves () {
     ]);
 
     var line3 = scored.line({}, [
-        scored.clef({value: "bass", measure: 0}),
-        scored.key({measure: 0}),
+        scored.clef({value: "tenor", measure: 0}),
+        scored.key({value: "A", measure: 0}),
         scored.timeSig({measure: 0})
     ]);
 
@@ -89,7 +89,7 @@ function testScoreMultipleStaves () {
     var staff2 = scored.staff({measures: 4});
     var staff3 = scored.staff({measures: 4});
 
-    var score = scored.score({staffHeights: [0, 100]}, [scored.timeSig({measure: 0}), staff1, staff2, line1]);
+    var score = scored.score({staffHeights: [0, 300]}, [scored.timeSig({measure: 0}), staff1, staff2, line1, line2, line3]);
 
     return scored.render(score, {});
 }
