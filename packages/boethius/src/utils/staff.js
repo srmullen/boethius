@@ -15,7 +15,7 @@ function getStaffItems (lines, voices) {
         return _.reduce(line.voices, (acc, voiceConfig) => {
             if (_.isString(voiceConfig)) {
                 const voice = _.find(voices, voice => voice.name === voiceConfig);
-                return !!voice ? acc.concat(voice.children) : acc;
+                return voice ? acc.concat(voice.children) : acc;
             } else if (_.isObject(voiceConfig)) {
                 // TODO: get the time frame from the voice
             } else {

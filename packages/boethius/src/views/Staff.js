@@ -142,43 +142,45 @@ Staff.renderTimeContexts = function (staff, lines, measures, voices, timeContext
 	const lineCenters = _.map(lineGroups, b);
 	placeTimes(timeContexts, measures, lineCenters, cursorFn);
 
-	map((line, lineGroup, lineCenter) => {
-		const startTime = _.find(_.first(timeContexts), ctx => !!ctx).time;
-		const endTime = _.find(_.last(timeContexts), ctx => !!ctx).time;
-		const lineItems = getLineItems(line, voices, startTime.time, endTime.time);
+	if (timeContexts) {
+		map((line, lineGroup, lineCenter) => {
+			const startTime = _.find(_.first(timeContexts), ctx => !!ctx).time;
+			const endTime = _.find(_.last(timeContexts), ctx => !!ctx).time;
+			const lineItems = getLineItems(line, voices, startTime.time, endTime.time);
 
-		_.each(lineItems, (lineVoice, i) => {
-			const itemsByMeasure = _.groupBy(lineVoice, child => getMeasureNumber(measures, child.time));
-			_.each(measures, (measure) => {
-				const items = itemsByMeasure[measure.value] || [];
+			_.each(lineItems, (lineVoice, i) => {
+				const itemsByMeasure = _.groupBy(lineVoice, child => getMeasureNumber(measures, child.time));
+				_.each(measures, (measure) => {
+					const items = itemsByMeasure[measure.value] || [];
 
-				// Nothing to do if there are no items in the measure.
-				if (!items) return;
+					// Nothing to do if there are no items in the measure.
+					if (!items) return;
 
-				// stems and beams need to know both line and voice
-				const context = line.contextAt({measure: measure.value});
-				const centerLineValue = getCenterLineValue(context.clef);
-				const beamings = Voice.findBeaming(context.timeSig, items);
-				const stemDirection = getStemDirection(lineItems, i);
-				const stemDirections = stemDirection ?
-					_.fill(new Array(items.length), stemDirection) :
-					Voice.getAllStemDirections(beamings, centerLineValue);
-				const beams = _.compact(mapDeep(_.partial(Voice.stemAndBeam, centerLineValue), beamings, stemDirections));
-				lineGroup.addChildren(beams);
+					// stems and beams need to know both line and voice
+					const context = line.contextAt({measure: measure.value});
+					const centerLineValue = getCenterLineValue(context.clef);
+					const beamings = Voice.findBeaming(context.timeSig, items);
+					const stemDirection = getStemDirection(lineItems, i);
+					const stemDirections = stemDirection ?
+						_.fill(new Array(items.length), stemDirection) :
+						Voice.getAllStemDirections(beamings, centerLineValue);
+					const beams = _.compact(mapDeep(_.partial(Voice.stemAndBeam, centerLineValue), beamings, stemDirections));
+					lineGroup.addChildren(beams);
 
-				// tuplet groups need to know voice and line
-				const tupletGroups = Voice.renderTuplets(items, lineCenter);
-				lineGroup.addChildren(tupletGroups);
+					// tuplet groups need to know voice and line
+					const tupletGroups = Voice.renderTuplets(items, lineCenter);
+					lineGroup.addChildren(tupletGroups);
+				});
 			});
-		});
 
-		// render decorations that only require knowledge of the line.
-		_.each(lineItems, voiceItems => {
-			renderLedgerLines(voiceItems, lineCenter);
-			Voice.renderArticulations(voiceItems); // items must have stem direction already
-		});
+			// render decorations that only require knowledge of the line.
+			_.each(lineItems, voiceItems => {
+				renderLedgerLines(voiceItems, lineCenter);
+				Voice.renderArticulations(voiceItems); // items must have stem direction already
+			});
 
-	}, lines, lineGroups, lineCenters);
+		}, lines, lineGroups, lineCenters);
+	}
 
 	_.each(voices, voice => {
 		// slurs only need to know voice
