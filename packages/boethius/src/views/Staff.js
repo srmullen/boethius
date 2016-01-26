@@ -40,14 +40,14 @@ Staff.render = function render (staff, {lines=[], voices=[], measures, length, s
 	/////////////////////////
 	measures = measures || createMeasures(staff.measures, staff.markings);
 
-	const endMeasure = startMeasure + staff.measures; // only time contexts
+	const endMeasure = startMeasure + staff.measures;
 
-	const lineItems = getStaffItems(lines, voices); // only time contexts
+	const lineItems = getStaffItems(lines, voices);
 
-	const lineTimes = map((line, items) => getTimeContexts(line, measures, items), lines, lineItems); // only time contexts
+	const lineTimes = map((line, items) => getTimeContexts(line, measures, items), lines, lineItems);
 
 	// get the times that are to be rendered on the staff.
-	const lineTimesToRender = _.map(lineTimes, (line) => { // used in render phase
+	const lineTimesToRender = _.map(lineTimes, (line) => {
 		return _.filter(line, (time) => {
 			return time.time.measure >= startMeasure && time.time.measure < endMeasure;
 		});

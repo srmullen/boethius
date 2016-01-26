@@ -13,7 +13,7 @@ function testLine () {
         scored.timeSig({measure: 0})
     ]);
 
-    return scored.render(line, {length: 500, numMeasures: 3});
+    return scored.render(line, {numMeasures: 3});
 }
 
 function testStaffSingleLine () {
@@ -79,10 +79,16 @@ function testScoreMultipleStaves () {
         scored.timeSig({measure: 0})
     ]);
 
+    var line3 = scored.line({}, [
+        scored.clef({value: "bass", measure: 0}),
+        scored.key({measure: 0}),
+        scored.timeSig({measure: 0})
+    ]);
+
     var staff1 = scored.staff({measures: 4});
     var staff2 = scored.staff({measures: 4});
 
-    var score = scored.score({}, [scored.timeSig({measure: 0}), staff1, staff2, line1, line2]);
+    var score = scored.score({staffHeights: [0, 100]}, [scored.timeSig({measure: 0}), staff1, staff2, line1]);
 
     return scored.render(score, {});
 }

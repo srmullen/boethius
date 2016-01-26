@@ -3,7 +3,7 @@ import _ from "lodash";
 import Staff from "./Staff";
 import constants from "../constants";
 import {createMeasures} from "../utils/measure";
-import {map, reductions} from "../utils/common";
+import {map, reductions, partitionWhen} from "../utils/common";
 import {getTimeContexts} from "../utils/line";
 import {getStaffItems, iterateByTime} from "../utils/staff";
 import {getAccidentalContexts} from "../utils/accidental";
@@ -56,17 +56,12 @@ Score.render = function (score, {measures, voices=[]}) {
 
     // split staffTimes and measures
     let staffIdx = 0;
-    const staffTimeContexts = [[]];
-    for (let i = 0; i < timeContexts.length; i++) {
-        const timeContext = timeContexts[i];
+    const staffTimeContexts = partitionWhen(timeContexts, (timeContext) => {
         const measure = _.find(timeContext, ctx => !!ctx).time.measure;
-        if (measure < startMeasures[staffIdx + 1]) {
-            _.last(staffTimeContexts).push(timeContext);
-        } else {
-            staffIdx++;
-            staffTimeContexts.push([timeContext]);
-        }
-    }
+        const ret = measure >= startMeasures[staffIdx + 1];
+        if (ret) staffIdx++;
+        return ret;
+    });
 
     let startMeasure = 0;
     let staffHeight = score.staffHeights[0] || 0;
