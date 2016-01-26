@@ -7,6 +7,7 @@ import {map, reductions, partitionWhen} from "../utils/common";
 import {getTimeContexts} from "../utils/line";
 import {getStaffItems, iterateByTime} from "../utils/staff";
 import {getAccidentalContexts} from "../utils/accidental";
+import {getTime} from "../utils/timeUtils";
 
 const TYPE = constants.type.score;
 
@@ -53,6 +54,12 @@ Score.render = function (score, {measures, voices=[]}) {
 
     // get the start measure for each Staff.
     const startMeasures = reductions((acc, stave) => acc + stave.measures, score.staves, 0);
+    const startTimes = _.dropRight(startMeasures).map((measure) => getTime(measures, {measure}));
+    const startContexts = startTimes.map((time) => {
+        return score.lines.map(line => line.contextAt(time));
+    });
+
+    console.log(startContexts);
 
     // split staffTimes and measures
     let staffIdx = 0;
@@ -62,6 +69,9 @@ Score.render = function (score, {measures, voices=[]}) {
         if (ret) staffIdx++;
         return ret;
     });
+
+    // add empty contexts for any remaining staffIdxs'
+    _.each(_.drop(startMeasures, staffIdx + 2), () => staffTimeContexts.push([]));
 
     let startMeasure = 0;
     let staffHeight = score.staffHeights[0] || 0;
