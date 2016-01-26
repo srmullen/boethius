@@ -3,7 +3,7 @@ import _ from "lodash";
 import Staff from "./Staff";
 import constants from "../constants";
 import {createMeasures} from "../utils/measure";
-import {map, reductions, partitionWhen} from "../utils/common";
+import {map, reductions, partitionWhen, clone} from "../utils/common";
 import {getTimeContexts} from "../utils/line";
 import {getStaffItems, iterateByTime} from "../utils/staff";
 import {getAccidentalContexts} from "../utils/accidental";
@@ -59,8 +59,6 @@ Score.render = function (score, {measures, voices=[]}) {
         return score.lines.map(line => line.contextAt(time));
     });
 
-    console.log(startContexts);
-
     // split staffTimes and measures
     let staffIdx = 0;
     const staffTimeContexts = partitionWhen(timeContexts, (timeContext) => {
@@ -72,6 +70,23 @@ Score.render = function (score, {measures, voices=[]}) {
 
     // add empty contexts for any remaining staffIdxs'
     _.each(_.drop(startMeasures, staffIdx + 2), () => staffTimeContexts.push([]));
+
+    // Create the context marking for the beginning of each staff.
+    map((staffContext, startContext, startTime) => {
+        const firstTime = _.first(staffContext);
+        if (firstTime) {
+            // create markings.
+            // merge the markings if the start time is the same as the first time.
+            // create a new timeContext if the startTime is earlier than firstTime.
+            console.log("firstTime", firstTime);
+        } else {
+            // create a timeContext with the cloned startContext markings
+            const items = [clone(startContext[0].clef), clone(startContext[0].key), clone(startContext[0].timeSig)];
+            staffContext.push([{context: startContext[0], items, time: startTime}]);
+            console.log("staffContext", staffContext);
+        }
+        // console.log(staffContext, startContext, startTime);
+    }, staffTimeContexts, startContexts, startTimes);
 
     let startMeasure = 0;
     let staffHeight = score.staffHeights[0] || 0;
