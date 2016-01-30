@@ -45,3 +45,6 @@ TODOS:
     - Fix double rendering of ledger lines.
     - Time and/or TimeContext classes
     - Lyrics
+
+ISSUES:
+    - a4 c5/8 b4 g4 The b4 is rendered as an eigth note.

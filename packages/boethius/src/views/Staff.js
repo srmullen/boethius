@@ -5,7 +5,7 @@ import {drawStaffBar} from "../engraver";
 import constants from "../constants";
 import {createMeasures} from "../utils/measure";
 import {getLineItems, getTimeContexts, b, positionMarkings} from "../utils/line";
-import {getStaffItems, calculateTimeLengths, calculateMeasureLengths, iterateByTime, renderTimeContext} from "../utils/staff";
+import {getStaffItems, calculateTimeLengths, calculateMeasureLengths, addDefaultMeasureLengths, iterateByTime, renderTimeContext} from "../utils/staff";
 import {map, mapDeep} from "../utils/common";
 import {getAccidentalContexts} from "../utils/accidental";
 import {calculateCursor, scaleCursor} from "../utils/placement";
@@ -89,7 +89,7 @@ Staff.renderTimeContexts = function (staff, lines, measures, voices, timeContext
 
 	const timeLengths = calculateTimeLengths(timeContexts, shortestDuration);
 
-	const measureLengths = calculateMeasureLengths(timeLengths);
+	const measureLengths = addDefaultMeasureLengths(staff.measures, calculateMeasureLengths(timeLengths));
 
 	// get the minimum length of the line
 	const minLineLength = _.sum(measureLengths);

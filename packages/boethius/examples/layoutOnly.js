@@ -1,9 +1,9 @@
 function run () {
-    // testLine().translate(25, 50);
-    // testStaffSingleLine().translate(25, 50);
-    // testStaffMultipleLines().translate(25, 50);
-    // testScoreSingleStaff().translate(25, 50);
-    testScoreMultipleStaves().translate(25, 50);
+    testLine().translate(25, 50);
+    // testStaffSingleLine().translate(25, 150);
+    testStaffMultipleLines().translate(25, 150);
+    // testScoreSingleStaff().translate(25, 250);
+    testScoreMultipleStaves().translate(25, 350);
 }
 
 function testLine () {
@@ -13,7 +13,7 @@ function testLine () {
         scored.timeSig({measure: 0})
     ]);
 
-    return scored.render(line, {numMeasures: 3});
+    return scored.render(line, {numMeasures: 4});
 }
 
 function testStaffSingleLine () {

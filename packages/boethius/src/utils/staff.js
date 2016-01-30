@@ -53,11 +53,37 @@ function calculateTimeLengths (timeContexts, shortestDuration) {
 function calculateMeasureLengths (timeLengths) {
     const noteHeadWidth = Scored.config.note.head.width;
     return _.map(partitionBy(timeLengths, ({time}) => time.measure), (measureTimes) => {
-		return _.sum(measureTimes, ({length}) => {
+		const [markingsLength, durationedLength] = _.reduce(measureTimes, (acc, {length}) => {
 			// sum the marking and duration item lengths
-			return _.sum(length);
-		}) + noteHeadWidth;
+			return [acc[0] + length[0], acc[1] + length[1]];
+		}, [0, 0]);
+
+        const measureLength = markingsLength + (durationedLength ? durationedLength : Scored.config.measure.length) + noteHeadWidth;
+
+        return measureLength;
 	});
+}
+
+/*
+ * @param numMeasures - The number of measure lengths to return.
+ * @param measureLengths Number[] - The measure lengths that have been calculated already.
+ * @return Number[]
+ */
+function addDefaultMeasureLengths (numMeasures, measureLengths) {
+    const defaultMeasureLengths = [];
+
+    for (let i = 0; i < numMeasures; i++) {
+        const length = measureLengths[i];
+        if (length) {
+            defaultMeasureLengths.push(length);
+        } else {
+            defaultMeasureLengths.push(
+                Scored.config.measure.length + Scored.config.note.head.width
+            );
+        }
+    }
+
+    return defaultMeasureLengths;
 }
 
 /*
@@ -175,6 +201,7 @@ export {
     getStaffItems,
     calculateTimeLengths,
     calculateMeasureLengths,
+    addDefaultMeasureLengths,
     nextTimes,
     iterateByTime,
     renderTimeContext

@@ -90,17 +90,16 @@ function calculateMeasureLengths (measures, times, noteHeadWidth, shortestDurati
 		return item.time.measure;
 	});
 
-	let measureLengths = _.map(measures, (measure) => {
+	const measureLengths = _.map(measures, (measure) => {
 		// sum the length of all times in the measure.
-		let measureLength = _.sum(_.map(itemsInMeasure[measure.value], ({items}) => {
+		const [markingsLength, durationedLength] = _.reduce(itemsInMeasure[measure.value], (acc, {items}) => {
 			// calculate the length of each time in the measure and sum the markings and duration items
-			const timeLength = calculateTimeLength(items, shortestDuration);
-			return _.sum(timeLength);
-		}));
+			const [marking, durationed] = calculateTimeLength(items, shortestDuration);
+			return [acc[0] + marking, acc[1] + durationed];
+		}, [0, 0]);
 
-		// pad the measure length
-		measureLength += noteHeadWidth;
-		return measureLength;
+		// use the default measure length if there are no durationed items in the measure
+		return markingsLength + (durationedLength ? durationedLength : Scored.config.measure.length) + noteHeadWidth;
 	});
 
 	return measureLengths;

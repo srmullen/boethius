@@ -26,6 +26,9 @@ const Config = (function () {
 			stepSpacing: null
 
 		},
+		measure: {
+			length: 100
+		},
 		maxBeamAngle: 13, // angle in degrees. angle can range from -maxBeamAngle to +maxBeamAngle
 		minStemLength: 10
 	};
