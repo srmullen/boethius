@@ -5,9 +5,9 @@ function run () {
 
 	// simpleLine().translate(25, 50);
 
-	testStacatoLegato().translate(25, 50);
-	testDots().translate(25, 150);
-	testDynamics().translate(25, 250);
+	// testStacatoLegato().translate(25, 50);
+	// testDots().translate(25, 150);
+	// testDynamics().translate(25, 250);
 
 	// eighthBeamings().translate(25, 50);
 	// sixteenthBeamings().translate(25, 150);
@@ -25,6 +25,8 @@ function run () {
 
 	// testMeasureRendering().translate(25, 50);
 	// testSlurs().translate(25, 50);
+
+	testRests().translate(25, 50);
 }
 
 function testClefKeyTimeSig (clefValue, keyValue, timeSigValue) {
@@ -511,4 +513,17 @@ function testBeatStructures () {
 	testSimpleBeatStructure(scored.timeSig({value: "12/8", measure: 0}), 16, 24).translate(400, 450);
 
 	// testComplexBeatStructure(scored.timeSig({value: "c", measure: 0}), [16, 8, 16], 4).translate(25, 50);
+}
+
+function testRests () {
+	var r = scored.rest;
+	var trebleLine = scored.line({}, [scored.clef({measure: 0}),
+									  scored.key({measure: 0}),
+									  scored.timeSig({value: "4/4", measure: 0})
+								  ]);
+	var voice = scored.voice({}, [
+		r({value: 1}), r({value: 2}), r({value: 4}), r({value: 8}), r({value: 16}), r({value: 32}), r({value: 64})
+	]);
+
+	return scored.render(trebleLine, {voices: [voice], numMeasures: 2});
 }

@@ -149,8 +149,12 @@ const offsets = {
 			return 0;
 		}
 	},
-	rest: function () {
-		return -Scored.config.layout.lineSpacing;
+	rest: function ({value}) {
+		if (value === 1) {
+			return -Scored.config.layout.lineSpacing * 2;
+		} else {
+			return -Scored.config.layout.lineSpacing;
+		}
 	}
 };
 

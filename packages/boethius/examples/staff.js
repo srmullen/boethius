@@ -1,8 +1,9 @@
 function run () {
-    testTwoLines().translate(25, 50);
-    testThreeLines().translate(450, 50);
-    testLineSwitching().translate(800, 150);
-    testMeasureRendering().translate(25, 400);
+    // testTwoLines().translate(25, 50);
+    // testThreeLines().translate(450, 50);
+    // testLineSwitching().translate(800, 150);
+    // testMeasureRendering().translate(25, 400);
+    testRests().translate(25, 50);
 }
 
 function testTwoLines () {
@@ -136,4 +137,21 @@ function testLineSwitching () {
 
     var staff = scored.staff({measures: 3}, [scored.timeSig({value: "4/4", measure: 0})]);
 	return scored.render(staff, {lines: [treble, bass], voices: [voice1, voice2, voice3]});
+}
+
+function testRests () {
+    var line = scored.line({voices: ["soprano"]}, [scored.clef({value: "treble", measure: 0}),
+                                 scored.key({value: "c", measure: 0}),
+                                 scored.timeSig({value: "4/4", measure: 0})
+                             ]);
+
+    var staff = scored.staff({measures: 2}, [scored.timeSig({value: "4/4", measure: 0})]);
+
+    var r = scored.rest;
+
+    var voice = scored.voice({name: "soprano"}, [
+        r({value: 1}), r({value: 2}), r({value: 4}), r({value: 8}), r({value: 16}), r({value: 32}), r({value: 64})
+    ]);
+
+    return scored.render(staff, {lines: [line], voices: [voice]});
 }
