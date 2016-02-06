@@ -24,9 +24,10 @@ function run () {
 	// testTripletsTwoVoices().translate(25, 350);
 
 	// testMeasureRendering().translate(25, 50);
-	// testSlurs().translate(25, 50);
 
 	testRests().translate(25, 50);
+	testSlurs().translate(25, 150);
+	testSlurChords().translate(25, 250);
 }
 
 function testClefKeyTimeSig (clefValue, keyValue, timeSigValue) {
@@ -526,4 +527,29 @@ function testRests () {
 	]);
 
 	return scored.render(trebleLine, {voices: [voice], numMeasures: 2});
+}
+
+function testSlurChords () {
+	var c = scored.chord;
+	var n = scored.note;
+
+	var line = scored.line({}, [
+		scored.clef({measure: 0}),
+		scored.key({measure: 0}),
+		scored.timeSig({value: "4/4", measure: 0})
+	]);
+
+	var voice = scored.voice({}, [
+		n({slur: 1, pitch: "c5"}), n({slur: 1, pitch: "c5"}),
+		n({slur: 2, pitch: "a4"}), n({slur: 2, pitch: "a4"}),
+		c({slur: 3}, ["a4", "c5"]), c({slur: 3}, ["a4", "c5"]),
+		c({slur: 4}, ["g4", "c5"]), c({slur: 4}, ["g4", "c5"]),
+
+		n({slur: 5, pitch: "c5"}), c({slur: 5}, ["a4", "c5"]),
+		c({slur: 6}, ["g4", "c5"]), n({slur: 6, pitch: "a4"}),
+		n({slur: 7, pitch: "c5"}), c({slur: 7}, ["a4", "c5"]),
+		n({slur: 8, pitch: "a4"}), c({slur: 8}, ["g4", "c5"])
+	]);
+
+	return scored.render(line, {voices: [voice], numMeasures: 4});
 }

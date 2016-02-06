@@ -33,7 +33,7 @@ function getStemLength (note, centerLineValue, stemDirection) {
 	if (!centerLineValue) return octaveHeight;
 
 	const steps = getSteps(centerLineValue, note.pitch);
-	
+
 	// handle stem directions for notes that don't have default direction
 	if (stemDirection === "up" && steps >= 0) return octaveHeight;
 	if (stemDirection === "down" && steps < 0) return octaveHeight;
@@ -83,35 +83,39 @@ function getAverageStemDirection (items, centerLineValue) {
 }
 
 /*
+ * @param item - Note or Chord.
  * @param incoming - the incoming slur handle
+ * @param stemDirection - String.
  */
-function getSlurPoint (note, incoming, stemDirection) {
-	stemDirection = stemDirection || note.getStemDirection();
+function getSlurPoint (item, incoming, stemDirection) {
+	stemDirection = stemDirection || item.getStemDirection();
+
+	const noteHead = isChord(item) ? item.getBaseNote(stemDirection).noteHead : item.noteHead;
 
 	if (!incoming) {
-		return stemDirection === "down" ? note.noteHead.bounds.center : note.noteHead.bounds.bottomCenter;
+		return stemDirection === "down" ? noteHead.bounds.center : noteHead.bounds.bottomCenter;
 	} else if (incoming.y < 0) {
-		return note.noteHead.bounds.center;
+		return noteHead.bounds.center;
 	} else {
-		return note.noteHead.bounds.bottomCenter;
+		return noteHead.bounds.bottomCenter;
 	}
 }
 
 function getSlurHandle (stemDirection) {
-	let yVec = stemDirection === "up" ? 10 : -10;
+	const yVec = stemDirection === "up" ? 10 : -10;
 	return new paper.Point([0, yVec]);
 }
 
-function slur (notes) {
-	let firstNote = notes[0],
-		lastNote = _.last(notes),
-		firstStem = firstNote.getStemDirection(),
-		begin = getSlurPoint(firstNote, null, firstStem),
-		handle = getSlurHandle(firstStem),
-		end = getSlurPoint(lastNote, handle);
+function slur (items) {
+	const firstItem = items[0];
+	const lastItem = _.last(items);
+	const firstStem = firstItem.getStemDirection();
+	const begin = getSlurPoint(firstItem, null, firstStem);
+	const handle = getSlurHandle(firstStem);
+	const end = getSlurPoint(lastItem, handle);
 		// center = begin.add(end.subtract(begin).divide(2)).add([0, 4]);
 
-	let path = new paper.Path({
+	const path = new paper.Path({
 		segments: [begin, end],
 		strokeColor: "black",
 		strokeWidth: 2

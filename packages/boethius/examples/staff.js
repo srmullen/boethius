@@ -1,9 +1,9 @@
 function run () {
-    // testTwoLines().translate(25, 50);
-    // testThreeLines().translate(450, 50);
-    // testLineSwitching().translate(800, 150);
-    // testMeasureRendering().translate(25, 400);
-    testRests().translate(25, 50);
+    testTwoLines().translate(25, 50);
+    testThreeLines().translate(450, 50);
+    testLineSwitching().translate(800, 150);
+    testMeasureRendering().translate(25, 400);
+    // testRests().translate(25, 50);
 }
 
 function testTwoLines () {

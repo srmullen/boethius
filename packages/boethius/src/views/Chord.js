@@ -17,7 +17,7 @@ const DOWN = "down";
 /*
  * @param children - Array of notes. Can take several representations. String, Object, or Note.
  */
-function Chord ({value=4, dots=0, tuplet, time, root, name, inversion, staccato, tenuto, portato, stemDirection}, children=[]) {
+function Chord ({value=4, dots=0, tuplet, time, root, name, inversion, staccato, tenuto, portato, slur, stemDirection}, children=[]) {
 	this.value = value;
 	this.dots = dots;
 	this.tuplet = tuplet;
@@ -30,6 +30,7 @@ function Chord ({value=4, dots=0, tuplet, time, root, name, inversion, staccato,
 	this.staccato = staccato;
 	this.tenuto = tenuto;
 	this.portato = portato;
+	this.slur = slur;
 
 	this.stemDirection = stemDirection;
 
