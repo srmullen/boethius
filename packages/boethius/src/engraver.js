@@ -598,21 +598,29 @@ function drawTuplets (items, centerLine, voiceDirection) {
 		yPos = lowestPoint.y + Scored.config.note.head.height;
 	}
 
-	let line = new paper.Path.Line({
-		from: [fromX, yPos],
-		to: [toX, yPos],
-		strokeColor: "black"
-	});
+	const leftPoint = new paper.Point(fromX, yPos);
+	const rightPoint = new paper.Point([toX, yPos]);
+	const numberPosition = leftPoint.add(distance/2, 0);
 
-	let num = new paper.PointText({
+	const num = new paper.PointText({
 		content: numerator,
 		fontFamily: 'gonvillealpha',
 		fontSize: Scored.config.fontSize/1.5,
-		fillColor: 'black',
-		position: line.segments[0].point.add(distance/2, 0)
+		position: numberPosition
 	});
 
-	return new paper.Group({children: [line, num]});
+	const leftDangle = (direction === "up") ? leftPoint.add(0, 5) : leftPoint.subtract(0, 5);
+	const leftBracket = new paper.Path.Line({
+		segments: [leftDangle, leftPoint, num.bounds.leftCenter]
+	});
+
+	const rightDangle = (direction === "up") ? rightPoint.add(0, 5) : rightPoint.subtract(0, 5);
+	const rightBracket = new paper.Path.Line({
+		segments: [num.bounds.rightCenter, rightPoint, rightDangle]
+	});
+
+	// return new paper.Group({children: [line, num]});
+	return new paper.Group({children: [leftBracket, num, rightBracket], strokeColor: "black"});
 }
 
 /*

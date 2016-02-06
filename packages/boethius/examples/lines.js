@@ -13,21 +13,22 @@ function run () {
 	// sixteenthBeamings().translate(25, 150);
 	// testAccidentals("c").translate(25, 250);
 	// testTimeSigs().translate(25, 350);
-	//
+
 	// testChords().translate(25, 50);
 	// testChordsTwoVoices().translate(25, 150);
-	// testTriplets().translate(25, 250);
+	// oneVoice().translate(25, 250);
+	// twoVoices().translate(25, 350);
 
 	// renderingNotesOnLine().translate(25, 50);
-	// oneVoice().translate(25, 150);
-	// twoVoices().translate(25, 250);
-	// testTripletsTwoVoices().translate(25, 350);
+
+	testTriplets().translate(25, 50);
+	testTripletsTwoVoices().translate(25, 150);
 
 	// testMeasureRendering().translate(25, 50);
 
-	testRests().translate(25, 50);
-	testSlurs().translate(25, 150);
-	testSlurChords().translate(25, 250);
+	// testRests().translate(25, 50);
+	// testSlurs().translate(25, 150);
+	// testSlurChords().translate(25, 250);
 }
 
 function testClefKeyTimeSig (clefValue, keyValue, timeSigValue) {

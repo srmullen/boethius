@@ -19,7 +19,6 @@ Should view render methods return a paper group, or should they return themselve
 TODOS:
     # High priority
     - Slurs / Ties, rendering improvements
-    - Finish tuplet rendering
     - Voices crossing lines.
     - placement.commonShortestDuration implementation.
     - Chord Symbols
