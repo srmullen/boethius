@@ -57,6 +57,15 @@ describe("Voice", () => {
                 [notes[0]], [notes[1]], [notes[2]]
             ]);
         });
+
+        it("should handle eighth note to qurter note within a beat", () => {
+            const eighth = n({value: 8});
+            const quarter = n({value: 4});
+            const voice = scored.voice({}, [eighth, quarter]);
+            expect(findBeaming(fourfour, voice.children)).to.eql([
+                [eighth], [quarter]
+            ]);
+        });
     });
 
     describe("groupTuplets", () => {

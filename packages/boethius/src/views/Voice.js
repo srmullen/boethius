@@ -3,7 +3,7 @@ import F from "fraction.js";
 
 import constants from "../constants";
 import {isPitched} from "../types";
-import {concat, partitionBy, reductions} from "../utils/common";
+import {concat, partitionBy, partitionWhen, reductions} from "../utils/common";
 import {beam, drawTuplets} from "../engraver";
 import {getAverageStemDirection, slur} from "../utils/note";
 import {calculateDuration, parseSignature, calculateTupletDuration, sumDurations} from "../utils/timeUtils";
@@ -50,7 +50,14 @@ function nextBeaming (items, groupingTime) {
     } else if (item.value <= 4) { // and item doesn't get beamed if it is a quarter note or greater.
         return [[_.first(items)], _.rest(items)];
     } else {
-        return _.partition(items, item => item.time < groupingTime);
+        // return _.partition(items, item => (item.time < groupingTime || item.value >= 4));
+        const splitIndex = _.findIndex(items, item => (item.time >= groupingTime || item.value <= 4));
+        console.log(splitIndex);
+        if (splitIndex === -1) {
+            return [items, []];
+        } else {
+            return [_.take(items, splitIndex), _.drop(items, splitIndex)];
+        }
     }
 }
 

@@ -9,10 +9,11 @@ function run () {
 	// testDots().translate(25, 150);
 	// testDynamics().translate(25, 250);
 
-	// eighthBeamings().translate(25, 50);
-	// sixteenthBeamings().translate(25, 150);
-	// testAccidentals("c").translate(25, 250);
-	// testTimeSigs().translate(25, 350);
+	eighthBeamings().translate(25, 50);
+	sixteenthBeamings().translate(25, 150);
+	testAccidentals("c").translate(25, 250);
+	testTimeSigs().translate(25, 350);
+	testEighthToQuarterBeamingIssue().translate(25, 450);
 
 	// testChords().translate(25, 50);
 	// testChordsTwoVoices().translate(25, 150);
@@ -21,14 +22,15 @@ function run () {
 
 	// renderingNotesOnLine().translate(25, 50);
 
-	testTriplets().translate(25, 50);
-	testTripletsTwoVoices().translate(25, 150);
+	// testTriplets().translate(25, 50);
+	// testTripletsTwoVoices().translate(25, 150);
 
 	// testMeasureRendering().translate(25, 50);
 
 	// testRests().translate(25, 50);
 	// testSlurs().translate(25, 150);
 	// testSlurChords().translate(25, 250);
+
 }
 
 function testClefKeyTimeSig (clefValue, keyValue, timeSigValue) {
@@ -550,6 +552,23 @@ function testSlurChords () {
 		c({slur: 6}, ["g4", "c5"]), n({slur: 6, pitch: "a4"}),
 		n({slur: 7, pitch: "c5"}), c({slur: 7}, ["a4", "c5"]),
 		n({slur: 8, pitch: "a4"}), c({slur: 8}, ["g4", "c5"])
+	]);
+
+	return scored.render(line, {voices: [voice], numMeasures: 4});
+}
+
+function testEighthToQuarterBeamingIssue () {
+	var n = scored.note;
+
+	var line = scored.line({}, [
+		scored.clef({measure: 0}),
+		scored.key({measure: 0}),
+		scored.timeSig({value: "4/4", measure: 0})
+	]);
+
+	var voice = scored.voice({}, [
+		n({pitch: "c5", value: 8}), n({pitch: "b4"}), n({pitch: "g4", value: 8}), n({value: 2}),
+		n({pitch: "a5"}), n({pitch: "g5"}), n({pitch: "f5", value: 8}), n({pitch: "f5", value: 4, dots: 1}), n({pitch: "e5"})
 	]);
 
 	return scored.render(line, {voices: [voice], numMeasures: 4});
