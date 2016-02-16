@@ -45,4 +45,3 @@ TODOS:
     - Lyrics
 
 ISSUES:
-    - Error when voice has items at time after score end time.
