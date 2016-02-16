@@ -9,11 +9,11 @@ function run () {
 	// testDots().translate(25, 150);
 	// testDynamics().translate(25, 250);
 
-	eighthBeamings().translate(25, 50);
-	sixteenthBeamings().translate(25, 150);
-	testAccidentals("c").translate(25, 250);
-	testTimeSigs().translate(25, 350);
-	testEighthToQuarterBeamingIssue().translate(25, 450);
+	// eighthBeamings().translate(25, 50);
+	// sixteenthBeamings().translate(25, 150);
+	// testAccidentals("c").translate(25, 250);
+	// testTimeSigs().translate(25, 350);
+	// testEighthToQuarterBeamingIssue().translate(25, 450);
 
 	// testChords().translate(25, 50);
 	// testChordsTwoVoices().translate(25, 150);
@@ -30,6 +30,8 @@ function run () {
 	// testRests().translate(25, 50);
 	// testSlurs().translate(25, 150);
 	// testSlurChords().translate(25, 250);
+
+	testLedgerLineMultipleRenderIssue().translate(25, 50);
 
 }
 
@@ -572,4 +574,20 @@ function testEighthToQuarterBeamingIssue () {
 	]);
 
 	return scored.render(line, {voices: [voice], numMeasures: 4});
+}
+
+function testLedgerLineMultipleRenderIssue () {
+	var c = scored.chord;
+
+	var line = scored.line({}, [
+		scored.clef({measure: 0}),
+		scored.key({measure: 0}),
+		scored.timeSig({value: "4/4", measure: 0})
+	]);
+
+	var voice = scored.voice({}, [
+		c({}, ["e6", "g6"])
+	]);
+
+	return scored.render(line, {voices: [voice], numMeasures: 1});
 }
