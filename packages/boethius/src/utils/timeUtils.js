@@ -66,7 +66,9 @@ function getTime (measures, item) {
 		time = getTimeNumber(measure, measureView.timeSig);
 	}
 
-	beat = item.beat || getBeat(time, measureView.timeSig, measureView.startsAt);
+	if (measureView) {
+		beat = item.beat || getBeat(time, measureView.timeSig, measureView.startsAt);
+	}
 
 	return {time, measure, beat};
 }

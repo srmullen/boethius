@@ -31,7 +31,8 @@ function run () {
 	// testSlurs().translate(25, 150);
 	// testSlurChords().translate(25, 250);
 
-	testLedgerLineMultipleRenderIssue().translate(25, 50);
+	// testLedgerLineMultipleRenderIssue().translate(25, 50);
+	testVoiceLongerThanLine().translate(25, 150);
 
 }
 
@@ -587,6 +588,22 @@ function testLedgerLineMultipleRenderIssue () {
 
 	var voice = scored.voice({}, [
 		c({}, ["e6", "g6"])
+	]);
+
+	return scored.render(line, {voices: [voice], numMeasures: 1});
+}
+
+function testVoiceLongerThanLine () {
+	var n = scored.note;
+
+	var line = scored.line({}, [
+		scored.clef({measure: 0}),
+		scored.key({measure: 0}),
+		scored.timeSig({value: "4/4", measure: 0})
+	]);
+
+	var voice = scored.voice({}, [
+		n({value: 1}), n({value: 1}), n(), n()
 	]);
 
 	return scored.render(line, {voices: [voice], numMeasures: 1});
