@@ -3,7 +3,7 @@ import F from "fraction.js";
 
 import constants from "../constants";
 import {isPitched} from "../types";
-import {concat, partitionBy, partitionWhen, reductions} from "../utils/common";
+import {concat, partitionBy, reductions} from "../utils/common";
 import {beam, drawTuplets} from "../engraver";
 import {getAverageStemDirection, slur} from "../utils/note";
 import {calculateDuration, parseSignature, calculateTupletDuration, sumDurations} from "../utils/timeUtils";
@@ -52,7 +52,6 @@ function nextBeaming (items, groupingTime) {
     } else {
         // return _.partition(items, item => (item.time < groupingTime || item.value >= 4));
         const splitIndex = _.findIndex(items, item => (item.time >= groupingTime || item.value <= 4));
-        console.log(splitIndex);
         if (splitIndex === -1) {
             return [items, []];
         } else {
