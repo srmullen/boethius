@@ -32,7 +32,9 @@ function run () {
 	// testSlurChords().translate(25, 250);
 
 	// testLedgerLineMultipleRenderIssue().translate(25, 50);
-	testVoiceLongerThanLine().translate(25, 150);
+	// testVoiceLongerThanLine().translate(25, 150);
+
+	testChordSymbols().translate(25, 50);
 
 }
 
@@ -607,4 +609,22 @@ function testVoiceLongerThanLine () {
 	]);
 
 	return scored.render(line, {voices: [voice], numMeasures: 1});
+}
+
+function testChordSymbols () {
+	var n = scored.note;
+
+	var line = scored.line({}, [
+		scored.clef({measure: 0}),
+		scored.key({measure: 0}),
+		scored.timeSig({value: "4/4", measure: 0})
+	]);
+
+	var chordSymbols = [scored.chordSymbol({value: "Cmaj", measure: 0})];
+
+	var voice = scored.voice({}, [
+		n()
+	]);
+
+	return scored.render(line, {voices: [voice], chordSymbols: chordSymbols, numMeasures: 4});
 }

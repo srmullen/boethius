@@ -51,7 +51,7 @@ Line.calculateAverageMeasureLength = function (staves, lineLength, measures) {
  * @param startMeasure - the index of the measure is measure at which to start rendering.
  * @param numMeasures - the number of measures to render on the line.
  */
-Line.render = function (line, {length, measures, voices=[], startMeasure=0, numMeasures=1}) {
+Line.render = function (line, {length, measures, voices=[], chordSymbols, startMeasure=0, numMeasures=1}) {
 	// Steps for rendering a Line.
 	// 1. Find the minimum width of each measure given the items that need to be renderred in it.
 	// 2. Warn if there's not enough room on the line.
@@ -64,8 +64,8 @@ Line.render = function (line, {length, measures, voices=[], startMeasure=0, numM
 	const endMeasure = startMeasure + numMeasures;
 
 	// position voice children
-	const noteHeadWidth = Scored.config.note.head.width,
-		shortestDuration = 0.125; // need function to calculate this.
+	const noteHeadWidth = Scored.config.note.head.width;
+	const shortestDuration = 0.125; // need function to calculate this.
 
 	// group and sort voice items by time.
 	const times = lineUtils.getTimeContexts(line, measures, _.reduce(voices, (acc, voice) => {
@@ -153,6 +153,12 @@ Line.render = function (line, {length, measures, voices=[], startMeasure=0, numM
 			const tupletGroups = Voice.renderTuplets(items, b);
 			lineGroup.addChildren(tupletGroups);
 		});
+
+		// draw and place chord symbols
+		if (chordSymbols) {
+			const chordSymbolGroups = chordSymbols.map(symbol => symbol.render());
+			lineGroup.addChildren(chordSymbolGroups);
+		}
 
 		Voice.renderArticulations();
 

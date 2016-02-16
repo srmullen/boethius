@@ -636,6 +636,19 @@ function drawDynamic (dynamicValue) {
 	return dynamicText;
 }
 
+/*
+ * @param - String representation of the Chord Symbol.
+ */
+function drawChordSymbol (value) {
+	const chordSymbol = new paper.PointText({
+		content: value,
+		fontFamily: 'gonvillealpha',
+		fontSize: Scored.config.fontSize / 1.5,
+		fillColor: "black"
+	});
+	return chordSymbol;
+}
+
 export {
 	drawLegerLines,
 	drawBarline,
@@ -653,5 +666,6 @@ export {
 	drawRest,
 	beam,
 	drawTuplets,
-	drawDynamic
+	drawDynamic,
+	drawChordSymbol
 };
