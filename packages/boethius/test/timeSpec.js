@@ -75,7 +75,7 @@ describe("timeUtils", () => {
             expect(getMeasureNumber(measures, 0.99)).to.equal(0);
             expect(getMeasureNumber(measures, 1)).to.equal(1);
             expect(getMeasureNumber(measures, 2.25)).to.equal(2);
-            expect(getMeasureNumber(measures, 5)).to.equal(-1);
+            expect(getMeasureNumber(measures, 5)).to.equal(4);
         });
     });
 

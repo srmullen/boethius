@@ -1,6 +1,7 @@
 function run () {
     // testDoubleStaffScore().translate(25, 50);
-    testVoicePastEndOfScore().translate(25, 50);
+    // testVoicePastEndOfScore().translate(25, 50);
+    testNoStemsOnSecondStave().translate(25, 50);
 }
 
 function testDoubleStaffScore () {
@@ -56,6 +57,30 @@ function testVoicePastEndOfScore () {
     ]);
 
     var score = scored.score({}, [timeSig, staff, line]);
+
+    return scored.render(score, {voices: [voice]});
+}
+
+function testNoStemsOnSecondStave () {
+    var timeSig = scored.timeSig({value: "4/4", measure: 0});
+
+    var line = scored.line({voices: ["v"]}, [
+        scored.clef({value: "treble", measure: 0}),
+        scored.key({value: "C", measure: 0}),
+        scored.timeSig({value: "4/4", measure: 0})
+    ]);
+
+    var staff1 = scored.staff({measures: 1, startMeasure: 0});
+    var staff2 = scored.staff({measures: 1, startmeasure: 1});
+
+    var score = scored.score({}, [timeSig, line, staff1, staff2]);
+
+    var n = scored.note;
+    var voice = scored.voice({name: "v"}, [
+        n(), n(), n(), n(),
+        n(), n(), n(), n(),
+        n()
+    ]);
 
     return scored.render(score, {voices: [voice]});
 }

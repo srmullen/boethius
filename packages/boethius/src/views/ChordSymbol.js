@@ -8,7 +8,7 @@ function ChordSymbol ({value, measure, beat, time}) {
     this.measure = measure;
     this.beat = beat;
     this.time = time;
-};
+}
 
 ChordSymbol.prototype.type = TYPE;
 

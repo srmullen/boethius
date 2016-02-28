@@ -88,14 +88,14 @@ function getTimeNumber (measure, timeSig, offset=0) {
  * @param time - number representing time of event.
  */
 function getMeasureNumber (measures, time) {
-	const measureNumber = _.findIndex(measures, (measure) => {
-		let measureEndsAt = measure.startsAt + getMeasureDuration(measure);
+	const measure = _.find(measures, (measure) => {
+		const measureEndsAt = measure.startsAt + getMeasureDuration(measure);
 		return time >= measure.startsAt && time < measureEndsAt;
 	});
 
 	// If the time isn't in the given measures then measure number will be -1.
 	// Return the index of the last measure + 1.
-	return (measureNumber < 0) ? measures.length : measureNumber;
+	return measure ? measure.value : _.last(measures).value + 1;
 }
 
 /*
