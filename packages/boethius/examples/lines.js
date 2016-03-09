@@ -3,7 +3,7 @@ function run () {
 	// testMarkings();
 	// testBeatStructures();
 
-	// simpleLine().translate(25, 50);
+	simpleLine().translate(25, 50);
 
 	// testStacatoLegato().translate(25, 50);
 	// testDots().translate(25, 150);
@@ -34,7 +34,7 @@ function run () {
 	// testLedgerLineMultipleRenderIssue().translate(25, 50);
 	// testVoiceLongerThanLine().translate(25, 150);
 
-	testChordSymbols().translate(25, 50);
+	// testChordSymbols().translate(25, 50);
 
 }
 
@@ -98,13 +98,13 @@ function renderingNotesOnLine () {
 }
 
 function simpleLine () {
-	var trebleLine = scored.line({}, [scored.clef({measure: 0}),
+	var trebleLine = scored.line({}, [scored.clef({value: "alto", measure: 0}),
 									  scored.key({measure: 0}),
 									  scored.timeSig({value: "4/4", measure: 0})
 								  ]);
-	var voice = scored.voice({}, [scored.note({pitch: "a4", value: 4}), scored.note({pitch: "a4", value: 4}),
-								  scored.note({pitch: "a4", value: 4}), scored.note({pitch: "a4", value: 4}),
-								  scored.note({pitch: "a4", value: 1})
+	var voice = scored.voice({}, [scored.note({pitch: "a4", value: 4}), scored.note({pitch: "b4", value: 4}),
+								  scored.note({pitch: "c5", value: 4}), scored.note({pitch: "e5", value: 4}),
+								  scored.note({pitch: "e5", value: 1})
 							  ]);
 
 	return scored.render(trebleLine, {length: 400, voices: [voice], numMeasures: 2});

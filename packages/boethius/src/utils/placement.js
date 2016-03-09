@@ -1,6 +1,5 @@
 import _ from "lodash";
 import * as timeUtils from "./timeUtils";
-// import {isMarking} from "./common";
 import constants from "../constants";
 import {isNote, isDynamic, isMarking} from "../types";
 
@@ -16,7 +15,7 @@ const noteNameToDegreeObj = {
 	clefBases = {
 		treble: {pitch: "C", degree: 0, octave: 5, offset: 3},
 		bass:   {pitch: "F", degree: 3, octave: 3, offset: 2},
-		alto:   {},
+		alto:   {pitch: "C", degree: 0, octave: 5, offset: 4},
 		tenor:  {}
 	},
 	lineNamesObj = {
@@ -64,11 +63,11 @@ function calculateAccidentalYpos (degree, step) {
  * @param set {Number} - distance between each note
  */
 function calculateNoteYpos (note, step, clefBase) {
-	let octave = note.note.octave(),
-		degree = noteNameToDegree(note.note.name());
+	const octave = note.note.octave();
+	const degree = noteNameToDegree(note.note.name());
 	// 4 is the offset (number of steps) of the center line.
 	// the clefBase offset it subtracted to normalize to the centerline, since the note is rendered from the centerLine.
-	let diffY = (clefBase.degree + (clefBase.octave * 7)) - (degree + (octave * 7)) - (4 - clefBase.offset);
+	const diffY = (clefBase.degree + (clefBase.octave * 7)) - (degree + (octave * 7)) - (4 - clefBase.offset);
 	return diffY * step;
 }
 
