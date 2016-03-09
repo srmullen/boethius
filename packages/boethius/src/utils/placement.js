@@ -15,8 +15,8 @@ const noteNameToDegreeObj = {
 	clefBases = {
 		treble: {pitch: "C", degree: 0, octave: 5, offset: 3},
 		bass:   {pitch: "F", degree: 3, octave: 3, offset: 2},
-		alto:   {pitch: "C", degree: 0, octave: 5, offset: 4},
-		tenor:  {}
+		alto:   {pitch: "C", degree: 0, octave: 4, offset: 4},
+		tenor:  {pitch: "C", degree: 0, octave: 4, offset: 2}
 	},
 	lineNamesObj = {
 		treble: ["f", "e", "d", "c", "b", "a", "g", "f", "e"],

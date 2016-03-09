@@ -33,7 +33,7 @@ Clef.prototype.render = function () {
 const centerLineValues = {
 	treble: "b4",
 	bass: "d3",
-	alto: "c5",
+	alto: "c4",
 	tenor: "a4"
 };
 
