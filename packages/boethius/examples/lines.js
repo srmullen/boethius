@@ -3,7 +3,7 @@ function run () {
 	// testMarkings();
 	// testBeatStructures();
 
-	simpleLine().translate(25, 50);
+	// simpleLine().translate(25, 50);
 
 	// testStacatoLegato().translate(25, 50);
 	// testDots().translate(25, 150);
@@ -34,7 +34,7 @@ function run () {
 	// testLedgerLineMultipleRenderIssue().translate(25, 50);
 	// testVoiceLongerThanLine().translate(25, 150);
 
-	// testChordSymbols().translate(25, 50);
+	testChordSymbols().translate(25, 50);
 
 }
 

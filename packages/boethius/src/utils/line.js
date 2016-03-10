@@ -40,7 +40,7 @@ function getClosestLine (line) {
 function getMeasure (line) {
 	const positions = _.map(line.children, measure => measure.barlines[0].position);
 	return function (point) {
-		let diffs = _.map(positions, p => point.x - p.x);
+		const diffs = _.map(positions, p => point.x - p.x);
 		return line.children[_.indexOf(diffs, _.min(_.filter(diffs, diff => diff >= 0)))];
 	};
 }
@@ -72,12 +72,12 @@ function getLineItems (line, voices, start, end) {
  * @return [...{time, items, context}] Array ordered by time
  */
 function getTimeContexts (line, measures, items) {
-	let allItems = line.markings.concat(items);
+	const allItems = line.markings.concat(items);
 
-	let times = _.sortBy(_.map(_.groupBy(allItems, (item) => {
+	const times = _.sortBy(_.map(_.groupBy(allItems, (item) => {
 		return getTime(measures, item).time;
 	}), (v) => {
-		let time = getTime(measures, v[0]);
+		const time = getTime(measures, v[0]);
 		return {time, items: v, context: line.contextAt(time)};
 	}), ({time}) => time.time);
 
@@ -86,7 +86,7 @@ function getTimeContexts (line, measures, items) {
 
 function calculateMeasureLengths (measures, times, noteHeadWidth, shortestDuration) {
 	// group items by measure.
-	let itemsInMeasure = _.groupBy(times, (item) => {
+	const itemsInMeasure = _.groupBy(times, (item) => {
 		return item.time.measure;
 	});
 
@@ -106,7 +106,7 @@ function calculateMeasureLengths (measures, times, noteHeadWidth, shortestDurati
 }
 
 function positionMarkings (lineCenter, cursor, {items}) {
-    let {
+    const {
 		clef: clefs,
 		key: keys,
 		timeSig: timeSigs
@@ -135,10 +135,10 @@ function renderTimeContext (lineCenter, cursor, {items, context}) {
 	// place pitched items
 	if (pitchedItems.length) {
 		// get widest note. that will be placed first.
-		let widestItem = _.max(pitchedItems, item => item.group.bounds.width),
+		const widestItem = _.max(pitchedItems, item => item.group.bounds.width),
 			placeY = (item) => {
-				let note = isNote(item) ? item : item.children[0];
-				let yPos = placement.calculateNoteYpos(note, Scored.config.lineSpacing/2, placement.getClefBase(context.clef.value));
+				const note = isNote(item) ? item : item.children[0];
+				const yPos = placement.calculateNoteYpos(note, Scored.config.lineSpacing/2, placement.getClefBase(context.clef.value));
 				item.group.translate(lineCenter.add([0, yPos]));
 			},
 			placeX = (item) => {
