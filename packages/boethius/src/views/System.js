@@ -16,11 +16,11 @@ import {getCenterLineValue} from "./Clef";
 const TYPE = constants.type.system;
 
 /*
- * @measures - the number of measures on the staff.
+ * @measures - the number of measures on the system.
  * @startMeasure - the index of the first measure on the stave.
  */
- // TODO: What are the children of a staff now? It's more of a view onto the lines, rather than something with children in it's own right.
- // @param children <Line, Measure, Marking>[] - A marking that is given to the staff will be rendered on all lines. If it is
+ // TODO: What are the children of a system now? It's more of a view onto the lines, rather than something with children in it's own right.
+ // @param children <Line, Measure, Marking>[] - A marking that is given to the system will be rendered on all lines. If it is
  // 	given to a line it will only affect that line.
 function System ({startMeasure=0, measures=4, lineHeights=[]}, children=[]) {
 	this.startMeasure = startMeasure;
@@ -34,19 +34,19 @@ function System ({startMeasure=0, measures=4, lineHeights=[]}, children=[]) {
 	this.lineHeights = lineHeights;
 }
 
-System.render = function render (staff, {lines=[], voices=[], measures, length, startMeasure=0}) {
+System.render = function render (system, {lines=[], voices=[], measures, length, startMeasure=0}) {
 	/////////////////////////
 	// Time Contexts Phase //
 	/////////////////////////
-	measures = measures || createMeasures(staff.measures, staff.markings);
+	measures = measures || createMeasures(system.measures, system.markings);
 
-	const endMeasure = startMeasure + staff.measures;
+	const endMeasure = startMeasure + system.measures;
 
 	const lineItems = getStaffItems(lines, voices);
 
 	const lineTimes = map((line, items) => getTimeContexts(line, measures, items), lines, lineItems);
 
-	// get the times that are to be rendered on the staff.
+	// get the times that are to be rendered on the system.
 	const lineTimesToRender = _.map(lineTimes, (line) => {
 		return _.filter(line, (time) => {
 			return time.time.measure >= startMeasure && time.time.measure < endMeasure;
@@ -63,20 +63,20 @@ System.render = function render (staff, {lines=[], voices=[], measures, length, 
 	const measuresToRender = _.slice(measures, startMeasure, endMeasure); // used in render and placement phases
 
 	// Group in order the times on each line
-	const staffTimes = iterateByTime(x => x, lineTimesToRender); // used in renderand placement phases
+	const systemTimes = iterateByTime(x => x, lineTimesToRender); // used in renderand placement phases
 
 	//////////////////
 	// Render Phase //
 	//////////////////
-	return System.renderTimeContexts(staff, lines, measuresToRender, voices, staffTimes, length);
+	return System.renderTimeContexts(system, lines, measuresToRender, voices, systemTimes, length);
 };
 
 /*
- * @param staff - Staff
+ * @param system - System
  * @param timeContexts - array of time contexts
  */
-System.renderTimeContexts = function (staff, lines, measures, voices, timeContexts, length) {
-	const staffGroup = staff.render();
+System.renderTimeContexts = function (system, lines, measures, voices, timeContexts, length) {
+	const systemGroup = system.render();
 
 	// returns an array of arrays. The index of each inner array maps the rendered items to the line they need to be added to.
 	const lineChildren = _.map(timeContexts, (timeContext) => {
@@ -89,7 +89,7 @@ System.renderTimeContexts = function (staff, lines, measures, voices, timeContex
 
 	const timeLengths = calculateTimeLengths(timeContexts, shortestDuration);
 
-	const measureLengths = addDefaultMeasureLengths(staff.measures, calculateMeasureLengths(timeLengths));
+	const measureLengths = addDefaultMeasureLengths(system.measures, calculateMeasureLengths(timeLengths));
 
 	// get the minimum length of the line
 	const minLineLength = _.sum(measureLengths);
@@ -97,18 +97,18 @@ System.renderTimeContexts = function (staff, lines, measures, voices, timeContex
 	let lineGroups, noteScale, cursorFn;
 
 	if (!length) {
-		lineGroups = staff.renderLines(lines, minLineLength);
+		lineGroups = system.renderLines(lines, minLineLength);
 
-		const measureGroups = staff.renderMeasures(measures, measureLengths, lineGroups);
+		const measureGroups = system.renderMeasures(measures, measureLengths, lineGroups);
 
-		staffGroup.addChildren(measureGroups);
+		systemGroup.addChildren(measureGroups);
 
 		cursorFn = (possibleNextPositions) => {
 			return _.min(possibleNextPositions);
 		};
 
 	} else {
-		lineGroups = staff.renderLines(lines, length);
+		lineGroups = system.renderLines(lines, length);
 
 		const totalMarkingLength = _.sum(timeLengths, ({length}) => length[0]);
 
@@ -116,9 +116,9 @@ System.renderTimeContexts = function (staff, lines, measures, voices, timeContex
 
 		noteScale = (length - totalMarkingLength) / (minLineLength - totalMarkingLength);
 
-		const measureGroups = staff.renderMeasures(measures, _.map(measureLengths, measureLength => measureLength * measureScale), lineGroups);
+		const measureGroups = system.renderMeasures(measures, _.map(measureLengths, measureLength => measureLength * measureScale), lineGroups);
 
-		staffGroup.addChildren(measureGroups);
+		systemGroup.addChildren(measureGroups);
 
 		cursorFn = (possibleNextPositions, cursor) => {
 			return scaleCursor(noteScale, cursor, _.min(possibleNextPositions));
@@ -126,15 +126,15 @@ System.renderTimeContexts = function (staff, lines, measures, voices, timeContex
 	}
 
 	// add the children to each line.
-	_.each(lineChildren, (staffItems) => {
-		_.each(staffItems, (lineItems, i) => {
+	_.each(lineChildren, (systemItems) => {
+		_.each(systemItems, (lineItems, i) => {
 			if (lineItems) lineGroups[i].addChildren(lineItems);
 		});
 	});
 
-	staffGroup.addChildren(lineGroups);
+	systemGroup.addChildren(lineGroups);
 
-	staffGroup.addChild(drawStaffBar(lineGroups));
+	systemGroup.addChild(drawStaffBar(lineGroups));
 
 	/////////////////////
 	// Placement Phase //
@@ -185,10 +185,10 @@ System.renderTimeContexts = function (staff, lines, measures, voices, timeContex
 	_.each(voices, voice => {
 		// slurs only need to know voice
 		const slurGroups = voice.renderSlurs();
-		staffGroup.addChildren(slurGroups);
+		systemGroup.addChildren(slurGroups);
 	});
 
-	return staffGroup;
+	return systemGroup;
 };
 
 /*
@@ -205,11 +205,11 @@ function renderLedgerLines (items, centerLine) {
     pitched.map(note => note.drawLegerLines(centerLine, Scored.config.lineSpacing));
 }
 
-function placeTimes (staffTimes, measures, lineCenters, cursorFn) {
-	_.reduce(staffTimes, (cursor, ctxs, i) => {
+function placeTimes (systemTimes, measures, lineCenters, cursorFn) {
+	_.reduce(systemTimes, (cursor, ctxs, i) => {
 		const lineIndices = _.filter(_.map(ctxs, (ctx, i) => ctx ? i : undefined), _.isNumber);
 		const centers = _.map(lineIndices, idx => lineCenters[idx]);
-		const previousTime = staffTimes[i-1] ? _.find(staffTimes[i-1], x => x).time : 0;
+		const previousTime = systemTimes[i-1] ? _.find(systemTimes[i-1], x => x).time : 0;
 		const currentTime = ctxs[lineIndices[0]].time;
 		// update cursor if it's a new measure
 		if (currentTime.measure !== previousTime.measure) {
@@ -251,14 +251,14 @@ System.prototype.renderLines = function (lines, length) {
 	return lineGroups;
 };
 
-System.prototype.renderMeasures = function (measures, lengths, staffGroup) {
+System.prototype.renderMeasures = function (measures, lengths, systemGroup) {
 	let measureGroups = _.reduce(measures, (groups, measure, i) => {
 		let measureLength = lengths[i],
 			previousGroup = _.last(groups),
 			leftBarline;
 
 		leftBarline = previousGroup ? previousGroup.children.barline : null;
-		let measureGroup = measure.render(staffGroup, leftBarline, measureLength);
+		let measureGroup = measure.render(systemGroup, leftBarline, measureLength);
 
 		groups.push(measureGroup);
 		return groups;

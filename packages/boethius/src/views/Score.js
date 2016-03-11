@@ -18,7 +18,7 @@ const TYPE = constants.type.score;
  */
 function Score ({measures=1, length, staffHeights=[]}, children=[]) {
     /*
-     * A score should have both staves and lines.
+     * A score should have both systems and lines.
      * A line represents all measures from 0 to the end of the score. It is one-dimentional.
      * A stave represents a section of the measures from all the lines. It is two-dimentional.
      */
@@ -26,7 +26,7 @@ function Score ({measures=1, length, staffHeights=[]}, children=[]) {
 
     this.timeSigs = types.timeSig || [];
     this.lines = types.line || [];
-    this.staves = types.system || [];
+    this.systems = types.system || [];
     this.length = length;
     this.staffHeights = staffHeights;
 }
@@ -36,7 +36,7 @@ Score.prototype.type = TYPE;
 Score.render = function (score, {measures, voices=[]}) {
     const scoreGroup = score.render();
 
-    const numMeasures = _.sum(score.staves, staff => staff.measures);
+    const numMeasures = _.sum(score.systems, system => system.measures);
 
     measures = measures || createMeasures(numMeasures, score.timeSigs);
 
@@ -54,7 +54,7 @@ Score.render = function (score, {measures, voices=[]}) {
     const timeContexts = iterateByTime(x => x, lineTimes);
 
     // get the start measure for each System.
-    const startMeasures = reductions((acc, stave) => acc + stave.measures, score.staves, 0);
+    const startMeasures = reductions((acc, stave) => acc + stave.measures, score.systems, 0);
     const startTimes = _.dropRight(startMeasures).map((measure) => getTime(measures, {measure}));
     const startContexts = startTimes.map((time) => {
         return score.lines.map(line => line.contextAt(time));
@@ -103,16 +103,16 @@ Score.render = function (score, {measures, voices=[]}) {
     let startMeasure = 0;
     let staffHeight = score.staffHeights[0] || 0;
     const defaultHeight = 250;
-    const staffGroups = _.map(score.staves, (staff, i) => {
-        const endMeasure = startMeasure + staff.measures;
-        const staffMeasures = _.slice(measures, startMeasure, endMeasure);
+    const staffGroups = _.map(score.systems, (system, i) => {
+        const endMeasure = startMeasure + system.measures;
+        const systemMeasures = _.slice(measures, startMeasure, endMeasure);
 
-        const staffGroup = System.renderTimeContexts(staff, score.lines, staffMeasures, voices, staffTimeContexts[i], score.length);
+        const staffGroup = System.renderTimeContexts(system, score.lines, systemMeasures, voices, staffTimeContexts[i], score.length);
         staffGroup.translate(0, staffHeight);
 
         staffHeight = (score.staffHeights[i+1] || defaultHeight) + staffHeight;
 
-        startMeasure += staff.measures;
+        startMeasure += system.measures;
 
         return staffGroup;
     });
