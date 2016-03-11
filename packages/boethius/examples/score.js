@@ -1,7 +1,7 @@
 function run () {
-    // testDoubleStaffScore().translate(25, 50);
+    testDoubleStaffScore().translate(25, 50);
     // testVoicePastEndOfScore().translate(25, 50);
-    testNoStemsOnSecondStave().translate(25, 50);
+    // testNoStemsOnSecondStave().translate(25, 50);
 }
 
 function testDoubleStaffScore () {
@@ -29,10 +29,10 @@ function testDoubleStaffScore () {
     var fourfour = scored.timeSig({value: "4/4", measure: 0});
 
     // create staves
-    var staff1 = scored.staff({measures: 6, lineHeights: [0, 200]});
-    var staff2 = scored.staff({measures: 6});
+    var system1 = scored.system({measures: 6, lineHeights: [0, 200]});
+    var system2 = scored.system({measures: 6});
 
-    var score = scored.score({length: 1000, staffHeights: [0, 350]}, [fourfour, staff1, staff2, trebleLine, bassLine]);
+    var score = scored.score({length: 1000, staffHeights: [0, 350]}, [fourfour, system1, system2, trebleLine, bassLine]);
 
     // render it all as a score.
     return scored.render(score, {voices: [soprano, bass]});
@@ -48,7 +48,7 @@ function testVoicePastEndOfScore () {
         scored.timeSig({value: "4/4", measure: 0})
     ]);
 
-    var staff = scored.staff({measures: 2, startMeasure: 0});
+    var system = scored.system({measures: 2, startMeasure: 0});
 
     var voice = scored.voice({name: "v"}, [
         scored.note({pitch: "a4", value: 1}),
@@ -56,7 +56,7 @@ function testVoicePastEndOfScore () {
         scored.note({pitch: "a4", value: 4})
     ]);
 
-    var score = scored.score({}, [timeSig, staff, line]);
+    var score = scored.score({}, [timeSig, system, line]);
 
     return scored.render(score, {voices: [voice]});
 }
@@ -70,10 +70,10 @@ function testNoStemsOnSecondStave () {
         scored.timeSig({value: "4/4", measure: 0})
     ]);
 
-    var staff1 = scored.staff({measures: 1, startMeasure: 0});
-    var staff2 = scored.staff({measures: 1, startmeasure: 1});
+    var system1 = scored.system({measures: 1, startMeasure: 0});
+    var system2 = scored.system({measures: 1, startmeasure: 1});
 
-    var score = scored.score({}, [timeSig, line, staff1, staff2]);
+    var score = scored.score({}, [timeSig, line, system1, system2]);
 
     var n = scored.note;
     var voice = scored.voice({name: "v"}, [

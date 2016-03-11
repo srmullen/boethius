@@ -16,7 +16,7 @@ function testTwoLines () {
                                  scored.timeSig({value: "4/4", measure: 0})
                              ]);
 
-    var staff = scored.staff({lineHeights: [0, 200], measures: 2}, [scored.timeSig({value: "4/4", measure: 0})]);
+    var system = scored.system({lineHeights: [0, 200], measures: 2}, [scored.timeSig({value: "4/4", measure: 0})]);
 
     var n = scored.note;
 
@@ -30,8 +30,8 @@ function testTwoLines () {
         n({value: 4, pitch: "e3"})
     ]);
 
-    // return scored.render(staff, {length: 500, lines: [line1, line2], voices: [voice1, voice2]});
-    return scored.render(staff, {lines: [line1, line2], voices: [voice1, voice2]});
+    // return scored.render(system, {length: 500, lines: [line1, line2], voices: [voice1, voice2]});
+    return scored.render(system, {lines: [line1, line2], voices: [voice1, voice2]});
 }
 
 function testThreeLines () {
@@ -49,7 +49,7 @@ function testThreeLines () {
                                 scored.timeSig({value: "4/4", measure: 0})
                             ]);
 
-    var staff = scored.staff({lineHeights: [0, 100, 100], measures: 2}, [scored.timeSig({value: "4/4", measure: 0})]);
+    var system = scored.system({lineHeights: [0, 100, 100], measures: 2}, [scored.timeSig({value: "4/4", measure: 0})]);
 
     var n = scored.note;
     var c = scored.chord;
@@ -74,7 +74,7 @@ function testThreeLines () {
 
     ]);
 
-    return scored.render(staff, {lines: [line1, line2, line3], voices: [voice1, voice2, voice3]});
+    return scored.render(system, {lines: [line1, line2, line3], voices: [voice1, voice2, voice3]});
 }
 
 function testMeasureRendering () {
@@ -98,9 +98,9 @@ function testMeasureRendering () {
 		n({value:1, pitch: "b2"}), n({value:1, pitch: "a2"}), n({value:1, pitch: "g2"}), n({value:1, pitch: "f2"})
 	]);
 
-    var staff = scored.staff({measures: 12}, [scored.timeSig({value: "4/4", measure: 0})]);
-	var measures = Scored.utils.measure.createMeasures(12, staff.markings);
-	return scored.render(staff, {length: 1000, lines: [treble, bass], voices: [voice1, voice2], measures: measures, startMeasure: 0});
+    var system = scored.system({measures: 12}, [scored.timeSig({value: "4/4", measure: 0})]);
+	var measures = Scored.utils.measure.createMeasures(12, system.markings);
+	return scored.render(system, {length: 1000, lines: [treble, bass], voices: [voice1, voice2], measures: measures, startMeasure: 0});
 }
 
 function testLineSwitching () {
@@ -135,8 +135,8 @@ function testLineSwitching () {
 		n({pitch: "b2"}), n({pitch: "a2"}), n({pitch: "g2"}), n({pitch: "f2"})
     ]);
 
-    var staff = scored.staff({measures: 3}, [scored.timeSig({value: "4/4", measure: 0})]);
-	return scored.render(staff, {lines: [treble, bass], voices: [voice1, voice2, voice3]});
+    var system = scored.system({measures: 3}, [scored.timeSig({value: "4/4", measure: 0})]);
+	return scored.render(system, {lines: [treble, bass], voices: [voice1, voice2, voice3]});
 }
 
 function testRests () {
@@ -145,7 +145,7 @@ function testRests () {
                                  scored.timeSig({value: "4/4", measure: 0})
                              ]);
 
-    var staff = scored.staff({measures: 2}, [scored.timeSig({value: "4/4", measure: 0})]);
+    var system = scored.system({measures: 2}, [scored.timeSig({value: "4/4", measure: 0})]);
 
     var r = scored.rest;
 
@@ -153,5 +153,5 @@ function testRests () {
         r({value: 1}), r({value: 2}), r({value: 4}), r({value: 8}), r({value: 16}), r({value: 32}), r({value: 64})
     ]);
 
-    return scored.render(staff, {lines: [line], voices: [voice]});
+    return scored.render(system, {lines: [line], voices: [voice]});
 }
