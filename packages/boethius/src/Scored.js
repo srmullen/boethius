@@ -5,7 +5,7 @@ import Voice from "./views/Voice";
 import Note from "./views/Note";
 import Rest from "./views/Rest";
 import Chord from "./views/Chord";
-import Staff from "./views/Staff";
+import System from "./views/System";
 import Line from "./views/Line";
 import Measure from "./views/Measure";
 import Clef from "./views/Clef";
@@ -47,16 +47,16 @@ Scored.prototype.layout = function (layout) {
 	return _.bind(parse, this)({}, layout) || [];
 };
 
-Scored.prototype.fromJSON = function (json) {
-
-};
-
 Scored.prototype.compose = function (layout, music) {
 	// When layout is a Score it needs to be responsible for putting music events into the correct line.
-	// Staff is currently handling this so that functionality needs to be ported.
+	// System is currently handling this so that functionality needs to be ported.
 	_.map(music, e => layout[e.type](e)); // FIXME: line.note now requires measures
 
 	return layout;
+};
+
+Scored.prototype.fromJSON = function (json) {
+
 };
 
 Scored.prototype.render = function (composition, ...args) {
@@ -75,8 +75,8 @@ Scored.prototype.render = function (composition, ...args) {
 			view = Line.render(composition, ...args);
 			break;
 
-		case constants.type.staff:
-			view = Staff.render(composition, ...args);
+		case constants.type.system:
+			view = System.render(composition, ...args);
 			break;
 
 		case constants.type.score:
@@ -144,8 +144,8 @@ Scored.prototype.line = function line (context={}, children) {
 	return new Line(context, children);
 };
 
-Scored.prototype.staff = function staff (context={}, children) {
-	return new Staff(context, children);
+Scored.prototype.system = function system (context={}, children) {
+	return new System(context, children);
 };
 
 Scored.prototype.score = function score (context={}, children) {

@@ -2,6 +2,7 @@ let constants = {
 	type: {
 		score: "score",
 		staff: "staff",
+		system: "system",
 		line: "line",
 		voice: "voice",
 		measure: "measure",

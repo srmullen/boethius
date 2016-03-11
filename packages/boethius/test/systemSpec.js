@@ -1,9 +1,9 @@
 import {expect} from "chai";
-import Staff from "../src/views/Staff";
+import System from "../src/views/System";
 import {getStaffItems} from "../src/utils/staff";
 import Scored from "../src/Scored";
 
-describe("Staff", () => {
+describe("System", () => {
     const scored = new Scored();
     describe("getStaffItems", () => {
         xit("should map one voice to one line", () => {

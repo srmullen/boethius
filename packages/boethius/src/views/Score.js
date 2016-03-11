@@ -1,6 +1,6 @@
 import _ from "lodash";
 
-import Staff from "./Staff";
+import System from "./System";
 import constants from "../constants";
 import {createMeasures} from "../utils/measure";
 import {map, reductions, partitionWhen, clone} from "../utils/common";
@@ -26,7 +26,7 @@ function Score ({measures=1, length, staffHeights=[]}, children=[]) {
 
     this.timeSigs = types.timeSig || [];
     this.lines = types.line || [];
-    this.staves = types.staff || [];
+    this.staves = types.system || [];
     this.length = length;
     this.staffHeights = staffHeights;
 }
@@ -53,7 +53,7 @@ Score.render = function (score, {measures, voices=[]}) {
 
     const timeContexts = iterateByTime(x => x, lineTimes);
 
-    // get the start measure for each Staff.
+    // get the start measure for each System.
     const startMeasures = reductions((acc, stave) => acc + stave.measures, score.staves, 0);
     const startTimes = _.dropRight(startMeasures).map((measure) => getTime(measures, {measure}));
     const startContexts = startTimes.map((time) => {
@@ -107,7 +107,7 @@ Score.render = function (score, {measures, voices=[]}) {
         const endMeasure = startMeasure + staff.measures;
         const staffMeasures = _.slice(measures, startMeasure, endMeasure);
 
-        const staffGroup = Staff.renderTimeContexts(staff, score.lines, staffMeasures, voices, staffTimeContexts[i], score.length);
+        const staffGroup = System.renderTimeContexts(staff, score.lines, staffMeasures, voices, staffTimeContexts[i], score.length);
         staffGroup.translate(0, staffHeight);
 
         staffHeight = (score.staffHeights[i+1] || defaultHeight) + staffHeight;

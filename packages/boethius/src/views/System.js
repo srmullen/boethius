@@ -13,7 +13,7 @@ import {getMeasureNumber} from "../utils/timeUtils";
 import Voice from "./Voice";
 import {getCenterLineValue} from "./Clef";
 
-const TYPE = constants.type.staff;
+const TYPE = constants.type.system;
 
 /*
  * @measures - the number of measures on the staff.
@@ -22,7 +22,7 @@ const TYPE = constants.type.staff;
  // TODO: What are the children of a staff now? It's more of a view onto the lines, rather than something with children in it's own right.
  // @param children <Line, Measure, Marking>[] - A marking that is given to the staff will be rendered on all lines. If it is
  // 	given to a line it will only affect that line.
-function Staff ({startMeasure=0, measures=4, lineHeights=[]}, children=[]) {
+function System ({startMeasure=0, measures=4, lineHeights=[]}, children=[]) {
 	this.startMeasure = startMeasure;
 
 	this.measures = measures;
@@ -34,7 +34,7 @@ function Staff ({startMeasure=0, measures=4, lineHeights=[]}, children=[]) {
 	this.lineHeights = lineHeights;
 }
 
-Staff.render = function render (staff, {lines=[], voices=[], measures, length, startMeasure=0}) {
+System.render = function render (staff, {lines=[], voices=[], measures, length, startMeasure=0}) {
 	/////////////////////////
 	// Time Contexts Phase //
 	/////////////////////////
@@ -68,14 +68,14 @@ Staff.render = function render (staff, {lines=[], voices=[], measures, length, s
 	//////////////////
 	// Render Phase //
 	//////////////////
-	return Staff.renderTimeContexts(staff, lines, measuresToRender, voices, staffTimes, length);
+	return System.renderTimeContexts(staff, lines, measuresToRender, voices, staffTimes, length);
 };
 
 /*
  * @param staff - Staff
  * @param timeContexts - array of time contexts
  */
-Staff.renderTimeContexts = function (staff, lines, measures, voices, timeContexts, length) {
+System.renderTimeContexts = function (staff, lines, measures, voices, timeContexts, length) {
 	const staffGroup = staff.render();
 
 	// returns an array of arrays. The index of each inner array maps the rendered items to the line they need to be added to.
@@ -227,9 +227,9 @@ function placeTimes (staffTimes, measures, lineCenters, cursorFn) {
 	}, Scored.config.note.head.width);
 }
 
-Staff.prototype.type = TYPE;
+System.prototype.type = TYPE;
 
-Staff.prototype.render = function () {
+System.prototype.render = function () {
 	const group = new paper.Group({
 		name: TYPE
 	});
@@ -237,7 +237,7 @@ Staff.prototype.render = function () {
 	return group;
 };
 
-Staff.prototype.renderLines = function (lines, length) {
+System.prototype.renderLines = function (lines, length) {
 	// draw each line
 	let lineHeight = this.lineHeights[0] || 0;
 	const defaultHeight = 120;
@@ -251,7 +251,7 @@ Staff.prototype.renderLines = function (lines, length) {
 	return lineGroups;
 };
 
-Staff.prototype.renderMeasures = function (measures, lengths, staffGroup) {
+System.prototype.renderMeasures = function (measures, lengths, staffGroup) {
 	let measureGroups = _.reduce(measures, (groups, measure, i) => {
 		let measureLength = lengths[i],
 			previousGroup = _.last(groups),
@@ -267,4 +267,4 @@ Staff.prototype.renderMeasures = function (measures, lengths, staffGroup) {
 	return measureGroups;
 };
 
-export default Staff;
+export default System;
