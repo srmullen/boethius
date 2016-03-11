@@ -5,7 +5,14 @@ import Scored from "../src/Scored";
 import Score from "../src/views/Score";
 
 describe("Scored", () => {
-	let scored = new Scored();
+	const scored = new Scored();
+
+	describe("fromJSON", () => {
+		it("should exist", () => {
+			expect(scored.fromJSON).to.be.ok;
+		});
+	});
+
 	describe("note", () => {
 		it("should return a Note object", () => {
 			let note = scored.note();
@@ -113,11 +120,7 @@ describe("Scored", () => {
 			expect(_.map(line.children, m => m.startsAt)).to.eql([0, 0.75, 1.5, 2.25]);
 		});
 	});
-	describe("staff", () => {
-		it("should return a Staff object", () => {
-
-		});
-	});
+	
     xdescribe("layout", () => {
 		describe("key", () => {
 			it("should layout", () => {

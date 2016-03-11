@@ -47,6 +47,10 @@ Scored.prototype.layout = function (layout) {
 	return _.bind(parse, this)({}, layout) || [];
 };
 
+Scored.prototype.fromJSON = function (json) {
+
+};
+
 Scored.prototype.compose = function (layout, music) {
 	// When layout is a Score it needs to be responsible for putting music events into the correct line.
 	// Staff is currently handling this so that functionality needs to be ported.
