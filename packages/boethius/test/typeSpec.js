@@ -9,7 +9,7 @@ import {
     isNote,
     isRest,
     isScore,
-    isStaff,
+    isSystem,
     isTimeSignature,
     isVoice,
     isMarking,
@@ -80,14 +80,14 @@ describe("types", () => {
     xdescribe("isScore", () => {
         it("should return true if the given item is a Score, false otherwise", () => {
             expect(isScore(scored.score())).to.be.true;
-            expect(isScore(scored.staff())).to.be.false;
+            expect(isScore(scored.system())).to.be.false;
         });
     });
 
-    describe("isStaff", () => {
+    describe("isSystem", () => {
         it("should return true if the given item is a Staff, false otherwise", () => {
-            expect(isStaff(scored.staff())).to.be.true;
-            expect(isStaff(scored.chord({}, ["c4", "d4"]))).to.be.false;
+            expect(isSystem(scored.system())).to.be.true;
+            expect(isSystem(scored.chord({}, ["c4", "d4"]))).to.be.false;
         });
     });
 

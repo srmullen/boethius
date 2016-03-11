@@ -21,7 +21,7 @@ const isMeasure = _.partial(isType, constants.type.measure);
 const isNote = _.partial(isType, constants.type.note);
 const isRest = _.partial(isType, constants.type.rest);
 const isScore = _.partial(isType, constants.type.score);
-const isStaff = _.partial(isType, constants.type.staff);
+const isSystem = _.partial(isType, constants.type.system);
 const isTimeSignature = _.partial(isType, constants.type.timeSig);
 const isVoice = _.partial(isType, constants.type.voice);
 const isMarking = item => isClef(item) || isKey(item) || isTimeSignature(item);
@@ -37,7 +37,7 @@ export {
     isNote,
     isRest,
     isScore,
-    isStaff,
+    isSystem,
     isTimeSignature,
     isVoice,
     isMarking,
