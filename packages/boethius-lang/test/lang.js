@@ -1,10 +1,112 @@
 import {expect} from "chai";
-import lang from "../lang";
+import {parser} from "../lang";
 
 describe("parser", () => {
+    it("should return an empty array for an empty file", () => {
+        expect(parser.parse("")).to.eql([]);
+    });
+
     describe("notes", () => {
-        it("should fail", () => {
-            expect(1).to.equal(2);
+        it("should return an object with type and pitch", () => {
+            let parsed = parser.parse("e4");
+            expect(parsed[0]).to.eql({type: "note", pitch: "e4"});
+        });
+
+        it("should return an object with type, pitch, and value", () => {
+            let parsed = parser.parse("c#3/8");
+            expect(parsed[0]).to.eql({type: "note", pitch: "c#3", value: 8, dots: undefined});
+        });
+
+        it("should return an object with type, pitch, value, and dots", () => {
+            let parsed = parser.parse("bb5/1..");
+            expect(parsed[0]).to.eql({type: "note", pitch: "bb5", value: 1, dots: 2});
+        });
+    });
+
+    describe("rests", () => {
+        it("should return an object with a type of rest", () => {
+            let parsed = parser.parse("r");
+            expect(parsed[0]).to.eql({type: "rest"});
+        });
+
+        it("should return an object with type and value", () => {
+            let parsed = parser.parse("r/2");
+            expect(parsed[0]).to.eql({type: "rest", value: 2, dots: undefined});
+        });
+
+        it("should return an object with type, value, and dots", () => {
+            let parsed = parser.parse("r/16.");
+            expect(parsed[0]).to.eql({type: "rest", value: 16, dots: 1});
+        });
+    });
+
+    describe("chords", () => {
+        it("should return and object with type and children", () => {
+            let parsed = parser.parse("<c4 e4 g4>");
+            let notes = parser.parse("c4 e4 g4");
+            expect(parsed[0]).to.eql({type: "chord", children: notes});
+        });
+
+        it("should return an object with type, children, and value", () => {
+            let parsed = parser.parse("<c4 e4>/8");
+            let notes = parser.parse("c4 e4");
+            expect(parsed[0]).to.eql({type: "chord", children: notes, value: 8, dots: undefined});
+        });
+
+        it("should return an object with type, children, dots, and value", () => {
+            let parsed = parser.parse("<c4 e4>/32...");
+            let notes = parser.parse("c4 e4");
+            expect(parsed[0]).to.eql({type: "chord", children: notes, value: 32, dots: 3});
+        });
+    });
+
+    describe("multiple items", () => {
+        it("should return an array of all items", () => {
+            let parsed = parser.parse("g4 c5/8 r/8 <c4 e4 g4 c5>/1");
+            expect(parsed.length).to.equal(4);
+        });
+    });
+
+    describe("arbitrary properties", () => {
+        it("should set true for the property if no value is given", () => {
+            let parsed = parser.parse("(slur a4)");
+            expect(parsed[0].slur).to.be.true;
+        });
+
+        it("should set boolean values if given", () => {
+            let parsed = parser.parse("(foo=false <c3 e4>)");
+            expect(parsed[0].foo).to.be.false;
+        });
+
+        it("should set integer values if given", () => {
+            let parsed = parser.parse("(dots=2 r/16)");
+            expect(parsed[0].dots).to.equal(2);
+        });
+
+        it("should set an identifier as a string if given", () => {
+            let parsed = parser.parse("(bar=baz d5/8)");
+            expect(parsed[0].bar).to.equal("baz");
+        });
+
+        it("should set the value on all contained items", () => {
+            let [note1, note2, note3] = parser.parse("(foo=1 b4 c5 d5)");
+            expect(note1.foo).to.equal(1);
+            expect(note2.foo).to.equal(1);
+            expect(note3.foo).to.equal(1);
+        });
+
+        it("should parse multiple un-nested scopes", () => {
+            let [note1, note2, note3] = parser.parse("(foo=1 b4) (foo=2 c5) (foo=3 d5)");
+            expect(note1.foo).to.equal(1);
+            expect(note2.foo).to.equal(2);
+            expect(note3.foo).to.equal(3);
+        });
+
+        it("should give inner contexts priority", () => {
+            let [note1, note2, note3] = parser.parse("(foo=1 b4 (foo=2 c5) d5)");
+            expect(note1.foo).to.equal(1);
+            expect(note2.foo).to.equal(2);
+            expect(note3.foo).to.equal(1);
         });
     });
 });
