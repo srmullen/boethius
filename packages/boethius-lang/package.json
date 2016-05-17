@@ -1,0 +1,18 @@
+{
+  "name": "boethius-lang",
+  "version": "0.0.1",
+  "description": "Music description language",
+  "main": "lang.js",
+  "scripts": {
+    "compile": "jison lang.jison -o lang.js",
+    "test": "mocha --compilers js:babel-register"
+  },
+  "author": "Sean Mullen <srmullen13@gmail.com> (http://seanmullen.me/)",
+  "license": "ISC",
+  "devDependencies": {
+    "babel-register": "^6.8.0",
+    "chai": "^3.5.0",
+    "jison": "^0.4.17",
+    "mocha": "^2.4.5"
+  }
+}
