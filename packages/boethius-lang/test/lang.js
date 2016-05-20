@@ -1,5 +1,5 @@
 import {expect} from "chai";
-import {parser} from "../lang";
+import {parser} from "../lang/lang";
 
 describe("parser", () => {
     it("should return an empty array for an empty file", () => {
