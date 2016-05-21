@@ -1,5 +1,10 @@
 /* description: Parses end executes boethius expressions. */
 %{
+    // types
+    var NOTE = "note";
+    var REST = "rest";
+    var CHORD = "chord";
+
     var NOTES = {
         "C":  0,  "c":  0,  "b#":  0,   "B#":  0,  "Dbb": 0,   "DBB": 0, "dbb": 0, "dBB": 0,
         "C#": 1,  "c#": 1,  "Db":  1,   "db":  1,  "DB":  1,   "dB":  1,
@@ -133,14 +138,14 @@ note:
         {
             var info = noteInfo($1);
             // default values
-            info.type = "note";
+            info.type = NOTE;
 
             $$ = info;
         }
     | PITCH FWDSLASH duration
         {
             var info = noteInfo($1);
-            info.type = "note";
+            info.type = NOTE;
             info.value = $3.value;
             info.dots = $3.dots;
             $$ = info;
@@ -156,17 +161,17 @@ notelist:
 
 rest:
     REST
-        {$$ = {type: "rest"}}
+        {$$ = {type: REST}}
     | REST FWDSLASH duration
-        {$$ = {type: "rest", value: $3.value, dots: $3.dots}}
+        {$$ = {type: REST, value: $3.value, dots: $3.dots}}
     ;
 
 chord:
     OPENBRKT notelist CLOSEBRKT
-        {$$ = {type: "chord", children: $2}}
+        {$$ = {type: CHORD, children: $2}}
     | OPENBRKT notelist CLOSEBRKT FWDSLASH duration
         {
-            $$ = {type: "chord", children: $2, value: $5.value, dots: $5.dots};
+            $$ = {type: CHORD, children: $2, value: $5.value, dots: $5.dots};
         }
     ;
 

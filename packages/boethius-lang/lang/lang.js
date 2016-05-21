@@ -99,7 +99,7 @@ case 5:
 
             var info = noteInfo($$[$0]);
             // default values
-            info.type = "note";
+            info.type = NOTE;
 
             this.$ = info;
         
@@ -107,7 +107,7 @@ break;
 case 6:
 
             var info = noteInfo($$[$0-2]);
-            info.type = "note";
+            info.type = NOTE;
             info.value = $$[$0].value;
             info.dots = $$[$0].dots;
             this.$ = info;
@@ -120,17 +120,17 @@ case 8: case 21: case 23:
 this.$ = $$[$0-1].concat($$[$0])
 break;
 case 9:
-this.$ = {type: "rest"}
+this.$ = {type: REST}
 break;
 case 10:
-this.$ = {type: "rest", value: $$[$0].value, dots: $$[$0].dots}
+this.$ = {type: REST, value: $$[$0].value, dots: $$[$0].dots}
 break;
 case 11:
-this.$ = {type: "chord", children: $$[$0-1]}
+this.$ = {type: CHORD, children: $$[$0-1]}
 break;
 case 12:
 
-            this.$ = {type: "chord", children: $$[$0-3], value: $$[$0].value, dots: $$[$0].dots};
+            this.$ = {type: CHORD, children: $$[$0-3], value: $$[$0].value, dots: $$[$0].dots};
         
 break;
 case 13: case 14: case 15: case 22:
@@ -304,6 +304,11 @@ parse: function parse(input) {
     }
     return true;
 }};
+
+    // types
+    var NOTE = "note";
+    var REST = "rest";
+    var CHORD = "chord";
 
     var NOTES = {
         "C":  0,  "c":  0,  "b#":  0,   "B#":  0,  "Dbb": 0,   "DBB": 0, "dbb": 0, "dBB": 0,
