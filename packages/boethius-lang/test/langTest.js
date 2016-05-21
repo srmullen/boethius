@@ -8,35 +8,63 @@ describe("parser", () => {
 
     describe("notes", () => {
         it("should return an object with type and pitch", () => {
-            let parsed = parser.parse("e4");
-            expect(parsed[0]).to.eql({type: "note", pitch: "e4"});
+            const [parsed] = parser.parse("e4");
+            expect(parsed).to.eql({
+                type: "note",
+                pitch: "e4",
+                frequency: 329.6275569128699,
+                interval: 4,
+                midi: 64,
+                octave: 4,
+                pitchClass: "e"
+            });
         });
 
         it("should return an object with type, pitch, and value", () => {
-            let parsed = parser.parse("c#3/8");
-            expect(parsed[0]).to.eql({type: "note", pitch: "c#3", value: 8, dots: undefined});
+            const [parsed] = parser.parse("c#3/8");
+            expect(parsed).to.eql({
+                frequency: 138.59131548843604,
+                interval: 1,
+                midi: 49,
+                octave: 3,
+                pitch: "c#3",
+                pitchClass: "c#",
+                type: "note",
+                value: 8,
+                dots: undefined
+            });
         });
 
         it("should return an object with type, pitch, value, and dots", () => {
-            let parsed = parser.parse("bb5/1..");
-            expect(parsed[0]).to.eql({type: "note", pitch: "bb5", value: 1, dots: 2});
+            const [parsed] = parser.parse("bb5/1..");
+            expect(parsed).to.eql({
+                "frequency": 932.3275230361799,
+                "interval": 10,
+                "midi": 82,
+                "octave": 5,
+                "pitch": "bb5",
+                "pitchClass": "bb",
+                "type": "note",
+                "value": 1,
+                "dots": 2
+            });
         });
     });
 
     describe("rests", () => {
         it("should return an object with a type of rest", () => {
-            let parsed = parser.parse("r");
-            expect(parsed[0]).to.eql({type: "rest"});
+            const [parsed] = parser.parse("r");
+            expect(parsed).to.eql({type: "rest"});
         });
 
         it("should return an object with type and value", () => {
-            let parsed = parser.parse("r/2");
-            expect(parsed[0]).to.eql({type: "rest", value: 2, dots: undefined});
+            const [parsed] = parser.parse("r/2");
+            expect(parsed).to.eql({type: "rest", value: 2, dots: undefined});
         });
 
         it("should return an object with type, value, and dots", () => {
-            let parsed = parser.parse("r/16.");
-            expect(parsed[0]).to.eql({type: "rest", value: 16, dots: 1});
+            const [parsed] = parser.parse("r/16.");
+            expect(parsed).to.eql({type: "rest", value: 16, dots: 1});
         });
     });
 

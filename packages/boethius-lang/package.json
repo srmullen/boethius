@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "watchify src/main.js -t [babelify] -o dist/main.js -v -d",
     "compile": "jison lang/lang.jison -o lang/lang.js",
-    "test": "mocha --compilers js:babel-register"
+    "test": "npm run compile && mocha --compilers js:babel-register"
   },
   "author": "Sean Mullen <srmullen13@gmail.com> (http://seanmullen.me/)",
   "license": "ISC",

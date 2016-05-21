@@ -3,7 +3,8 @@ import * as musicBox from "./musicBox";
 
 function compile (program) {
     const parsed = parser.parse(program);
-    return parsed.map(musicBox.noteInfo);
+    
+    return parsed;
 }
 
 export default compile;
