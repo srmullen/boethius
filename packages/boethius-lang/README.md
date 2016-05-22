@@ -6,6 +6,6 @@ Music description language for Scores and Sound.
 TODO
 ====
 
-- time property
+- time property?
 - handle Rest type
 - handle other types
