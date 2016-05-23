@@ -1,8 +1,8 @@
 {
   "name": "boethius-lang",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Music description language",
-  "main": "dist/main.js",
+  "main": "lang/lang.js",
   "scripts": {
     "dev": "watchify src/main.js -t [babelify] -o dist/main.js -v -d",
     "compile": "jison lang/lang.jison -o lang/lang.js",
