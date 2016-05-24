@@ -189,19 +189,24 @@ ratio:
         {$$ = "" + $1 + $2 + $3}
     ;
 
+propertydef:
+    IDENTIFIER EQUALS BOOL
+        {$$ = {key: $1, value: toBoolean($3)}}
+    | IDENTIFIER EQUALS INTEGER
+        {$$ = {key: $1, value: Number($3)}}
+    | IDENTIFIER EQUALS IDENTIFIER
+        {$$ = {key: $1, value: $3}}
+    | IDENTIFIER EQUALS ratio
+        {$$ = {key: $1, value: $3}}
+    ;
+
 propscope:
     LPAREN IDENTIFIER list RPAREN
         {$$ = $3.map(function (item) {
             return applyProperty(item, $2, true);
         });}
-    | LPAREN IDENTIFIER EQUALS BOOL list RPAREN
-        {$$ = $5.map(function (item) {return applyProperty(item, $2, toBoolean($4))})}
-    | LPAREN IDENTIFIER EQUALS INTEGER list RPAREN
-        {$$ = $5.map(function (item) {return applyProperty(item, $2, Number($4))})}
-    | LPAREN IDENTIFIER EQUALS IDENTIFIER list RPAREN
-        {$$ = $5.map(function (item) {return applyProperty(item, $2, $4)});}
-    | LPAREN IDENTIFIER EQUALS ratio list RPAREN
-        {$$ = $5.map(function (item) {return applyProperty(item, $2, $4)});}
+    | LPAREN propertydef list RPAREN
+        {$$ = $3.map(function (item) {return applyProperty(item, $2.key, $2.value)})}
     ;
 
 list:

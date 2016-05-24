@@ -72,12 +72,12 @@
   }
 */
 var lang = (function(){
-var o=function(k,v,o,l){for(o=o||{},l=k.length;l--;o[k[l]]=v);return o},$V0=[1,10],$V1=[1,11],$V2=[1,12],$V3=[1,9],$V4=[4,10,14,16,21,23],$V5=[4,10,14,16,17,21,23],$V6=[1,24],$V7=[10,17];
+var o=function(k,v,o,l){for(o=o||{},l=k.length;l--;o[k[l]]=v);return o},$V0=[1,10],$V1=[1,11],$V2=[1,12],$V3=[1,9],$V4=[4,10,14,16,25,26],$V5=[4,10,14,16,17,25,26],$V6=[1,26],$V7=[10,17],$V8=[10,14,16,25];
 var parser = {trace: function trace() { },
 yy: {},
-symbols_: {"error":2,"expressions":3,"EOF":4,"list":5,"duration":6,"INTEGER":7,"DOTS":8,"note":9,"PITCH":10,"FWDSLASH":11,"notelist":12,"rest":13,"REST":14,"chord":15,"OPENBRKT":16,"CLOSEBRKT":17,"item":18,"ratio":19,"propscope":20,"LPAREN":21,"IDENTIFIER":22,"RPAREN":23,"EQUALS":24,"BOOL":25,"$accept":0,"$end":1},
-terminals_: {2:"error",4:"EOF",7:"INTEGER",8:"DOTS",10:"PITCH",11:"FWDSLASH",14:"REST",16:"OPENBRKT",17:"CLOSEBRKT",21:"LPAREN",22:"IDENTIFIER",23:"RPAREN",24:"EQUALS",25:"BOOL"},
-productions_: [0,[3,1],[3,2],[6,1],[6,2],[9,1],[9,3],[12,1],[12,2],[13,1],[13,3],[15,3],[15,5],[18,1],[18,1],[18,1],[19,3],[20,4],[20,6],[20,6],[20,6],[20,6],[5,1],[5,2],[5,1],[5,2]],
+symbols_: {"error":2,"expressions":3,"EOF":4,"list":5,"duration":6,"INTEGER":7,"DOTS":8,"note":9,"PITCH":10,"FWDSLASH":11,"notelist":12,"rest":13,"REST":14,"chord":15,"OPENBRKT":16,"CLOSEBRKT":17,"item":18,"ratio":19,"propertydef":20,"IDENTIFIER":21,"EQUALS":22,"BOOL":23,"propscope":24,"LPAREN":25,"RPAREN":26,"$accept":0,"$end":1},
+terminals_: {2:"error",4:"EOF",7:"INTEGER",8:"DOTS",10:"PITCH",11:"FWDSLASH",14:"REST",16:"OPENBRKT",17:"CLOSEBRKT",21:"IDENTIFIER",22:"EQUALS",23:"BOOL",25:"LPAREN",26:"RPAREN"},
+productions_: [0,[3,1],[3,2],[6,1],[6,2],[9,1],[9,3],[12,1],[12,2],[13,1],[13,3],[15,3],[15,5],[18,1],[18,1],[18,1],[19,3],[20,3],[20,3],[20,3],[20,3],[24,4],[24,4],[5,1],[5,2],[5,1],[5,2]],
 performAction: function anonymous(yytext, yyleng, yylineno, yy, yystate /* action[1] */, $$ /* vstack */, _$ /* lstack */) {
 /* this == yyval */
 
@@ -113,10 +113,10 @@ case 6:
             this.$ = info;
         
 break;
-case 7: case 22:
+case 7: case 23:
 this.$ = [$$[$0]]
 break;
-case 8: case 23: case 25:
+case 8: case 24: case 26:
 this.$ = $$[$0-1].concat($$[$0])
 break;
 case 9:
@@ -133,29 +133,32 @@ case 12:
             this.$ = {type: CHORD, children: $$[$0-3], value: $$[$0].value, dots: $$[$0].dots};
         
 break;
-case 13: case 14: case 15: case 24:
+case 13: case 14: case 15: case 25:
 this.$ = $$[$0]
 break;
 case 16:
 this.$ = "" + $$[$0-2] + $$[$0-1] + $$[$0]
 break;
 case 17:
+this.$ = {key: $$[$0-2], value: toBoolean($$[$0])}
+break;
+case 18:
+this.$ = {key: $$[$0-2], value: Number($$[$0])}
+break;
+case 19: case 20:
+this.$ = {key: $$[$0-2], value: $$[$0]}
+break;
+case 21:
 this.$ = $$[$0-1].map(function (item) {
             return applyProperty(item, $$[$0-2], true);
         });
 break;
-case 18:
-this.$ = $$[$0-1].map(function (item) {return applyProperty(item, $$[$0-4], toBoolean($$[$0-2]))})
-break;
-case 19:
-this.$ = $$[$0-1].map(function (item) {return applyProperty(item, $$[$0-4], Number($$[$0-2]))})
-break;
-case 20: case 21:
-this.$ = $$[$0-1].map(function (item) {return applyProperty(item, $$[$0-4], $$[$0-2])});
+case 22:
+this.$ = $$[$0-1].map(function (item) {return applyProperty(item, $$[$0-2].key, $$[$0-2].value)})
 break;
 }
 },
-table: [{3:1,4:[1,2],5:3,9:6,10:$V0,13:7,14:$V1,15:8,16:$V2,18:4,20:5,21:$V3},{1:[3]},{1:[2,1]},{4:[1,13],9:6,10:$V0,13:7,14:$V1,15:8,16:$V2,18:14,20:15,21:$V3},o($V4,[2,22]),o($V4,[2,24]),o($V4,[2,13]),o($V4,[2,14]),o($V4,[2,15]),{22:[1,16]},o($V5,[2,5],{11:[1,17]}),o($V4,[2,9],{11:[1,18]}),{9:20,10:$V0,12:19},{1:[2,2]},o($V4,[2,23]),o($V4,[2,25]),{5:21,9:6,10:$V0,13:7,14:$V1,15:8,16:$V2,18:4,20:5,21:$V3,24:[1,22]},{6:23,7:$V6},{6:25,7:$V6},{9:27,10:$V0,17:[1,26]},o($V7,[2,7]),{9:6,10:$V0,13:7,14:$V1,15:8,16:$V2,18:14,20:15,21:$V3,23:[1,28]},{7:[1,30],19:32,22:[1,31],25:[1,29]},o($V5,[2,6]),o($V5,[2,3],{8:[1,33]}),o($V4,[2,10]),o($V4,[2,11],{11:[1,34]}),o($V7,[2,8]),o($V4,[2,17]),{5:35,9:6,10:$V0,13:7,14:$V1,15:8,16:$V2,18:4,20:5,21:$V3},{5:36,9:6,10:$V0,11:[1,37],13:7,14:$V1,15:8,16:$V2,18:4,20:5,21:$V3},{5:38,9:6,10:$V0,13:7,14:$V1,15:8,16:$V2,18:4,20:5,21:$V3},{5:39,9:6,10:$V0,13:7,14:$V1,15:8,16:$V2,18:4,20:5,21:$V3},o($V5,[2,4]),{6:40,7:$V6},{9:6,10:$V0,13:7,14:$V1,15:8,16:$V2,18:14,20:15,21:$V3,23:[1,41]},{9:6,10:$V0,13:7,14:$V1,15:8,16:$V2,18:14,20:15,21:$V3,23:[1,42]},{7:[1,43]},{9:6,10:$V0,13:7,14:$V1,15:8,16:$V2,18:14,20:15,21:$V3,23:[1,44]},{9:6,10:$V0,13:7,14:$V1,15:8,16:$V2,18:14,20:15,21:$V3,23:[1,45]},o($V4,[2,12]),o($V4,[2,18]),o($V4,[2,19]),o([10,14,16,21],[2,16]),o($V4,[2,20]),o($V4,[2,21])],
+table: [{3:1,4:[1,2],5:3,9:6,10:$V0,13:7,14:$V1,15:8,16:$V2,18:4,24:5,25:$V3},{1:[3]},{1:[2,1]},{4:[1,13],9:6,10:$V0,13:7,14:$V1,15:8,16:$V2,18:14,24:15,25:$V3},o($V4,[2,23]),o($V4,[2,25]),o($V4,[2,13]),o($V4,[2,14]),o($V4,[2,15]),{20:17,21:[1,16]},o($V5,[2,5],{11:[1,18]}),o($V4,[2,9],{11:[1,19]}),{9:21,10:$V0,12:20},{1:[2,2]},o($V4,[2,24]),o($V4,[2,26]),{5:22,9:6,10:$V0,13:7,14:$V1,15:8,16:$V2,18:4,22:[1,23],24:5,25:$V3},{5:24,9:6,10:$V0,13:7,14:$V1,15:8,16:$V2,18:4,24:5,25:$V3},{6:25,7:$V6},{6:27,7:$V6},{9:29,10:$V0,17:[1,28]},o($V7,[2,7]),{9:6,10:$V0,13:7,14:$V1,15:8,16:$V2,18:14,24:15,25:$V3,26:[1,30]},{7:[1,32],19:34,21:[1,33],23:[1,31]},{9:6,10:$V0,13:7,14:$V1,15:8,16:$V2,18:14,24:15,25:$V3,26:[1,35]},o($V5,[2,6]),o($V5,[2,3],{8:[1,36]}),o($V4,[2,10]),o($V4,[2,11],{11:[1,37]}),o($V7,[2,8]),o($V4,[2,21]),o($V8,[2,17]),o($V8,[2,18],{11:[1,38]}),o($V8,[2,19]),o($V8,[2,20]),o($V4,[2,22]),o($V5,[2,4]),{6:39,7:$V6},{7:[1,40]},o($V4,[2,12]),o($V8,[2,16])],
 defaultActions: {2:[2,1],13:[2,2]},
 parseError: function parseError(str, hash) {
     if (hash.recoverable) {
@@ -722,9 +725,9 @@ var YYSTATE=YY_START;
 switch($avoiding_name_collisions) {
 case 0:/* skip whitespace */
 break;
-case 1:return 21
+case 1:return 25
 break;
-case 2:return 23
+case 2:return 26
 break;
 case 3:return 16
 break;
@@ -732,7 +735,7 @@ case 4:return 17
 break;
 case 5:return 11
 break;
-case 6:return 24
+case 6:return 22
 break;
 case 7:return 10
 break;
@@ -740,11 +743,11 @@ case 8:return 14
 break;
 case 9:return 8
 break;
-case 10:return 25
+case 10:return 23
 break;
 case 11:return 7
 break;
-case 12:return 22
+case 12:return 21
 break;
 case 13:return 4
 break;

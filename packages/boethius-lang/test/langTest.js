@@ -119,7 +119,7 @@ describe("parser", () => {
         it("should set ratios as as string if given", () => {
             const [parsed] = parser.parse("(tuplet=3/2 c4)");
             expect(parsed.tuplet).to.eql("3/2");
-        })
+        });
 
         it("should set the value on all contained items", () => {
             let [note1, note2, note3] = parser.parse("(foo=1 b4 c5 d5)");
@@ -140,6 +140,12 @@ describe("parser", () => {
             expect(note1.foo).to.equal(1);
             expect(note2.foo).to.equal(2);
             expect(note3.foo).to.equal(1);
+        });
+
+        xit("should handle multiple arbitrary properties in one scope", () => {
+            const [parsed] = parser.parse("(foo=bar bar=baz c4)");
+            expect(parsed.foo).to.equal("bar");
+            expect(parsed.bar).to.equal("baz");
         });
     });
 });
