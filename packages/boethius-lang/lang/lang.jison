@@ -184,6 +184,11 @@ item:
         {$$ = $1}
     ;
 
+ratio:
+    INTEGER FWDSLASH INTEGER
+        {$$ = "" + $1 + $2 + $3}
+    ;
+
 propscope:
     LPAREN IDENTIFIER list RPAREN
         {$$ = $3.map(function (item) {
@@ -194,6 +199,8 @@ propscope:
     | LPAREN IDENTIFIER EQUALS INTEGER list RPAREN
         {$$ = $5.map(function (item) {return applyProperty(item, $2, Number($4))})}
     | LPAREN IDENTIFIER EQUALS IDENTIFIER list RPAREN
+        {$$ = $5.map(function (item) {return applyProperty(item, $2, $4)});}
+    | LPAREN IDENTIFIER EQUALS ratio list RPAREN
         {$$ = $5.map(function (item) {return applyProperty(item, $2, $4)});}
     ;
 
