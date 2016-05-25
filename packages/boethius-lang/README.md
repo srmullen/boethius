@@ -9,3 +9,4 @@ TODO
 - time property?
 - handle Rest type
 - handle other types
+- voices

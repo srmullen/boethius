@@ -168,4 +168,21 @@ describe("parser", () => {
             expect(parsed.bar).to.equal("baz");
         });
     });
+
+    describe("comments", () => {
+        it("should ignore text after ;", () => {
+            expect(parser.parse("; i'm a comment")).to.eql([]);
+            let [note1, note2] = parser.parse("c4 ; d4");
+            expect(note1).to.be.ok;
+            expect(note2).not.to.be.ok;
+        });
+
+        it("should not carry over to a newline", () => {
+            let [note1, note2] = parser.parse(
+                `c4 ; d4
+                e4`);
+            expect(note1.pitch).to.equal("c4");
+            expect(note2.pitch).to.equal("e4");
+        });
+    });
 });

@@ -91,6 +91,7 @@
 %%
 
 \s+                   /* skip whitespace */
+\;.*                  /* ignore comments */ 
 \(                    return 'LPAREN'
 \)                    return 'RPAREN'
 \<                    return 'OPENBRKT'
