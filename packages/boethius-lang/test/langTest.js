@@ -31,7 +31,7 @@ describe("parser", () => {
                 pitchClass: "c#",
                 type: "note",
                 value: 8,
-                dots: undefined
+                dots: 0
             });
         });
 
@@ -59,7 +59,7 @@ describe("parser", () => {
 
         it("should return an object with type and value", () => {
             const [parsed] = parser.parse("r/2");
-            expect(parsed).to.eql({type: "rest", value: 2, dots: undefined});
+            expect(parsed).to.eql({type: "rest", value: 2, dots: 0});
         });
 
         it("should return an object with type, value, and dots", () => {
@@ -78,7 +78,7 @@ describe("parser", () => {
         it("should return an object with type, children, and value", () => {
             let parsed = parser.parse("<c4 e4>/8");
             let notes = parser.parse("c4 e4");
-            expect(parsed[0]).to.eql({type: "chord", children: notes, value: 8, dots: undefined});
+            expect(parsed[0]).to.eql({type: "chord", children: notes, value: 8, dots: 0});
         });
 
         it("should return an object with type, children, dots, and value", () => {
@@ -95,6 +95,26 @@ describe("parser", () => {
         });
     });
 
+    describe("duration", () => {
+        it("should set value and dots", () => {
+            const [note1, note2, note3] = parser.parse("f#3 g4/8 bb6/2.");
+            expect(note1.value).not.to.be.defined;
+            expect(note1.dots).not.to.be.defined;
+            expect(note2.value).to.equal(8);
+            expect(note2.dots).to.equal(0);
+            expect(note3.value).to.equal(2);
+            expect(note3.dots).to.equal(1);
+        });
+
+        it("should not override dots when there is a duration", () => {
+            const [note1, note2, note3, note4] = parser.parse("c4/4 (dots=1 c4/4 c4/4.. c4)");
+            expect(note1.dots).not.to.be.defined;
+            expect(note2.dots).to.equal(0);
+            expect(note3.dots).to.equal(2);
+            expect(note4.dots).to.equal(1);
+        });
+    });
+
     describe("arbitrary properties", () => {
         it("should set true for the property if no value is given", () => {
             let parsed = parser.parse("(slur a4)");
@@ -107,7 +127,7 @@ describe("parser", () => {
         });
 
         it("should set integer values if given", () => {
-            let parsed = parser.parse("(dots=2 r/16)");
+            let parsed = parser.parse("(dots=2 r)");
             expect(parsed[0].dots).to.equal(2);
         });
 
@@ -142,7 +162,7 @@ describe("parser", () => {
             expect(note3.foo).to.equal(1);
         });
 
-        xit("should handle multiple arbitrary properties in one scope", () => {
+        it("should handle multiple arbitrary properties in one scope", () => {
             const [parsed] = parser.parse("(foo=bar bar=baz c4)");
             expect(parsed.foo).to.equal("bar");
             expect(parsed.bar).to.equal("baz");

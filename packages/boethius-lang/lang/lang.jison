@@ -128,7 +128,7 @@ expressions:
 
 duration:
     INTEGER
-        {$$ = {value: Number($1)}}
+        {$$ = {value: Number($1), dots: 0}}
     | INTEGER DOTS
         {$$ = {value: Number($1), dots: $2.length}}
     ;
@@ -200,13 +200,30 @@ propertydef:
         {$$ = {key: $1, value: $3}}
     ;
 
+propertylist:
+    propertydef
+        {
+            var props = {};
+            props[$1.key] = $1.value;
+            $$ = props;
+        }
+    | propertylist propertydef
+        {
+            var props = {};
+            props[$2.key] = $2.value;
+            $$ = Object.assign({}, $1, props);
+        }
+    ;
+
 propscope:
     LPAREN IDENTIFIER list RPAREN
         {$$ = $3.map(function (item) {
             return applyProperty(item, $2, true);
         });}
-    | LPAREN propertydef list RPAREN
-        {$$ = $3.map(function (item) {return applyProperty(item, $2.key, $2.value)})}
+    | LPAREN propertylist list RPAREN
+        {$$ = $3.map(function (item) {
+            return Object.assign({}, $2, item);
+        });}
     ;
 
 list:
