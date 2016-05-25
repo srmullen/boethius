@@ -1,6 +1,6 @@
 {
   "name": "boethius-lang",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Music description language",
   "main": "lang/lang.js",
   "scripts": {
