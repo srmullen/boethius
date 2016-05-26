@@ -91,14 +91,14 @@
 %%
 
 \s+                   /* skip whitespace */
-\;.*                  /* ignore comments */ 
+\;.*                  /* ignore comments */
 \(                    return 'LPAREN'
 \)                    return 'RPAREN'
 \<                    return 'OPENBRKT'
 \>                    return 'CLOSEBRKT'
 \/                    return 'FWDSLASH'
 \=                    return 'EQUALS'
-[a-g][b|#]{0,2}[\d]+  return 'PITCH'
+[a-gA-G][b|#]{0,2}[\d]+  return 'PITCH'
 r                     return 'REST'
 \.+                   return 'DOTS'
 true|false            return 'BOOL'

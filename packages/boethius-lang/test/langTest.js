@@ -49,6 +49,17 @@ describe("parser", () => {
                 "dots": 2
             });
         });
+
+        it("should take capitalized notes", () => {
+            const [a, b, c, d, e, f, g] = parser.parse("A4 B4 C4 D4 E4 F4 G4");
+            expect(a.pitch).to.equal("A4");
+            expect(b.pitch).to.equal("B4");
+            expect(c.pitch).to.equal("C4");
+            expect(d.pitch).to.equal("D4");
+            expect(e.pitch).to.equal("E4");
+            expect(f.pitch).to.equal("F4");
+            expect(g.pitch).to.equal("G4");
+        });
     });
 
     describe("rests", () => {
