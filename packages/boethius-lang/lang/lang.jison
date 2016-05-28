@@ -90,22 +90,23 @@
 %lex
 %%
 
-\s+                   /* skip whitespace */
-\;.*                  /* ignore comments */
-\(                    return 'LPAREN'
-\)                    return 'RPAREN'
-\<                    return 'OPENBRKT'
-\>                    return 'CLOSEBRKT'
-\/                    return 'FWDSLASH'
-\=                    return 'EQUALS'
+\s+                      /* skip whitespace */
+\;.*                     /* ignore comments */
+\|                       /* ignore barlines */
+\(                       return 'LPAREN'
+\)                       return 'RPAREN'
+\<                       return 'OPENBRKT'
+\>                       return 'CLOSEBRKT'
+\/                       return 'FWDSLASH'
+\=                       return 'EQUALS'
 [a-gA-G][b|#]{0,2}[\d]+  return 'PITCH'
-r                     return 'REST'
-\.+                   return 'DOTS'
-true|false            return 'BOOL'
-[0-9]+                return 'INTEGER'
-[a-zA-Z][a-zA-Z0-9]*  return 'IDENTIFIER'
-<<EOF>>               return 'EOF'
-.                     return 'INVALID'
+r                        return 'REST'
+\.+                      return 'DOTS'
+true|false               return 'BOOL'
+[0-9]+                   return 'INTEGER'
+[a-zA-Z][a-zA-Z0-9]*     return 'IDENTIFIER'
+<<EOF>>                  return 'EOF'
+.                        return 'INVALID'
 
 /lex
 

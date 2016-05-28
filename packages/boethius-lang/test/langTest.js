@@ -196,4 +196,30 @@ describe("parser", () => {
             expect(note2.pitch).to.equal("e4");
         });
     });
+
+    describe("barlines", () => {
+        it("should ignore them", () => {
+            expect(parser.parse("c4/1 | d4/1")).to.be.ok;
+        });
+    });
+
+    xdescribe("time", () => {
+        it("should add a time property", () => {
+            const [parsedNote] = parser.parse("c4");
+            expect(parsedNote.time).to.equal(0);
+
+            const [parsedRest] = parser.parse("r");
+            expect(parsedRest.time).to.equal(0);
+
+            const [parsedChord] = parser.parse("<d4 f4>");
+            expect(parsedChord.time).to.equal(0);
+        });
+
+        it("should increment time for subsequent items", () => {
+            const items = parser.parse("c4 d4/8 r");
+            expect(items[0].time).to.equal(0);
+            expect(items[1].time).to.equal(0.25);
+            expect(items[2].time).to.equal(0.375);
+        });
+    });
 });
