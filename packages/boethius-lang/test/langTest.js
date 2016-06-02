@@ -142,6 +142,11 @@ describe("parser", () => {
             expect(parsed[0].dots).to.equal(2);
         });
 
+        it("should set float values if given", () => {
+            let [parsed] = parser.parse("(tempo=34.56 c4)");
+            expect(parsed.tempo).to.equal(34.56);
+        });
+
         it("should set an identifier as a string if given", () => {
             let parsed = parser.parse("(bar=baz d5/8)");
             expect(parsed[0].bar).to.equal("baz");

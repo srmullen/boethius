@@ -128,11 +128,16 @@ expressions:
         {return $1;}
     ;
 
+float:
+    INTEGER DOTS INTEGER
+        {$$ = parseFloat($1 + "." + $3)}
+    ;
+
 duration:
-    INTEGER
-        {$$ = {value: Number($1), dots: 0}}
-    | INTEGER DOTS
-        {$$ = {value: Number($1), dots: $2.length}}
+    FWDSLASH INTEGER
+        {$$ = {value: Number($2), dots: 0}}
+    | FWDSLASH INTEGER DOTS
+        {$$ = {value: Number($2), dots: $3.length}}
     ;
 
 note:
@@ -144,12 +149,12 @@ note:
 
             $$ = info;
         }
-    | PITCH FWDSLASH duration
+    | PITCH duration
         {
             var info = noteInfo($1);
             info.type = NOTE;
-            info.value = $3.value;
-            info.dots = $3.dots;
+            info.value = $2.value;
+            info.dots = $2.dots;
             $$ = info;
         }
     ;
@@ -164,16 +169,16 @@ notelist:
 rest:
     REST
         {$$ = {type: REST}}
-    | REST FWDSLASH duration
-        {$$ = {type: REST, value: $3.value, dots: $3.dots}}
+    | REST duration
+        {$$ = {type: REST, value: $2.value, dots: $2.dots}}
     ;
 
 chord:
     OPENBRKT notelist CLOSEBRKT
         {$$ = {type: CHORD, children: $2}}
-    | OPENBRKT notelist CLOSEBRKT FWDSLASH duration
+    | OPENBRKT notelist CLOSEBRKT duration
         {
-            $$ = {type: CHORD, children: $2, value: $5.value, dots: $5.dots};
+            $$ = {type: CHORD, children: $2, value: $4.value, dots: $4.dots};
         }
     ;
 
@@ -199,6 +204,8 @@ propertydef:
     | IDENTIFIER EQUALS IDENTIFIER
         {$$ = {key: $1, value: $3}}
     | IDENTIFIER EQUALS ratio
+        {$$ = {key: $1, value: $3}}
+    | IDENTIFIER EQUALS float
         {$$ = {key: $1, value: $3}}
     ;
 
