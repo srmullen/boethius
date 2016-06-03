@@ -1,9 +1,9 @@
 function run () {
     testLine().translate(25, 50);
-    // testStaffSingleLine().translate(25, 150);
-    testStaffMultipleLines().translate(25, 150);
-    // testScoreSingleStaff().translate(25, 250);
-    testScoreMultipleStaves().translate(25, 350);
+    testStaffSingleLine().translate(25, 150);
+    // testStaffMultipleLines().translate(25, 150);
+    testScoreSingleStaff().translate(25, 250);
+    // testScoreMultipleStaves().translate(25, 350);
 }
 
 function testLine () {
@@ -23,9 +23,9 @@ function testStaffSingleLine () {
         scored.timeSig({measure: 0})
     ]);
 
-    var staff = scored.staff({}, [scored.timeSig({measure: 0})]);
+    var system = scored.system({}, [scored.timeSig({measure: 0})]);
 
-    return scored.render(staff, {lines: [line]});
+    return scored.render(system, {lines: [line]});
 }
 
 function testStaffMultipleLines () {
@@ -41,9 +41,9 @@ function testStaffMultipleLines () {
         scored.timeSig({measure: 0})
     ]);
 
-    var staff = scored.staff({}, [scored.timeSig({measure: 0})]);
+    var system = scored.system({}, [scored.timeSig({measure: 0})]);
 
-    return scored.render(staff, {lines: [line1, line2]});
+    return scored.render(system, {lines: [line1, line2]});
 }
 
 function testScoreSingleStaff () {
@@ -59,9 +59,9 @@ function testScoreSingleStaff () {
         scored.timeSig({measure: 0})
     ]);
 
-    var staff = scored.staff({});
+    var system = scored.system({});
 
-    var score = scored.score({}, [scored.timeSig({measure: 0}), staff, line1, line2]);
+    var score = scored.score({}, [scored.timeSig({measure: 0}), system, line1, line2]);
 
     return scored.render(score, {});
 }
@@ -85,11 +85,11 @@ function testScoreMultipleStaves () {
         scored.timeSig({measure: 0})
     ]);
 
-    var staff1 = scored.staff({measures: 4});
-    var staff2 = scored.staff({measures: 4});
-    var staff3 = scored.staff({measures: 4});
+    var system1 = scored.system({measures: 4});
+    var system2 = scored.system({measures: 4});
+    var system3 = scored.system({measures: 4});
 
-    var score = scored.score({staffHeights: [0, 300]}, [scored.timeSig({measure: 0}), staff1, staff2, line1, line2, line3]);
+    var score = scored.score({staffHeights: [0, 300]}, [scored.timeSig({measure: 0}), system1, system2, line1, line2, line3]);
 
     return scored.render(score, {});
 }
