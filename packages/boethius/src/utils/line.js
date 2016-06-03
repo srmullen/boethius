@@ -22,21 +22,6 @@ const b = lineGetter("B");
 const g = lineGetter("G");
 const e = lineGetter("E");
 
-/*
- * getClosestLine :: line -> (point -> noteName)
- */
-function getClosestLine (line) {
-	const lineGroup = line.staves[0];
-	const positions = [f(lineGroup), d(lineGroup), b(lineGroup), g(lineGroup), e(lineGroup)];
-	return function (point) {
-		let diffs = _.map(positions, (p) => Math.abs(point.y - p.y));
-		return _.indexOf(diffs, _.min(diffs));
-	};
-}
-
-/*
- * getClosestLine :: line -> (point -> measure)
- */
 function getMeasure (line) {
 	const positions = _.map(line.children, measure => measure.barlines[0].position);
 	return function (point) {
@@ -191,7 +176,6 @@ export {
 	b,
 	g,
 	e,
-	getClosestLine,
 	getMeasure,
 	getLineItems,
 	getTimeContexts,

@@ -13,7 +13,7 @@ import {isClef, isKey, isTimeSignature} from "../types";
 const TYPE = constants.type.score;
 
 /*
- * Class for managing Staves and Lines.
+ * Class for managing Systems and Lines.
  * Meta data such as title/composer could also be attached here.
  */
 function Score ({measures=1, length, systemHeights=[]}, children=[]) {

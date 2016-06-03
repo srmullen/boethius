@@ -1,7 +1,7 @@
 import _ from "lodash";
 
 import {isMarking, isPitched} from "../types";
-import {drawStaffBar} from "../engraver";
+import {drawSystemBar} from "../engraver";
 import constants from "../constants";
 import {createMeasures} from "../utils/measure";
 import {getLineItems, getTimeContexts, b, positionMarkings} from "../utils/line";
@@ -134,7 +134,7 @@ System.renderTimeContexts = function (system, lines, measures, voices, timeConte
 
 	systemGroup.addChildren(lineGroups);
 
-	systemGroup.addChild(drawStaffBar(lineGroups));
+	systemGroup.addChild(drawSystemBar(lineGroups));
 
 	/////////////////////
 	// Placement Phase //

@@ -146,7 +146,10 @@ function drawLine (width) {
 // 	return new paper.Symbol(new paper.Group(_.flatten([rectangle, lineArray])));
 // });
 
-function drawStaffBar (lines) {
+/*
+ * A System Bar is the bar at the beginning of a system connecting all the staves.
+ */
+function drawSystemBar (lines) {
 	const firstLine = lines[0];
 	const lastLine = lines[lines.length - 1];
 
@@ -653,7 +656,7 @@ export {
 	drawLegerLines,
 	drawBarline,
 	drawLine,
-	drawStaffBar,
+	drawSystemBar,
 	drawClef,
 	drawTimeSig,
 	drawHead,
