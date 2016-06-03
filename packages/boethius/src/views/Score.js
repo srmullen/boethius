@@ -5,7 +5,7 @@ import constants from "../constants";
 import {createMeasures} from "../utils/measure";
 import {map, reductions, partitionWhen, clone} from "../utils/common";
 import {getTimeContexts} from "../utils/line";
-import {getStaffItems, iterateByTime} from "../utils/staff";
+import {getStaffItems, iterateByTime} from "../utils/system";
 import {getAccidentalContexts} from "../utils/accidental";
 import {getTime} from "../utils/timeUtils";
 import {isClef, isKey, isTimeSignature} from "../types";
@@ -61,18 +61,18 @@ Score.render = function (score, {measures, voices=[]}) {
     });
 
     // split staffTimes and measures
-    let staffIdx = 0;
+    let systemIdx = 0;
     const systemTimeContexts = partitionWhen(timeContexts, (timeContext) => {
         const measure = _.find(timeContext, ctx => !!ctx).time.measure;
-        const ret = measure >= startMeasures[staffIdx + 1];
-        if (ret) staffIdx++;
+        const ret = measure >= startMeasures[systemIdx + 1];
+        if (ret) systemIdx++;
         return ret;
     });
 
-    // add empty contexts for any remaining staffIdxs'
-    _.each(_.drop(startMeasures, staffIdx + 2), () => systemTimeContexts.push([]));
+    // add empty contexts for any remaining systemIdxs'
+    _.each(_.drop(startMeasures, systemIdx + 2), () => systemTimeContexts.push([]));
 
-    // Create the context marking for the beginning of each staff.
+    // Create the context marking for the beginning of each system.
     map((systemContext, startContext, startTime) => {
         const firstTime = _.first(systemContext);
         if (firstTime) {
@@ -100,16 +100,16 @@ Score.render = function (score, {measures, voices=[]}) {
     }, systemTimeContexts, startContexts, startTimes);
 
     let startMeasure = 0;
-    let staffHeight = score.systemHeights[0] || 0;
+    let systemHeight = score.systemHeights[0] || 0;
     const defaultHeight = 250;
     const systemGroups = _.map(score.systems, (system, i) => {
         const endMeasure = startMeasure + system.measures;
         const systemMeasures = _.slice(measures, startMeasure, endMeasure);
 
         const systemGroup = System.renderTimeContexts(system, score.lines, systemMeasures, voices, systemTimeContexts[i], score.length);
-        systemGroup.translate(0, staffHeight);
+        systemGroup.translate(0, systemHeight);
 
-        staffHeight = (score.systemHeights[i+1] || defaultHeight) + staffHeight;
+        systemHeight = (score.systemHeights[i+1] || defaultHeight) + systemHeight;
 
         startMeasure += system.measures;
 

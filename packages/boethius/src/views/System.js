@@ -5,7 +5,7 @@ import {drawStaffBar} from "../engraver";
 import constants from "../constants";
 import {createMeasures} from "../utils/measure";
 import {getLineItems, getTimeContexts, b, positionMarkings} from "../utils/line";
-import {getStaffItems, calculateTimeLengths, calculateMeasureLengths, addDefaultMeasureLengths, iterateByTime, renderTimeContext} from "../utils/staff";
+import {getStaffItems, calculateTimeLengths, calculateMeasureLengths, addDefaultMeasureLengths, iterateByTime, renderTimeContext} from "../utils/system";
 import {map, mapDeep} from "../utils/common";
 import {getAccidentalContexts} from "../utils/accidental";
 import {calculateCursor, scaleCursor} from "../utils/placement";
