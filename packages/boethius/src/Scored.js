@@ -56,6 +56,13 @@ Scored.prototype.compose = function (layout, music) {
 };
 
 Scored.prototype.fromJSON = function (json) {
+	switch  (json.type) {
+	case constants.type.note:
+		return this.note(json);
+	case constants.type.rest:
+		return this.rest(json);
+	}
+
 
 };
 

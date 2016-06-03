@@ -3,6 +3,8 @@ import _ from "lodash";
 import * as common from "../src/utils/common";
 import Scored from "../src/Scored";
 import Score from "../src/views/Score";
+import Note from "../src/views/Note";
+import Rest from "../src/views/Rest";
 
 describe("Scored", () => {
 	const scored = new Scored();
@@ -11,6 +13,14 @@ describe("Scored", () => {
 		it("should exist", () => {
 			expect(scored.fromJSON).to.be.ok;
 		});
+
+		it("should convert a note object", () => {
+			expect(scored.fromJSON({type: "note"})).to.be.instanceof(Note);
+		});
+
+		it("should convert a rest object", () => {
+			expect(scored.fromJSON({type: "rest"})).to.be.instanceof(Rest);
+		})
 	});
 
 	describe("note", () => {
@@ -120,7 +130,7 @@ describe("Scored", () => {
 			expect(_.map(line.children, m => m.startsAt)).to.eql([0, 0.75, 1.5, 2.25]);
 		});
 	});
-	
+
     xdescribe("layout", () => {
 		describe("key", () => {
 			it("should layout", () => {
