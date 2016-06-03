@@ -32,7 +32,7 @@ function testDoubleStaffScore () {
     var system1 = scored.system({measures: 6, lineHeights: [0, 200]});
     var system2 = scored.system({measures: 6});
 
-    var score = scored.score({length: 1000, staffHeights: [0, 350]}, [fourfour, system1, system2, trebleLine, bassLine]);
+    var score = scored.score({length: 1000, systemHeights: [0, 350]}, [fourfour, system1, system2, trebleLine, bassLine]);
 
     // render it all as a score.
     return scored.render(score, {voices: [soprano, bass]});

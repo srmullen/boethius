@@ -16,7 +16,7 @@ const TYPE = constants.type.score;
  * Class for managing Staves and Lines.
  * Meta data such as title/composer could also be attached here.
  */
-function Score ({measures=1, length, staffHeights=[]}, children=[]) {
+function Score ({measures=1, length, systemHeights=[]}, children=[]) {
     /*
      * A score should have both systems and lines.
      * A line represents all measures from 0 to the end of the score. It is one-dimentional.
@@ -28,7 +28,7 @@ function Score ({measures=1, length, staffHeights=[]}, children=[]) {
     this.lines = types.line || [];
     this.systems = types.system || [];
     this.length = length;
-    this.staffHeights = staffHeights;
+    this.systemHeights = systemHeights;
 }
 
 Score.prototype.type = TYPE;
@@ -100,7 +100,7 @@ Score.render = function (score, {measures, voices=[]}) {
     }, systemTimeContexts, startContexts, startTimes);
 
     let startMeasure = 0;
-    let staffHeight = score.staffHeights[0] || 0;
+    let staffHeight = score.systemHeights[0] || 0;
     const defaultHeight = 250;
     const systemGroups = _.map(score.systems, (system, i) => {
         const endMeasure = startMeasure + system.measures;
@@ -109,7 +109,7 @@ Score.render = function (score, {measures, voices=[]}) {
         const systemGroup = System.renderTimeContexts(system, score.lines, systemMeasures, voices, systemTimeContexts[i], score.length);
         systemGroup.translate(0, staffHeight);
 
-        staffHeight = (score.staffHeights[i+1] || defaultHeight) + staffHeight;
+        staffHeight = (score.systemHeights[i+1] || defaultHeight) + staffHeight;
 
         startMeasure += system.measures;
 

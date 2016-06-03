@@ -89,7 +89,7 @@ function testScoreMultipleStaves () {
     var system2 = scored.system({measures: 4});
     var system3 = scored.system({measures: 4});
 
-    var score = scored.score({staffHeights: [0, 300]}, [scored.timeSig({measure: 0}), system1, system2, line1, line2, line3]);
+    var score = scored.score({systemHeights: [0, 300]}, [scored.timeSig({measure: 0}), system1, system2, line1, line2, line3]);
 
     return scored.render(score, {});
 }
