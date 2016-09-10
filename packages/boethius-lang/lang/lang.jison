@@ -69,10 +69,10 @@
 
 
     var applyProperty = function (item, prop, val) {
-        if (item[prop] !== undefined) {
+        if (item.props[prop] !== undefined) {
             return item;
         } else {
-            item[prop] = val;
+            item.props[prop] = val;
             return item;
         }
     }
@@ -143,19 +143,21 @@ duration:
 note:
     PITCH
         {
-            var info = noteInfo($1);
+            var props = noteInfo($1);
             // default values
-            info.type = NOTE;
+            /*info.type = NOTE;*/
 
-            $$ = info;
+            /*$$ = info;*/
+            $$ = {type: NOTE, props: props};
         }
     | PITCH duration
         {
-            var info = noteInfo($1);
-            info.type = NOTE;
-            info.value = $2.value;
-            info.dots = $2.dots;
-            $$ = info;
+            var props = noteInfo($1);
+            /*info.type = NOTE;*/
+            props.value = $2.value;
+            props.dots = $2.dots;
+            /*$$ = info;*/
+            $$ = {type: NOTE, props: props}
         }
     ;
 
@@ -231,7 +233,11 @@ propscope:
         });}
     | LPAREN propertylist list RPAREN
         {$$ = $3.map(function (item) {
-            return Object.assign({}, $2, item);
+            // items properties overwrite the proplist's properties
+            var props = Object.assign({}, $2, item.props);
+            /*return Object.assign({}, $2, item);*/
+            // resulting props are placed on the item.
+            return Object.assign({}, item, {props: props});
         });}
     ;
 

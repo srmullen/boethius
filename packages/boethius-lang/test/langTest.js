@@ -11,54 +11,60 @@ describe("parser", () => {
             const [parsed] = parser.parse("e4");
             expect(parsed).to.eql({
                 type: "note",
-                pitch: "e4",
-                frequency: 329.6275569128699,
-                interval: 4,
-                midi: 64,
-                octave: 4,
-                pitchClass: "e"
+                props: {
+                    pitch: "e4",
+                    frequency: 329.6275569128699,
+                    interval: 4,
+                    midi: 64,
+                    octave: 4,
+                    pitchClass: "e"
+                }
             });
         });
 
         it("should return an object with type, pitch, and value", () => {
             const [parsed] = parser.parse("c#3/8");
             expect(parsed).to.eql({
-                frequency: 138.59131548843604,
-                interval: 1,
-                midi: 49,
-                octave: 3,
-                pitch: "c#3",
-                pitchClass: "c#",
                 type: "note",
-                value: 8,
-                dots: 0
+                props: {
+                    frequency: 138.59131548843604,
+                    interval: 1,
+                    midi: 49,
+                    octave: 3,
+                    pitch: "c#3",
+                    pitchClass: "c#",
+                    value: 8,
+                    dots: 0
+                }
             });
         });
 
         it("should return an object with type, pitch, value, and dots", () => {
             const [parsed] = parser.parse("bb5/1..");
             expect(parsed).to.eql({
-                "frequency": 932.3275230361799,
-                "interval": 10,
-                "midi": 82,
-                "octave": 5,
-                "pitch": "bb5",
-                "pitchClass": "bb",
-                "type": "note",
-                "value": 1,
-                "dots": 2
+                type: "note",
+                props: {
+                    "frequency": 932.3275230361799,
+                    "interval": 10,
+                    "midi": 82,
+                    "octave": 5,
+                    "pitch": "bb5",
+                    "pitchClass": "bb",
+                    "value": 1,
+                    "dots": 2
+                }
             });
         });
 
         it("should take capitalized notes", () => {
             const [a, b, c, d, e, f, g] = parser.parse("A4 B4 C4 D4 E4 F4 G4");
-            expect(a.pitch).to.equal("A4");
-            expect(b.pitch).to.equal("B4");
-            expect(c.pitch).to.equal("C4");
-            expect(d.pitch).to.equal("D4");
-            expect(e.pitch).to.equal("E4");
-            expect(f.pitch).to.equal("F4");
-            expect(g.pitch).to.equal("G4");
+            expect(a.props.pitch).to.equal("A4");
+            expect(b.props.pitch).to.equal("B4");
+            expect(c.props.pitch).to.equal("C4");
+            expect(d.props.pitch).to.equal("D4");
+            expect(e.props.pitch).to.equal("E4");
+            expect(f.props.pitch).to.equal("F4");
+            expect(g.props.pitch).to.equal("G4");
         });
     });
 
@@ -108,7 +114,7 @@ describe("parser", () => {
 
     describe("duration", () => {
         it("should set value and dots", () => {
-            const [note1, note2, note3] = parser.parse("f#3 g4/8 bb6/2.");
+            const [{props: note1}, {props: note2}, {props: note3}] = parser.parse("f#3 g4/8 bb6/2.");
             expect(note1.value).not.to.be.defined;
             expect(note1.dots).not.to.be.defined;
             expect(note2.value).to.equal(8);
@@ -119,69 +125,69 @@ describe("parser", () => {
 
         it("should not override dots when there is a duration", () => {
             const [note1, note2, note3, note4] = parser.parse("c4/4 (dots=1 c4/4 c4/4.. c4)");
-            expect(note1.dots).not.to.be.defined;
-            expect(note2.dots).to.equal(0);
-            expect(note3.dots).to.equal(2);
-            expect(note4.dots).to.equal(1);
+            expect(note1.props.dots).not.to.be.defined;
+            expect(note2.props.dots).to.equal(0);
+            expect(note3.props.dots).to.equal(2);
+            expect(note4.props.dots).to.equal(1);
         });
     });
 
     describe("arbitrary properties", () => {
         it("should set true for the property if no value is given", () => {
             let parsed = parser.parse("(slur a4)");
-            expect(parsed[0].slur).to.be.true;
+            expect(parsed[0].props.slur).to.be.true;
         });
 
         it("should set boolean values if given", () => {
             let parsed = parser.parse("(foo=false <c3 e4>)");
-            expect(parsed[0].foo).to.be.false;
+            expect(parsed[0].props.foo).to.be.false;
         });
 
         it("should set integer values if given", () => {
             let parsed = parser.parse("(dots=2 r)");
-            expect(parsed[0].dots).to.equal(2);
+            expect(parsed[0].props.dots).to.equal(2);
         });
 
         it("should set float values if given", () => {
             let [parsed] = parser.parse("(tempo=34.56 c4)");
-            expect(parsed.tempo).to.equal(34.56);
+            expect(parsed.props.tempo).to.equal(34.56);
         });
 
         it("should set an identifier as a string if given", () => {
             let parsed = parser.parse("(bar=baz d5/8)");
-            expect(parsed[0].bar).to.equal("baz");
+            expect(parsed[0].props.bar).to.equal("baz");
         });
 
         it("should set ratios as as string if given", () => {
             const [parsed] = parser.parse("(tuplet=3/2 c4)");
-            expect(parsed.tuplet).to.eql("3/2");
+            expect(parsed.props.tuplet).to.eql("3/2");
         });
 
         it("should set the value on all contained items", () => {
             let [note1, note2, note3] = parser.parse("(foo=1 b4 c5 d5)");
-            expect(note1.foo).to.equal(1);
-            expect(note2.foo).to.equal(1);
-            expect(note3.foo).to.equal(1);
+            expect(note1.props.foo).to.equal(1);
+            expect(note2.props.foo).to.equal(1);
+            expect(note3.props.foo).to.equal(1);
         });
 
         it("should parse multiple un-nested scopes", () => {
             let [note1, note2, note3] = parser.parse("(foo=1 b4) (foo=2 c5) (foo=3 d5)");
-            expect(note1.foo).to.equal(1);
-            expect(note2.foo).to.equal(2);
-            expect(note3.foo).to.equal(3);
+            expect(note1.props.foo).to.equal(1);
+            expect(note2.props.foo).to.equal(2);
+            expect(note3.props.foo).to.equal(3);
         });
 
         it("should give inner contexts priority", () => {
             let [note1, note2, note3] = parser.parse("(foo=1 b4 (foo=2 c5) d5)");
-            expect(note1.foo).to.equal(1);
-            expect(note2.foo).to.equal(2);
-            expect(note3.foo).to.equal(1);
+            expect(note1.props.foo).to.equal(1);
+            expect(note2.props.foo).to.equal(2);
+            expect(note3.props.foo).to.equal(1);
         });
 
         it("should handle multiple arbitrary properties in one scope", () => {
             const [parsed] = parser.parse("(foo=bar bar=baz c4)");
-            expect(parsed.foo).to.equal("bar");
-            expect(parsed.bar).to.equal("baz");
+            expect(parsed.props.foo).to.equal("bar");
+            expect(parsed.props.bar).to.equal("baz");
         });
     });
 
@@ -197,8 +203,8 @@ describe("parser", () => {
             let [note1, note2] = parser.parse(
                 `c4 ; d4
                 e4`);
-            expect(note1.pitch).to.equal("c4");
-            expect(note2.pitch).to.equal("e4");
+            expect(note1.props.pitch).to.equal("c4");
+            expect(note2.props.pitch).to.equal("e4");
         });
     });
 
@@ -211,20 +217,20 @@ describe("parser", () => {
     xdescribe("time", () => {
         it("should add a time property", () => {
             const [parsedNote] = parser.parse("c4");
-            expect(parsedNote.time).to.equal(0);
+            expect(parsedNote.props.time).to.equal(0);
 
             const [parsedRest] = parser.parse("r");
-            expect(parsedRest.time).to.equal(0);
+            expect(parsedRest.props.time).to.equal(0);
 
             const [parsedChord] = parser.parse("<d4 f4>");
-            expect(parsedChord.time).to.equal(0);
+            expect(parsedChord.props.time).to.equal(0);
         });
 
         it("should increment time for subsequent items", () => {
             const items = parser.parse("c4 d4/8 r");
-            expect(items[0].time).to.equal(0);
-            expect(items[1].time).to.equal(0.25);
-            expect(items[2].time).to.equal(0.375);
+            expect(items[0].props.time).to.equal(0);
+            expect(items[1].props.time).to.equal(0.25);
+            expect(items[2].props.time).to.equal(0.375);
         });
     });
 });

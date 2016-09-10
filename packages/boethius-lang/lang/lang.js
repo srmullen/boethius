@@ -100,20 +100,22 @@ this.$ = {value: Number($$[$0-1]), dots: $$[$0].length}
 break;
 case 6:
 
-            var info = noteInfo($$[$0]);
+            var props = noteInfo($$[$0]);
             // default values
-            info.type = NOTE;
+            /*info.type = NOTE;*/
 
-            this.$ = info;
+            /*this.$ = info;*/
+            this.$ = {type: NOTE, props: props};
         
 break;
 case 7:
 
-            var info = noteInfo($$[$0-1]);
-            info.type = NOTE;
-            info.value = $$[$0].value;
-            info.dots = $$[$0].dots;
-            this.$ = info;
+            var props = noteInfo($$[$0-1]);
+            /*info.type = NOTE;*/
+            props.value = $$[$0].value;
+            props.dots = $$[$0].dots;
+            /*this.$ = info;*/
+            this.$ = {type: NOTE, props: props}
         
 break;
 case 8: case 27:
@@ -172,7 +174,11 @@ this.$ = $$[$0-1].map(function (item) {
 break;
 case 26:
 this.$ = $$[$0-1].map(function (item) {
-            return Object.assign({}, $$[$0-2], item);
+            // items properties overwrite the proplist's properties
+            var props = Object.assign({}, $$[$0-2], item.props);
+            /*return Object.assign({}, $$[$0-2], item);*/
+            // resulting props are placed on the item.
+            return Object.assign({}, item, {props: props});
         });
 break;
 }
@@ -399,10 +405,10 @@ parse: function parse(input) {
 
 
     var applyProperty = function (item, prop, val) {
-        if (item[prop] !== undefined) {
+        if (item.props[prop] !== undefined) {
             return item;
         } else {
-            item[prop] = val;
+            item.props[prop] = val;
             return item;
         }
     }

@@ -6,19 +6,19 @@ describe("boethius compilation", () => {
         const [note] = compile("a4");
 
         it("should add midi property", () => {
-            expect(note.midi).to.equal(69);
+            expect(note.props.midi).to.equal(69);
         });
 
         it("should add frequency property", () => {
-            expect(note.frequency).to.equal(440);
+            expect(note.props.frequency).to.equal(440);
         });
 
         it("should add octave property", () => {
-            expect(note.octave).to.equal(4);
+            expect(note.props.octave).to.equal(4);
         });
 
         it("should add interval property", () => {
-            expect(note.interval).to.equal(9);
+            expect(note.props.interval).to.equal(9);
         });
     });
 });
