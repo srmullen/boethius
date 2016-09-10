@@ -177,10 +177,10 @@ rest:
 
 chord:
     OPENBRKT notelist CLOSEBRKT
-        {$$ = {type: CHORD, children: $2}}
+        {$$ = {type: CHORD, props: {}, children: $2}}
     | OPENBRKT notelist CLOSEBRKT duration
         {
-            $$ = {type: CHORD, children: $2, value: $4.value, dots: $4.dots};
+            $$ = {type: CHORD, children: $2, props: {value: $4.value, dots: $4.dots}};
         }
     ;
 

@@ -89,19 +89,19 @@ describe("parser", () => {
         it("should return and object with type and children", () => {
             let parsed = parser.parse("<c4 e4 g4>");
             let notes = parser.parse("c4 e4 g4");
-            expect(parsed[0]).to.eql({type: "chord", children: notes});
+            expect(parsed[0]).to.eql({type: "chord", props: {}, children: notes});
         });
 
         it("should return an object with type, children, and value", () => {
             let parsed = parser.parse("<c4 e4>/8");
             let notes = parser.parse("c4 e4");
-            expect(parsed[0]).to.eql({type: "chord", children: notes, value: 8, dots: 0});
+            expect(parsed[0]).to.eql({type: "chord", children: notes, props: {value: 8, dots: 0}});
         });
 
         it("should return an object with type, children, dots, and value", () => {
             let parsed = parser.parse("<c4 e4>/32...");
             let notes = parser.parse("c4 e4");
-            expect(parsed[0]).to.eql({type: "chord", children: notes, value: 32, dots: 3});
+            expect(parsed[0]).to.eql({type: "chord", children: notes, props: {value: 32, dots: 3}});
         });
     });
 

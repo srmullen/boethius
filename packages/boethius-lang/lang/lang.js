@@ -131,11 +131,11 @@ case 11:
 this.$ = {type: REST, value: $$[$0].value, dots: $$[$0].dots}
 break;
 case 12:
-this.$ = {type: CHORD, children: $$[$0-1]}
+this.$ = {type: CHORD, props: {}, children: $$[$0-1]}
 break;
 case 13:
 
-            this.$ = {type: CHORD, children: $$[$0-2], value: $$[$0].value, dots: $$[$0].dots};
+            this.$ = {type: CHORD, children: $$[$0-2], props: {value: $$[$0].value, dots: $$[$0].dots}};
         
 break;
 case 14: case 15: case 16: case 29:
