@@ -125,10 +125,10 @@ case 9: case 28: case 30:
 this.$ = $$[$0-1].concat($$[$0])
 break;
 case 10:
-this.$ = {type: REST}
+this.$ = {type: REST, props: {}}
 break;
 case 11:
-this.$ = {type: REST, value: $$[$0].value, dots: $$[$0].dots}
+this.$ = {type: REST, props: {value: $$[$0].value, dots: $$[$0].dots}}
 break;
 case 12:
 this.$ = {type: CHORD, props: {}, children: $$[$0-1]}

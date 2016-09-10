@@ -170,9 +170,9 @@ notelist:
 
 rest:
     REST
-        {$$ = {type: REST}}
+        {$$ = {type: REST, props: {}}}
     | REST duration
-        {$$ = {type: REST, value: $2.value, dots: $2.dots}}
+        {$$ = {type: REST, props: {value: $2.value, dots: $2.dots}}}
     ;
 
 chord:

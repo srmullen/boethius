@@ -71,17 +71,17 @@ describe("parser", () => {
     describe("rests", () => {
         it("should return an object with a type of rest", () => {
             const [parsed] = parser.parse("r");
-            expect(parsed).to.eql({type: "rest"});
+            expect(parsed).to.eql({type: "rest", props: {}});
         });
 
         it("should return an object with type and value", () => {
             const [parsed] = parser.parse("r/2");
-            expect(parsed).to.eql({type: "rest", value: 2, dots: 0});
+            expect(parsed).to.eql({type: "rest", props: {value: 2, dots: 0}});
         });
 
         it("should return an object with type, value, and dots", () => {
             const [parsed] = parser.parse("r/16.");
-            expect(parsed).to.eql({type: "rest", value: 16, dots: 1});
+            expect(parsed).to.eql({type: "rest", props: {value: 16, dots: 1}});
         });
     });
 
