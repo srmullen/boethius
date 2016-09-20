@@ -13,6 +13,7 @@ function isType (type, item) {
 }
 
 const isChord = _.partial(isType, constants.type.chord);
+const isChordSymbol = _.partial(isType, constants.type.chordSymbol);
 const isClef = _.partial(isType, constants.type.clef);
 const isDynamic = _.partial(isType, constants.type.dynamic);
 const isKey = _.partial(isType, constants.type.key);
@@ -29,6 +30,7 @@ const isPitched = item => isNote(item) || isChord(item);
 
 export {
     isChord,
+    isChordSymbol,
     isClef,
     isDynamic,
     isKey,

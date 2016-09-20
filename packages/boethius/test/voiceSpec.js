@@ -154,4 +154,81 @@ describe("Voice", () => {
             expect(v.getTimeFrame(0.25, 0.5)).to.eql([n2]);
         });
     });
+
+    describe("equals", () => {
+        it("should compare type", () => {
+            const v = scored.voice({});
+            const c = scored.chord({});
+            expect(v.equals(c)).to.be.false;
+        });
+
+        it("should compare name", () => {
+            const v1 = scored.voice({name: "treble"});
+            const v2 = scored.voice({name: "bass"});
+            expect(v1.equals(v2)).to.be.false;
+        });
+
+        it("should compare stemDirection", () => {
+            const v1 = scored.voice({stemDirection: "up"});
+            const v2 = scored.voice({stemDirection: "down"});
+            expect(v1.equals(v2)).to.be.false;
+        });
+
+        it("should compare children", () => {
+            const v1 = scored.voice({}, [scored.note({pitch: "a4"})]);
+            const v2 = scored.voice({}, [scored.note({pitch: "b4"})]);
+            const v3 = scored.voice({}, [scored.note({pitch: "a4"})]);
+            expect(v1.equals(v2)).to.be.false;
+            expect(v1.equals(v3)).to.be.true;
+        });
+
+        it("should compare children length", () => {
+            const v1 = scored.voice({}, [scored.note({pitch: "a4"})]);
+            const v2 = scored.voice({}, [scored.note({pitch: "a4"}), scored.rest()]);
+            expect(v1.equals(v2)).to.be.false;
+            expect(v2.equals(v1)).to.be.false;
+        });
+    });
+
+    describe("iteration", () => {
+        it("should have nothing to iterate if no children are passed", () => {
+            const v = scored.voice({name: "treble"});
+            expect([...v].length).to.equal(0);
+        });
+
+        it("should have items equals to the number of children given they're all at different times", () => {
+            const v1 = scored.voice({name: "treble"}, [scored.note()]);
+            const v2 = scored.voice({name: "bass"}, [scored.note, scored.rest]);
+            const v3 = scored.voice({name: "alto"}, [scored.chord({}, ["c4", "e4"]), scored.rest(), scored.note]);
+            expect([...v1].length).to.equal(1);
+            expect([...v2].length).to.equal(2);
+            expect([...v3].length).to.equal(3);
+        });
+
+        it("should return an array as the iterable value", () => {
+            const v = scored.voice({}, [scored.note()]);
+            const iter = v.iterate();
+            const {value} = iter.next();
+            expect(value).to.be.an("array");
+        });
+
+        it("should group the items by time", () => {
+            const v = scored.voice({}, [scored.clef(), scored.key()]);
+            const iter = v.iterate();
+            const {value} = iter.next();
+            expect(value.length).to.equal(2);
+        });
+
+        it("should return the times in order", () => {
+            const v = scored.voice({}, [
+                scored.clef(), scored.key(), scored.note({value: 8}), scored.rest({value: 4}), scored.chord({}, ["c3", "e3", "g3"])
+            ]);
+            const times = [];
+            for (let items of v) {
+                times.push(items[0].time);
+            }
+
+            expect(times).to.eql([0, 0.125, 0.375]);
+        });
+    });
 });

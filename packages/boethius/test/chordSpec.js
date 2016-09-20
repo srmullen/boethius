@@ -159,4 +159,53 @@ describe("Chord", () => {
             expect(getAccidentalOrdering(10)).to.eql([9, 0, 8, 1, 7, 2, 6, 3, 5, 4]);
         });
     });
+
+    describe("equals", () => {
+        it("should compare type, value, dots, tuplet, time, staccato, tenuto, portato, slur, stemDirection", () => {
+            const c = new Chord({});
+            const n = new Note({});
+            expect(c.equals(n)).to.be.false;
+
+            const c1 = new Chord({
+                value: 4,
+                dots: 2,
+                time: 3,
+                staccato: true
+            }, ["d#3", "e#4"]);
+
+            expect(c1.equals(new Chord({
+                value: 4,
+                dots: 2,
+                time: 3,
+                staccato: true
+            }, ["d#3", "e#4"]))).to.be.true;
+
+            expect(c1.equals(new Chord({
+                value: 4,
+                dots: 1,
+                time: 3,
+                tenuto: true
+            }, ["d#3", "e#4"]))).to.be.false;
+        });
+
+        it("should compare children", () => {
+            const c1 = new Chord({}, ["c4", "e4"]);
+            const c2 = new Chord({}, ["d4", "f4"]);
+            const c3 = new Chord({}, [new Note({pitch: "c4"}), new Note({pitch: "e4"})]);
+            expect(c1.equals(c2)).to.be.false;
+            expect(c1.equals(c3)).to.be.true;
+        });
+
+        it("should not care about note creation order", () => {
+            const c1 = new Chord({}, ["c4", "e4"]);
+            const c2 = new Chord({}, ["e4", "c4"]);
+            expect(c1.equals(c2)).to.be.true;
+        });
+
+        it("should return false is children length is different", () => {
+            const c1 = new Chord({}, ["c4", "e4"]);
+            const c2 = new Chord({}, ["e4", "c4", "g5"]);
+            expect(c1.equals(c2)).to.be.false;
+        });
+    });
 });

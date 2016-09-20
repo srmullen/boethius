@@ -235,7 +235,7 @@ accidentalTopOffsets[constants.font.accidentals.natural] = 10;
  * This function handles the difference.
  */
 function getAccidentalTop (accidental) {
-	return accidental.bounds.top + accidentalTopOffsets[accidental.symbol.definition.content];
+	return accidental.bounds.top + accidentalTopOffsets[accidental.content];
 }
 
 function getAccidentalBottom (accidental) {

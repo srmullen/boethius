@@ -68,7 +68,8 @@ System.render = function render (system, {lines=[], voices=[], measures, length,
 	//////////////////
 	// Render Phase //
 	//////////////////
-	return System.renderTimeContexts(system, lines, measuresToRender, voices, systemTimes, length);
+	const systemGroup = System.renderTimeContexts(system, lines, measuresToRender, voices, systemTimes, length);
+	return renderDecorations(systemGroup, voices);
 };
 
 /*
@@ -76,6 +77,7 @@ System.render = function render (system, {lines=[], voices=[], measures, length,
  * @param timeContexts - array of time contexts
  */
 System.renderTimeContexts = function (system, lines, measures, voices, timeContexts, length) {
+	// create the system group that all items will be added to.
 	const systemGroup = system.render();
 
 	// returns an array of arrays. The index of each inner array maps the rendered items to the line they need to be added to.
@@ -143,9 +145,9 @@ System.renderTimeContexts = function (system, lines, measures, voices, timeConte
 	placeTimes(timeContexts, measures, lineCenters, cursorFn);
 
 	if (timeContexts) {
+		const startTime = _.find(_.first(timeContexts), ctx => !!ctx).time;
+		const endTime = _.find(_.last(timeContexts), ctx => !!ctx).time;
 		map((line, lineGroup, lineCenter) => {
-			const startTime = _.find(_.first(timeContexts), ctx => !!ctx).time;
-			const endTime = _.find(_.last(timeContexts), ctx => !!ctx).time;
 			const lineItems = getLineItems(line, voices, startTime.time, endTime.time);
 
 			_.each(lineItems, (lineVoice, i) => {
@@ -182,14 +184,24 @@ System.renderTimeContexts = function (system, lines, measures, voices, timeConte
 		}, lines, lineGroups, lineCenters);
 	}
 
-	_.each(voices, voice => {
-		// slurs only need to know voice
-		const slurGroups = voice.renderSlurs();
-		systemGroup.addChildren(slurGroups);
-	});
-
 	return systemGroup;
 };
+
+/*
+ * mutates systemGroup
+ */
+function renderDecorations (systemGroup, voices) {
+	const decorationGroups = renderSlurs(voices);
+	decorationGroups.map(group => systemGroup.addChildren(group));
+	return systemGroup;
+}
+
+function renderSlurs (voices) {
+	return _.map(voices, voice => {
+		// slurs only need to know voice
+		return voice.renderSlurs();
+	});
+}
 
 /*
  * @param Items[][] - Array of voices on the line
@@ -257,7 +269,7 @@ System.prototype.renderMeasures = function (measures, lengths, systemGroup) {
 			previousGroup = _.last(groups),
 			leftBarline;
 
-		leftBarline = previousGroup ? previousGroup.children.barline : null;
+		leftBarline = previousGroup ? _.last(previousGroup.children) : null;
 		let measureGroup = measure.render(systemGroup, leftBarline, measureLength);
 
 		groups.push(measureGroup);

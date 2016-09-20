@@ -275,44 +275,4 @@ describe("Scored", () => {
             });
 		});
     });
-	describe("createEvents", () => {
-		it("should return an array", () => {
-			let music = scored.createEvents();
-			expect(music).to.eql([]);
-		});
-		it("should take a single event array", () => {
-			let music = ["note"];
-			expect(scored.createEvents(music)).to.eql([scored.note({time: 0})]);
-
-			music = ["note", {pitch: "f#3", value: 2}];
-			expect(scored.createEvents(music)).to.eql([scored.note({pitch: "f#3", value: 2, time: 0})]);
-
-			let rest = ["rest"];
-			expect(scored.createEvents(rest)).to.eql([scored.rest({time: 0})]);
-
-			rest = ["rest", {value: 8, tuplet: "3/2"}];
-			expect(scored.createEvents(rest)).to.eql([scored.rest({value: 8, tuplet: "3/2", time: 0})]);
-		});
-		it("should take nested arrays", () => {
-			let music = [["note"]];
-			expect(scored.createEvents(music)).to.eql([scored.note({time: 0})]);
-		});
-		it("should add time to the events", () => {
-			let music = [["note"], ["note", {value: 8}], ["note", {value: 16}]];
-			expect(scored.createEvents(music)).to.eql([scored.note({time: 0}),
-				scored.note({value: 8, time: 0.25}),
-				scored.note({value: 16, time: 0.375})]);
-
-			music = [["rest", {value: 16}], ["rest", {value: 8}], ["rest"]];
-			expect(scored.createEvents(music)).to.eql([scored.rest({value: 16, time: 0}),
-				scored.rest({value: 8, time: 1/16}),
-				scored.rest({time: 3/16})]);
-		});
-		it("should set the voice", () => {
-			let voice = ["voice", {value: 2}, ["note"]];
-			expect(scored.createEvents(voice)).to.eql([scored.note({time: 0, voice: 2})]);
-		});
-
-	});
-
 });

@@ -43,5 +43,6 @@ TODOS:
     - Fix double rendering of ledger lines.
     - Time and/or TimeContext classes
     - Lyrics
+    - Ability to specify horizontal position of systems.
 
 ISSUES:

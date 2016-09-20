@@ -1,0 +1,47 @@
+<!doctype html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+<head>
+    <meta charset="UTF-8">
+    <title>PaperJS Memory Leak</title>
+    <link rel="stylesheet" href="../styles/index.css">
+</head>
+<body>
+    <canvas id="leakycanvas"></canvas>
+    <script type="text/javascript" src="../bower_components/paper/dist/paper-core.js"></script>
+    <script>
+        paper.setup(document.getElementById("leakycanvas"));
+
+        function MyGroup (color) {
+            this.color = color;
+        }
+
+        MyGroup.prototype.render = function () {
+            var group = this.group = new paper.Group({color: this.color});
+            // var group = this.group = new paper.Group();
+            this.group.addChild(new paper.PointText({content: "a"}));
+            this.touchGroupBounds();
+            return group;
+        }
+
+        MyGroup.prototype.touchGroupBounds = function () {
+            this.group.bounds;
+        }
+
+        function createGroup () {
+            var g = new MyGroup("blue");
+            return g.render();
+        }
+
+        var group;
+        function runTimes (f, n) {
+        	for (var i = 0; i < n; i++) {
+        		if (group) group.remove();
+        		group = f();
+        	}
+        }
+    </script>
+</body>
+</html>

@@ -1,5 +1,6 @@
 import {drawClef} from "../engraver";
 import constants from "../constants";
+import {clefEquals} from "../utils/equality";
 
 const TYPE = constants.type.clef;
 
@@ -23,11 +24,14 @@ Clef.prototype.render = function () {
 		name: TYPE
 	});
 
-	const symbol = drawClef(this.value, margin);
-
-	group.addChild(symbol.place());
+	group.addChild(drawClef(this.value, margin));
+	group.position = [0, 0];
 
 	return group;
+};
+
+Clef.prototype.equals = function (clef) {
+	return clefEquals(this, clef);
 };
 
 const centerLineValues = {

@@ -321,4 +321,22 @@ Chord.prototype.calculateStemPoint = function (fulcrum, vector, direction) {
 	return baseNote.calculateStemPoint(fulcrum, vector, direction);
 };
 
+Chord.prototype.equals = function (chord) {
+	// chord.root, chord.inversion, and chord.name are not compared right now since they have no bearing on rendering.
+	return (
+		this.type === chord.type &&
+		this.value === chord.value &&
+		this.dots === chord.dots &&
+		this.tuplet === chord.tuplet &&
+		this.time === chord.time &&
+		this.staccato === chord.staccato &&
+		this.tenuto === chord.tenuto &&
+		this.portato === chord.portato &&
+		this.slur === chord.slur &&
+		this.stemDirection === chord.stemDirection &&
+		this.children.length === chord.children.length &&
+		_.every(this.children, (child, i) => child.equals(chord.children[i]))
+	);
+};
+
 export default Chord;

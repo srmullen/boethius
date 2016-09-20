@@ -2,6 +2,7 @@ import {expect} from "chai";
 
 import Scored from "../src/Scored";
 import Note from "../src/views/Note";
+import Rest from "../src/views/Rest";
 import {getSteps, getAverageStemDirection, parsePitch, hasPitch} from "../src/utils/note";
 
 describe("Note", () => {
@@ -102,6 +103,94 @@ describe("Note", () => {
             expect(hasPitch(fMinor, parsePitch("c#4"))).to.be.false;
             expect(hasPitch(fMinor, parsePitch("eb3"))).to.be.true;
             expect(hasPitch(fMinor, parsePitch("d8"))).to.be.false;
+        });
+    });
+
+    describe("equals", () => {
+        it("should compare type", () => {
+            const n = new Note({});
+            const r = new Rest({});
+            expect(n.equals(r)).to.be.false;
+        });
+
+        it("should compare value", () => {
+            const n1 = new Note({value: 4});
+            const n2 = new Note({value: 8});
+            const n3 = new Note({value: 4});
+            expect(n1.equals(n2)).to.be.false;
+            expect(n1.equals(n3)).to.be.true;
+        });
+
+        it("should compare pitch", () => {
+            const n1 = new Note({pitch: "a4"});
+            const n2 = new Note({pitch: "b5"});
+            const n3 = new Note({pitch: "a4"});
+            expect(n1.equals(n2)).to.be.false;
+            expect(n1.equals(n3)).to.be.true;
+        });
+
+        it("should compare dots", () => {
+            const n1 = new Note({dots: 1});
+            const n2 = new Note({dots: 2});
+            const n3 = new Note({dots: 1});
+            expect(n1.equals(n2)).to.be.false;
+            expect(n1.equals(n3)).to.be.true;
+        });
+
+        it("should compare tuplet", () => {
+            const n1 = new Note({tuplet: "3/4"});
+            const n2 = new Note({tuplet: "2/3"});
+            const n3 = new Note({tuplet: "3/4"});
+            expect(n1.equals(n2)).to.be.false;
+            expect(n1.equals(n3)).to.be.true;
+        });
+
+        it("should compare time", () => {
+            const n1 = new Note({time: 4});
+            const n2 = new Note({time: 8});
+            const n3 = new Note({time: 4});
+            expect(n1.equals(n2)).to.be.false;
+            expect(n1.equals(n3)).to.be.true;
+        });
+
+        it("should compare voice", () => {
+            const n1 = new Note({voice: "treble"});
+            const n2 = new Note({voice: "bass"});
+            const n3 = new Note({voice: "treble"});
+            expect(n1.equals(n2)).to.be.false;
+            expect(n1.equals(n3)).to.be.true;
+        });
+
+        it("should compare slur", () => {
+            const n1 = new Note({slur: 4});
+            const n2 = new Note({slur: 8});
+            const n3 = new Note({slur: 4});
+            expect(n1.equals(n2)).to.be.false;
+            expect(n1.equals(n3)).to.be.true;
+        });
+
+        it("should compare staccato", () => {
+            const n1 = new Note({staccato: true});
+            const n2 = new Note({});
+            const n3 = new Note({staccato: true});
+            expect(n1.equals(n2)).to.be.false;
+            expect(n1.equals(n3)).to.be.true;
+        });
+
+        it("should compare tenuto", () => {
+            const n1 = new Note({tenuto: true});
+            const n2 = new Note({});
+            const n3 = new Note({tenuto: true});
+            expect(n1.equals(n2)).to.be.false;
+            expect(n1.equals(n3)).to.be.true;
+        });
+
+        it("should compare portato", () => {
+            const n1 = new Note({portato: true});
+            const n2 = new Note({});
+            const n3 = new Note({portato: true});
+            expect(n1.equals(n2)).to.be.false;
+            expect(n1.equals(n3)).to.be.true;
         });
     });
 });

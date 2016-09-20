@@ -1,6 +1,6 @@
 import {expect} from "chai";
 import System from "../src/views/System";
-import {getStaffItems} from "../src/utils/staff";
+import {getStaffItems} from "../src/utils/system";
 import Scored from "../src/Scored";
 
 describe("System", () => {

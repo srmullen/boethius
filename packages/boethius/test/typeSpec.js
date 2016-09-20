@@ -2,6 +2,7 @@ import {expect} from "chai";
 
 import {
     isChord,
+    isChordSymbol,
     isClef,
     isKey,
     isLine,
@@ -25,6 +26,13 @@ describe("types", () => {
         it("should return true if the given item is a Chord, false otherwise", () => {
             expect(isChord(scored.chord({}, ["c4", "d4"]))).to.be.true;
             expect(isChord(scored.rest())).to.be.false;
+        });
+    });
+
+    describe("isChordSymbol", () => {
+        it("should return true if the given item is a ChordSymbol, false otherwise", () => {
+            expect(isChordSymbol(scored.chordSymbol({}, []))).to.be.true;
+            expect(isChordSymbol(scored.rest())).to.be.false;
         });
     });
 

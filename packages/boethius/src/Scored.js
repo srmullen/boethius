@@ -1,5 +1,6 @@
+import _ from "lodash";
+
 import Config from "./config";
-import * as events from "./events";
 
 import Voice from "./views/Voice";
 import Note from "./views/Note";
@@ -22,14 +23,15 @@ import * as common from "./utils/common";
 import * as timeUtils from "./utils/timeUtils";
 import * as measureUtils from "./utils/measure";
 import constants from "./constants";
-import _ from "lodash";
+import vScore from "./virtual-score";
 
 const Scored = function (options={}) {
 	Scored.config = new Config(options.config);
 };
 
 Scored.prototype.setup = function (canvas) {
-	this.project = paper.setup(canvas).project;
+	// this.project = paper.setup(canvas).project;
+	paper.setup(canvas).project;
 };
 
 // Scored.projects = paper.projects;
@@ -66,41 +68,35 @@ Scored.prototype.fromJSON = function (json) {
 
 };
 
-Scored.prototype.render = function (composition, ...args) {
+Scored.prototype.render = function (composition, args) {
 	let view;
-	// return view;
+	// create a white background for images. Possible memleak issue.
+	// const background = new paper.Path.Rectangle(paper.view.bounds);
+	// background.fillColor = "white";
+
 	switch (composition.type) {
 		case constants.type.note:
-			view = Note.render(composition, ...args);
+			view = Note.render(composition, args);
+			break;
+
+		case constants.type.rest:
+			view = Rest.render(composition, args);
 			break;
 
 		case constants.type.chord:
-			view = Chord.render(composition, ...args);
-			break;
-
-		case constants.type.line:
-			view = Line.render(composition, ...args);
+			view = Chord.render(composition, args);
 			break;
 
 		case constants.type.system:
-			view = System.render(composition, ...args);
+			view = System.render(composition, args);
 			break;
 
 		case constants.type.score:
-			view = Score.render(composition, ...args);
+			view = vScore(composition, args);
 			break;
 	}
 	paper.view.update();
 	return view;
-};
-
-/*
- * @deprecated
- * @param music - hierarchical description of music.
- * @return - array of music events with all info needed to add to a score.
- */
-Scored.prototype.createEvents = function (music=[]) {
-	return events.createEvents({}, [], music);
 };
 
 Scored.prototype.serialize = function (item) {

@@ -1,3 +1,4 @@
+import {isEqual} from "lodash";
 import {drawTimeSig} from "../engraver";
 import constants from "../constants";
 
@@ -36,11 +37,19 @@ TimeSignature.prototype.render = function () {
 		name: TYPE
 	});
 
-	const symbol = drawTimeSig(this.value, margin);
-
-	group.addChild(symbol.place());
+	group.addChild(drawTimeSig(this.value, margin));
+	group.position = [0, 0];
 
 	return group;
+};
+
+TimeSignature.prototype.equals = function (timeSig) {
+	return (
+        this.type === timeSig.type &&
+		this.value === timeSig.value &&
+        this.measure === timeSig.measure &&
+        isEqual(this.beatStructure, timeSig.beatStructure)
+	);
 };
 
 export default TimeSignature;

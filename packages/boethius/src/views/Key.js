@@ -167,13 +167,13 @@ Key.prototype.render = function (context = {}) {
 	let [signature, accidental] = nameToSignature[this.value],
 		position = new paper.Point(clefToPosition[clefValue]);
 
-	let symbol, item, yTranslate;
+	// let symbol, item, yTranslate;
 	for (let i = 0; i < signature.length; i++) {
-		symbol = drawAccidental(accidental);
+		const item = drawAccidental(accidental);
 
-		yTranslate = placement.calculateAccidentalYpos(signature[i], Scored.config.lineSpacing/2);
+		const yTranslate = placement.calculateAccidentalYpos(signature[i], Scored.config.lineSpacing/2);
 
-		item = symbol.place(position.add([0, yTranslate]));
+		item.position = position.add([0, yTranslate]);
 
 		position = position.add([7, 0]);
 
@@ -185,6 +185,15 @@ Key.prototype.render = function (context = {}) {
 
 Key.prototype.getPitches = function () {
 	return keyToPitches[this.value];
+};
+
+Key.prototype.equals = function (key) {
+	return (
+		this.type === key.type &&
+		this.value === key.value &&
+		this.measure === key.measure &&
+		this.beat === key.beat
+	);
 };
 
 export default Key;

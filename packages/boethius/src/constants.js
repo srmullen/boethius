@@ -1,4 +1,4 @@
-let constants = {
+const constants = {
 	type: {
 		score: "score",
 		staff: "staff",
@@ -9,6 +9,7 @@ let constants = {
 		note: "note",
 		rest: "rest",
 		chord: "chord",
+		chordSymbol: "chordSymbol",
 		clef: "clef",
 		key: "key",
 		timeSig: "timeSig",

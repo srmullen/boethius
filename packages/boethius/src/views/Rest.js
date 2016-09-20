@@ -1,5 +1,6 @@
 import {drawRest, drawDots} from "../engraver";
 import constants from "../constants";
+import {restEquals} from "../utils/equality";
 
 const TYPE = constants.type.rest;
 
@@ -12,6 +13,10 @@ function Rest ({voice=0, value=4, dots=0, tuplet, time, slur}) {
 	this.slur = slur;
 }
 
+Rest.render = function (rest, context={}) {
+	return rest.render(context);
+}
+
 Rest.prototype.type = TYPE;
 
 Rest.prototype.render = function (context) {
@@ -19,9 +24,8 @@ Rest.prototype.render = function (context) {
 		name: TYPE
 	});
 
-	this.symbol = drawRest(this.value);
-
-	group.addChild(this.symbol.place());
+	group.addChild(drawRest(this.value));
+	group.position = [0, 0];
 
 	if (this.dots) {
 		this.drawDots(this.dots, context.clef);
@@ -46,6 +50,10 @@ Rest.prototype.drawGroupBounds = function (group) {
 	// rectangle.fillColor = "blue"; // create a fill so the center can be clicked
 	// rectangle.opacity = 0.2;
 	group.insertChild(0, rectangle);
+};
+
+Rest.prototype.equals = function (rest) {
+	return restEquals(this, rest);
 };
 
 export default Rest;

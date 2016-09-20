@@ -6,6 +6,14 @@ function run () {
     // testRests().translate(25, 50);
 }
 
+var l;
+function runTimes (f, n) {
+	for (var i = 0; i < n; i++) {
+		if (l && l.remove) l.remove();
+		l = f();
+	}
+}
+
 function testTwoLines () {
     var line1 = scored.line({voices: ["soprano"]}, [scored.clef({value: "treble", measure: 0}),
                                  scored.key({value: "c", measure: 0}),

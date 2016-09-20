@@ -1,15 +1,55 @@
-var line;
 function run () {
+	var n = scored.note;
+	var c = scored.chord;
+	var r = scored.rest;
+	var d = scored.dynamic;
+
+	// voices
+	var staccatoLegatoVoice = scored.voice({name: "v1"}, [
+		n({pitch: "a4", staccato: true}), n({pitch: "a4", tenuto: true}), n({pitch: "c5", staccato: true}), n({pitch: "c5", tenuto: true}),
+		n({value: 2, pitch: "a4", portato: true}), n({value: 2, pitch: "c5", portato: true}),
+		c({staccato: true}, ["f4", "g4", "a4"]), c({tenuto: true}, ["f4", "g4", "a4"]),
+		c({staccato: true}, ["c5", "d5", "e5"]), c({tenuto: true}, ["c5", "d5", "e5"]),
+		c({value: 2, portato: true}, ["f4", "g4", "a4"]), c({value: 2, portato: true}, ["c5", "d5", "e5"])
+	]);
+
+	var dotsVoice = scored.voice({name: "v1"}, [
+		n({pitch: "a4", value: 4, dots: 1}), r({value: 8}), n({pitch: "b4", value: 4, dots: 1}), r({value: 8}),
+
+		c({value: 4, dots: 1}, ["a4", "c5"]), r({value: 8}),
+		c({value: 4, dots: 1}, ["a4", "b4"]), r({value: 8}),
+		c({value: 4, dots: 1}, ["a4", "b4", "c5"]), r({value: 8}),
+		c({value: 4, dots: 1}, ["f4", "f5"]), r({value: 8}),
+		r({value: 4, dots: 1}), r({value: 8}), r({value: 8, dots: 1}), r({value: 16}), r({value: 16}),
+	]);
+
+	var dynamicsVoice = scored.voice({name: "v1"}, [
+		n({pitch: "a4", value: 4}), n({pitch: "b4", value: 4}),
+		d({value: "p"}),
+		c({value: 4}, ["a4", "c5"]),
+		c({value: 4}, ["a4", "b4"]),
+		d({value: "ffff"}),
+		c({value: 4}, ["a4", "b4", "c5"]),
+		c({value: 4}, ["f4", "f5"]),
+		c({value: 4}, ["a4", "b4", "c5"]),
+		c({value: 4}, ["f4", "f5"])
+	]);
+
+	// lines
+	var basicLine = line("treble", "C", "c");
+
 	// testMarkings();
 	// testBeatStructures();
 
-	// simpleLine().translate(25, 50);
+	// Fixed
+	// render(basicLine).translate(25, 50);
+	// render(basicLine, {voices: [staccatoLegatoVoice]}).translate(25, 50);
+	// render(basicLine, {voices: [dotsVoice]}).translate(25, 150);
+	// render(basicLine, {voices: [dynamicsVoice]}).translate(25, 250);
 
-	// testStacatoLegato().translate(25, 50);
-	// testDots().translate(25, 150);
-	// testDynamics().translate(25, 250);
+	// Not Fixed
 
-	// eighthBeamings().translate(25, 50);
+	eighthBeamings().translate(25, 50);
 	// sixteenthBeamings().translate(25, 150);
 	// testAccidentals("c").translate(25, 250);
 	// testTimeSigs().translate(25, 350);
@@ -34,8 +74,35 @@ function run () {
 	// testLedgerLineMultipleRenderIssue().translate(25, 50);
 	// testVoiceLongerThanLine().translate(25, 150);
 
-	testChordSymbols().translate(25, 50);
+	// testChordSymbols().translate(25, 50);
+}
 
+var l;
+function runTimes (f, n) {
+	for (var i = 0; i < n; i++) {
+		if (l && l.remove) l.remove();
+		l = f();
+	}
+}
+
+function line (clef, key, timeSig, voices) {
+	voices = voices || ["v1"];
+	return scored.line({voices: voices}, [scored.clef({value: clef , measure: 0}),
+							scored.key({value: key, measure: 0}),
+							scored.timeSig({value: timeSig, measure: 0})]);
+}
+
+function render (line, props) {
+	props = props || {};
+
+	var fourfour = scored.timeSig({value: "4/4", measure: 0});
+
+    // create staves
+    var system = scored.system({measures: props.measures});
+
+    var score = scored.score({}, [fourfour, system, line]);
+
+	return scored.render(score, props);
 }
 
 function testClefKeyTimeSig (clefValue, keyValue, timeSigValue) {
@@ -97,19 +164,6 @@ function renderingNotesOnLine () {
 	return scored.render(trebleLine, {voices: [voice], numMeasures: 2});
 }
 
-function simpleLine () {
-	var trebleLine = scored.line({}, [scored.clef({value: "alto", measure: 0}),
-									  scored.key({measure: 0}),
-									  scored.timeSig({value: "4/4", measure: 0})
-								  ]);
-	var voice = scored.voice({}, [scored.note({pitch: "a4", value: 4}), scored.note({pitch: "b4", value: 4}),
-								  scored.note({pitch: "c5", value: 4}), scored.note({pitch: "e5", value: 4}),
-								  scored.note({pitch: "e5", value: 1})
-							  ]);
-
-	return scored.render(trebleLine, {length: 400, voices: [voice], numMeasures: 2});
-}
-
 function oneVoice () {
 	var line = scored.line({}, [scored.clef({value: "treble", measure: 0}),
 								scored.key({value: "C", measure: 0}),
@@ -138,6 +192,7 @@ function twoVoices () {
 	var line = scored.line({}, [scored.clef({value: "treble", measure: 0}),
 								scored.key({value: "C", measure: 0}),
 								scored.timeSig({value: "4/4", measure: 0})]);
+
 	var notes1 = _.fill(new Array(16), 16).concat(_.fill(new Array(8), 8)).concat(_.fill(new Array(4), 4)).concat(_.fill(new Array(2), 2)).concat(_.fill(new Array(1), 1));
 	var notes2 = _.fill(new Array(4), 4).concat(
 		_.fill(new Array(2), 2)).concat(
@@ -406,68 +461,24 @@ function testSlurs () {
 }
 
 function testStacatoLegato () {
-	var line = scored.line({}, [scored.clef({value: "treble", measure: 0}),
+	var line = scored.line({voices: ["v1"]}, [scored.clef({value: "treble", measure: 0}),
 								scored.key({value: "C", measure: 0}),
 								scored.timeSig({value: "4/4", measure: 0})]);
 
-	var n = scored.note;
-	var c = scored.chord;
-
-	var voice = scored.voice({}, [
-		n({pitch: "a4", staccato: true}), n({pitch: "a4", tenuto: true}), n({pitch: "c5", staccato: true}), n({pitch: "c5", tenuto: true}),
-		n({value: 2, pitch: "a4", portato: true}), n({value: 2, pitch: "c5", portato: true}),
-		c({staccato: true}, ["f4", "g4", "a4"]), c({tenuto: true}, ["f4", "g4", "a4"]),
-		c({staccato: true}, ["c5", "d5", "e5"]), c({tenuto: true}, ["c5", "d5", "e5"]),
-		c({value: 2, portato: true}, ["f4", "g4", "a4"]), c({value: 2, portato: true}, ["c5", "d5", "e5"])
-	]);
-
-	return scored.render(line, {voices: [voice], numMeasures: 4});
+	return line;
 }
 
 function testDots () {
-	var line = scored.line({}, [scored.clef({value: "treble", measure: 0}),
+	var line = scored.line({voices: ["v1"]}, [scored.clef({value: "treble", measure: 0}),
 								scored.key({value: "C", measure: 0}),
 								scored.timeSig({value: "4/4", measure: 0})]);
 
-	var n = scored.note;
-	var c = scored.chord;
-	var r = scored.rest;
-
-	// need to test notes, chords and rests with at least two dots each.
-	var voice = scored.voice({}, [
-		n({pitch: "a4", value: 4, dots: 1}), r({value: 8}), n({pitch: "b4", value: 4, dots: 1}), r({value: 8}),
-
-		c({value: 4, dots: 1}, ["a4", "c5"]), r({value: 8}),
-		c({value: 4, dots: 1}, ["a4", "b4"]), r({value: 8}),
-		c({value: 4, dots: 1}, ["a4", "b4", "c5"]), r({value: 8}),
-		c({value: 4, dots: 1}, ["f4", "f5"]), r({value: 8}),
-		r({value: 4, dots: 1}), r({value: 8}), r({value: 8, dots: 1}), r({value: 16}), r({value: 16}),
-	]);
-
-	return scored.render(line, {voices: [voice], numMeasures: 4});
+	return line;
 }
 
 function testDynamics () {
-	var line = scored.line({}, [scored.clef({value: "treble", measure: 0}),
-								scored.key({value: "C", measure: 0}),
-								scored.timeSig({value: "4/4", measure: 0})]);
-
-	var n = scored.note;
-	var c = scored.chord;
-	var d = scored.dynamic;
-
 	// need to test notes, chords and rests with at least two dots each.
-	var voice = scored.voice({}, [
-		n({pitch: "a4", value: 4}), n({pitch: "b4", value: 4}),
-		d({value: "p"}),
-		c({value: 4}, ["a4", "c5"]),
-		c({value: 4}, ["a4", "b4"]),
-		d({value: "ffff"}),
-		c({value: 4}, ["a4", "b4", "c5"]),
-		c({value: 4}, ["f4", "f5"]),
-		c({value: 4}, ["a4", "b4", "c5"]),
-		c({value: 4}, ["f4", "f5"])
-	]);
+
 
 	return scored.render(line, {voices: [voice], numMeasures: 4});
 }
@@ -525,7 +536,6 @@ function testBeatStructures () {
 }
 
 function testRests () {
-	var r = scored.rest;
 	var trebleLine = scored.line({}, [scored.clef({measure: 0}),
 									  scored.key({measure: 0}),
 									  scored.timeSig({value: "4/4", measure: 0})
@@ -538,8 +548,6 @@ function testRests () {
 }
 
 function testSlurChords () {
-	var c = scored.chord;
-	var n = scored.note;
 
 	var line = scored.line({}, [
 		scored.clef({measure: 0}),
@@ -563,8 +571,6 @@ function testSlurChords () {
 }
 
 function testEighthToQuarterBeamingIssue () {
-	var n = scored.note;
-
 	var line = scored.line({}, [
 		scored.clef({measure: 0}),
 		scored.key({measure: 0}),
@@ -580,7 +586,6 @@ function testEighthToQuarterBeamingIssue () {
 }
 
 function testLedgerLineMultipleRenderIssue () {
-	var c = scored.chord;
 
 	var line = scored.line({}, [
 		scored.clef({measure: 0}),
@@ -596,8 +601,6 @@ function testLedgerLineMultipleRenderIssue () {
 }
 
 function testVoiceLongerThanLine () {
-	var n = scored.note;
-
 	var line = scored.line({}, [
 		scored.clef({measure: 0}),
 		scored.key({measure: 0}),
@@ -612,8 +615,6 @@ function testVoiceLongerThanLine () {
 }
 
 function testChordSymbols () {
-	var n = scored.note;
-
 	var line = scored.line({}, [
 		scored.clef({measure: 0}),
 		scored.key({measure: 0}),

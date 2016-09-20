@@ -54,25 +54,4 @@ Measure.prototype.drawGroupBounds = function (previousBarlinePosition, barline) 
 	return rectangle;
 };
 
-Measure.addGroupEvents = function (group) {
-	_.extend(group, {
-		onMouseEnter: () => {
-			let bounds = group.children.bounds;
-			bounds.fillColor = "green";
-			bounds.opacity = 0.2;
-		},
-		onMouseLeave: () => {
-			let bounds = group.children.bounds;
-			bounds.fillColor = "#FFF";
-			bounds.opacity = 0;
-		},
-		onMouseDown: () => {
-			group.children.bounds.fillColor = "red";
-		},
-		onMouseUp: () => {
-			group.children.bounds.fillColor = "green";
-		}
-	});
-};
-
 export default Measure;

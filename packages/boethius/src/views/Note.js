@@ -9,6 +9,7 @@ import {getAccidental} from "../utils/accidental";
 import constants from "../constants";
 import {getCenterLineValue} from "./Clef";
 import {isEven} from "../utils/common";
+import {noteEquals} from "../utils/equality";
 
 const TYPE = constants.type.note;
 
@@ -73,13 +74,12 @@ Note.prototype.render = function () {
 		name: TYPE
 	});
 
-	this.symbol = engraver.drawHead(1/this.value);
-
 	// xPos and yPos are the center of the font item, not the noteHead. placement will take care of handling the offset for now.
 	const offset = placement.getNoteHeadOffset([0, 0]);
-	const noteHead = this.noteHead = this.symbol.place(offset);
+	const noteHead = this.noteHead = engraver.drawHead(1/this.value);
+	noteHead.position = offset;
 
-	group.addChild(noteHead);
+	group.addChild(noteHead); // commenting this line removed the Group mem leak.
 
 	return group;
 };
@@ -149,14 +149,13 @@ Note.prototype.drawStem = function (to, stemDirection) {
  */
 Note.prototype.drawFlag = function () {
 	let dur = this.value,
-		stem = this.group.children.stem,
-		flag, position;
+		stem = this.group.children.stem;
 
-	let flagSymbol = engraver.drawFlag(dur, this.stemDirection);
+	// let flagSymbol = engraver.drawFlag(dur, this.stemDirection);
+	const flag = engraver.drawFlag(dur, this.stemDirection);
 
-	if (flagSymbol) {
-		position = engraver.getFlagOffset(stem.segments[1].point, this.stemDirection);
-		flag = flagSymbol.place(position);
+	if (flag) {
+		flag.position = engraver.getFlagOffset(stem.segments[1].point, this.stemDirection);
 		this.group.addChild(flag);
 	}
 
@@ -164,9 +163,8 @@ Note.prototype.drawFlag = function () {
 };
 
 Note.prototype.drawAccidental = function (accidental) {
-	let accidentalSymbol = engraver.drawAccidental(accidental);
-
-	let accidentalGroup = accidentalSymbol.place();
+	const accidentalGroup = engraver.drawAccidental(accidental);
+	accidentalGroup.position = [0, 0];
 
 	this.group.addChild(accidentalGroup);
 
@@ -236,6 +234,13 @@ Note.prototype.getStemDirection = function (centerLineValue) {
 Note.prototype.calculateStemPoint = function (fulcrum, vector, direction) {
 	// get the beam point at the center of the noteHead
 	return getLinePoint((direction === "up" ? this.noteHead.bounds.right : this.noteHead.bounds.left), fulcrum, vector);
+};
+
+/*
+ * @return true if the this note is equivalent to the given note.
+ */
+Note.prototype.equals = function (note) {
+	return noteEquals(this, note);
 };
 
 export default Note;

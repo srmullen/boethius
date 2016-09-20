@@ -27,6 +27,7 @@ function calculateAndSetTimes (items, offset=0) {
 }
 
 function Voice ({value, name, stemDirection}, children=[]) {
+    // FIXME: Is value used? For what?
     this.value = value;
 
     this.name = name;
@@ -200,6 +201,42 @@ Voice.prototype.getTimeFrame = function getTimeFrame(frm, to, inclusive) {
         }
     }
     return timeFrame;
+};
+
+Voice.prototype.equals = function (voice) {
+    return (
+        this.type === voice.type &&
+        this.name === voice.name &&
+        this.stemDirection === voice.stemDirection &&
+        this.children.length === voice.children.length &&
+        _.every(this.children, (child, i) => child.equals(voice.children[i]))
+    );
+};
+
+Voice.prototype[Symbol.iterator] = Voice.prototype.iterate = function () {
+    let i = -1;
+    return {
+        items: this.children,
+        next: function next () {
+            i++;
+            const item = this.items[i];
+
+            if (!item) return {done: true};
+
+            const time = item.time;
+
+            const items = [];
+            while (this.items[i+1] && time === this.items[i+1].time) {
+                items.push(this.items[i+1]);
+                i++;
+            };
+
+            return {
+                done: false,
+                value: [item, ...items]
+            };
+        }
+    }
 };
 
 export default Voice;

@@ -123,28 +123,11 @@ function drawLine (width) {
 	rectangle.opacity = 0; // make the rectangle invisible
 	rectangle.name = "bounds";
 
-	return new paper.Group(_.flatten([rectangle, lineArray]));
+	return new paper.Group({
+		name: "systemLine",
+		children: _.flatten([rectangle, lineArray])
+	});
 }
-
-// var drawLine = _.memoize(function (width) {
-// 	var line,
-// 		lineArray = [],
-// 		lineNames = ["F", "D", "B", "G", "E"];
-
-// 	for (var i = 0; i < 5; i++) {
-// 		line = new paper.Path.Line(new paper.Point(0, i * Scored.config.lineSpacing), new paper.Point(width, i * Scored.config.lineSpacing));
-// 		line.name = lineNames[i];
-// 		line.strokeColor = "black";
-// 		lineArray.push(line);
-// 	}
-
-// 	var rectangle = new paper.Rectangle(lineArray[0].firstSegment.point, lineArray[4].lastSegment.point);
-// 	rectangle = new paper.Path.Rectangle(rectangle);
-// 	rectangle.fillColor = "#FFFFFF"; // create a fill so the center can be clicked
-// 	rectangle.opacity = 0.0; // make the rectangle invisible
-
-// 	return new paper.Symbol(new paper.Group(_.flatten([rectangle, lineArray])));
-// });
 
 /*
  * A System Bar is the bar at the beginning of a system connecting all the staves.
@@ -164,9 +147,9 @@ function drawSystemBar (lines) {
 // Marking Engraver //
 //////////////////////
 
-// memoized to always return the same symbol for a given clef. May cause issues with margin param
-const drawClef = _.memoize(function (clef, margin={}) {
-	const svgItem = new paper.PointText({
+const drawClef = function (clef, margin={}) {
+
+	const item = new paper.PointText({
 		content: {
 			treble: '9',
 			bass: '8',
@@ -179,26 +162,29 @@ const drawClef = _.memoize(function (clef, margin={}) {
 		name: 'clef'
 	});
 
-	return new paper.Symbol(drawBounds(svgItem, margin));
-});
+	return drawBounds(new paper.Group({
+		name: "clef",
+		children: [item]
+	}), margin);
+};
 
-const drawTimeSig = _.memoize(function (timeSig, margin) {
+const drawTimeSig = function (timeSig, margin) {
 	let item;
 
 	if (timeSig === "c") { // common time
-		item = new paper.PointText({
+		item = new paper.Group(new paper.PointText({
 			content: constants.font.timeSigs.common,
 			fontFamily: 'gonville',
 			fontSize: 32,
 			fillColor: 'black'
-		});
+		}));
 	} else if (timeSig === "h") { // half time
-		item = new paper.PointText({
+		item = new paper.Group(new paper.PointText({
 			content: constants.font.timeSigs.half,
 			fontFamily: 'gonville',
 			fontSize: 32,
 			fillColor: 'black'
-		});
+		}));
 	} else {
 		let [beats, value] = timeSig.split("/"),
 			top = new paper.PointText({
@@ -218,37 +204,15 @@ const drawTimeSig = _.memoize(function (timeSig, margin) {
 		bot.translate([0, top.bounds.height/2]);
 	}
 
-	return new paper.Symbol(drawBounds(item, margin));
-});
-
-// var drawKey = _.memoize(function (key, signature, accidental, margin) {
-// 	var keyGroup = new paper.Group();
-
-// 	var position = new paper.Point(0,0);
-
-// 	var item, yTranslate;
-// 	for (var i = 0; i < signature.length; i++) {
-// 		item = new paper.PointText({
-// 			content: constants.font.accidentals[accidental],
-// 			fontFamily: 'gonville',
-// 			fontSize: 32,
-// 			fillColor: 'black'
-// 		});
-
-// 		yTranslate = placement.calculateAccidentalYpos(signature[i], Scored.config.lineSpacing/2);
-
-// 		item.setPosition(position.add([0, yTranslate]));
-
-// 		position = position.add([7, 0]);
-
-// 		keyGroup.addChild(item);
-// 	}
-
-// 	return new paper.Symbol(drawBounds(keyGroup, margin));
-// });
+	return drawBounds(item, margin);
+};
 
 function drawBounds (item, {top=0, left=0, bottom=0, right=0}) {
-	const rect = new paper.Path.Rectangle(item.bounds.topLeft.subtract([left, top]), item.bounds.bottomRight.add([right, bottom]));
+	const rect = new paper.Path.Rectangle({
+		name: "itemBounds",
+		from:item.bounds.topLeft.subtract([left, top]),
+		to: item.bounds.bottomRight.add([right, bottom])
+	});
 
 	rect.fillColor = "#FFFFFF";
 	rect.opacity = 0;
@@ -263,7 +227,7 @@ function drawBounds (item, {top=0, left=0, bottom=0, right=0}) {
 // Note Engraver //
 ///////////////////
 
-const drawHead = _.memoize(function (type) {
+const drawHead = function (type) {
 	let noteHead, noteheadChar;
 
 	if (type >= 1) {
@@ -274,16 +238,14 @@ const drawHead = _.memoize(function (type) {
 		noteheadChar = constants.font.noteheads.solid;
 	}
 
-	noteHead = new paper.PointText({
+	return new paper.PointText({
 		name: "head",
 		content: noteheadChar,
 		fontFamily: 'gonville',
 		fontSize: Scored.config.fontSize,
 		fillColor: 'black'
 	});
-
-	return new paper.Symbol(noteHead);
-});
+};
 
 /*
  * Draw the duration dots on the note
@@ -325,7 +287,7 @@ function drawTenuto (point) {
 	return tenuto;
 }
 
-const drawAccidental = _.memoize(function (accidental) {
+const drawAccidental = function (accidental) {
 	const content = {
 			"#": constants.font.accidentals.sharp,
 			"b": constants.font.accidentals.flat,
@@ -333,17 +295,15 @@ const drawAccidental = _.memoize(function (accidental) {
 			"x": constants.font.accidentals.doubleSharp,
 			"n": constants.font.accidentals.natural,
 		}[accidental];
-	const item = new paper.PointText({
+	return new paper.PointText({
 		content: content,
 		fontFamily: 'gonville',
 		fontSize: Scored.config.fontSize,
 		fillColor: 'black'
 	});
+};
 
-	return new paper.Symbol(item);
-});
-
-const drawFlag = _.memoize(function (dur, stemDirection) {
+const drawFlag = function (dur, stemDirection) {
 	const flagName = {
 			8: "eighth",
 			16: "sixteenth",
@@ -353,16 +313,14 @@ const drawFlag = _.memoize(function (dur, stemDirection) {
 		}[dur];
 
 	if (flagName) {
-		const flag = new paper.PointText({
+		return new paper.PointText({
 			content: constants.font.flags[flagName][stemDirection],
 			fontFamily: 'gonville',
 			fontSize: Scored.config.fontSize,
 			fillColor: 'black'
 		});
-
-		return new paper.Symbol(flag);
 	}
-}, (dur, stemDirection) => "" + dur + stemDirection);
+};
 
 const flagOffsets = {up: [4, -9], down: [5, -11]};
 
@@ -370,16 +328,14 @@ function getFlagOffset (point, direction) {
 	return point.add(flagOffsets[direction]);
 }
 
-const drawRest = _.memoize(function (type) {
-	const rest = new paper.PointText({
+const drawRest = function (type) {
+	return new paper.PointText({
 		content: constants.font.rests[type],
 		fontFamily: 'gonville',
 		fontSize: Scored.config.fontSize,
 		fillColor: 'black'
 	});
-
-	return new paper.Symbol(rest);
-});
+};
 
 /*
  * @param items - <Note, Chord>[]
