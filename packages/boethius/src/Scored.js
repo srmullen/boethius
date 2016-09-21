@@ -16,6 +16,7 @@ import Dynamic from "./views/Dynamic";
 import ChordSymbol from "./views/ChordSymbol";
 import Score from "./views/Score";
 
+import {parse} from "./utils/parser";
 import * as lineUtils from "./utils/line";
 import * as noteUtils from "./utils/note";
 import * as accidental from './utils/accidental';
@@ -55,17 +56,6 @@ Scored.prototype.compose = function (layout, music) {
 	_.map(music, e => layout[e.type](e)); // FIXME: line.note now requires measures
 
 	return layout;
-};
-
-Scored.prototype.fromJSON = function (json) {
-	switch  (json.type) {
-	case constants.type.note:
-		return this.note(json);
-	case constants.type.rest:
-		return this.rest(json);
-	}
-
-
 };
 
 Scored.prototype.render = function (composition, args) {
@@ -155,18 +145,20 @@ Scored.prototype.score = function score (context={}, children) {
 	return new Score(context, children);
 };
 
-function parse (parentContext={}, [type, context={}, elements=[]]) {
-	const data = arguments[1],
-		handler = _.isString(type) ? this[type] : null;
+Scored.parse = parse;
 
-	if (handler) {
-		const mergedContext = _.extend({}, parentContext, context);
-		const mappableParse = _.bind(parse, this, mergedContext);
-		return handler(mergedContext, mappableParse(elements));
-	} else if (_.isArray(type)) {
-		return _.map(data, _.partial(parse, parentContext), this);
-	}
-}
+// function parse (parentContext={}, [type, context={}, elements=[]]) {
+// 	const data = arguments[1],
+// 		handler = _.isString(type) ? this[type] : null;
+//
+// 	if (handler) {
+// 		const mergedContext = _.extend({}, parentContext, context);
+// 		const mappableParse = _.bind(parse, this, mergedContext);
+// 		return handler(mergedContext, mappableParse(elements));
+// 	} else if (_.isArray(type)) {
+// 		return _.map(data, _.partial(parse, parentContext), this);
+// 	}
+// }
 
 export default Scored;
 

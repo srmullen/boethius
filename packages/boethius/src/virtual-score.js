@@ -37,10 +37,10 @@ let cache = {
 let scoreGroup, measures, systems, startMeasures, systemGroups;
 export default function render (score, {voices: music=[]}) {
 
-    // FIXME: Always getting RENDERALL
-    const voiceDiff = diffAllVoices(cache.music, music);
+    const voices = createVoiceScoredObjects(music);
 
-    const voices = getVoiceItems(voiceDiff, cache, music);
+    // FIXME: voiceDiff currently unused.
+    const voiceDiff = diffAllVoices(cache.voices, voices);
 
     if (!cache.score || diff.measures(cache.score, score)) {
         measures = scoreToMeasures(score);
@@ -137,25 +137,6 @@ function diffAllVoices (previous, next) {
     }
 
     return _.uniq(_.sortBy(times));
-}
-
-/*
- * @param voiceDiff
- * @param cache - Object
- * @param voices - Array of voice objects
- * @return Array of Scored Voices.
- */
-function getVoiceItems (voiceDiff, cache, voices) {
-    if (voiceDiff === RENDERALL) {
-        console.log("render all");
-        return createVoiceScoredObjects(voices);
-    } else if (!voiceDiff.length) {
-        console.log("no change in voices");
-        return cache.voices;
-    } else {
-        console.log(voiceDiff);
-        return createVoiceScoredObjects(voices);
-    }
 }
 
 function createVoiceScoredObjects (voices) {

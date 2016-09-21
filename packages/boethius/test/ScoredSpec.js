@@ -9,18 +9,8 @@ import Rest from "../src/views/Rest";
 describe("Scored", () => {
 	const scored = new Scored();
 
-	describe("fromJSON", () => {
-		it("should exist", () => {
-			expect(scored.fromJSON).to.be.ok;
-		});
-
-		it("should convert a note object", () => {
-			expect(scored.fromJSON({type: "note"})).to.be.instanceof(Note);
-		});
-
-		it("should convert a rest object", () => {
-			expect(scored.fromJSON({type: "rest"})).to.be.instanceof(Rest);
-		})
+	it("should expose parse method", () => {
+		expect(Scored.parse).to.be.ok;
 	});
 
 	describe("note", () => {
