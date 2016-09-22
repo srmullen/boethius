@@ -148,19 +148,6 @@ Scored.prototype.score = function score (context={}, children) {
 
 Scored.parse = parse;
 
-// function parse (parentContext={}, [type, context={}, elements=[]]) {
-// 	const data = arguments[1],
-// 		handler = _.isString(type) ? this[type] : null;
-//
-// 	if (handler) {
-// 		const mergedContext = _.extend({}, parentContext, context);
-// 		const mappableParse = _.bind(parse, this, mergedContext);
-// 		return handler(mergedContext, mappableParse(elements));
-// 	} else if (_.isArray(type)) {
-// 		return _.map(data, _.partial(parse, parentContext), this);
-// 	}
-// }
-
 export default Scored;
 
 if (typeof window === "object") {
