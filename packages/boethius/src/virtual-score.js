@@ -42,7 +42,6 @@ let scoreGroup, measures, systems, startMeasures, systemGroups;
  * @param pages {Number[]} - the page to render.
  */
 export default function render (score, {voices=[], pages=[1]}) {
-
     // FIXME: voiceDiff currently unused.
     const voiceDiff = diffAllVoices(cache.voices, voices);
 
@@ -53,6 +52,7 @@ export default function render (score, {voices=[], pages=[1]}) {
     const systemHeights = score.systemHeights;
     const heightsDiff = diff.arrays(cache.systemHeights, systemHeights);
     if (scoreGroup && cache.systemHeights && heightsDiff.length) {
+        // FIXME: Causing occasional errors trying to translate an unrendered system group. Intermitent
         heightsDiff.map((i) => {
             cache.systemGroups[i].translate(0, systemHeights[i] - cache.systemHeights[i]);
         });
