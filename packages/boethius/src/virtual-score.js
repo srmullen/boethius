@@ -16,7 +16,7 @@ import Score, {scoreToMeasures, getSystemTimeContexts, createLineTimeContext, re
 
 import constants from "./constants";
 import {createMeasures} from "./utils/measure";
-import {map, reductions, partitionWhen, clone} from "./utils/common";
+import {map, reductions, partitionWhen, clone, concat} from "./utils/common";
 import {getTimeContexts} from "./utils/line";
 import {getStaffItems, iterateByTime} from "./utils/system";
 import {getAccidentalContexts} from "./utils/accidental";
@@ -102,11 +102,15 @@ export default function render (score, {voices=[], pages=[1]}) {
             }
         }, systemTimeContexts, startContexts, startTimes);
 
-        systemGroups = _.map(score.systems.filter(system => _.contains(pages, system.page)), (system, i) => {
+        const systemsToRender = _.reduce(score.systems, (acc, system, i) => {
+            return _.contains(pages, system.page) ? concat(acc, [system, systemTimeContexts[i], i]) : acc;
+        }, []);
+
+        systemGroups = _.map(systemsToRender, ([system, timeContext, i]) => {
             const endMeasure = startMeasures[i] + system.measures;
             const systemMeasures = _.slice(measures, startMeasures[i], endMeasure);
 
-            const systemGroup = System.renderTimeContexts(system, score.lines, systemMeasures, voices, systemTimeContexts[i], score.length);
+            const systemGroup = System.renderTimeContexts(system, score.lines, systemMeasures, voices, timeContext, score.length);
 
             systemGroup.translate(0, systemHeights[i]);
 
