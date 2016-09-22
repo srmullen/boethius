@@ -126,7 +126,7 @@ function testPages () {
 
     // create staves
     var system1 = scored.system({measures: 4, lineHeights: [0, 200], page: 1});
-    var system2 = scored.system({measures: 4, page: 2});
+    var system2 = scored.system({measures: 4, page: 1});
     var system3 = scored.system({measures: 4, page: 2});
 
     var score = scored.score({
@@ -135,6 +135,6 @@ function testPages () {
     }, [fourfour, system1, system2, system3, trebleLine, bassLine]);
 
     // render it all as a score.
-    return scored.render(score, {voices: [soprano, bass], pages: [1, 2]});
+    return scored.render(score, {voices: [soprano, bass], pages: [1]});
 
 }

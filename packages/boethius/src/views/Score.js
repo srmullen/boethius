@@ -3,7 +3,7 @@ import _ from "lodash";
 import System from "./System";
 import constants from "../constants";
 import {createMeasures} from "../utils/measure";
-import {map, reductions, partitionWhen, clone} from "../utils/common";
+import {map, reductions, partitionWhen, clone, concat} from "../utils/common";
 import {getTimeContexts} from "../utils/line";
 import {getStaffItems, iterateByTime} from "../utils/system";
 import {getAccidentalContexts} from "../utils/accidental";
@@ -77,19 +77,20 @@ Score.render = function (score, {measures, voices=[], pages=[1]}) {
         }
     }, systemTimeContexts, startContexts, startTimes);
 
-    let systemHeight = score.systemHeights[0] || 0;
-    const defaultHeight = 250;
-    const systemGroups = _.map(score.systems.filter(system => _.contains(pages, system.page)), (system, i) => {
+    const systemsToRender = _.reduce(score.systems, (acc, system, i) => {
+        return _.contains(pages, system.page) ? concat(acc, [system, systemTimeContexts[i], i]) : acc;
+    }, []);
+    const systemGroups = _.map(systemsToRender, ([system, timeContext, i]) => {
         const endMeasure = startMeasures[i] + system.measures;
         const systemMeasures = _.slice(measures, startMeasures[i], endMeasure);
 
-        const systemGroup = System.renderTimeContexts(system, score.lines, systemMeasures, voices, systemTimeContexts[i], score.length);
+        const systemGroup = System.renderTimeContexts(system, score.lines, systemMeasures, voices, timeContext, score.length);
 
         systemGroup.translate(0, score.systemHeights[i]);
 
         return systemGroup;
     });
-
+    
     scoreGroup.addChildren(systemGroups);
 
     renderDecorations(scoreGroup, voices);
