@@ -35,9 +35,13 @@ let cache = {
     voices: []
 };
 let scoreGroup, measures, systems, startMeasures, systemGroups;
-export default function render (score, {voices: music=[]}) {
 
-    const voices = createVoiceScoredObjects(music);
+/*
+ * @param score {Score} - the score to render.
+ * @param voices {Voice[]}
+ * @param pages {Number[]} - the page to render.
+ */
+export default function render (score, {voices=[], pages=[1]}) {
 
     // FIXME: voiceDiff currently unused.
     const voiceDiff = diffAllVoices(cache.voices, voices);
@@ -98,7 +102,7 @@ export default function render (score, {voices: music=[]}) {
             }
         }, systemTimeContexts, startContexts, startTimes);
 
-        systemGroups = _.map(score.systems, (system, i) => {
+        systemGroups = _.map(score.systems.filter(system => _.contains(pages, system.page)), (system, i) => {
             const endMeasure = startMeasures[i] + system.measures;
             const systemMeasures = _.slice(measures, startMeasures[i], endMeasure);
 

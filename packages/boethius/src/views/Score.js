@@ -34,7 +34,7 @@ function Score (props={}, children=[]) {
 
 Score.prototype.type = TYPE;
 
-Score.render = function (score, {measures, voices=[]}) {
+Score.render = function (score, {measures, voices=[], pages=[1]}) {
     // Create the Score Group. No actual rendering is done here.
     const scoreGroup = score.render();
 
@@ -77,18 +77,15 @@ Score.render = function (score, {measures, voices=[]}) {
         }
     }, systemTimeContexts, startContexts, startTimes);
 
-    console.log(systemTimeContexts);
     let systemHeight = score.systemHeights[0] || 0;
     const defaultHeight = 250;
-    const systemGroups = _.map(score.systems, (system, i) => {
+    const systemGroups = _.map(score.systems.filter(system => _.contains(pages, system.page)), (system, i) => {
         const endMeasure = startMeasures[i] + system.measures;
         const systemMeasures = _.slice(measures, startMeasures[i], endMeasure);
 
         const systemGroup = System.renderTimeContexts(system, score.lines, systemMeasures, voices, systemTimeContexts[i], score.length);
 
-        systemGroup.translate(0, systemHeight);
-
-        systemHeight = (score.systemHeights[i+1] || defaultHeight) + systemHeight;
+        systemGroup.translate(0, score.systemHeights[i]);
 
         return systemGroup;
     });

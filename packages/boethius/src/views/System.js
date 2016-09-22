@@ -22,7 +22,9 @@ const TYPE = constants.type.system;
  // TODO: What are the children of a system now? It's more of a view onto the lines, rather than something with children in it's own right.
  // @param children <Line, Measure, Marking>[] - A marking that is given to the system will be rendered on all lines. If it is
  // 	given to a line it will only affect that line.
-function System ({startMeasure=0, measures=4, lineHeights=[]}, children=[]) {
+function System ({page=1, startMeasure=0, measures=4, lineHeights=[]}, children=[]) {
+	this.page = page;
+	
 	this.startMeasure = startMeasure;
 
 	this.measures = measures;

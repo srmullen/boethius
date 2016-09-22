@@ -83,6 +83,7 @@ Scored.prototype.render = function (composition, args) {
 
 		case constants.type.score:
 			view = vScore(composition, args);
+			// view = Score.render(composition, args);
 			break;
 	}
 	paper.view.update();
