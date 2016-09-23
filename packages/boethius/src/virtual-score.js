@@ -112,7 +112,12 @@ export default function render (score, {voices=[], pages=[1]}) {
 
             const systemGroup = System.renderTimeContexts(system, score.lines, systemMeasures, voices, timeContext, score.length);
 
-            systemGroup.translate(0, systemHeights[i]);
+            // Add height of previously rendered pages
+            const systemTranslation = (!_.contains(pages, system.page - 1)) ?
+                systemHeights[i] :
+                systemHeights[i] + _.indexOf(pages, system.page) * score.pageHeight;
+
+            systemGroup.translate(0, systemTranslation);
 
             return systemGroup;
         });

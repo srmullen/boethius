@@ -114,12 +114,14 @@ function testPages () {
     var soprano = scored.voice({name: "treble"}, [
         n({value:1, pitch: "c4"}), r({value:2, pitch: "d#4"}), n({value:2, pitch: "d#4"}), n({value:1, pitch: "e4"}), n({value:1, pitch: "f4"}),
 		n({value:1, pitch: "g4"}), n({value:1, pitch: "a4"}), n({value:1, pitch: "b4"}), n({value:1, pitch: "c5"}),
-		n({value:1, pitch: "d5"}), n({value:1, pitch: "e5"}), n({value:1, pitch: "f5"}), n({value:1, pitch: "g5"})
+		n({value:1, pitch: "d5"}), n({value:1, pitch: "e5"}), n({value:1, pitch: "f5"}), n({value:1, pitch: "g5"}),
+        r({value:1}), r({value:1}), r({value:1}), r({value:1})
     ]);
     var bass = scored.voice({name: "bass"}, [
         n({value:1, pitch: "c4"}), n({value:1, pitch: "b3"}), n({value:1, pitch: "a3"}), n({value:1, pitch: "g3"}),
 		n({value:1, pitch: "f3"}), r({value:1, pitch: "e3"}), n({value:1, pitch: "d3"}), n({value:1, pitch: "c3"}),
-		n({value:1, pitch: "b2"}), n({value:1, pitch: "a2"}), n({value:1, pitch: "g2"}), n({value:1, pitch: "f2"})
+		n({value:1, pitch: "b2"}), n({value:1, pitch: "a2"}), n({value:1, pitch: "g2"}), n({value:1, pitch: "f2"}),
+        r({value:1}), r({value:1}), r({value:1}), r({value:1})
     ]);
 
     var fourfour = scored.timeSig({value: "4/4", measure: 0});
@@ -128,13 +130,14 @@ function testPages () {
     var system1 = scored.system({measures: 4, lineHeights: [0, 200], page: 1});
     var system2 = scored.system({measures: 4, page: 1});
     var system3 = scored.system({measures: 4, page: 2});
+    var system4 = scored.system({measures: 4, page: 3});
 
     var score = scored.score({
         length: 1000,
-        systemHeights: [0, 350, 600]
-    }, [fourfour, system1, system2, system3, trebleLine, bassLine]);
+        systemHeights: [0, 350, 0, 0]
+    }, [fourfour, system1, system2, system3, system4, trebleLine, bassLine]);
 
     // render it all as a score.
-    return scored.render(score, {voices: [soprano, bass], pages: [1]});
+    return scored.render(score, {voices: [soprano, bass], pages: [2, 3]});
 
 }

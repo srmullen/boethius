@@ -15,9 +15,10 @@ const TYPE = constants.type.score;
 /*
  * Class for managing Systems and Lines.
  * Meta data such as title/composer could also be attached here.
+ * @param pageWidth - pixels given 72 dpi
+ * @param pageHeight - pixels given 72 dpi
  */
-// function Score ({measures=1, length, systemHeights=[]}, children=[]) {
-function Score (props={}, children=[]) {
+function Score ({pageWidth=595, pageHeight=842, length, systemHeights}, children=[]) {
     /*
      * A score should have both systems and lines.
      * A line represents all measures from 0 to the end of the score. It is one-dimentional.
@@ -28,8 +29,10 @@ function Score (props={}, children=[]) {
     this.timeSigs = types.timeSig || [];
     this.lines = types.line || [];
     this.systems = types.system || [];
-    this.length = props.length;
-    this.systemHeights = props.systemHeights;
+    this.length = length;
+    this.systemHeights = systemHeights;
+    this.pageWidth = pageWidth;
+    this.pageHeight = pageHeight;
 }
 
 Score.prototype.type = TYPE;
@@ -80,17 +83,23 @@ Score.render = function (score, {measures, voices=[], pages=[1]}) {
     const systemsToRender = _.reduce(score.systems, (acc, system, i) => {
         return _.contains(pages, system.page) ? concat(acc, [system, systemTimeContexts[i], i]) : acc;
     }, []);
+
     const systemGroups = _.map(systemsToRender, ([system, timeContext, i]) => {
         const endMeasure = startMeasures[i] + system.measures;
         const systemMeasures = _.slice(measures, startMeasures[i], endMeasure);
 
         const systemGroup = System.renderTimeContexts(system, score.lines, systemMeasures, voices, timeContext, score.length);
 
-        systemGroup.translate(0, score.systemHeights[i]);
+        // Add height of previously rendered pages
+        const systemTranslation = (!_.contains(pages, system.page - 1)) ?
+            score.systemHeights[i] :
+            score.systemHeights[i] + _.indexOf(pages, system.page) * score.pageHeight;
+
+        systemGroup.translate(0, systemTranslation);
 
         return systemGroup;
     });
-    
+
     scoreGroup.addChildren(systemGroups);
 
     renderDecorations(scoreGroup, voices);
@@ -105,6 +114,10 @@ Score.prototype.render = function () {
 
     return group;
 };
+
+function calculatePageTranslation () {
+
+}
 
 export function scoreToMeasures (score) {
     const numMeasures = _.sum(score.systems, system => system.measures);
