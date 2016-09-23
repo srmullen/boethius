@@ -6,6 +6,20 @@ function concat (a = [], b) {
 }
 
 /*
+ * @param ar - Array to set value in.
+ * @param i - the index to pu the value.
+ * @param val - the value to place at the arrays index.
+ * @return a new array. ar will be unchanged.
+ */
+function set (ar, i, val) {
+    return [
+        ...ar.slice(0, i),
+        val,
+        ...ar.slice(i + 1)
+    ];
+}
+
+/*
  * partitions the collection each time f returns a new value
  */
 function partitionBy (coll, f) {
@@ -136,5 +150,6 @@ export {
 	reductions,
 	isEven,
 	isOdd,
-	clone
+	clone,
+	set
 };

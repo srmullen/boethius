@@ -16,7 +16,7 @@ import Score, {scoreToMeasures, getSystemTimeContexts, createLineTimeContext, re
 
 import constants from "./constants";
 import {createMeasures} from "./utils/measure";
-import {map, reductions, partitionWhen, clone, concat} from "./utils/common";
+import {map, reductions, partitionWhen, clone, concat, set} from "./utils/common";
 import {getTimeContexts} from "./utils/line";
 import {getStaffItems, iterateByTime} from "./utils/system";
 import {getAccidentalContexts} from "./utils/accidental";
@@ -28,11 +28,11 @@ import {isClef, isKey, isTimeSignature} from "./types";
 const RENDERALL = "RENDERALL";
 
 let cache = {
-    score: null,
+    score: {},
     startMeasures: [],
-    systemHeights: [],
     // [Voice]
-    voices: []
+    voices: [],
+    systemGroups: []
 };
 let scoreGroup, measures, systems, startMeasures, systemGroups;
 
@@ -49,12 +49,13 @@ export default function render (score, {voices=[], pages=[1]}) {
         measures = scoreToMeasures(score);
     }
 
-    const systemHeights = score.systemHeights;
-    const heightsDiff = diff.arrays(cache.systemHeights, systemHeights);
-    if (scoreGroup && cache.systemHeights && heightsDiff.length) {
-        // FIXME: Causing occasional errors trying to translate an unrendered system group. Intermitent
+    // const systemHeights = score.systemHeights;
+    const heightsDiff = diff.arrays(cache.score.systemHeights || [], score.systemHeights);
+    if (scoreGroup && cache.score.systemHeights && heightsDiff.length) {
         heightsDiff.map((i) => {
-            cache.systemGroups[i].translate(0, systemHeights[i] - cache.systemHeights[i]);
+            if (cache.systemGroups[i]) {
+                cache.systemGroups[i].translate(0, score.systemHeights[i] - cache.score.systemHeights[i]);
+            }
         });
     } else {
         if (scoreGroup) {
@@ -106,7 +107,7 @@ export default function render (score, {voices=[], pages=[1]}) {
             return _.contains(pages, system.page) ? concat(acc, [system, systemTimeContexts[i], i]) : acc;
         }, []);
 
-        systemGroups = _.map(systemsToRender, ([system, timeContext, i]) => {
+        systemGroups = _.reduce(systemsToRender, (acc, [system, timeContext, i]) => {
             const endMeasure = startMeasures[i] + system.measures;
             const systemMeasures = _.slice(measures, startMeasures[i], endMeasure);
 
@@ -114,13 +115,13 @@ export default function render (score, {voices=[], pages=[1]}) {
 
             // Add height of previously rendered pages
             const systemTranslation = (!_.contains(pages, system.page - 1)) ?
-                systemHeights[i] :
-                systemHeights[i] + _.indexOf(pages, system.page) * score.pageHeight;
+                score.systemHeights[i] :
+                score.systemHeights[i] + _.indexOf(pages, system.page) * score.pageHeight;
 
             systemGroup.translate(0, systemTranslation);
 
-            return systemGroup;
-        });
+            return set(acc, i, systemGroup);
+        }, []);
 
         scoreGroup.addChildren(systemGroups);
 
@@ -130,7 +131,6 @@ export default function render (score, {voices=[], pages=[1]}) {
     // set cache items
     if (score) cache.score = score;
     if (startMeasures) cache.startMeasures = startMeasures;
-    if (systemHeights) cache.systemHeights = systemHeights;
     if (systemGroups) cache.systemGroups = systemGroups;
     if (voices) cache.voices = voices;
 
