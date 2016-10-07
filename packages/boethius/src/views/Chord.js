@@ -196,16 +196,14 @@ Chord.prototype.drawStem = function (to, stemDirection) {
  * @return paper.Group
  */
 Chord.prototype.drawFlag = function () {
-	let dur = this.value,
-		stem = this.group.children.stem,
-		flag, position;
+	const dur = this.value;
+	const stem = this.group.children.stem;
 
-	let flagSymbol = drawFlag(dur, this.stemDirection);
+	const flag = drawFlag(dur, this.stemDirection);
 
-	if (flagSymbol) {
+	if (flag) {
 		// FIXME: getFlagOffset should probably be in placement rather than engraver.
-		position = getFlagOffset(stem.segments[1].point, this.stemDirection);
-		flag = flagSymbol.place(position);
+		flag.position = getFlagOffset(stem.segments[1].point, this.stemDirection);
 		this.group.addChild(flag);
 	}
 
