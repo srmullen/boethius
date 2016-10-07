@@ -291,6 +291,7 @@ Chord.prototype.drawArticulations = function () {
 function parseChildren (children, defaults={}) {
 	let notes = _.map(children, note => {
 		if (note instanceof Note) {
+			note.value = defaults.value;
 			return note;
 		}
 
@@ -299,7 +300,7 @@ function parseChildren (children, defaults={}) {
 		}
 
 		if (_.isObject(note)) {
-			return new Note(_.assign({}, defaults, note));
+			return new Note(_.assign({}, defaults, note, {value: defaults.value}));
 		}
 	});
 
