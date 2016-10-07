@@ -33,8 +33,8 @@ describe("Chord", () => {
             expect(cmaj.children[1].pitch).to.equal("e5");
             expect(cmaj.children[2].pitch).to.equal("g5");
 
-            expect(cmaj.children[0].value).to.equal(8);
-            expect(cmaj.children[1].value).to.equal(16);
+            expect(cmaj.children[0].value).to.equal(2);
+            expect(cmaj.children[1].value).to.equal(2);
             expect(cmaj.children[2].value).to.equal(2);
         });
 
@@ -50,9 +50,9 @@ describe("Chord", () => {
             expect(cmaj.children[1].pitch).to.equal("e5");
             expect(cmaj.children[2].pitch).to.equal("g5");
 
-            expect(cmaj.children[0].value).to.equal(8);
-            expect(cmaj.children[1].value).to.equal(16);
-            expect(cmaj.children[2].value).to.equal(4); // four is the default value of Note
+            expect(cmaj.children[0].value).to.equal(2);
+            expect(cmaj.children[1].value).to.equal(2);
+            expect(cmaj.children[2].value).to.equal(2); // four is the default value of Note
         });
 
         it("should take an array of strings, objects, and Notes as children", () => {
@@ -65,8 +65,8 @@ describe("Chord", () => {
             expect(cmaj.children[1].pitch).to.equal("e5");
             expect(cmaj.children[2].pitch).to.equal("g5");
 
-            expect(cmaj.children[0].value).to.equal(8);
-            expect(cmaj.children[1].value).to.equal(16);
+            expect(cmaj.children[0].value).to.equal(2);
+            expect(cmaj.children[1].value).to.equal(2);
             expect(cmaj.children[2].value).to.equal(2);
         });
 
