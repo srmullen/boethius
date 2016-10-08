@@ -51,8 +51,7 @@ function nextBeaming (items, groupingTime) {
     } else if (item.value <= 4) { // and item doesn't get beamed if it is a quarter note or greater.
         return [[_.first(items)], _.rest(items)];
     } else {
-        // return _.partition(items, item => (item.time < groupingTime || item.value >= 4));
-        const splitIndex = _.findIndex(items, item => (item.time >= groupingTime || item.value <= 4));
+        const splitIndex = _.findIndex(items, item => ((item.time >= groupingTime || item.value <= 4) || !isPitched(item)));
         if (splitIndex === -1) {
             return [items, []];
         } else {

@@ -425,23 +425,25 @@ const durationToBeams = {
  /*esline-disable*/
 function beam (items, {line="b4", fulcrum, vector, stemDirections}) {
 
-	let numBeams = durationToBeams[_.max(_.map(items, item => item.value))];
+	const numBeams = durationToBeams[_.max(_.map(items, item => item.value))];
 
-	let durations = items.map(item => item.value),
-		stemLengths = map((item, stemDirection) => {
-			if (isNote(item)) {
-				return noteUtils.getStemLength(item, line, stemDirection);
-			} else if (isChord) {
-				return chordUtils.getStemLength(item, line, stemDirection);
-			}
-		}, items, stemDirections),
-		stemPoints = items.map((item, i) => {
-			if (isNote(item)) {
-				return noteUtils.defaultStemPoint(item, stemDirections[i], stemLengths[i]);
-			} else if (isChord) {
-				return chordUtils.defaultStemPoint(item, stemDirections[i], stemLengths[i]);
-			}
-		});
+	const durations = items.map(item => item.value);
+
+	const stemLengths = map((item, stemDirection) => {
+		if (isNote(item)) {
+			return noteUtils.getStemLength(item, line, stemDirection);
+		} else if (isChord(item)) {
+			return chordUtils.getStemLength(item, line, stemDirection);
+		}
+	}, items, stemDirections);
+
+	const stemPoints = items.map((item, i) => {
+		if (isNote(item)) {
+			return noteUtils.defaultStemPoint(item, stemDirections[i], stemLengths[i]);
+		} else if (isChord(item)) {
+			return chordUtils.defaultStemPoint(item, stemDirections[i], stemLengths[i]);
+		}
+	});
 
 	// only calculate the fulcrum and vector if they aren't passed in as arguments
 	if (fulcrum && !vector) {
