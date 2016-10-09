@@ -1,6 +1,6 @@
 import {expect} from "chai";
 import Scored from "../src/Scored";
-import Score from "../src/views/Score";
+import Score, {getTimeFrame} from "../src/views/Score";
 
 describe("Score", () => {
 

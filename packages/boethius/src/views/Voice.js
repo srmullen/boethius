@@ -168,6 +168,11 @@ Voice.renderTuplets = function (items, centerLine) {
     return tuplets.map(tuplet => drawTuplets(tuplet, centerLine, this.stemDirection));
 };
 
+Voice.renderSlurs = function (items) {
+    const slurred = Voice.groupSlurs(items);
+    return _.map(slurred, slur);
+}
+
 Voice.prototype.renderSlurs = function () {
     const slurred = Voice.groupSlurs(this.children);
     return _.map(slurred, slur);

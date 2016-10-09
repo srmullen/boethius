@@ -24,7 +24,7 @@ const TYPE = constants.type.system;
  // 	given to a line it will only affect that line.
 function System ({page=1, startMeasure=0, measures=4, lineHeights=[]}, children=[]) {
 	this.page = page;
-	
+
 	this.startMeasure = startMeasure;
 
 	this.measures = measures;
@@ -71,7 +71,8 @@ System.render = function render (system, {lines=[], voices=[], measures, length,
 	// Render Phase //
 	//////////////////
 	const systemGroup = System.renderTimeContexts(system, lines, measuresToRender, voices, systemTimes, length);
-	return renderDecorations(systemGroup, voices);
+	// return renderDecorations(systemGroup, voices);
+	return systemGroup;
 };
 
 /*
@@ -181,6 +182,9 @@ System.renderTimeContexts = function (system, lines, measures, voices, timeConte
 			_.each(lineItems, voiceItems => {
 				renderLedgerLines(voiceItems, lineCenter);
 				Voice.renderArticulations(voiceItems); // items must have stem direction already
+
+				const slurGroups = Voice.renderSlurs(voiceItems);
+				lineGroup.addChildren(slurGroups);
 			});
 
 		}, lines, lineGroups, lineCenters);

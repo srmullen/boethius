@@ -44,18 +44,20 @@ Score.render = function (score, {measures, voices=[], pages=[1]}) {
     // Optimize here. Measures shouldn't need to be recreated every time the score is re-rendered.
     measures = measures || scoreToMeasures(score);
 
+    const systemsToRender = _.reduce(score.systems, (acc, system, i) => {
+        return _.contains(pages, system.page) ? concat(acc, [system, i]) : acc;
+    }, []);
+
     // get the start measure for each System.
     const startMeasures = reductions((acc, system) => acc + system.measures, score.systems, 0);
     const startTimes = _.dropRight(startMeasures).map((measure) => getTime(measures, {measure}));
-    const startContexts = startTimes.map((time) => {
-        return score.lines.map(line => line.contextAt(time));
-    });
 
     const systemTimeContexts = getSystemTimeContexts(score, voices, measures, startMeasures);
 
     // Create the context marking for the beginning of each system.
-    map((systemContext, startContext, startTime) => {
+    map((systemContext, startTime) => {
         const firstTime = _.first(systemContext);
+        const startContext = getStartContext(score, startTime);
         if (firstTime) {
             const time = _.find(firstTime, ctx => !!ctx).time;
             if (startTime.time < time.time) {
@@ -78,15 +80,12 @@ Score.render = function (score, {measures, voices=[], pages=[1]}) {
             const systemTimeContext = _.map(startContext, _.partial(createLineTimeContext, startTime));
             systemContext.push(systemTimeContext);
         }
-    }, systemTimeContexts, startContexts, startTimes);
+    }, systemTimeContexts, startTimes);
 
-    const systemsToRender = _.reduce(score.systems, (acc, system, i) => {
-        return _.contains(pages, system.page) ? concat(acc, [system, systemTimeContexts[i], i]) : acc;
-    }, []);
-
-    const systemGroups = _.map(systemsToRender, ([system, timeContext, i]) => {
+    const systemGroups = _.map(systemsToRender, ([system, i]) => {
         const endMeasure = startMeasures[i] + system.measures;
         const systemMeasures = _.slice(measures, startMeasures[i], endMeasure);
+        const timeContext = systemTimeContexts[i];
 
         const systemGroup = System.renderTimeContexts(system, score.lines, systemMeasures, voices, timeContext, score.length);
 
@@ -102,7 +101,7 @@ Score.render = function (score, {measures, voices=[], pages=[1]}) {
 
     scoreGroup.addChildren(systemGroups);
 
-    renderDecorations(scoreGroup, voices);
+    // renderDecorations(scoreGroup, voices);
 
     return scoreGroup;
 };
@@ -115,8 +114,8 @@ Score.prototype.render = function () {
     return group;
 };
 
-function calculatePageTranslation () {
-
+function getStartContext (score, time) {
+    return score.lines.map(line => line.contextAt(time));
 }
 
 export function scoreToMeasures (score) {

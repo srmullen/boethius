@@ -19,6 +19,7 @@ Should view render methods return a paper group, or should they return themselve
 TODOS:
     # High priority
     - Slurs / Ties, rendering improvements
+    - end slur and start new slur on same note.
     - Voices crossing lines.
     - placement.commonShortestDuration implementation.
     - Chord Symbols

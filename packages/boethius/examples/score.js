@@ -3,7 +3,8 @@ function run () {
     // testVoicePastEndOfScore().translate(25, 50);
     // testNoStemsOnSecondStave().translate(25, 50);
     // testPages().translate(25, 50);
-    testChords().translate(25, 50);
+    // testChords().translate(25, 50);
+    testSlurs().translate(25, 50);
 }
 
 var l;
@@ -177,4 +178,46 @@ function testChords () {
 
     // render it all as a score.
     return scored.render(score, {voices: [soprano, bass]});
+}
+
+function testSlurs () {
+    var n = scored.note;
+    var r = scored.rest;
+    var c = scored.chord;
+
+    // create lines
+    var trebleLine = scored.line({voices: ["treble"]}, [
+        scored.clef({value: "treble", measure: 0}), scored.key({value: "c", measure: 0}), scored.timeSig({value: "4/4", measure: 0})
+    ]);
+    var bassLine = scored.line({voices: ["bass"]}, [
+        scored.clef({value: "bass", measure: 0}), scored.key({value: "c", measure: 0}), scored.timeSig({value: "4/4", measure: 0})
+    ]);
+
+    // create voices
+    var soprano = scored.voice({name: "treble"}, [
+        // slur across systems
+        n({value: 1, pitch: 'a4', slur: 1}), n({value: 1, pitch: 'ab4', slur: 1}), n({value: 1, pitch: 'c5', slur: 2}),
+        n({value: 1, pitch: 'a4', slur: 2}),
+        // n({value: 16, pitch: 'a4'}), n({value: 16, pitch: 'a4'}), n({value: 16, pitch: 'a4'}), n({value: 16, pitch: 'a4'}),
+        // n({value: 16, pitch: 'a4'}), n({value: 16, pitch: 'a4'}), n({value: 16, pitch: 'a4'}), n({value: 16, pitch: 'a4'}),
+        // n({value: 16, pitch: 'a4'}), n({value: 16, pitch: 'a4'}), n({value: 16, pitch: 'a4'}), n({value: 16, pitch: 'a4'})
+    ]);
+    var bass = scored.voice({name: "bass"}, [
+        n({value: 1, pitch: 'e3'}), n({value: 1, pitch: 'e3'}), n({value: 1, pitch: 'e3'}), n({value: 1, pitch: 'e3'}),
+        n({value: 1, pitch: 'e3'}), n({value: 1, pitch: 'e3'}), n({value: 1, pitch: 'e3'}), n({value: 1, pitch: 'e3'}),
+        n({value: 1, pitch: 'e3'}), n({value: 1, pitch: 'e3'}), n({value: 1, pitch: 'e3'}), n({value: 1, pitch: 'e3'})
+    ]);
+
+    var fourfour = scored.timeSig({value: "4/4", measure: 0});
+
+    // create staves
+    var system1 = scored.system({measures: 3, page: 1});
+    var system2 = scored.system({measures: 3, page: 1});
+    var system3 = scored.system({measures: 3, page: 2});
+    var system4 = scored.system({measures: 3, page: 2});
+
+    var score = scored.score({systemHeights: [0, 250, 500, 750]}, [fourfour, system1, system2, system3, system4, trebleLine, bassLine]);
+
+    // render it all as a score.
+    return scored.render(score, {voices: [soprano, bass], pages: [2]});
 }
