@@ -53,9 +53,10 @@ Score.render = function (score, {measures, voices=[], pages=[1]}) {
     const startTimes = _.dropRight(startMeasures).map((measure) => getTime(measures, {measure}));
 
     const systemTimeContexts = getSystemTimeContexts(score, voices, measures, startMeasures);
+    const systemTimeContextsToRender = systemsToRender.map(([system, i]) => [systemTimeContexts[i], startTimes[i]]);
 
     // Create the context marking for the beginning of each system.
-    map((systemContext, startTime) => {
+    map(([systemContext, startTime]) => {
         const firstTime = _.first(systemContext);
         const startContext = getStartContext(score, startTime);
         if (firstTime) {
@@ -80,7 +81,7 @@ Score.render = function (score, {measures, voices=[], pages=[1]}) {
             const systemTimeContext = _.map(startContext, _.partial(createLineTimeContext, startTime));
             systemContext.push(systemTimeContext);
         }
-    }, systemTimeContexts, startTimes);
+    }, systemTimeContextsToRender);
 
     const systemGroups = _.map(systemsToRender, ([system, i]) => {
         const endMeasure = startMeasures[i] + system.measures;
@@ -149,6 +150,7 @@ export function createLineTimeContext (time, context) {
     return {context, items, time};
 }
 
+// Staff[Time[Line[Context]]]
 export function getSystemTimeContexts (score, voices, measures, startMeasures) {
     // get the time contexts
 	const lineItems = getStaffItems(score.lines, voices);
