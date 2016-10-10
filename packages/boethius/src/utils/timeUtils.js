@@ -160,6 +160,10 @@ function compareByTime ({time: t1=0}, {time: t2=0}) {
 	return t1 <= t2;
 }
 
+function equals (time1, time2) {
+	
+}
+
 function splitByMeasure (events) {
 	const measures = _.mapValues(_.groupBy(events, function ([, ctx]) {
 		return ctx.measure || 0;

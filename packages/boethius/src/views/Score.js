@@ -58,8 +58,14 @@ Score.render = function (score, {measures, voices=[], pages=[1]}) {
 
     // get voice time frames for rendering decorations.
     const voiceTimeFrames = voices.map(voice => voice.getTimeFrame(timeFrame[0].time, timeFrame[1].time));
-    // slurs are grouped by voice
-    const slurs = voiceTimeFrames.map(voice => Slur.groupSlurs(voice).map(slur => Slur.of({}, slur)));
+    // slurs are grouped by voice.
+    const slurs = voiceTimeFrames.map(voice => Slur.groupSlurs(voice, startTimes).map(slurred => {
+        // FIXME: need to add timeBreak property.
+        const slurStartTime = _.first(slurred).time;
+        const slurEndTime = _.last(slurred).time;
+        const timeBreak = _.contains(startTimes.map(time => time.time), slurEndTime);
+        return Slur.of({timeBreak}, slurred);
+    }));
 
     const systemTimeContexts = getSystemTimeContexts(score.lines, voices, measures, startMeasures, timeFrame);
 

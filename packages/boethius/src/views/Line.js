@@ -89,27 +89,6 @@ Line.prototype.renderItems = function (times) {
 };
 
 /*
- * @param lineGroup - the group returned by line.render
- */
-// Line.prototype.renderMeasures = function (measures, lengths, lineGroup, lineLength) {
-// 	let averageMeasureLength = Line.calculateAverageMeasureLength(1, lineLength, measures.length);
-//
-// 	let measureGroups = _.reduce(measures, (groups, measure, i) => {
-// 		let measureLength = lengths[i] || averageMeasureLength,
-// 			previousGroup = _.last(groups),
-// 			leftBarline;
-//
-// 		// leftBarline = previousGroup ? previousGroup.children.barline : null;
-// 		leftBarline = previousGroup ? _.last(previousGroup.children) : null;
-// 		let measureGroup = measure.render([lineGroup], leftBarline, measureLength);
-//
-// 		groups.push(measureGroup);
-// 		return groups;
-// 	}, []);
-// 	return measureGroups;
-// };
-
-/*
  * Returns the clef, time signature and accidentals at the given time.
  */
 Line.prototype.contextAt = function (time) {
