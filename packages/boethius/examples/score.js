@@ -219,5 +219,5 @@ function testSlurs () {
     var score = scored.score({systemHeights: [0, 250, 500, 750]}, [fourfour, system1, system2, system3, system4, trebleLine, bassLine]);
 
     // render it all as a score.
-    return scored.render(score, {voices: [soprano, bass], pages: [2]});
+    return scored.render(score, {voices: [soprano, bass], pages: [1]});
 }

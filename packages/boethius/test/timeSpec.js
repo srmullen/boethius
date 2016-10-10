@@ -62,6 +62,13 @@ describe("timeUtils", () => {
 
         });
 
+        it("should return the end time if item isn't in measures", () => {
+            const timeSig = scored.timeSig({value: "4/4", measure: 0});
+            const measures = createMeasures(4, [timeSig]);
+
+            expect(getTime(measures, {measure: 4})).to.be.ok;
+        });
+
         it("should always return beat as zero and time as the startTime of the measure", () => {
 
         });

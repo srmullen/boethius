@@ -47,14 +47,18 @@ function getBeat (time, timeSig, offset=0) {
 function getTime (measures, item) {
 	let beat,
 		measure = item.measure,
-		time = item.time,
-		measureView;
+		time = item.time;
 
 	if (!_.isNumber(item.measure)) {
 		measure = getMeasureNumber(measures, item.time);
 	}
 
-	measureView = measures[measure];
+	if (measure >= measures.length) {
+		const lastMeasure = _.last(measures);
+		time = getMeasureDuration(lastMeasure) + lastMeasure.startsAt;
+	}
+
+	const measureView = measures[measure];
 
 	// time signatures are always at the beginning of a measure.
 	if (isTimeSignature(item)) {

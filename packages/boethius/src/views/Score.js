@@ -44,16 +44,19 @@ Score.render = function (score, {measures, voices=[], pages=[1]}) {
     // Optimize here. Measures shouldn't need to be recreated every time the score is re-rendered.
     measures = measures || scoreToMeasures(score);
 
-    const systemsToRender = _.reduce(score.systems, (acc, system, i) => {
-        return _.contains(pages, system.page) ? concat(acc, [system, i]) : acc;
+    const systemsToRender = _.reduce(score.systems, (acc, system, index) => {
+        return _.contains(pages, system.page) ? concat(acc, {system, index}) : acc;
     }, []);
 
     // get the start measure for each System.
     const startMeasures = reductions((acc, system) => acc + system.measures, score.systems, 0);
-    const startTimes = _.dropRight(startMeasures).map((measure) => getTime(measures, {measure}));
+    const startTimes = startMeasures.map((measure) => getTime(measures, {measure}));
 
-    const systemTimeContexts = getSystemTimeContexts(score, voices, measures, startMeasures);
-    const systemTimeContextsToRender = systemsToRender.map(([system, i]) => [systemTimeContexts[i], startTimes[i]]);
+    // [startTime inclusive, endTime exclusive]
+    const timeFrame = [startTimes[_.first(systemsToRender).index], startTimes[_.last(systemsToRender).index + 1]];
+
+    const systemTimeContexts = getSystemTimeContexts(score.lines, voices, measures, startMeasures, timeFrame);
+    const systemTimeContextsToRender = systemsToRender.map(({system, index}) => [systemTimeContexts[index], startTimes[index]]);
 
     // Create the context marking for the beginning of each system.
     map(([systemContext, startTime]) => {
@@ -83,17 +86,17 @@ Score.render = function (score, {measures, voices=[], pages=[1]}) {
         }
     }, systemTimeContextsToRender);
 
-    const systemGroups = _.map(systemsToRender, ([system, i]) => {
-        const endMeasure = startMeasures[i] + system.measures;
-        const systemMeasures = _.slice(measures, startMeasures[i], endMeasure);
-        const timeContext = systemTimeContexts[i];
+    const systemGroups = _.map(systemsToRender, ({system, index}) => {
+        const endMeasure = startMeasures[index] + system.measures;
+        const systemMeasures = _.slice(measures, startMeasures[index], endMeasure);
+        const timeContext = systemTimeContexts[index];
 
         const systemGroup = System.renderTimeContexts(system, score.lines, systemMeasures, voices, timeContext, score.length);
 
         // Add height of previously rendered pages
         const systemTranslation = (!_.contains(pages, system.page - 1)) ?
-            score.systemHeights[i] :
-            score.systemHeights[i] + _.indexOf(pages, system.page) * score.pageHeight;
+            score.systemHeights[index] :
+            score.systemHeights[index] + _.indexOf(pages, system.page) * score.pageHeight;
 
         systemGroup.translate(0, systemTranslation);
 
@@ -151,10 +154,10 @@ export function createLineTimeContext (time, context) {
 }
 
 // Staff[Time[Line[Context]]]
-export function getSystemTimeContexts (score, voices, measures, startMeasures) {
+export function getSystemTimeContexts (lines, voices, measures, startMeasures, timeFrame) {
     // get the time contexts
-	const lineItems = getStaffItems(score.lines, voices);
-	const lineTimes = map((line, items) => getTimeContexts(line, measures, items), score.lines, lineItems);
+	const lineItems = getStaffItems(lines, voices);
+	const lineTimes = map((line, items) => getTimeContexts(line, measures, items), lines, lineItems);
 
     // calculate the accidentals for each line.
 	_.each(lineTimes, (times) => {
