@@ -5,7 +5,7 @@ import constants from "../constants";
 import {isPitched} from "../types";
 import {concat, partitionBy, reductions} from "../utils/common";
 import {beam, drawTuplets} from "../engraver";
-import {getAverageStemDirection, slur} from "../utils/note";
+import {getAverageStemDirection} from "../utils/note";
 import {calculateDuration, parseSignature, calculateTupletDuration, sumDurations} from "../utils/timeUtils";
 
 /*
@@ -129,10 +129,6 @@ Voice.groupTuplets = function groupTuplets (items) {
     return groupings;
 };
 
-Voice.groupSlurs = function (items) {
-    return _.filter(partitionBy(items, item => item.slur), ([item]) => !!item.slur);
-};
-
 /*
  * @param centerLineValue - String representing note value.
  * @param notes <Note, Chord>[]
@@ -166,16 +162,6 @@ Voice.renderArticulations = function (items) {
 Voice.renderTuplets = function (items, centerLine) {
     const tuplets = Voice.groupTuplets(items);
     return tuplets.map(tuplet => drawTuplets(tuplet, centerLine, this.stemDirection));
-};
-
-Voice.renderSlurs = function (items) {
-    const slurred = Voice.groupSlurs(items);
-    return _.map(slurred, slur);
-}
-
-Voice.prototype.renderSlurs = function () {
-    const slurred = Voice.groupSlurs(this.children);
-    return _.map(slurred, slur);
 };
 
 function gt (n1, n2) {

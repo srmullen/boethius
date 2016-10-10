@@ -12,7 +12,7 @@ import {isNote} from "../types";
  */
 function getStaffItems (lines, voices) {
     return _.map(lines, (line) => {
-        return _.reduce(line.voices, (acc, voiceConfig) => {
+        return _.reduce(line.voices, (acc, voiceConfig) => { // FIXME: duplication of getLineItems
             if (_.isString(voiceConfig)) {
                 const voice = _.find(voices, voice => voice.name === voiceConfig);
                 return voice ? acc.concat(voice.children) : acc;

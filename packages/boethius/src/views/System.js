@@ -36,44 +36,44 @@ function System ({page=1, startMeasure=0, measures=4, lineHeights=[]}, children=
 	this.lineHeights = lineHeights;
 }
 
-System.render = function render (system, {lines=[], voices=[], measures, length, startMeasure=0}) {
-	/////////////////////////
-	// Time Contexts Phase //
-	/////////////////////////
-	measures = measures || createMeasures(system.measures, system.markings);
-
-	const endMeasure = startMeasure + system.measures;
-
-	const lineItems = getStaffItems(lines, voices);
-
-	const lineTimes = map((line, items) => getTimeContexts(line, measures, items), lines, lineItems);
-
-	// get the times that are to be rendered on the system.
-	const lineTimesToRender = _.map(lineTimes, (line) => {
-		return _.filter(line, (time) => {
-			return time.time.measure >= startMeasure && time.time.measure < endMeasure;
-		});
-	});
-
-	// calculate the accidentals for each line.
-	_.each(lineTimesToRender, (times) => {
-		const accidentals = getAccidentalContexts(times);
-		// add accidentals to times
-		_.each(times, (time, i) => time.context.accidentals = accidentals[i]);
-	});
-
-	const measuresToRender = _.slice(measures, startMeasure, endMeasure); // used in render and placement phases
-
-	// Group in order the times on each line
-	const systemTimes = iterateByTime(x => x, lineTimesToRender); // used in renderand placement phases
-
-	//////////////////
-	// Render Phase //
-	//////////////////
-	const systemGroup = System.renderTimeContexts(system, lines, measuresToRender, voices, systemTimes, length);
-	// return renderDecorations(systemGroup, voices);
-	return systemGroup;
-};
+// System.render = function render (system, {lines=[], voices=[], measures, length, startMeasure=0}) {
+// 	/////////////////////////
+// 	// Time Contexts Phase //
+// 	/////////////////////////
+// 	measures = measures || createMeasures(system.measures, system.markings);
+//
+// 	const endMeasure = startMeasure + system.measures;
+//
+// 	const lineItems = getStaffItems(lines, voices);
+//
+// 	const lineTimes = map((line, items) => getTimeContexts(line, measures, items), lines, lineItems);
+//
+// 	// get the times that are to be rendered on the system.
+// 	const lineTimesToRender = _.map(lineTimes, (line) => {
+// 		return _.filter(line, (time) => {
+// 			return time.time.measure >= startMeasure && time.time.measure < endMeasure;
+// 		});
+// 	});
+//
+// 	// calculate the accidentals for each line.
+// 	_.each(lineTimesToRender, (times) => {
+// 		const accidentals = getAccidentalContexts(times);
+// 		// add accidentals to times
+// 		_.each(times, (time, i) => time.context.accidentals = accidentals[i]);
+// 	});
+//
+// 	const measuresToRender = _.slice(measures, startMeasure, endMeasure); // used in render and placement phases
+//
+// 	// Group in order the times on each line
+// 	const systemTimes = iterateByTime(x => x, lineTimesToRender); // used in renderand placement phases
+//
+// 	//////////////////
+// 	// Render Phase //
+// 	//////////////////
+// 	const systemGroup = System.renderTimeContexts(system, lines, measuresToRender, voices, systemTimes, length);
+// 	// return renderDecorations(systemGroup, voices);
+// 	return systemGroup;
+// };
 
 /*
  * @param system - System
@@ -182,9 +182,6 @@ System.renderTimeContexts = function (system, lines, measures, voices, timeConte
 			_.each(lineItems, voiceItems => {
 				renderLedgerLines(voiceItems, lineCenter);
 				Voice.renderArticulations(voiceItems); // items must have stem direction already
-
-				const slurGroups = Voice.renderSlurs(voiceItems);
-				lineGroup.addChildren(slurGroups);
 			});
 
 		}, lines, lineGroups, lineCenters);

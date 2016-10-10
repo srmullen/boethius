@@ -1,6 +1,7 @@
 import _ from "lodash";
 
 import System from "./System";
+import Slur from "./Slur";
 import constants from "../constants";
 import {createMeasures} from "../utils/measure";
 import {map, reductions, partitionWhen, clone, concat} from "../utils/common";
@@ -55,12 +56,17 @@ Score.render = function (score, {measures, voices=[], pages=[1]}) {
     // [startTime inclusive, endTime exclusive]
     const timeFrame = [startTimes[_.first(systemsToRender).index], startTimes[_.last(systemsToRender).index + 1]];
 
+    // get voice time frames for rendering decorations.
+    const voiceTimeFrames = voices.map(voice => voice.getTimeFrame(timeFrame[0].time, timeFrame[1].time));
+    // slurs are grouped by voice
+    const slurs = voiceTimeFrames.map(voice => Slur.groupSlurs(voice).map(slur => Slur.of({}, slur)));
+
     const systemTimeContexts = getSystemTimeContexts(score.lines, voices, measures, startMeasures, timeFrame);
-    const systemTimeContextsToRender = systemsToRender.map(({system, index}) => [systemTimeContexts[index], startTimes[index]]);
 
     // Create the context marking for the beginning of each system.
-    map(([systemContext, startTime]) => {
-        const firstTime = _.first(systemContext);
+    map(({index}) => {
+        const firstTime = _.first(systemTimeContexts[index]);
+        const startTime = startTimes[index]
         const startContext = getStartContext(score, startTime);
         if (firstTime) {
             const time = _.find(firstTime, ctx => !!ctx).time;
@@ -84,9 +90,9 @@ Score.render = function (score, {measures, voices=[], pages=[1]}) {
             const systemTimeContext = _.map(startContext, _.partial(createLineTimeContext, startTime));
             systemContext.push(systemTimeContext);
         }
-    }, systemTimeContextsToRender);
+    }, systemsToRender);
 
-    const systemGroups = _.map(systemsToRender, ({system, index}) => {
+    const systemGroups = _.map(systemsToRender, ({system, index}, i) => {
         const endMeasure = startMeasures[index] + system.measures;
         const systemMeasures = _.slice(measures, startMeasures[index], endMeasure);
         const timeContext = systemTimeContexts[index];
@@ -102,6 +108,9 @@ Score.render = function (score, {measures, voices=[], pages=[1]}) {
 
         return systemGroup;
     });
+
+    const slurGroups = _.flatten(slurs).map(slur => slur.render());
+    scoreGroup.addChildren(slurGroups);
 
     scoreGroup.addChildren(systemGroups);
 
@@ -154,7 +163,7 @@ export function createLineTimeContext (time, context) {
 }
 
 // Staff[Time[Line[Context]]]
-export function getSystemTimeContexts (lines, voices, measures, startMeasures, timeFrame) {
+export function getSystemTimeContexts (lines, voices, measures, startMeasures) {
     // get the time contexts
 	const lineItems = getStaffItems(lines, voices);
 	const lineTimes = map((line, items) => getTimeContexts(line, measures, items), lines, lineItems);

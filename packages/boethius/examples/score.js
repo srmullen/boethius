@@ -197,15 +197,18 @@ function testSlurs () {
     var soprano = scored.voice({name: "treble"}, [
         // slur across systems
         n({value: 2, pitch: 'a4'}), n({value: 2, pitch: 'a4', slur: 1}), n({value: 1, pitch: 'ab4', slur: 1}), n({value: 1, pitch: 'c5', slur: 2}),
-        n({value: 1, pitch: 'a4', slur: 2}),
+        n({value: 2, pitch: 'a4', slur: 2}), n({value: 2, pitch: 'a4', slur: 1}), n({value: 1, pitch: 'ab4', slur: 1}), n({value: 1, pitch: 'c5', slur: 2}),
+        n({value: 2, pitch: 'a4'}), n({value: 2, pitch: 'c5', slur: 1}), n({value: 1, pitch: 'ab4', slur: 1}), n({value: 1, pitch: 'c5', slur: 2}),
+        n({value: 2, pitch: 'a4'}), n({value: 2, pitch: 'c5', slur: 1}), n({value: 1, pitch: 'ab4', slur: 1}), n({value: 1, pitch: 'c5', slur: 2})
         // n({value: 16, pitch: 'a4'}), n({value: 16, pitch: 'a4'}), n({value: 16, pitch: 'a4'}), n({value: 16, pitch: 'a4'}),
         // n({value: 16, pitch: 'a4'}), n({value: 16, pitch: 'a4'}), n({value: 16, pitch: 'a4'}), n({value: 16, pitch: 'a4'}),
         // n({value: 16, pitch: 'a4'}), n({value: 16, pitch: 'a4'}), n({value: 16, pitch: 'a4'}), n({value: 16, pitch: 'a4'})
     ]);
     var bass = scored.voice({name: "bass"}, [
-        n({value: 1, pitch: 'e3'}), n({value: 1, pitch: 'e3'}), n({value: 1, pitch: 'e3'}), n({value: 1, pitch: 'e3'}),
-        n({value: 1, pitch: 'e3'}), n({value: 1, pitch: 'e3'}), n({value: 1, pitch: 'e3'}), n({value: 1, pitch: 'e3'}),
-        n({value: 1, pitch: 'e3'}), n({value: 1, pitch: 'e3'}), n({value: 1, pitch: 'e3'}), n({value: 1, pitch: 'e3'})
+        n({value: 1, pitch: 'e3'}), n({value: 1, pitch: 'e3'}), n({value: 1, pitch: 'e3'}),
+        n({value: 1, pitch: 'e3'}), n({value: 1, pitch: 'e3'}), n({value: 1, pitch: 'e3'}),
+        n({value: 1, pitch: 'e3'}), n({value: 1, pitch: 'f3'}), n({value: 1, pitch: 'g3'}),
+        n({value: 1, pitch: 'e3'}), n({value: 1, pitch: 'f3'}), n({value: 1, pitch: 'g3'})
     ]);
 
     var fourfour = scored.timeSig({value: "4/4", measure: 0});
