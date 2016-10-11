@@ -63,8 +63,8 @@ Score.render = function (score, {measures, voices=[], pages=[1]}) {
         // FIXME: need to add timeBreak property.
         const slurStartTime = _.first(slurred).time;
         const slurEndTime = _.last(slurred).time;
-        const timeBreak = _.contains(startTimes.map(time => time.time), slurEndTime);
-        return Slur.of({timeBreak}, slurred);
+        const systemBreak = _.contains(startTimes.map(time => time.time), slurEndTime);
+        return Slur.of({systemBreak}, slurred);
     }));
 
     const systemTimeContexts = getSystemTimeContexts(score.lines, voices, measures, startMeasures, timeFrame);

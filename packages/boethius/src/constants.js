@@ -3,6 +3,7 @@ const constants = {
 		score: "score",
 		staff: "staff",
 		system: "system",
+		slur: "slur",
 		line: "line",
 		voice: "voice",
 		measure: "measure",

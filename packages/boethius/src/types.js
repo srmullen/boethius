@@ -22,6 +22,7 @@ const isMeasure = _.partial(isType, constants.type.measure);
 const isNote = _.partial(isType, constants.type.note);
 const isRest = _.partial(isType, constants.type.rest);
 const isScore = _.partial(isType, constants.type.score);
+const isSlur = _.partial(isType, constants.type.slur);
 const isSystem = _.partial(isType, constants.type.system);
 const isTimeSignature = _.partial(isType, constants.type.timeSig);
 const isVoice = _.partial(isType, constants.type.voice);
@@ -39,6 +40,7 @@ export {
     isNote,
     isRest,
     isScore,
+    isSlur,
     isSystem,
     isTimeSignature,
     isVoice,

@@ -82,38 +82,28 @@ function getAverageStemDirection (items, centerLineValue) {
 	return items.map(() => averageDirection);
 }
 
-/*
- * @param item - Note or Chord.
- * @param incoming - the incoming slur handle
- * @param stemDirection - String.
- */
-function getSlurPoint (item, incoming, stemDirection) {
-	stemDirection = stemDirection || item.getStemDirection();
+// function slur (items) {
+// 	const firstItem = items[0];
+// 	const lastItem = _.last(items);
+// 	const firstStem = firstItem.getStemDirection();
+// 	const begin = getSlurPoint(firstItem, null, firstStem);
+// 	const handle = getSlurHandle(firstStem);
+// 	const end = getSlurPoint(lastItem, handle);
+// 		// center = begin.add(end.subtract(begin).divide(2)).add([0, 4]);
+//
+// 	const path = new paper.Path({
+// 		segments: [begin, end],
+// 		strokeColor: "black",
+// 		strokeWidth: 2
+// 	});
+//
+// 	path.segments[0].handleOut = handle;
+// 	path.segments[1].handleIn = handle;
+//
+// 	return path;
+// }
 
-	const noteHead = isChord(item) ? item.getBaseNote(stemDirection).noteHead : item.noteHead;
-
-	if (!incoming) {
-		return stemDirection === "down" ? noteHead.bounds.center : noteHead.bounds.bottomCenter;
-	} else if (incoming.y < 0) {
-		return noteHead.bounds.center;
-	} else {
-		return noteHead.bounds.bottomCenter;
-	}
-}
-
-function getSlurHandle (stemDirection) {
-	const yVec = stemDirection === "up" ? 10 : -10;
-	return new paper.Point([0, yVec]);
-}
-
-function slur (items) {
-	const firstItem = items[0];
-	const lastItem = _.last(items);
-	const firstStem = firstItem.getStemDirection();
-	const begin = getSlurPoint(firstItem, null, firstStem);
-	const handle = getSlurHandle(firstStem);
-	const end = getSlurPoint(lastItem, handle);
-		// center = begin.add(end.subtract(begin).divide(2)).add([0, 4]);
+function slur (begin, end, handle) {
 
 	const path = new paper.Path({
 		segments: [begin, end],
