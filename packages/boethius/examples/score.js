@@ -198,8 +198,8 @@ function testSlurs () {
         // slur across systems
         n({value: 2, pitch: 'a4'}), n({value: 2, pitch: 'a4', slur: 1}), n({value: 1, pitch: 'ab4', slur: 1}), n({value: 1, pitch: 'c5', slur: 2}),
         n({value: 2, pitch: 'a4', slur: 2}), n({value: 2, pitch: 'a4', slur: 1}), n({value: 1, pitch: 'ab4', slur: 1}), n({value: 1, pitch: 'c5', slur: 2}),
-        n({value: 2, pitch: 'a4'}), n({value: 2, pitch: 'c5', slur: 1}), n({value: 1, pitch: 'ab4', slur: 1}), n({value: 1, pitch: 'c5', slur: 2}),
-        n({value: 2, pitch: 'a4'}), n({value: 2, pitch: 'c5', slur: 1}), n({value: 1, pitch: 'ab4', slur: 1}), n({value: 1, pitch: 'c5', slur: 2})
+        n({value: 2, pitch: 'a4', slur: 2}), n({value: 2, pitch: 'c5', slur: 1}), n({value: 1, pitch: 'ab4', slur: 1}), n({value: 1, pitch: 'c5', slur: 2}),
+        n({value: 2, pitch: 'a4', slur: 2}), n({value: 2, pitch: 'c5', slur: 1}), n({value: 1, pitch: 'ab4', slur: 1}), n({value: 1, pitch: 'c5'})
         // n({value: 16, pitch: 'a4'}), n({value: 16, pitch: 'a4'}), n({value: 16, pitch: 'a4'}), n({value: 16, pitch: 'a4'}),
         // n({value: 16, pitch: 'a4'}), n({value: 16, pitch: 'a4'}), n({value: 16, pitch: 'a4'}), n({value: 16, pitch: 'a4'}),
         // n({value: 16, pitch: 'a4'}), n({value: 16, pitch: 'a4'}), n({value: 16, pitch: 'a4'}), n({value: 16, pitch: 'a4'})

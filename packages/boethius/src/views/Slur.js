@@ -9,9 +9,11 @@ const TYPE = constants.type.slur;
 
 /*
  * @param systemBreak - true if slur is across systems.
+ * @param isEnd - true if slur ends on only item in children. Makes no difference is children contains multiple items.
  */
-function Slur ({systemBreak}, children = []) {
+function Slur ({systemBreak, isEnd}, children = []) {
     this.systemBreak = systemBreak;
+    this.isEnd = isEnd;
     this.children = children;
 }
 
@@ -26,7 +28,22 @@ Slur.prototype.render = function () {
 
     const firstItem = first(this.children);
     const lastItem = last(this.children);
-    if (this.systemBreak) {
+    if (this.children.length === 1) {
+        if (this.isEnd) {
+            const stem = lastItem.getStemDirection();
+            const end = getSlurPoint(lastItem, null, stem);
+            const begin = end.subtract(20, 0);
+            const handle = getSlurHandle(stem);
+            group.addChild(slur(begin, end, handle));
+        } else {
+            const stem = firstItem.getStemDirection();
+            const begin = getSlurPoint(firstItem, null, stem);
+            const end = begin.add(20, 0);
+            const handle = getSlurHandle(stem);
+            group.addChild(slur(begin, end, handle));
+
+        }
+    } else if (this.systemBreak) {
         // TODO: Currently assumes only two notes in slur. Need to handle many notes.
         const firstStem = firstItem.getStemDirection();
         const s1Begin = getSlurPoint(firstItem, null, firstStem);
@@ -42,9 +59,9 @@ Slur.prototype.render = function () {
 
         group.addChildren([slur1, slur2]);
     } else {
-    	const firstStem = firstItem.getStemDirection();
-    	const begin = getSlurPoint(firstItem, null, firstStem);
-    	const handle = getSlurHandle(firstStem);
+    	const stem = firstItem.getStemDirection();
+    	const begin = getSlurPoint(firstItem, null, stem);
+    	const handle = getSlurHandle(stem);
     	const end = getSlurPoint(lastItem, handle);
         group.addChild(slur(begin, end, handle));
     }
@@ -52,7 +69,7 @@ Slur.prototype.render = function () {
 };
 
 Slur.groupSlurs = function (items) {
-    return _.filter(partitionBy(items, item => item.slur), ([item]) => !!item.slur);
+    return filter(partitionBy(items, item => item.slur), ([item]) => !!item.slur);
 };
 
 /*
