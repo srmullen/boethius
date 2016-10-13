@@ -59,14 +59,16 @@ function getLineItems (line, voices, start, end) {
 function getTimeContexts (line, measures, items) {
 	const allItems = line.markings.concat(items);
 
-	const times = _.sortBy(_.map(_.groupBy(allItems, (item) => {
+	const times = _.map(_.groupBy(allItems, (item) => {
 		return getTime(measures, item).time;
 	}), (v) => {
 		const time = getTime(measures, v[0]);
 		return {time, items: v, context: line.contextAt(time)};
-	}), ({time}) => time.time);
+	});
 
-	return times;
+	const sortedTimes = _.sortBy(times, ({time}) => time.time);
+
+	return sortedTimes;
 }
 
 function calculateMeasureLengths (measures, times, noteHeadWidth, shortestDuration) {

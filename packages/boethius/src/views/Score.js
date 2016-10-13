@@ -172,6 +172,7 @@ export function createLineTimeContext (time, context) {
 export function getSystemTimeContexts (lines, voices, measures, startMeasures) {
     // get the time contexts
 	const lineItems = getStaffItems(lines, voices);
+    // FIXME: returned contexts are incorrect when clef starts on beat other than 0.
 	const lineTimes = map((line, items) => getTimeContexts(line, measures, items), lines, lineItems);
 
     // calculate the accidentals for each line.

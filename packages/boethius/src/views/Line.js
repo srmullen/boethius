@@ -92,7 +92,17 @@ Line.prototype.renderItems = function (times) {
  * Returns the clef, time signature and accidentals at the given time.
  */
 Line.prototype.contextAt = function (time) {
-	const getMarking = _.curry((time, marking) => marking.measure <= time.measure && (marking.beat || 0) <= (time.beat || 0));
+	// FIXME: Marking should have time property and not just measure and beat properties.
+	const getMarking = _.curry((time, marking) => {
+		if (marking.measure < time.measure) {
+			return true;
+		} else if (marking.measure === time.measure) {
+			return (marking.beat || 0) <= (time.beat || 0);
+		} else {
+			return false;
+		}
+	});
+	// const getMarking = _.curry((time, marking) => marking.time <= time.time);
 	const getMarkingAtTime = (markings, type, time) => {
 		// Reverse mutates the array. Filtering first give a new array so no need to worry about mutating markings.
 		let markingsOfType = _.filter(markings, (marking) => marking.type === type).reverse();

@@ -72,6 +72,15 @@ describe("timeUtils", () => {
         it("should always return beat as zero and time as the startTime of the measure", () => {
 
         });
+
+        it("not report these as the same time", () => {
+            const timeSig = scored.timeSig({value: "4/4", measure: 0});
+            const measures = createMeasures(12, [timeSig]);
+            const clef = scored.clef({value: "bass", measure: 8, beat: 2});
+            const note = scored.note({value: 2, time: 8});
+
+            expect(getTime(measures, clef)).not.to.eql(getTime(measures, note));
+        });
     });
 
     describe("getMeasureNumber", () => {

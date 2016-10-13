@@ -67,7 +67,14 @@ function getTime (measures, item) {
 	}
 
 	if (!_.isNumber(item.time) && !_.isNumber(time)) {
-		time = getTimeNumber(measure, measureView.timeSig);
+		const baseTime = getTimeNumber(measure, measureView.timeSig);
+		if (_.isNumber(item.beat)) {
+			const [,beatType] = parseSignature(measureView.timeSig);
+			const beatTime = (1/beatType) * item.beat;
+			time = baseTime + beatTime;
+		} else {
+			time = baseTime;
+		}
 	}
 
 	if (measureView) {
@@ -161,7 +168,7 @@ function compareByTime ({time: t1=0}, {time: t2=0}) {
 }
 
 function equals (time1, time2) {
-	
+
 }
 
 function splitByMeasure (events) {
