@@ -71,7 +71,8 @@ Score.render = function (score, {measures, voices=[], pages=[1]}) {
 
     // Create the context marking for the beginning of each system.
     map(({index}) => {
-        const firstTime = _.first(systemTimeContexts[index]);
+        const systemContext = systemTimeContexts[index];
+        const firstTime = _.first(systemContext);
         const startTime = startTimes[index]
         const startContext = getStartContext(score, startTime);
         if (firstTime) {
