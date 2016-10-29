@@ -30,6 +30,7 @@ function Score ({pageWidth=595, pageHeight=842, length, systemHeights}, children
     this.timeSigs = types.timeSig || [];
     this.lines = types.line || [];
     this.systems = types.system || [];
+    this.pages = types.page || [];
     this.length = length;
     this.systemHeights = systemHeights;
     this.pageWidth = pageWidth;
@@ -106,10 +107,9 @@ Score.render = function (score, {measures, voices=[], pages=[1]}) {
 
         const systemGroup = System.renderTimeContexts(system, score.lines, systemMeasures, voices, timeContext, score.length);
 
-        // Add height of previously rendered pages
-        const systemTranslation = (!_.contains(pages, system.page - 1)) ?
-            score.systemHeights[index] :
-            score.systemHeights[index] + _.indexOf(pages, system.page) * score.pageHeight;
+        const systemTranslation = (!_.contains(pages, system.page)) ?
+            score.pages[system.page].staffSpacing[index] || index * 250 :
+            score.pages[system.page].staffSpacing[index] || index * 250 + _.indexOf(pages, system.page) * score.pageHeight;
 
         systemGroup.translate(0, systemTranslation);
 

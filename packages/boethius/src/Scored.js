@@ -15,6 +15,7 @@ import TimeSignature from "./views/TimeSignature";
 import Dynamic from "./views/Dynamic";
 import ChordSymbol from "./views/ChordSymbol";
 import Score from "./views/Score";
+import Page from "./views/Page";
 
 import {parse} from "./utils/parser";
 import * as lineUtils from "./utils/line";
@@ -129,6 +130,10 @@ Scored.prototype.chord = function chord (context={}, children=[]) {
 Scored.prototype.voice = function voice (context={}, children=[]) {
 	return new Voice(context, children);
 };
+
+Scored.prototype.page = function page (context={} , children=[]) {
+	return new Page(context, children);
+}
 
 Scored.prototype.measure = function measure (context={}, children) {
 	return new Measure(context, children);
