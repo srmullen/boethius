@@ -19,7 +19,7 @@ const TYPE = constants.type.score;
  * @param pageWidth - pixels given 72 dpi
  * @param pageHeight - pixels given 72 dpi
  */
-function Score ({pageWidth=595, pageHeight=842, length, systemHeights}, children=[]) {
+function Score ({pageWidth=595, pageHeight=842, length}, children=[]) {
     /*
      * A score should have both systems and lines.
      * A line represents all measures from 0 to the end of the score. It is one-dimentional.
@@ -32,7 +32,6 @@ function Score ({pageWidth=595, pageHeight=842, length, systemHeights}, children
     this.systems = types.system || [];
     this.pages = types.page || [];
     this.length = length;
-    this.systemHeights = systemHeights;
     this.pageWidth = pageWidth;
     this.pageHeight = pageHeight;
 }
