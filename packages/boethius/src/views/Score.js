@@ -38,7 +38,7 @@ function Score ({pageWidth=595, pageHeight=842, length}, children=[]) {
 
 Score.prototype.type = TYPE;
 
-Score.render = function (score, {measures, voices=[], pages=[1]}) {
+Score.render = function (score, {measures, voices=[], pages=[0]}) {
     // Create the Score Group. No actual rendering is done here.
     const scoreGroup = score.render();
 
@@ -49,78 +49,80 @@ Score.render = function (score, {measures, voices=[], pages=[1]}) {
         return _.contains(pages, system.page) ? concat(acc, {system, index}) : acc;
     }, []);
 
-    // get the start measure for each System.
-    const startMeasures = reductions((acc, system) => acc + system.measures, score.systems, 0);
-    const startTimes = startMeasures.map((measure) => getTime(measures, {measure}));
+    if (systemsToRender.length) {
+        // get the start measure for each System.
+        const startMeasures = reductions((acc, system) => acc + system.measures, score.systems, 0);
+        const startTimes = startMeasures.map((measure) => getTime(measures, {measure}));
 
-    // [startTime inclusive, endTime exclusive]
-    const timeFrame = [startTimes[_.first(systemsToRender).index], startTimes[_.last(systemsToRender).index + 1]];
+        // [startTime inclusive, endTime exclusive]
+        const timeFrame = [startTimes[_.first(systemsToRender).index], startTimes[_.last(systemsToRender).index + 1]];
 
-    // get voice time frames for rendering decorations.
-    const voiceTimeFrames = voices.map(voice => voice.getTimeFrame(timeFrame[0].time, timeFrame[1].time));
-    // slurs are grouped by voice.
-    const slurs = voiceTimeFrames.map(voice => Slur.groupSlurs(voice, startTimes).map(slurred => {
-        const slurStartTime = _.first(slurred).time;
-        const slurEndTime = _.last(slurred).time;
-        const systemBreak = _.contains(startTimes.map(time => time.time), slurEndTime);
-        const isEnd = !!systemBreak && slurred.length === 1;
-        return Slur.of({systemBreak, isEnd}, slurred);
-    }));
+        // get voice time frames for rendering decorations.
+        const voiceTimeFrames = voices.map(voice => voice.getTimeFrame(timeFrame[0].time, timeFrame[1].time));
+        // slurs are grouped by voice.
+        const slurs = voiceTimeFrames.map(voice => Slur.groupSlurs(voice, startTimes).map(slurred => {
+            const slurStartTime = _.first(slurred).time;
+            const slurEndTime = _.last(slurred).time;
+            const systemBreak = _.contains(startTimes.map(time => time.time), slurEndTime);
+            const isEnd = !!systemBreak && slurred.length === 1;
+            return Slur.of({systemBreak, isEnd}, slurred);
+        }));
 
-    const systemTimeContexts = getSystemTimeContexts(score.lines, voices, measures, startMeasures, timeFrame);
+        const systemTimeContexts = getSystemTimeContexts(score.lines, voices, measures, startMeasures, timeFrame);
 
-    // Create the context marking for the beginning of each system.
-    map(({index}) => {
-        const systemContext = systemTimeContexts[index];
-        const firstTime = _.first(systemContext);
-        const startTime = startTimes[index]
-        const startContext = getStartContext(score, startTime);
-        if (firstTime) {
-            const time = _.find(firstTime, ctx => !!ctx).time;
-            if (startTime.time < time.time) {
-                throw new Error("Gap in time");
+        // Create the context marking for the beginning of each system.
+        map(({index}) => {
+            const systemContext = systemTimeContexts[index];
+            const firstTime = _.first(systemContext);
+            const startTime = startTimes[index]
+            const startContext = getStartContext(score, startTime);
+            if (firstTime) {
+                const time = _.find(firstTime, ctx => !!ctx).time;
+                if (startTime.time < time.time) {
+                    throw new Error("Gap in time");
+                } else {
+                    _.each(firstTime, (timeContext, i) => {
+                        if (timeContext) { // there are items at the time.
+                            // add markings to the items list if they don't exist.
+                            const {context, items} = timeContext;
+                            if (!_.find(timeContext.items, isClef)) items.push(clone(context.clef));
+                            if (!_.find(timeContext.items, isKey)) items.push(clone(context.key));
+                            if (!_.find(timeContext.items, isTimeSignature)) items.push(clone(context.timeSig));
+                        } else { // create a context and marking items for the line
+                            firstTime[i] = createLineTimeContext(startTime, startContext[i]);
+                        }
+                    });
+                }
             } else {
-                _.each(firstTime, (timeContext, i) => {
-                    if (timeContext) { // there are items at the time.
-                        // add markings to the items list if they don't exist.
-                        const {context, items} = timeContext;
-                        if (!_.find(timeContext.items, isClef)) items.push(clone(context.clef));
-                        if (!_.find(timeContext.items, isKey)) items.push(clone(context.key));
-                        if (!_.find(timeContext.items, isTimeSignature)) items.push(clone(context.timeSig));
-                    } else { // create a context and marking items for the line
-                        firstTime[i] = createLineTimeContext(startTime, startContext[i]);
-                    }
-                });
+                // create a timeContext with the cloned startContext markings
+                const systemTimeContext = _.map(startContext, _.partial(createLineTimeContext, startTime));
+                systemContext.push(systemTimeContext);
             }
-        } else {
-            // create a timeContext with the cloned startContext markings
-            const systemTimeContext = _.map(startContext, _.partial(createLineTimeContext, startTime));
-            systemContext.push(systemTimeContext);
-        }
-    }, systemsToRender);
+        }, systemsToRender);
 
-    const systemGroups = _.map(systemsToRender, ({system, index}, i) => {
-        const endMeasure = startMeasures[index] + system.measures;
-        const systemMeasures = _.slice(measures, startMeasures[index], endMeasure);
-        const timeContext = systemTimeContexts[index];
+        const systemGroups = _.map(systemsToRender, ({system, index}, i) => {
+            const endMeasure = startMeasures[index] + system.measures;
+            const systemMeasures = _.slice(measures, startMeasures[index], endMeasure);
+            const timeContext = systemTimeContexts[index];
 
-        const systemGroup = System.renderTimeContexts(system, score.lines, systemMeasures, voices, timeContext, score.length);
+            const systemGroup = System.renderTimeContexts(system, score.lines, systemMeasures, voices, timeContext, score.length);
 
-        const systemTranslation = (!_.contains(pages, system.page)) ?
-            score.pages[system.page].staffSpacing[index] || index * 250 :
-            score.pages[system.page].staffSpacing[index] || index * 250 + _.indexOf(pages, system.page) * score.pageHeight;
+            const systemTranslation = (!_.contains(pages, system.page)) ?
+                score.pages[system.page].staffSpacing[index] || index * 250 :
+                score.pages[system.page].staffSpacing[index] || index * 250 + _.indexOf(pages, system.page) * score.pageHeight;
 
-        systemGroup.translate(0, systemTranslation);
+            systemGroup.translate(0, systemTranslation);
 
-        return systemGroup;
-    });
+            return systemGroup;
+        });
 
-    const slurGroups = _.flatten(slurs).map(slur => slur.render());
-    scoreGroup.addChildren(slurGroups);
+        const slurGroups = _.flatten(slurs).map(slur => slur.render());
+        scoreGroup.addChildren(slurGroups);
 
-    scoreGroup.addChildren(systemGroups);
+        scoreGroup.addChildren(systemGroups);
 
-    // renderDecorations(scoreGroup, voices);
+        // renderDecorations(scoreGroup, voices);
+    }
 
     return scoreGroup;
 };
