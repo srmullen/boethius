@@ -108,8 +108,8 @@ Score.render = function (score, {measures, voices=[], pages=[0]}) {
             const systemGroup = System.renderTimeContexts(system, score.lines, systemMeasures, voices, timeContext, score.length);
 
             const systemTranslation = (!_.contains(pages, system.page)) ?
-                score.pages[system.page].staffSpacing[index] || index * 250 :
-                score.pages[system.page].staffSpacing[index] || index * 250 + _.indexOf(pages, system.page) * score.pageHeight;
+                score.pages[system.page].staffSpacing[i] || i * 250 :
+                score.pages[system.page].staffSpacing[i] || i * 250 + _.indexOf(pages, system.page) * score.pageHeight;
 
             systemGroup.translate(0, systemTranslation);
 
