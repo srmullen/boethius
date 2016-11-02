@@ -151,6 +151,8 @@ Scored.prototype.score = function score (context={}, children) {
 	return new Score(context, children);
 };
 
+Scored.prototype.clone = common.clone;
+
 Scored.parse = parse;
 
 export default Scored;
