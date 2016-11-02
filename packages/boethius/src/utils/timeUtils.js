@@ -67,7 +67,8 @@ function getTime (measures, item) {
 	}
 
 	if (!_.isNumber(item.time) && !_.isNumber(time)) {
-		const baseTime = getTimeNumber(measure, measureView.timeSig);
+		// const baseTime = getTimeNumber(measure, measureView.timeSig);
+		const baseTime = measureView.startsAt;
 		if (_.isNumber(item.beat)) {
 			const [,beatType] = parseSignature(measureView.timeSig);
 			const beatTime = (1/beatType) * item.beat;
