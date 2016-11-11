@@ -50,7 +50,9 @@ function testDoubleStaffScore () {
     var system1 = scored.system({measures: 6, lineHeights: [0, 200]});
     var system2 = scored.system({measures: 6});
 
-    var score = scored.score({length: 1000, systemHeights: [0, 350]}, [fourfour, system1, system2, trebleLine, bassLine]);
+    const page0 = scored.page();
+
+    var score = scored.score({length: 1000, systemHeights: [0, 350]}, [fourfour, system1, system2, trebleLine, bassLine, page0]);
 
     // render it all as a score.
     return scored.render(score, {voices: [soprano, bass]});
@@ -74,7 +76,9 @@ function testVoicePastEndOfScore () {
         scored.note({pitch: "a4", value: 4})
     ]);
 
-    var score = scored.score({}, [timeSig, system, line]);
+    const page0 = scored.page();
+
+    var score = scored.score({}, [timeSig, system, line, page0]);
 
     return scored.render(score, {voices: [voice]});
 }
@@ -91,7 +95,9 @@ function testNoStemsOnSecondStave () {
     var system1 = scored.system({measures: 1, startMeasure: 0});
     var system2 = scored.system({measures: 1, startmeasure: 1});
 
-    var score = scored.score({}, [timeSig, line, system1, system2]);
+    const page0 = scored.page();
+
+    var score = scored.score({}, [timeSig, line, system1, system2, page0]);
 
     var n = scored.note;
     var voice = scored.voice({name: "v"}, [
@@ -131,18 +137,22 @@ function testPages () {
     var fourfour = scored.timeSig({value: "4/4", measure: 0});
 
     // create staves
-    var system1 = scored.system({measures: 4, lineHeights: [0, 200], page: 1});
-    var system2 = scored.system({measures: 4, page: 1});
-    var system3 = scored.system({measures: 4, page: 2});
-    var system4 = scored.system({measures: 4, page: 3});
+    var system1 = scored.system({measures: 4, lineHeights: [0, 200], page: 0});
+    var system2 = scored.system({measures: 4, page: 0});
+    var system3 = scored.system({measures: 4, page: 1});
+    var system4 = scored.system({measures: 4, page: 2});
+
+    const page0 = scored.page();
+    const page1 = scored.page();
+    const page2 = scored.page();
 
     var score = scored.score({
         length: 1000,
         systemHeights: [0, 350, 0, 0]
-    }, [fourfour, system1, system2, system3, system4, trebleLine, bassLine]);
+    }, [fourfour, system1, system2, system3, system4, trebleLine, bassLine, page0, page1, page2]);
 
     // render it all as a score.
-    return scored.render(score, {voices: [soprano, bass], pages: [2, 3]});
+    return scored.render(score, {voices: [soprano, bass], pages: [1]});
 }
 
 function testChords () {
@@ -176,7 +186,9 @@ function testChords () {
     var system1 = scored.system({measures: 6, lineHeights: [0, 200]});
     var system2 = scored.system({measures: 6});
 
-    var score = scored.score({length: 1000, systemHeights: [0, 350]}, [fourfour, system1, system2, trebleLine, bassLine]);
+    const page0 = scored.page();
+
+    var score = scored.score({length: 1000, systemHeights: [0, 350]}, [fourfour, system1, system2, trebleLine, bassLine, page0]);
 
     // render it all as a score.
     return scored.render(score, {voices: [soprano, bass]});
@@ -213,12 +225,17 @@ function testSlurs () {
     var fourfour = scored.timeSig({value: "4/4", measure: 0});
 
     // create staves
-    var system1 = scored.system({measures: 3, page: 1});
-    var system2 = scored.system({measures: 3, page: 1});
-    var system3 = scored.system({measures: 3, page: 2});
-    var system4 = scored.system({measures: 3, page: 2});
+    var system1 = scored.system({measures: 3, page: 0});
+    var system2 = scored.system({measures: 3, page: 0});
+    var system3 = scored.system({measures: 3, page: 1});
+    var system4 = scored.system({measures: 3, page: 1});
 
-    var score = scored.score({systemHeights: [0, 250, 500, 750]}, [fourfour, system1, system2, system3, system4, trebleLine, bassLine]);
+    const page0 = scored.page();
+    const page1 = scored.page();
+
+    var score = scored.score({
+        systemHeights: [0, 250, 500, 750]
+    }, [fourfour, system1, system2, system3, system4, trebleLine, bassLine, page0, page1]);
 
     // render it all as a score.
     return scored.render(score, {voices: [soprano, bass], pages: [1]});
