@@ -16,19 +16,16 @@ function drawCircle (point, radius, color) {
     return circ;
 }
 
-/*
- * @param $el {jQuery} - element to append the canvas to.
- */
-function createCanvas ($el) {
-    $el.append('<canvas class="scored-canvas parnassus"><canvas>');
+function createCanvas (el) {
+    el.innerHTML = '<canvas class="scored-canvas parnassus"><canvas>';
 
-    return $(".scored-canvas");
+    return document.getElementsByClassName("scored-canvas");
 }
 
 start(function () {
-    var $canvas = createCanvas($(".music"));
+    var canvas = createCanvas(document.getElementById("music"));
     scored = new Scored();
-    scored.setup($canvas[0]);
+    scored.setup(canvas[0]);
     run();
     paper.view.update();
 });
