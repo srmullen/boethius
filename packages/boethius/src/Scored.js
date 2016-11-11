@@ -1,5 +1,3 @@
-import _ from "lodash";
-
 import Config from "./config";
 
 import Voice from "./views/Voice";
@@ -34,29 +32,6 @@ const Scored = function (options={}) {
 Scored.prototype.setup = function (canvas) {
 	// this.project = paper.setup(canvas).project;
 	paper.setup(canvas).project;
-};
-
-// Scored.projects = paper.projects;
-
-Scored.utils = {
-	note: noteUtils,
-	line: lineUtils,
-	time: timeUtils,
-	measure: measureUtils,
-	common,
-	accidental
-};
-
-Scored.prototype.layout = function (layout) {
-	return _.bind(parse, this)({}, layout) || [];
-};
-
-Scored.prototype.compose = function (layout, music) {
-	// When layout is a Score it needs to be responsible for putting music events into the correct line.
-	// System is currently handling this so that functionality needs to be ported.
-	_.map(music, e => layout[e.type](e)); // FIXME: line.note now requires measures
-
-	return layout;
 };
 
 Scored.prototype.render = function (composition, args) {
