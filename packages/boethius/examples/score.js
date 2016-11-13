@@ -28,7 +28,7 @@ var examples = {
         var system1 = scored.system({measures: 6, lineHeights: [0, 200]});
         var system2 = scored.system({measures: 6});
 
-        const page0 = scored.page();
+        var page0 = scored.page();
 
         var score = scored.score({length: 1000, systemHeights: [0, 350]}, [fourfour, system1, system2, trebleLine, bassLine, page0]);
 
@@ -54,7 +54,7 @@ var examples = {
             scored.note({pitch: "a4", value: 4})
         ]);
 
-        const page0 = scored.page();
+        var page0 = scored.page();
 
         var score = scored.score({}, [timeSig, system, line, page0]);
 
@@ -73,7 +73,7 @@ var examples = {
         var system1 = scored.system({measures: 1, startMeasure: 0});
         var system2 = scored.system({measures: 1, startmeasure: 1});
 
-        const page0 = scored.page();
+        var page0 = scored.page();
 
         var score = scored.score({}, [timeSig, line, system1, system2, page0]);
 
@@ -120,9 +120,9 @@ var examples = {
         var system3 = scored.system({measures: 4, page: 1});
         var system4 = scored.system({measures: 4, page: 2});
 
-        const page0 = scored.page();
-        const page1 = scored.page();
-        const page2 = scored.page();
+        var page0 = scored.page();
+        var page1 = scored.page();
+        var page2 = scored.page();
 
         var score = scored.score({
             length: 1000,
@@ -164,7 +164,7 @@ var examples = {
         var system1 = scored.system({measures: 6, lineHeights: [0, 200]});
         var system2 = scored.system({measures: 6});
 
-        const page0 = scored.page();
+        var page0 = scored.page();
 
         var score = scored.score({length: 1000, systemHeights: [0, 350]}, [fourfour, system1, system2, trebleLine, bassLine, page0]);
 
@@ -208,8 +208,8 @@ var examples = {
         var system3 = scored.system({measures: 3, page: 1});
         var system4 = scored.system({measures: 3, page: 1});
 
-        const page0 = scored.page();
-        const page1 = scored.page();
+        var page0 = scored.page();
+        var page1 = scored.page();
 
         var score = scored.score({
             systemHeights: [0, 250, 500, 750]
@@ -249,9 +249,7 @@ var examples = {
 
         var fourfour = scored.timeSig({value: "4/4", measure: 0});
 
-        const page0 = scored.page();
-
-        // create staves
+        var page0 = scored.page();
         var system1 = scored.system({measures: 6, lineHeights: [0, 200]});
         var system2 = scored.system({measures: 6});
 
@@ -294,10 +292,7 @@ var examples = {
         var fourfour = scored.timeSig({value: "4/4", measure: 0});
         var threefour = scored.timeSig({value: "3/4", measure: 1});
         var threeEight = scored.timeSig({value: "3/8", measure: 2});
-
-        const page0 = scored.page();
-
-        // create staves
+        var page0 = scored.page();
         var system1 = scored.system({measures: 6, lineHeights: [0, 200]});
         var system2 = scored.system({measures: 6});
 
@@ -305,6 +300,49 @@ var examples = {
 
         // render it all as a score.
         return scored.render(score, {voices: [soprano, bass], pages: [0]});
+    },
+
+    testChordSymbols: function () {
+        var n = scored.note;
+        // create lines
+        var trebleLine = scored.line({voices: ["treble"]}, [
+            scored.clef({value: "treble", measure: 0}), scored.key({value: "C", measure: 0}), scored.timeSig({value: "4/4", measure: 0}),
+        ]);
+        var bassLine = scored.line({voices: ["bass"]}, [
+            scored.clef({value: "bass", measure: 0}), scored.key({value: "C", measure: 0}), scored.timeSig({value: "4/4", measure: 0})
+        ]);
+
+        // create voices
+        var soprano = scored.voice({name: "treble"}, [
+            n({value: 1, pitch: "c5"}), n({value: 1, pitch: "c5"}), n({value: 1, pitch: "f4"}), n({value: 1, pitch: "f4"}),
+            n({value: 1, pitch: "c5"}), n({value: 1, pitch: "c5"}), n({value: 1, pitch: "f4"}), n({value: 1, pitch: "f4"}),
+            n({value: 1, pitch: "c5"}), n({value: 1, pitch: "c5"}), n({value: 1, pitch: "g4"}), n({value: 1, pitch: "g4"}),
+            n({value: 1, pitch: "f5"}), n({value: 1, pitch: "f5"}), n({value: 1, pitch: "c4"}), n({value: 1, pitch: "c4"})
+        ]);
+
+        var bass = scored.voice({name: "bass"}, [
+            n({value: 2, pitch: "c4"}), n({value: 2, pitch: "c4"}), n({value: 1, pitch: "bb3"}), n({value: 1, pitch: "a3"}), n({value: 1, pitch: "f3"}),
+            n({value: 1, pitch: "c5"}), n({value: 1, pitch: "c5"}), n({value: 1, pitch: "f4"}), n({value: 1, pitch: "f4"}),
+            n({value: 1, pitch: "c5"}), n({value: 1, pitch: "c5"}), n({value: 1, pitch: "g4"}), n({value: 1, pitch: "g4"}),
+            n({value: 1, pitch: "f5"}), n({value: 1, pitch: "f5"}), n({value: 1, pitch: "c4"}), n({value: 1, pitch: "c4"})
+        ]);
+
+        var cmaj1 = scored.chordSymbol({value: "C", measure: 0});
+        var fmaj1 = scored.chordSymbol({value: "Fm", measure: 2});
+
+        var page0 = scored.page();
+        var fourfour = scored.timeSig({value: "4/4", measure: 0});
+        var system1 = scored.system({measures: 6});
+        var system2 = scored.system({measures: 6});
+
+        var score = scored.score({length: 1000, systemHeights: [0, 150]}, [fourfour, page0, system1, system2, trebleLine, bassLine]);
+
+        // render it all as a score.
+        return scored.render(score, {
+            voices: [soprano, bass],
+            pages: [0],
+            chordSymbols: [cmaj1, fmaj1]
+        });
     }
 };
 

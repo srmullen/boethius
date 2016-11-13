@@ -38,7 +38,7 @@ function Score ({pageWidth=595, pageHeight=842, length}, children=[]) {
 
 Score.prototype.type = TYPE;
 
-Score.render = function (score, {measures, voices=[], pages=[0]}) {
+Score.render = function (score, {measures, voices=[], chordSymbols=[], pages=[0]}) {
     // Create the Score Group. No actual rendering is done here.
     const scoreGroup = score.render();
 
@@ -116,10 +116,17 @@ Score.render = function (score, {measures, voices=[], pages=[0]}) {
             return systemGroup;
         });
 
+        // render slurs
         const slurGroups = _.flatten(slurs).map(slur => slur.render());
         scoreGroup.addChildren(slurGroups);
-
         scoreGroup.addChildren(systemGroups);
+
+        // render chord symbols
+        const chordSymbolGroups = chordSymbols.map(chordSymbol => {
+            return chordSymbol.render();
+        });
+
+        scoreGroup.addChildren(chordSymbolGroups);
 
         // renderDecorations(scoreGroup, voices);
     }

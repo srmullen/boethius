@@ -1,14 +1,14 @@
 import _ from "lodash";
 
-import {isMarking, isPitched} from "../types";
+import {isMarking, isPitched, isNote} from "../types";
 import {drawSystemBar} from "../engraver";
 import constants from "../constants";
 import {createMeasures} from "../utils/measure";
 import {getLineItems, getTimeContexts, b, positionMarkings} from "../utils/line";
-import {getStaffItems, calculateTimeLengths, calculateMeasureLengths, addDefaultMeasureLengths, iterateByTime, renderTimeContext} from "../utils/system";
+import {getStaffItems, calculateTimeLengths, calculateMeasureLengths, addDefaultMeasureLengths, iterateByTime} from "../utils/system";
 import {map, mapDeep} from "../utils/common";
 import {getAccidentalContexts} from "../utils/accidental";
-import {calculateCursor, scaleCursor} from "../utils/placement";
+import * as placement from "../utils/placement";
 import {getMeasureNumber} from "../utils/timeUtils";
 import Voice from "./Voice";
 import {getCenterLineValue} from "./Clef";
@@ -35,45 +35,6 @@ function System ({page=0, startMeasure=0, measures=4, lineHeights=[]}, children=
 
 	this.lineHeights = lineHeights;
 }
-
-// System.render = function render (system, {lines=[], voices=[], measures, length, startMeasure=0}) {
-// 	/////////////////////////
-// 	// Time Contexts Phase //
-// 	/////////////////////////
-// 	measures = measures || createMeasures(system.measures, system.markings);
-//
-// 	const endMeasure = startMeasure + system.measures;
-//
-// 	const lineItems = getStaffItems(lines, voices);
-//
-// 	const lineTimes = map((line, items) => getTimeContexts(line, measures, items), lines, lineItems);
-//
-// 	// get the times that are to be rendered on the system.
-// 	const lineTimesToRender = _.map(lineTimes, (line) => {
-// 		return _.filter(line, (time) => {
-// 			return time.time.measure >= startMeasure && time.time.measure < endMeasure;
-// 		});
-// 	});
-//
-// 	// calculate the accidentals for each line.
-// 	_.each(lineTimesToRender, (times) => {
-// 		const accidentals = getAccidentalContexts(times);
-// 		// add accidentals to times
-// 		_.each(times, (time, i) => time.context.accidentals = accidentals[i]);
-// 	});
-//
-// 	const measuresToRender = _.slice(measures, startMeasure, endMeasure); // used in render and placement phases
-//
-// 	// Group in order the times on each line
-// 	const systemTimes = iterateByTime(x => x, lineTimesToRender); // used in renderand placement phases
-//
-// 	//////////////////
-// 	// Render Phase //
-// 	//////////////////
-// 	const systemGroup = System.renderTimeContexts(system, lines, measuresToRender, voices, systemTimes, length);
-// 	// return renderDecorations(systemGroup, voices);
-// 	return systemGroup;
-// };
 
 /*
  * @param system - System
@@ -126,7 +87,7 @@ System.renderTimeContexts = function (system, lines, measures, voices, timeConte
 		systemGroup.addChildren(measureGroups);
 
 		cursorFn = (possibleNextPositions, cursor) => {
-			return scaleCursor(noteScale, cursor, _.min(possibleNextPositions));
+			return placement.scaleCursor(noteScale, cursor, _.min(possibleNextPositions));
 		};
 	}
 
@@ -145,7 +106,7 @@ System.renderTimeContexts = function (system, lines, measures, voices, timeConte
 	// Placement Phase //
 	/////////////////////
 	const lineCenters = _.map(lineGroups, b);
-	placeTimes(timeContexts, measures, lineCenters, cursorFn);
+	const cursors = placeTimes(timeContexts, measures, lineCenters, cursorFn);
 
 	if (timeContexts) {
 		const startTime = _.find(_.first(timeContexts), ctx => !!ctx).time;
@@ -190,6 +151,95 @@ System.renderTimeContexts = function (system, lines, measures, voices, timeConte
 	return systemGroup;
 };
 
+function placeTimes (systemTimes, measures, lineCenters, cursorFn) {
+	return _.reduce(systemTimes, (cursors, ctxs, i) => {
+		const lineIndices = _.filter(_.map(ctxs, (ctx, i) => ctx ? i : undefined), _.isNumber);
+		const centers = _.map(lineIndices, idx => lineCenters[idx]);
+		const previousTime = systemTimes[i-1] ? _.find(systemTimes[i-1], x => x).time : 0;
+		const currentTime = ctxs[lineIndices[0]].time;
+		let cursor = _.last(cursors);
+		// update cursor if it's a new measure
+		if (currentTime.measure !== previousTime.measure) {
+			const measure = _.find(measures, measure => measure.value === currentTime.measure);
+			cursor = placement.calculateCursor(measure);
+		}
+
+		// place all the markings in the time context.
+		cursor = _.max(_.map(lineIndices, (idx, i) => positionMarkings(centers[i], cursor, ctxs[idx])));
+
+		// place the items that have duration
+		const possibleNextPositions = _.map(lineIndices, (idx, i) => renderTimeContext(centers[i], cursor, ctxs[idx]));
+
+		return cursors.concat(cursorFn(possibleNextPositions, cursor));
+	}, [Scored.config.note.head.width]);
+}
+
+
+function renderTimeContext (lineCenter, cursor, {items, context}) {
+    const {
+		note: notes,
+		rest: rests,
+		chord: chords,
+        dynamic: dynamics
+	} = _.groupBy(items, item => item.type);
+
+	let possibleNextPositions = [];
+
+	const pitchedItems = _.compact([].concat(notes, chords));
+
+	if (pitchedItems.length) {
+		// get widest note. that will be placed first.
+		let widestItem = _.max(pitchedItems, item => item.group.bounds.width),
+			placeY = (item) => {
+				let note = isNote(item) ? item : item.children[0];
+				let yPos = placement.calculateNoteYpos(note, Scored.config.lineSpacing/2, placement.getClefBase(context.clef.value));
+				item.group.translate(lineCenter.add([0, yPos]));
+			},
+			placeX = (item) => {
+				placement.placeAt(cursor, item);
+			},
+			place = (item) => {
+				placeY(item);
+				placeX(item);
+				return placement.calculateCursor(item);
+			};
+
+
+		possibleNextPositions = possibleNextPositions.concat(place(widestItem));
+
+		_.remove(pitchedItems, item => item === widestItem); // mutation of notes array
+
+		_.each(pitchedItems, placeY);
+
+		const alignToNoteHead = isNote(widestItem) ? widestItem.noteHead : widestItem.children[0].noteHead;
+		placement.alignNoteHeads(alignToNoteHead.bounds.center.x, pitchedItems);
+
+		possibleNextPositions = possibleNextPositions.concat(_.map(pitchedItems, placement.calculateCursor));
+	}
+
+	possibleNextPositions = possibleNextPositions.concat(_.map(rests, rest => {
+		let pos = placement.getYOffset(rest);
+
+		rest.group.translate(lineCenter.add(0, pos));
+		placement.placeAt(cursor, rest);
+
+		return placement.calculateCursor(rest);
+	}));
+
+    // place dynamics.
+	// Stems and slurs are not rendered at this point so it's hard to get the best position for the dynamic.
+	_.map(dynamics, (dynamic) => {
+		// const lowestPoint = _.max(_.map(pitchedItems, item => item.group.bounds.bottom));
+		dynamic.group.translate(lineCenter.add(0, Scored.config.layout.lineSpacing * 5.5));
+		placement.placeAt(cursor, dynamic);
+	});
+
+	// next time is at smallest distance
+	cursor = _.min(possibleNextPositions);
+
+	return cursor;
+}
+
 /*
  * mutates systemGroup
  */
@@ -218,28 +268,6 @@ function getStemDirection (lineItems, voiceIndex) {
 function renderLedgerLines (items, centerLine) {
 	const pitched = _.filter(items, isPitched);
     pitched.map(note => note.drawLegerLines(centerLine, Scored.config.lineSpacing));
-}
-
-function placeTimes (systemTimes, measures, lineCenters, cursorFn) {
-	_.reduce(systemTimes, (cursor, ctxs, i) => {
-		const lineIndices = _.filter(_.map(ctxs, (ctx, i) => ctx ? i : undefined), _.isNumber);
-		const centers = _.map(lineIndices, idx => lineCenters[idx]);
-		const previousTime = systemTimes[i-1] ? _.find(systemTimes[i-1], x => x).time : 0;
-		const currentTime = ctxs[lineIndices[0]].time;
-		// update cursor if it's a new measure
-		if (currentTime.measure !== previousTime.measure) {
-			const measure = _.find(measures, measure => measure.value === currentTime.measure);
-			cursor = calculateCursor(measure);
-		}
-
-		// place all the markings in the time context.
-		cursor = _.max(_.map(lineIndices, (idx, i) => positionMarkings(centers[i], cursor, ctxs[idx])));
-
-		// place the items that have duration
-		const possibleNextPositions = _.map(lineIndices, (idx, i) => renderTimeContext(centers[i], cursor, ctxs[idx]));
-
-		return cursorFn(possibleNextPositions, cursor);
-	}, Scored.config.note.head.width);
 }
 
 System.prototype.type = TYPE;
