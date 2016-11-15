@@ -12,6 +12,7 @@ import * as placement from "../utils/placement";
 import {getMeasureNumber} from "../utils/timeUtils";
 import Voice from "./Voice";
 import {getCenterLineValue} from "./Clef";
+import Line from "./Line";
 
 const TYPE = constants.type.system;
 
@@ -48,7 +49,7 @@ System.renderTimeContexts = function (system, lines, measures, voices, timeConte
 	const lineChildren = _.map(timeContexts, (timeContext) => {
 		return _.map(timeContext, (lineTimeContext, i) => {
 			if (lineTimeContext) {
-				return lines[i].renderTime(lineTimeContext);
+				return Line.renderTime(lineTimeContext);
 			}
 		});
 	});
@@ -93,10 +94,10 @@ System.renderTimeContexts = function (system, lines, measures, voices, timeConte
 		};
 	}
 
-	// add the children to each line.
+	// add the items to the system group
 	_.each(lineChildren, (systemItems) => {
-		_.each(systemItems, (lineItems, i) => {
-			if (lineItems) lineGroups[i].addChildren(lineItems);
+		_.each(systemItems, (lineItems) => {
+			if (lineItems) systemGroup.addChildren(lineItems);
 		});
 	});
 

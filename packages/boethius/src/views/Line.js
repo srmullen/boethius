@@ -76,16 +76,8 @@ Line.prototype.render = function (length) {
 	return group;
 };
 
-// FIXME: doesn't need to be on the prototype.
-Line.prototype.renderTime = function ({items, context}) {
+Line.renderTime = function ({items, context}) {
 	return _.map(items, item => renderItem(item, context));
-};
-
-Line.prototype.renderItems = function (times) {
-	return _.reduce(times, (acc, time) => {
-		const groups = this.renderTime(time);
-		return acc.concat(groups);
-	}, []);
 };
 
 /*
