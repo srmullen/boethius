@@ -340,7 +340,7 @@ var examples = {
         var system1 = scored.system({measures: 6});
         var system2 = scored.system({measures: 6});
 
-        var score = scored.score({length: 1000, systemHeights: [0, 150]}, [fourfour, page0, system1, trebleLine, bassLine]);
+        var score = scored.score({length: 1000, systemHeights: [0, 150]}, [fourfour, page0, system1, system2, trebleLine, bassLine]);
 
         // render it all as a score.
         return scored.render(score, {

@@ -46,13 +46,8 @@ System.renderTimeContexts = function (system, lines, measures, voices, timeConte
 	const systemGroup = system.render();
 
 	// returns an array of arrays. The index of each inner array maps the rendered items to the line they need to be added to.
-	const lineChildren = _.map(timeContexts, (timeContext) => {
-		return _.map(timeContext, (lineTimeContext, i) => {
-			if (lineTimeContext) {
-				return Line.renderTime(lineTimeContext);
-			}
-		});
-	});
+
+	const timeContextGroups = _.map(timeContexts, timeContext => timeContext.render());
 
 	const shortestDuration = 0.125; // need function to calculate this.
 
@@ -95,11 +90,12 @@ System.renderTimeContexts = function (system, lines, measures, voices, timeConte
 	}
 
 	// add the items to the system group
-	_.each(lineChildren, (systemItems) => {
-		_.each(systemItems, (lineItems) => {
-			if (lineItems) systemGroup.addChildren(lineItems);
-		});
-	});
+	// _.each(lineChildren, (systemItems) => {
+	// 	_.each(systemItems, (lineItems) => {
+	// 		if (lineItems) systemGroup.addChildren(lineItems);
+	// 	});
+	// });
+	systemGroup.addChildren(timeContextGroups);
 
 	systemGroup.addChildren(lineGroups);
 
@@ -113,8 +109,8 @@ System.renderTimeContexts = function (system, lines, measures, voices, timeConte
 	console.log(cursors);
 
 	if (timeContexts) {
-		const startTime = _.find(_.first(timeContexts), ctx => !!ctx).time;
-		const endTime = _.find(_.last(timeContexts), ctx => !!ctx).time;
+		const startTime = _.first(timeContexts).time;
+		const endTime = _.last(timeContexts).time;
 		map((line, lineGroup, lineCenter) => {
 			const lineItems = getLineItems(line, voices, startTime.time, endTime.time);
 
@@ -161,27 +157,24 @@ System.renderTimeContexts = function (system, lines, measures, voices, timeConte
  * @return {time: Time, [markingLength, durationedLength]}
  */
 function calculateTimeLengths (timeContexts, shortestDuration) {
-    return _.map(timeContexts, (lineContexts) => {
-		// get the time
-		const time = _.find(lineContexts, ctx => !!ctx).time;
-
+    return _.map(timeContexts, (timeContext) => {
 		// get all items at the time
-		const allItems = lineContexts.reduce((acc, line) => {
+		const allItems = timeContext.lines.reduce((acc, line) => {
 			return line ? acc.concat(line.items) : acc;
 		}, []);
 
 		const timeLength = placement.calculateTimeLength(allItems, shortestDuration);
 
-		return {time, length: timeLength};
+		return {time: timeContext.time, length: timeLength};
 	});
 }
 
-function placeTimes (systemTimes, measures, lineCenters, cursorFn) {
-	return _.reduce(systemTimes, (cursors, ctxs, i) => {
-		const lineIndices = _.filter(_.map(ctxs, (ctx, i) => ctx ? i : undefined), _.isNumber);
+function placeTimes (timeContexts, measures, lineCenters, cursorFn) {
+	return _.reduce(timeContexts, (cursors, timeContext, i) => {
+		const lineIndices = _.filter(_.map(timeContext.lines, (ctx, i) => ctx ? i : undefined), _.isNumber);
 		const centers = _.map(lineIndices, idx => lineCenters[idx]);
-		const previousTime = systemTimes[i-1] ? _.find(systemTimes[i-1], x => x).time : 0;
-		const currentTime = ctxs[lineIndices[0]].time;
+		const previousTime = timeContexts[i-1] ? _.find(timeContexts[i-1].lines, x => x).time : 0;
+		const currentTime = timeContext.lines[lineIndices[0]].time;
 		let cursor = _.last(cursors) ? _.last(cursors).cursor : Scored.config.note.head.width;
 		// update cursor if it's a new measure
 		if (currentTime.measure !== previousTime.measure) {
@@ -190,10 +183,10 @@ function placeTimes (systemTimes, measures, lineCenters, cursorFn) {
 		}
 
 		// place all the markings in the time context.
-		cursor = _.max(_.map(lineIndices, (idx, i) => positionMarkings(centers[i], cursor, ctxs[idx])));
+		cursor = _.max(_.map(lineIndices, (idx, i) => positionMarkings(centers[i], cursor, timeContext.lines[idx])));
 
 		// place the items that have duration
-		const possibleNextPositions = _.map(lineIndices, (idx, i) => renderTimeContext(centers[i], cursor, ctxs[idx]));
+		const possibleNextPositions = _.map(lineIndices, (idx, i) => renderTimeContext(centers[i], cursor, timeContext.lines[idx]));
 
 		return cursors.concat({time: currentTime, cursor: cursorFn(possibleNextPositions, cursor)});
 	}, []);
