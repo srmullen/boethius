@@ -5,7 +5,7 @@ import {drawSystemBar} from "../engraver";
 import constants from "../constants";
 import {createMeasures} from "../utils/measure";
 import {getLineItems, getTimeContexts, b, positionMarkings} from "../utils/line";
-import {getStaffItems, calculateTimeLengths, calculateMeasureLengths, addDefaultMeasureLengths, iterateByTime} from "../utils/system";
+import {getStaffItems, calculateMeasureLengths, addDefaultMeasureLengths, iterateByTime} from "../utils/system";
 import {map, mapDeep} from "../utils/common";
 import {getAccidentalContexts} from "../utils/accidental";
 import * as placement from "../utils/placement";
@@ -47,7 +47,9 @@ System.renderTimeContexts = function (system, lines, measures, voices, timeConte
 	// returns an array of arrays. The index of each inner array maps the rendered items to the line they need to be added to.
 	const lineChildren = _.map(timeContexts, (timeContext) => {
 		return _.map(timeContext, (lineTimeContext, i) => {
-			if (lineTimeContext) return lines[i].renderTime(lineTimeContext);
+			if (lineTimeContext) {
+				return lines[i].renderTime(lineTimeContext);
+			}
 		});
 	});
 
@@ -107,6 +109,7 @@ System.renderTimeContexts = function (system, lines, measures, voices, timeConte
 	/////////////////////
 	const lineCenters = _.map(lineGroups, b);
 	const cursors = placeTimes(timeContexts, measures, lineCenters, cursorFn);
+	console.log(cursors);
 
 	if (timeContexts) {
 		const startTime = _.find(_.first(timeContexts), ctx => !!ctx).time;
@@ -151,13 +154,34 @@ System.renderTimeContexts = function (system, lines, measures, voices, timeConte
 	return systemGroup;
 };
 
+/*
+ * @param timeContexts - array of lineContexts.
+ * @param shortestDuration - float representation of shortest duration in the measure.
+ * @return {time: Time, [markingLength, durationedLength]}
+ */
+function calculateTimeLengths (timeContexts, shortestDuration) {
+    return _.map(timeContexts, (lineContexts) => {
+		// get the time
+		const time = _.find(lineContexts, ctx => !!ctx).time;
+
+		// get all items at the time
+		const allItems = lineContexts.reduce((acc, line) => {
+			return line ? acc.concat(line.items) : acc;
+		}, []);
+
+		const timeLength = placement.calculateTimeLength(allItems, shortestDuration);
+
+		return {time, length: timeLength};
+	});
+}
+
 function placeTimes (systemTimes, measures, lineCenters, cursorFn) {
 	return _.reduce(systemTimes, (cursors, ctxs, i) => {
 		const lineIndices = _.filter(_.map(ctxs, (ctx, i) => ctx ? i : undefined), _.isNumber);
 		const centers = _.map(lineIndices, idx => lineCenters[idx]);
 		const previousTime = systemTimes[i-1] ? _.find(systemTimes[i-1], x => x).time : 0;
 		const currentTime = ctxs[lineIndices[0]].time;
-		let cursor = _.last(cursors);
+		let cursor = _.last(cursors) ? _.last(cursors).cursor : Scored.config.note.head.width;
 		// update cursor if it's a new measure
 		if (currentTime.measure !== previousTime.measure) {
 			const measure = _.find(measures, measure => measure.value === currentTime.measure);
@@ -170,10 +194,15 @@ function placeTimes (systemTimes, measures, lineCenters, cursorFn) {
 		// place the items that have duration
 		const possibleNextPositions = _.map(lineIndices, (idx, i) => renderTimeContext(centers[i], cursor, ctxs[idx]));
 
-		return cursors.concat(cursorFn(possibleNextPositions, cursor));
-	}, [Scored.config.note.head.width]);
+		return cursors.concat({time: currentTime, cursor: cursorFn(possibleNextPositions, cursor)});
+	}, []);
 }
 
+function placeY (lineCenter, context, item) {
+	const note = isNote(item) ? item : item.children[0];
+	const yPos = placement.calculateNoteYpos(note, Scored.config.lineSpacing/2, placement.getClefBase(context.clef.value));
+	item.group.translate(lineCenter.add([0, yPos]));
+};
 
 function renderTimeContext (lineCenter, cursor, {items, context}) {
     const {
@@ -189,27 +218,19 @@ function renderTimeContext (lineCenter, cursor, {items, context}) {
 
 	if (pitchedItems.length) {
 		// get widest note. that will be placed first.
-		let widestItem = _.max(pitchedItems, item => item.group.bounds.width),
-			placeY = (item) => {
-				let note = isNote(item) ? item : item.children[0];
-				let yPos = placement.calculateNoteYpos(note, Scored.config.lineSpacing/2, placement.getClefBase(context.clef.value));
-				item.group.translate(lineCenter.add([0, yPos]));
-			},
-			placeX = (item) => {
-				placement.placeAt(cursor, item);
-			},
-			place = (item) => {
-				placeY(item);
+		const widestItem = _.max(pitchedItems, item => item.group.bounds.width)
+		const placeX = _.partial(placement.placeAt, cursor);
+		const place = (item) => {
+				placeY(lineCenter, context, item);
 				placeX(item);
 				return placement.calculateCursor(item);
 			};
-
 
 		possibleNextPositions = possibleNextPositions.concat(place(widestItem));
 
 		_.remove(pitchedItems, item => item === widestItem); // mutation of notes array
 
-		_.each(pitchedItems, placeY);
+		_.each(pitchedItems, _.partial(placeY, lineCenter, context));
 
 		const alignToNoteHead = isNote(widestItem) ? widestItem.noteHead : widestItem.children[0].noteHead;
 		placement.alignNoteHeads(alignToNoteHead.bounds.center.x, pitchedItems);

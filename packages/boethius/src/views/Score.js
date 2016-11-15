@@ -1,6 +1,7 @@
 import _ from "lodash";
 
 import System from "./System";
+import TimeContext from "./TimeContext";
 import Slur from "./Slur";
 import constants from "../constants";
 import {createMeasures} from "../utils/measure";

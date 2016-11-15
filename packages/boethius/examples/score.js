@@ -304,8 +304,9 @@ var examples = {
 
     testChordSymbols: function () {
         var n = scored.note;
+        var c = scored.chord;
         // create lines
-        var trebleLine = scored.line({voices: ["treble"]}, [
+        var trebleLine = scored.line({voices: ["treble", "alto"]}, [
             scored.clef({value: "treble", measure: 0}), scored.key({value: "C", measure: 0}), scored.timeSig({value: "4/4", measure: 0}),
         ]);
         var bassLine = scored.line({voices: ["bass"]}, [
@@ -320,8 +321,12 @@ var examples = {
             n({value: 1, pitch: "f5"}), n({value: 1, pitch: "f5"}), n({value: 1, pitch: "c4"}), n({value: 1, pitch: "c4"})
         ]);
 
+        var alto = scored.voice({name: "alto"}, [
+            n({value: 2, pitch: "g4"}), n({value: 2, pitch: "e4"}), n({value: 2, pitch: "d4"}), n({value: 2, pitch: "e4"})
+        ]);
+
         var bass = scored.voice({name: "bass"}, [
-            n({value: 2, pitch: "c4"}), n({value: 2, pitch: "c4"}), n({value: 1, pitch: "bb3"}), n({value: 1, pitch: "a3"}), n({value: 1, pitch: "f3"}),
+            c({value: 2}, ["e3", "c4"]), n({value: 2, pitch: "c4"}), n({value: 1, pitch: "bb3"}), n({value: 1, pitch: "a3"}), n({value: 1, pitch: "f3"}),
             n({value: 1, pitch: "c5"}), n({value: 1, pitch: "c5"}), n({value: 1, pitch: "f4"}), n({value: 1, pitch: "f4"}),
             n({value: 1, pitch: "c5"}), n({value: 1, pitch: "c5"}), n({value: 1, pitch: "g4"}), n({value: 1, pitch: "g4"}),
             n({value: 1, pitch: "f5"}), n({value: 1, pitch: "f5"}), n({value: 1, pitch: "c4"}), n({value: 1, pitch: "c4"})
@@ -335,11 +340,11 @@ var examples = {
         var system1 = scored.system({measures: 6});
         var system2 = scored.system({measures: 6});
 
-        var score = scored.score({length: 1000, systemHeights: [0, 150]}, [fourfour, page0, system1, system2, trebleLine, bassLine]);
+        var score = scored.score({length: 1000, systemHeights: [0, 150]}, [fourfour, page0, system1, trebleLine, bassLine]);
 
         // render it all as a score.
         return scored.render(score, {
-            voices: [soprano, bass],
+            voices: [soprano, alto, bass],
             pages: [0],
             chordSymbols: [cmaj1, fmaj1]
         });

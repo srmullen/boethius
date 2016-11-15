@@ -26,27 +26,6 @@ function getStaffItems (lines, voices) {
 }
 
 /*
- * @param timeContexts - array of lineContexts.
- * @param shortestDuration - float representation of shortest duration in the measure.
- * @return {time: Time, [markingLength, durationedLength]}
- */
-function calculateTimeLengths (timeContexts, shortestDuration) {
-    return _.map(timeContexts, (lineContexts) => {
-		// get the time
-		const time = _.find(lineContexts, ctx => !!ctx).time;
-
-		// get all items at the time
-		const allItems = lineContexts.reduce((acc, line) => {
-			return line ? acc.concat(line.items) : acc;
-		}, []);
-
-		const timeLength = placement.calculateTimeLength(allItems, shortestDuration);
-
-		return {time, length: timeLength};
-	});
-}
-
-/*
  * @param timeLengths - {time, length[]}[]
  * @return length[]
  */
@@ -134,7 +113,6 @@ function iterateByTime (fn, times) {
 
 export {
     getStaffItems,
-    calculateTimeLengths,
     calculateMeasureLengths,
     addDefaultMeasureLengths,
     nextTimes,
