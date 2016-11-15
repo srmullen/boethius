@@ -78,11 +78,11 @@ Score.render = function (score, {measures, voices=[], chordSymbols=[], pages=[0]
             const startTime = startTimes[index]
             const startContext = getStartContext(score, startTime);
             if (firstTime) {
-                const time = _.find(firstTime, ctx => !!ctx).time;
+                const time = firstTime.time
                 if (startTime.time < time.time) {
                     throw new Error("Gap in time");
                 } else {
-                    _.each(firstTime, (timeContext, i) => {
+                    _.each(firstTime.lines, (timeContext, i) => {
                         if (timeContext) { // there are items at the time.
                             // add markings to the items list if they don't exist.
                             const {context, items} = timeContext;
@@ -97,14 +97,14 @@ Score.render = function (score, {measures, voices=[], chordSymbols=[], pages=[0]
             } else {
                 // create a timeContext with the cloned startContext markings
                 const systemTimeContext = _.map(startContext, _.partial(createLineTimeContext, startTime));
-                systemContext.push(systemTimeContext);
+                systemContext.push(new TimeContext(systemTimeContext));
             }
         }, systemsToRender);
 
         const systemGroups = _.map(systemsToRender, ({system, index}, i) => {
             const endMeasure = startMeasures[index] + system.measures;
             const systemMeasures = _.slice(measures, startMeasures[index], endMeasure);
-            const timeContexts = systemTimeContexts[index].map(timeContext => new TimeContext(timeContext));
+            const timeContexts = systemTimeContexts[index];
 
             const systemGroup = System.renderTimeContexts(system, score.lines, systemMeasures, voices, timeContexts, score.length);
 
@@ -192,12 +192,13 @@ export function getSystemTimeContexts (lines, voices, measures, startMeasures) {
 		_.each(times, (time, i) => time.context.accidentals = accidentals[i]);
 	});
 
-    const timeContexts = iterateByTime(x => x, lineTimes);
+    const timeContexts = iterateByTime(timeContext => new TimeContext(timeContext), lineTimes);
 
     // split staffTimes and measures
     let systemIdx = 0;
     const systemTimeContexts = partitionWhen(timeContexts, (timeContext) => {
-        const measure = _.find(timeContext, ctx => !!ctx).time.measure;
+        // const measure = _.find(timeContext, ctx => !!ctx).time.measure;
+        const measure = timeContext.time.measure;
         const ret = measure >= startMeasures[systemIdx + 1];
         if (ret) systemIdx++;
         return ret;
