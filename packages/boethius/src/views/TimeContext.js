@@ -1,6 +1,8 @@
 import _ from "lodash";
 
-import Line from "./Line";
+import Note from "./Note";
+import Chord from "./Chord";
+import {isNote, isChord} from "../types";
 
 /*
  * Representation of all items across lines that are at a given time.
@@ -17,7 +19,7 @@ TimeContext.prototype.render = function () {
 
 	const itemGroups = _.map(this.lines, (lineTimeContext) => {
 		if (lineTimeContext) {
-			return Line.renderTime(lineTimeContext);
+			return renderTime(lineTimeContext);
 		}
 	});
 
@@ -25,5 +27,42 @@ TimeContext.prototype.render = function () {
 
     return group;
 }
+
+function renderTime ({items, context}) {
+	return _.map(items, item => renderItem(item, context));
+};
+
+function renderItem (item, context) {
+	if (isNote(item)) {
+		return renderNote(item, context);
+	} else if (isChord(item)) {
+		return renderChord(item, context);
+	} else {
+		return item.render(context);
+	}
+}
+
+/*
+ * @param note - Note
+ * @param context - {key, timeSig, time, clef, accidentals}
+ * @return paper.Group
+ */
+function renderNote (note, context) {
+	const group = note.render(context);
+	Note.renderAccidental(note, context.accidentals, context.key);
+	Note.renderDots(note, context.clef);
+	return group;
+};
+
+/*
+ * @param Chord - Chord
+ * @param context - {key, timeSig, time, clef, accidentals}
+ * @return Paper.Group
+ */
+function renderChord (chord, context) {
+	const group = chord.render(context);
+	Chord.renderAccidentals(chord, context);
+	return group;
+};
 
 export default TimeContext;

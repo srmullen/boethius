@@ -1,8 +1,6 @@
 import _ from "lodash";
 
 import {partitionBy} from "./common";
-import * as placement from "./placement";
-import {isNote} from "../types";
 
 /*
  * Given lines and voices, returns an array of item arrays. The first array is all items to be rendered on the first line, and so on.

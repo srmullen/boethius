@@ -90,11 +90,6 @@ System.renderTimeContexts = function (system, lines, measures, voices, timeConte
 	}
 
 	// add the items to the system group
-	// _.each(lineChildren, (systemItems) => {
-	// 	_.each(systemItems, (lineItems) => {
-	// 		if (lineItems) systemGroup.addChildren(lineItems);
-	// 	});
-	// });
 	systemGroup.addChildren(timeContextGroups);
 
 	systemGroup.addChildren(lineGroups);
