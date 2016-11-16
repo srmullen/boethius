@@ -132,25 +132,24 @@ function placeAt (cursor, item) {
 const offsets = {
 	clef: function ({value}) {
 		return {
-			treble: 0,
-			bass: -17,
-			alto: -9,
-			tenor: -18
+			treble: Scored.config.note.head.width * 1.5,
+			bass: (Scored.config.note.head.width * 1.5) - 17,
+			alto: (Scored.config.note.head.width * 1.5) - 9,
+			tenor: (Scored.config.note.head.width * 1.5) - 18
 		}[value];
 	},
 	key: function () {
-		return -9;
+		return (Scored.config.note.head.width * 1.5) - 8;
 	},
 	timeSig: function ({value}) {
 		if (value === "c" || value === "h") {
 			return -9;
 		} else {
-			return 0;
+			return Scored.config.note.head.width * 1.5;
 		}
 	},
 	rest: function ({value}) {
 		if (value === 1) {
-			// return -Scored.config.layout.lineSpacing/2;
 			return 0;
 		} else {
 			return Scored.config.layout.lineSpacing;
@@ -167,20 +166,20 @@ function getYOffset (item) {
 	return offsetFn(item);
 }
 
-function calculateCursor (item1) {
-	const noteHeadWidth = Scored.config.note.head.width,
-		shortestDuration = 0.125;
+function calculateCursor (item) {
+	const noteHeadWidth = Scored.config.note.head.width;
+	const shortestDuration = 0.125;
 
-	let cursor;
+	let cursor = 0;
 
-	if (isMarking(item1)) {
+	if (isMarking(item)) {
 		// FIXME: needs a little work for perfect positioning
-		cursor = item1.group.children.length ? item1.group.bounds.right + noteHeadWidth : cursor;
-	} else if (item1.type === constants.type.measure) {
-		let leftBarline = item1.barlines[0];
+		cursor = item.group.children.length ? item.group.bounds.width + noteHeadWidth : 0;
+	} else if (item.type === constants.type.measure) {
+		const leftBarline = item.barlines[0];
 		cursor = leftBarline.position.x + noteHeadWidth;
 	} else {
-		cursor = item1.group.bounds.right + (noteHeadWidth * getStaffSpace(shortestDuration, item1));
+		cursor = item.group.bounds.width + (noteHeadWidth * getStaffSpace(shortestDuration, item));
 	}
 
 	return cursor;
@@ -282,7 +281,7 @@ function placeMarking (lineCenter, cursor, marking) {
 	marking.group.translate(lineCenter.add([0, getYOffset(marking)]));
 	placeAt(cursor, marking);
 	// since keys of C and a have no children calculateCursor return undefined.
-	return calculateCursor(marking) || cursor;
+	return calculateCursor(marking);
 }
 
 /*

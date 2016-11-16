@@ -67,8 +67,8 @@ System.renderTimeContexts = function (system, lines, measures, voices, timeConte
 
 		systemGroup.addChildren(measureGroups);
 
-		cursorFn = (possibleNextPositions) => {
-			return _.min(possibleNextPositions);
+		cursorFn = (possibleNextPositions, cursor) => {
+			return _.min(possibleNextPositions) + cursor;
 		};
 
 	} else {
@@ -85,7 +85,7 @@ System.renderTimeContexts = function (system, lines, measures, voices, timeConte
 		systemGroup.addChildren(measureGroups);
 
 		cursorFn = (possibleNextPositions, cursor) => {
-			return placement.scaleCursor(noteScale, cursor, _.min(possibleNextPositions));
+			return placement.scaleCursor(noteScale, cursor, _.min(possibleNextPositions) + cursor);
 		};
 	}
 
@@ -100,7 +100,8 @@ System.renderTimeContexts = function (system, lines, measures, voices, timeConte
 	// Placement Phase //
 	/////////////////////
 	const lineCenters = _.map(lineGroups, b);
-	const cursors = placeTimes(timeContexts, measures, lineCenters, cursorFn, lineHeights);
+	const cursors = placeTimes(timeContexts, measures, cursorFn);
+	// console.log(cursors);
 
 	if (timeContexts) {
 		const startTime = _.first(timeContexts).time;
@@ -163,10 +164,9 @@ function calculateTimeLengths (timeContexts, shortestDuration) {
 	});
 }
 
-function placeTimes (timeContexts, measures, lineCenters, cursorFn, lineHeights) {
+function placeTimes (timeContexts, measures, cursorFn) {
 	return _.reduce(timeContexts, (cursors, timeContext, i) => {
 		const lineIndices = _.filter(_.map(timeContext.lines, (ctx, i) => ctx ? i : undefined), _.isNumber);
-		const centers = _.map(lineIndices, idx => lineCenters[idx]);
 		const previousTime = _.last(cursors) ? _.last(cursors).time : 0;
 		const currentTime = timeContext.time;
 		let cursor = _.last(cursors) ? _.last(cursors).cursor : Scored.config.note.head.width;
@@ -176,80 +176,11 @@ function placeTimes (timeContexts, measures, lineCenters, cursorFn, lineHeights)
 			cursor = placement.calculateCursor(measure);
 		}
 
-		// place all the markings in the time context.
-		cursor = _.max(_.map(lineIndices, (idx, i) => positionMarkings(centers[i], cursor, timeContext.lines[idx])));
-
-		// place the items that have duration
-		const possibleNextPositions = _.map(lineIndices, (idx, i) => renderTimeContext(centers[i], cursor, timeContext.lines[idx], lineHeights[idx]));
+		timeContext.group.translate(cursor, 0);
+		const possibleNextPositions = timeContext.calculateCursor();
 
 		return cursors.concat({time: currentTime, cursor: cursorFn(possibleNextPositions, cursor)});
 	}, []);
-}
-
-// function placeY (lineCenter, context, item) {
-// 	const note = isNote(item) ? item : item.children[0];
-// 	const yPos = placement.calculateNoteYpos(note, Scored.config.lineSpacing/2, placement.getClefBase(context.clef.value), 4);
-// 	item.group.translate(lineCenter.add([0, yPos]));
-// };
-
-function renderTimeContext (lineCenter, cursor, {items, context}, yTranslation) {
-    const {
-		note: notes,
-		rest: rests,
-		chord: chords,
-        dynamic: dynamics
-	} = _.groupBy(items, item => item.type);
-
-	let possibleNextPositions = [];
-
-	const pitchedItems = _.compact([].concat(notes, chords));
-
-	if (pitchedItems.length) {
-		// get widest note. that will be placed first.
-		const widestItem = _.max(pitchedItems, item => item.group.bounds.width)
-		const placeX = _.partial(placement.placeAt, cursor);
-		// const rootY = new paper.Point(0, yTranslation);
-		const place = (item) => {
-				// placeY(lineCenter, context, item);
-				// placeY(rootY, context, item);
-				placeX(item);
-				return placement.calculateCursor(item);
-			};
-
-		possibleNextPositions = possibleNextPositions.concat(place(widestItem));
-
-		_.remove(pitchedItems, item => item === widestItem); // mutation of notes array
-
-		// _.each(pitchedItems, _.partial(placeY, lineCenter, context));
-		// _.each(pitchedItems, _.partial(placeY, rootY, context));
-
-		const alignToNoteHead = isNote(widestItem) ? widestItem.noteHead : widestItem.children[0].noteHead;
-		placement.alignNoteHeads(alignToNoteHead.bounds.center.x, pitchedItems);
-
-		possibleNextPositions = possibleNextPositions.concat(_.map(pitchedItems, placement.calculateCursor));
-	}
-
-	possibleNextPositions = possibleNextPositions.concat(_.map(rests, rest => {
-		// let pos = placement.getYOffset(rest);
-		//
-		// rest.group.translate(lineCenter.add(0, pos));
-		placement.placeAt(cursor, rest);
-
-		return placement.calculateCursor(rest);
-	}));
-
-    // place dynamics.
-	// Stems and slurs are not rendered at this point so it's hard to get the best position for the dynamic.
-	// _.map(dynamics, (dynamic) => {
-	// 	// const lowestPoint = _.max(_.map(pitchedItems, item => item.group.bounds.bottom));
-	// 	dynamic.group.translate(lineCenter.add(0, Scored.config.layout.lineSpacing * 5.5));
-	// 	placement.placeAt(cursor, dynamic);
-	// });
-
-	// next time is at smallest distance
-	cursor = _.min(possibleNextPositions);
-
-	return cursor;
 }
 
 /*

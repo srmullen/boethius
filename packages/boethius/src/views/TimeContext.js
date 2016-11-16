@@ -2,8 +2,9 @@ import _ from "lodash";
 
 import Note from "./Note";
 import Chord from "./Chord";
-import {isNote, isChord, isRest, isDynamic, isPitched} from "../types";
-import {calculateNoteYpos, getClefBase, alignNoteHeads, getYOffset} from "../utils/placement";
+import {isNote, isChord, isRest, isDynamic, isPitched, isMarking, hasDuration} from "../types";
+import {calculateNoteYpos, getClefBase, alignNoteHeads, getYOffset, calculateCursor, placeAt} from "../utils/placement";
+import {positionMarkings} from "../utils/line";
 
 /*
  * Representation of all items across lines that are at a given time.
@@ -16,20 +17,25 @@ function TimeContext (timeContext) {
 }
 
 TimeContext.prototype.render = function (lineHeights) {
-    const group = new paper.Group();
+    const group = this.group = new paper.Group();
 
 	const itemGroups = _.map(this.lines, (line, i) => {
 		if (line) {
 			const itemGroups = renderTime(line);
 
+            const markings = _.filter(line.items, isMarking);
             const pitchedItems = _.filter(line.items, isPitched);
             const rests = _.filter(line.items, isRest);
             const dynamics = _.filter(line.items, isDynamic);
 
             const rootY = new paper.Point(0, lineHeights[i]);
+
+            const cursor = positionMarkings(rootY, 0, line);
+
             if (pitchedItems.length) {
                 const widestItem = _.max(pitchedItems, item => item.group.bounds.width);
                 placeY(rootY, line.context, widestItem);
+                placeAt(cursor, widestItem);
                 // mutation of notes array
                 _.remove(pitchedItems, item => item === widestItem);
                 _.each(pitchedItems, _.partial(placeY, rootY, line.context));
@@ -43,7 +49,6 @@ TimeContext.prototype.render = function (lineHeights) {
             });
 
             dynamics.map((dynamic) => {
-        		// const lowestPoint = _.max(_.map(pitchedItems, item => item.group.bounds.bottom));
         		dynamic.group.translate(rootY.add(0, Scored.config.layout.lineSpacing * 7.5));
         		// placement.placeAt(cursor, dynamic);
         	});
@@ -59,10 +64,20 @@ TimeContext.prototype.render = function (lineHeights) {
     return group;
 }
 
-function placeY (lineCenter, context, item) {
+TimeContext.prototype.calculateCursor = function () {
+    return this.lines.map((line) => {
+        if (line) {
+            const markingCursor = _.filter(line.items, isMarking).reduce((acc, marking) => calculateCursor(marking) + acc, 0);
+            const durationedCursor = _.min(_.filter(line.items, hasDuration).map(calculateCursor));
+            return markingCursor + durationedCursor;
+        }
+    });
+};
+
+function placeY (rootY, context, item) {
 	const note = isNote(item) ? item : item.children[0];
 	const yPos = calculateNoteYpos(note, Scored.config.lineSpacing/2, getClefBase(context.clef.value), 4);
-	item.group.translate(lineCenter.add([0, yPos]));
+	item.group.translate(rootY.add([0, yPos]));
 };
 
 function renderTime ({items, context}) {
