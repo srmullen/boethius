@@ -62,13 +62,13 @@ function calculateAccidentalYpos (degree, step) {
  * @param note {Note}
  * @param set {Number} - distance between each note
  */
-function calculateNoteYpos (note, step, clefBase) {
+function calculateNoteYpos (note, step, clefBase, offset=0) {
 	const octave = note.note.octave();
 	const degree = noteNameToDegree(note.note.name());
 	// 4 is the offset (number of steps) of the center line.
 	// the clefBase offset it subtracted to normalize to the centerline, since the note is rendered from the centerLine.
 	const diffY = (clefBase.degree + (clefBase.octave * 7)) - (degree + (octave * 7)) - (4 - clefBase.offset);
-	return diffY * step;
+	return (diffY + offset) * step;
 }
 
 /*
@@ -150,9 +150,10 @@ const offsets = {
 	},
 	rest: function ({value}) {
 		if (value === 1) {
-			return -Scored.config.layout.lineSpacing * 2;
+			// return -Scored.config.layout.lineSpacing/2;
+			return 0;
 		} else {
-			return -Scored.config.layout.lineSpacing;
+			return Scored.config.layout.lineSpacing;
 		}
 	}
 };

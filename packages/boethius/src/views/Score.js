@@ -178,7 +178,9 @@ export function createLineTimeContext (time, context) {
     return {context, items, time};
 }
 
-// Staff[Time[Line[Context]]]
+/*
+ * @return [TimeContext[]]
+ */
 export function getSystemTimeContexts (lines, voices, measures, startMeasures) {
     // get the time contexts
 	const lineItems = getStaffItems(lines, voices);

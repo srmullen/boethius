@@ -45,9 +45,9 @@ System.renderTimeContexts = function (system, lines, measures, voices, timeConte
 	// create the system group that all items will be added to.
 	const systemGroup = system.render();
 
-	// returns an array of arrays. The index of each inner array maps the rendered items to the line they need to be added to.
+	const lineHeights = system.getLineHeights(lines);
 
-	const timeContextGroups = _.map(timeContexts, timeContext => timeContext.render());
+	const timeContextGroups = _.map(timeContexts, timeContext => timeContext.render(lineHeights));
 
 	const shortestDuration = 0.125; // need function to calculate this.
 
@@ -100,8 +100,7 @@ System.renderTimeContexts = function (system, lines, measures, voices, timeConte
 	// Placement Phase //
 	/////////////////////
 	const lineCenters = _.map(lineGroups, b);
-	const cursors = placeTimes(timeContexts, measures, lineCenters, cursorFn);
-	console.log(cursors);
+	const cursors = placeTimes(timeContexts, measures, lineCenters, cursorFn, lineHeights);
 
 	if (timeContexts) {
 		const startTime = _.first(timeContexts).time;
@@ -164,12 +163,12 @@ function calculateTimeLengths (timeContexts, shortestDuration) {
 	});
 }
 
-function placeTimes (timeContexts, measures, lineCenters, cursorFn) {
+function placeTimes (timeContexts, measures, lineCenters, cursorFn, lineHeights) {
 	return _.reduce(timeContexts, (cursors, timeContext, i) => {
 		const lineIndices = _.filter(_.map(timeContext.lines, (ctx, i) => ctx ? i : undefined), _.isNumber);
 		const centers = _.map(lineIndices, idx => lineCenters[idx]);
-		const previousTime = timeContexts[i-1] ? _.find(timeContexts[i-1].lines, x => x).time : 0;
-		const currentTime = timeContext.lines[lineIndices[0]].time;
+		const previousTime = _.last(cursors) ? _.last(cursors).time : 0;
+		const currentTime = timeContext.time;
 		let cursor = _.last(cursors) ? _.last(cursors).cursor : Scored.config.note.head.width;
 		// update cursor if it's a new measure
 		if (currentTime.measure !== previousTime.measure) {
@@ -181,19 +180,19 @@ function placeTimes (timeContexts, measures, lineCenters, cursorFn) {
 		cursor = _.max(_.map(lineIndices, (idx, i) => positionMarkings(centers[i], cursor, timeContext.lines[idx])));
 
 		// place the items that have duration
-		const possibleNextPositions = _.map(lineIndices, (idx, i) => renderTimeContext(centers[i], cursor, timeContext.lines[idx]));
+		const possibleNextPositions = _.map(lineIndices, (idx, i) => renderTimeContext(centers[i], cursor, timeContext.lines[idx], lineHeights[idx]));
 
 		return cursors.concat({time: currentTime, cursor: cursorFn(possibleNextPositions, cursor)});
 	}, []);
 }
 
-function placeY (lineCenter, context, item) {
-	const note = isNote(item) ? item : item.children[0];
-	const yPos = placement.calculateNoteYpos(note, Scored.config.lineSpacing/2, placement.getClefBase(context.clef.value));
-	item.group.translate(lineCenter.add([0, yPos]));
-};
+// function placeY (lineCenter, context, item) {
+// 	const note = isNote(item) ? item : item.children[0];
+// 	const yPos = placement.calculateNoteYpos(note, Scored.config.lineSpacing/2, placement.getClefBase(context.clef.value), 4);
+// 	item.group.translate(lineCenter.add([0, yPos]));
+// };
 
-function renderTimeContext (lineCenter, cursor, {items, context}) {
+function renderTimeContext (lineCenter, cursor, {items, context}, yTranslation) {
     const {
 		note: notes,
 		rest: rests,
@@ -209,8 +208,10 @@ function renderTimeContext (lineCenter, cursor, {items, context}) {
 		// get widest note. that will be placed first.
 		const widestItem = _.max(pitchedItems, item => item.group.bounds.width)
 		const placeX = _.partial(placement.placeAt, cursor);
+		// const rootY = new paper.Point(0, yTranslation);
 		const place = (item) => {
-				placeY(lineCenter, context, item);
+				// placeY(lineCenter, context, item);
+				// placeY(rootY, context, item);
 				placeX(item);
 				return placement.calculateCursor(item);
 			};
@@ -219,7 +220,8 @@ function renderTimeContext (lineCenter, cursor, {items, context}) {
 
 		_.remove(pitchedItems, item => item === widestItem); // mutation of notes array
 
-		_.each(pitchedItems, _.partial(placeY, lineCenter, context));
+		// _.each(pitchedItems, _.partial(placeY, lineCenter, context));
+		// _.each(pitchedItems, _.partial(placeY, rootY, context));
 
 		const alignToNoteHead = isNote(widestItem) ? widestItem.noteHead : widestItem.children[0].noteHead;
 		placement.alignNoteHeads(alignToNoteHead.bounds.center.x, pitchedItems);
@@ -228,9 +230,9 @@ function renderTimeContext (lineCenter, cursor, {items, context}) {
 	}
 
 	possibleNextPositions = possibleNextPositions.concat(_.map(rests, rest => {
-		let pos = placement.getYOffset(rest);
-
-		rest.group.translate(lineCenter.add(0, pos));
+		// let pos = placement.getYOffset(rest);
+		//
+		// rest.group.translate(lineCenter.add(0, pos));
 		placement.placeAt(cursor, rest);
 
 		return placement.calculateCursor(rest);
@@ -238,11 +240,11 @@ function renderTimeContext (lineCenter, cursor, {items, context}) {
 
     // place dynamics.
 	// Stems and slurs are not rendered at this point so it's hard to get the best position for the dynamic.
-	_.map(dynamics, (dynamic) => {
-		// const lowestPoint = _.max(_.map(pitchedItems, item => item.group.bounds.bottom));
-		dynamic.group.translate(lineCenter.add(0, Scored.config.layout.lineSpacing * 5.5));
-		placement.placeAt(cursor, dynamic);
-	});
+	// _.map(dynamics, (dynamic) => {
+	// 	// const lowestPoint = _.max(_.map(pitchedItems, item => item.group.bounds.bottom));
+	// 	dynamic.group.translate(lineCenter.add(0, Scored.config.layout.lineSpacing * 5.5));
+	// 	placement.placeAt(cursor, dynamic);
+	// });
 
 	// next time is at smallest distance
 	cursor = _.min(possibleNextPositions);
@@ -290,14 +292,19 @@ System.prototype.render = function () {
 	return group;
 };
 
+System.prototype.getLineHeights = function (lines) {
+	const defaultHeight = 120;
+	return lines.reduce((heights, line, i) => {
+		return heights.concat((this.lineHeights[i+1] || defaultHeight) + _.last(heights));
+	}, [this.lineHeights[0] || 0]);
+};
+
 System.prototype.renderLines = function (lines, length) {
 	// draw each line
-	let lineHeight = this.lineHeights[0] || 0;
-	const defaultHeight = 120;
+	const lineHeights = this.getLineHeights(lines);
 	const lineGroups = lines.map((line, i) => {
 		const group = line.render(length);
-		group.translate([0, lineHeight]);
-		lineHeight = (this.lineHeights[i+1] || defaultHeight) + lineHeight;
+		group.translate([0, lineHeights[i]]);
 		return group;
 	});
 

@@ -148,12 +148,13 @@ var examples = {
 
         // create voices
         var soprano = scored.voice({name: "treble"}, [
-            c({value: 2}, [{value: 4, pitch: "c4"}, "eb4", "g4", "c5"]), n({value: 4, dots: 1}), n({value:2, pitch: "d#4"}), n({value:2, pitch: "d#4"}), n({value:1, pitch: "e4"}), n({value:1, pitch: "f4"}),
+            c({value: 2}, [{value: 4, pitch: "c4"}, "eb4", "g4", "c5"]), n({value: 4, dots: 1}), n({value:8, pitch: "d#4"}),
+            n({value:2, pitch: "d#4"}), n({value:2, pitch: "e4"}), n({value:1, pitch: "f4"}),
     		n({value:1, pitch: "g4"}), n({value:1, pitch: "a4"}), n({value:1, pitch: "b4"}), n({value:1, pitch: "c5"}),
     		n({value:1, pitch: "d5"}), n({value:1, pitch: "e5"}), n({value:1, pitch: "f5"}), n({value:1, pitch: "g5"})
         ]);
         var bass = scored.voice({name: "bass"}, [
-            n({value:8, pitch: "c4"}), r({value: 8}), n({value: 4}), n({value: 2}), n({value:1, pitch: "b3"}), n({value:1, pitch: "a3"}), n({value:1, pitch: "g3"}),
+            n({value:8, pitch: "c4"}), r({value: 8}), n({value: 4, pitch: "ab4"}), n({value: 2}), n({value:1, pitch: "b3"}), n({value:1, pitch: "a3"}), n({value:1, pitch: "g3"}),
     		n({value:1, pitch: "f3"}), r({value:1, pitch: "e3"}), n({value:1, pitch: "d3"}), n({value:1, pitch: "c3"}),
     		n({value:1, pitch: "b2"}), n({value:1, pitch: "a2"}), n({value:1, pitch: "g2"}), n({value:1, pitch: "f2"})
         ]);
@@ -304,7 +305,9 @@ var examples = {
 
     testChordSymbols: function () {
         var n = scored.note;
+        var r = scored.rest;
         var c = scored.chord;
+        var d = scored.dynamic;
         // create lines
         var trebleLine = scored.line({voices: ["treble", "alto"]}, [
             scored.clef({value: "treble", measure: 0}), scored.key({value: "C", measure: 0}), scored.timeSig({value: "4/4", measure: 0}),
@@ -315,18 +318,20 @@ var examples = {
 
         // create voices
         var soprano = scored.voice({name: "treble"}, [
-            n({value: 1, pitch: "c5"}), n({value: 1, pitch: "c5"}), n({value: 1, pitch: "f4"}), n({value: 1, pitch: "f4"}),
+            d({value: "f"}), n({value: 1, pitch: "c5"}), r({value: 1, pitch: "c5"}), n({value: 1, pitch: "f4"}),
+            r({value: 4}), r({value: 8}), r({value: 8}),r({value: 8, dots: 1}), r({value: 16}), r({value: 4}),
             n({value: 1, pitch: "c5"}), n({value: 1, pitch: "c5"}), n({value: 1, pitch: "f4"}), n({value: 1, pitch: "f4"}),
             n({value: 1, pitch: "c5"}), n({value: 1, pitch: "c5"}), n({value: 1, pitch: "g4"}), n({value: 1, pitch: "g4"}),
             n({value: 1, pitch: "f5"}), n({value: 1, pitch: "f5"}), n({value: 1, pitch: "c4"}), n({value: 1, pitch: "c4"})
         ]);
 
         var alto = scored.voice({name: "alto"}, [
-            n({value: 2, pitch: "g4"}), n({value: 2, pitch: "e4"}), n({value: 2, pitch: "d4"}), n({value: 2, pitch: "e4"})
+            n({value: 2, pitch: "g4"}), d({value: "p"}), n({value: 2, pitch: "e4"}), n({value: 2, pitch: "d4"}), n({value: 2, pitch: "e4"})
         ]);
 
         var bass = scored.voice({name: "bass"}, [
-            c({value: 2}, ["e3", "c4"]), n({value: 2, pitch: "c4"}), n({value: 1, pitch: "bb3"}), n({value: 1, pitch: "a3"}), n({value: 1, pitch: "f3"}),
+            c({value: 2}, ["e3", "c4"]), r({value: 2, pitch: "c4"}), n({value: 1, pitch: "bb3"}), n({value: 1, pitch: "a3"}),
+            r({value: 4}), r({value: 8}), r({value: 8}),r({value: 8, dots: 1}), r({value: 16}), r({value: 4}),
             n({value: 1, pitch: "c5"}), n({value: 1, pitch: "c5"}), n({value: 1, pitch: "f4"}), n({value: 1, pitch: "f4"}),
             n({value: 1, pitch: "c5"}), n({value: 1, pitch: "c5"}), n({value: 1, pitch: "g4"}), n({value: 1, pitch: "g4"}),
             n({value: 1, pitch: "f5"}), n({value: 1, pitch: "f5"}), n({value: 1, pitch: "c4"}), n({value: 1, pitch: "c4"})
