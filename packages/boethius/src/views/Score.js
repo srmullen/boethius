@@ -69,7 +69,7 @@ Score.render = function (score, {measures, voices=[], chordSymbols=[], pages=[0]
             return Slur.of({systemBreak, isEnd}, slurred);
         }));
 
-        const systemTimeContexts = getSystemTimeContexts(score.lines, voices, measures, startMeasures, timeFrame);
+        const systemTimeContexts = partitionBySystem(createTimeContexts(score.lines, voices, measures), startMeasures);
 
         // Create the context marking for the beginning of each system.
         map(({index}) => {
@@ -107,7 +107,7 @@ Score.render = function (score, {measures, voices=[], chordSymbols=[], pages=[0]
             const timeContexts = systemTimeContexts[index];
 
             const systemGroup = System.renderTimeContexts({
-                system, voices, timeContexts,
+                system, voices, timeContexts, chordSymbols,
                 lines: score.lines,
                 measures: systemMeasures,
                 length: score.length
@@ -128,11 +128,11 @@ Score.render = function (score, {measures, voices=[], chordSymbols=[], pages=[0]
         scoreGroup.addChildren(systemGroups);
 
         // render chord symbols
-        const chordSymbolGroups = chordSymbols.map(chordSymbol => {
-            return chordSymbol.render();
-        });
+        // const chordSymbolGroups = chordSymbols.map(chordSymbol => {
+        //     return chordSymbol.render();
+        // });
 
-        scoreGroup.addChildren(chordSymbolGroups);
+        // scoreGroup.addChildren(chordSymbolGroups);
 
         // renderDecorations(scoreGroup, voices);
     }
@@ -183,10 +183,7 @@ export function createLineTimeContext (time, context) {
     return {context, items, time};
 }
 
-/*
- * @return [TimeContext[]]
- */
-export function getSystemTimeContexts (lines, voices, measures, startMeasures) {
+function createTimeContexts (lines, voices, measures) {
     // get the time contexts
 	const lineItems = getStaffItems(lines, voices);
     // FIXME: returned contexts are incorrect when clef starts on beat other than 0.
@@ -199,12 +196,16 @@ export function getSystemTimeContexts (lines, voices, measures, startMeasures) {
 		_.each(times, (time, i) => time.context.accidentals = accidentals[i]);
 	});
 
-    const timeContexts = iterateByTime(timeContext => new TimeContext(timeContext), lineTimes);
+    return iterateByTime(timeContext => new TimeContext(timeContext), lineTimes);
+}
 
+/*
+ * @return [TimeContext[]]
+ */
+export function partitionBySystem (timeContexts, startMeasures) {
     // split staffTimes and measures
     let systemIdx = 0;
     const systemTimeContexts = partitionWhen(timeContexts, (timeContext) => {
-        // const measure = _.find(timeContext, ctx => !!ctx).time.measure;
         const measure = timeContext.time.measure;
         const ret = measure >= startMeasures[systemIdx + 1];
         if (ret) systemIdx++;
