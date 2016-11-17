@@ -1,12 +1,20 @@
 import {expect} from "chai";
 import _ from "lodash";
 
-import {getBeat, getTime, getMeasureNumber, getMeasureByTime, calculateDuration, calculateTupletDuration} from "../src/utils/timeUtils";
+import {
+    getBeat, getTime, getMeasureNumber, getMeasureByTime, calculateDuration, calculateTupletDuration, equals
+} from "../src/utils/timeUtils";
 import {createMeasures} from "../src/utils/measure";
 import Scored from "../src/Scored";
 
 describe("timeUtils", () => {
     const scored = new Scored();
+
+    describe("equals", () => {
+        it("should use absolute time if present", () => {
+            expect(equals({time: 1}, {time: 1})).to.be.true;
+        });
+    });
 
     describe("getBeat", () => {
         it("should return the float representation of the beat number", () => {

@@ -130,7 +130,7 @@ function placeAt (cursor, item) {
 }
 
 const offsets = {
-	clef: function ({value}) {
+	[constants.type.clef]: function ({value}) {
 		return {
 			treble: Scored.config.note.head.width * 1.5,
 			bass: (Scored.config.note.head.width * 1.5) - 17,
@@ -138,22 +138,25 @@ const offsets = {
 			tenor: (Scored.config.note.head.width * 1.5) - 18
 		}[value];
 	},
-	key: function () {
+	[constants.type.key]: function () {
 		return (Scored.config.note.head.width * 1.5) - 8;
 	},
-	timeSig: function ({value}) {
+	[constants.type.timeSig]: function ({value}) {
 		if (value === "c" || value === "h") {
 			return -9;
 		} else {
 			return Scored.config.note.head.width * 1.5;
 		}
 	},
-	rest: function ({value}) {
+	[constants.type.rest]: function ({value}) {
 		if (value === 1) {
 			return 0;
 		} else {
 			return Scored.config.layout.lineSpacing;
 		}
+	},
+	[constants.type.chordSymbol]: function () {
+		return -16;
 	}
 };
 

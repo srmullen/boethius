@@ -9,7 +9,7 @@ import {map, reductions, partitionWhen, clone, concat} from "../utils/common";
 import {getTimeContexts} from "../utils/line";
 import {getStaffItems, iterateByTime} from "../utils/system";
 import {getAccidentalContexts} from "../utils/accidental";
-import {getTime} from "../utils/timeUtils";
+import {getTime, equals} from "../utils/timeUtils";
 import {isClef, isKey, isTimeSignature} from "../types";
 
 const TYPE = constants.type.score;
@@ -69,7 +69,7 @@ Score.render = function (score, {measures, voices=[], chordSymbols=[], pages=[0]
             return Slur.of({systemBreak, isEnd}, slurred);
         }));
 
-        const systemTimeContexts = partitionBySystem(createTimeContexts(score.lines, voices, measures), startMeasures);
+        const systemTimeContexts = partitionBySystem(createTimeContexts(score.lines, voices, measures, chordSymbols), startMeasures);
 
         // Create the context marking for the beginning of each system.
         map(({index}) => {
@@ -127,13 +127,6 @@ Score.render = function (score, {measures, voices=[], chordSymbols=[], pages=[0]
         scoreGroup.addChildren(slurGroups);
         scoreGroup.addChildren(systemGroups);
 
-        // render chord symbols
-        // const chordSymbolGroups = chordSymbols.map(chordSymbol => {
-        //     return chordSymbol.render();
-        // });
-
-        // scoreGroup.addChildren(chordSymbolGroups);
-
         // renderDecorations(scoreGroup, voices);
     }
 
@@ -183,7 +176,7 @@ export function createLineTimeContext (time, context) {
     return {context, items, time};
 }
 
-function createTimeContexts (lines, voices, measures) {
+function createTimeContexts (lines, voices, measures, chordSymbols) {
     // get the time contexts
 	const lineItems = getStaffItems(lines, voices);
     // FIXME: returned contexts are incorrect when clef starts on beat other than 0.
@@ -196,7 +189,15 @@ function createTimeContexts (lines, voices, measures) {
 		_.each(times, (time, i) => time.context.accidentals = accidentals[i]);
 	});
 
-    return iterateByTime(timeContext => new TimeContext(timeContext), lineTimes);
+    return iterateByTime(timeContext => {
+        let [symbols, ] = _.partition(chordSymbols, (sym) => {
+            const symbolTime = getTime(measures, sym);
+            const contextTime = _.find(timeContext, line => !!line).time;
+            return equals(contextTime, symbolTime);
+        });
+
+        return new TimeContext(timeContext, symbols);
+    }, lineTimes);
 }
 
 /*

@@ -9,11 +9,13 @@ import {positionMarkings} from "../utils/line";
 /*
  * Representation of all items across lines that are at a given time.
  * Internal class. Not exposed as Boethius view.
- * @param lines - array of lineTimeContexts
+ * @param timeContext - array of lineTimeContexts.
+ * @param symbols - array of symbols.
  */
-function TimeContext (timeContext) {
+function TimeContext (timeContext = [], symbols = []) {
     this.lines = timeContext;
     this.time = _.find(timeContext, line => !!line).time;
+    this.symbols = symbols;
 }
 
 TimeContext.prototype.render = function (lineHeights) {
@@ -60,6 +62,15 @@ TimeContext.prototype.render = function (lineHeights) {
     _.each(itemGroups, (items) => {
         group.addChildren(items);
     });
+
+    // render symbols
+    const symbolGroups = this.symbols.map(symbol => {
+        const symbolGroup = symbol.render();
+        symbolGroup.translate(0, getYOffset(symbol));
+        return symbolGroup;
+    });
+
+    group.addChildren(symbolGroups);
 
     return group;
 }

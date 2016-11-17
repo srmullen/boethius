@@ -169,7 +169,7 @@ function compareByTime ({time: t1=0}, {time: t2=0}) {
 }
 
 function equals (time1, time2) {
-
+	return time1.time === time2.time;
 }
 
 function splitByMeasure (events) {
@@ -254,5 +254,6 @@ export {
 	splitByMeasure,
 	calculateDuration,
 	parseSignature,
-	sumDurations
+	sumDurations,
+	equals
 };
