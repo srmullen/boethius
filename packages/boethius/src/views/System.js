@@ -41,7 +41,7 @@ function System ({page=0, startMeasure=0, measures=4, lineHeights=[]}, children=
  * @param system - System
  * @param timeContexts - array of time contexts
  */
-System.renderTimeContexts = function (system, lines, measures, voices, timeContexts, length) {
+System.renderTimeContexts = function ({system, lines, measures, voices, timeContexts, length}) {
 	// create the system group that all items will be added to.
 	const systemGroup = system.render();
 
@@ -101,8 +101,8 @@ System.renderTimeContexts = function (system, lines, measures, voices, timeConte
 	/////////////////////
 	const lineCenters = _.map(lineGroups, b);
 	const cursors = placeTimes(timeContexts, measures, cursorFn);
-	// console.log(cursors);
 
+	// Render stems, beams, tuplets, articulations, and ledger lines.
 	if (timeContexts) {
 		const startTime = _.first(timeContexts).time;
 		const endTime = _.last(timeContexts).time;

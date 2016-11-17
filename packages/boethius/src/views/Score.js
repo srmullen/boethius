@@ -106,7 +106,12 @@ Score.render = function (score, {measures, voices=[], chordSymbols=[], pages=[0]
             const systemMeasures = _.slice(measures, startMeasures[index], endMeasure);
             const timeContexts = systemTimeContexts[index];
 
-            const systemGroup = System.renderTimeContexts(system, score.lines, systemMeasures, voices, timeContexts, score.length);
+            const systemGroup = System.renderTimeContexts({
+                system, voices, timeContexts,
+                lines: score.lines,
+                measures: systemMeasures,
+                length: score.length
+            });
 
             const systemTranslation = (!_.contains(pages, system.page)) ?
                 score.pages[system.page].staffSpacing[i] || i * 250 :
