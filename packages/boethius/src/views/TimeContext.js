@@ -21,7 +21,7 @@ function TimeContext (timeContext = [], symbols = []) {
 TimeContext.prototype.render = function (lineHeights) {
     const group = this.group = new paper.Group();
 
-	const itemGroups = _.map(this.lines, (line, i) => {
+	const cursors = _.map(this.lines, (line, i) => {
 		if (line) {
 			const itemGroups = renderTime(line);
 
@@ -52,21 +52,21 @@ TimeContext.prototype.render = function (lineHeights) {
 
             dynamics.map((dynamic) => {
         		dynamic.group.translate(rootY.add(0, Scored.config.layout.lineSpacing * 7.5));
-        		// placement.placeAt(cursor, dynamic);
+        		placeAt(cursor, dynamic);
         	});
 
-            return itemGroups;
+            group.addChildren(itemGroups);
+
+            return cursor;
 		}
 	});
 
-    _.each(itemGroups, (items) => {
-        group.addChildren(items);
-    });
-
     // render symbols
+    const minCursor = Math.min.apply(null, _.compact(cursors));
+    const symbolCursor = _.isFinite(minCursor) ? minCursor : 0;
     const symbolGroups = this.symbols.map(symbol => {
         const symbolGroup = symbol.render();
-        symbolGroup.translate(0, getYOffset(symbol));
+        symbolGroup.translate(symbolCursor, getYOffset(symbol));
         return symbolGroup;
     });
 
