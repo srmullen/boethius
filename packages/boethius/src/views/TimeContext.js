@@ -48,6 +48,7 @@ TimeContext.prototype.render = function (lineHeights) {
 
             rests.map(rest => {
         		rest.group.translate(rootY.add(0, getYOffset(rest)));
+                placeAt(cursor, rest);
             });
 
             dynamics.map((dynamic) => {
