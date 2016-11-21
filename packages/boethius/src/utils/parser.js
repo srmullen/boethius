@@ -4,6 +4,7 @@ import Voice from "../views/Voice";
 import Note from "../views/Note";
 import Rest from "../views/Rest";
 import Chord from "../views/Chord";
+import ChordSymbol from "../views/ChordSymbol";
 import System from "../views/System";
 import Line from "../views/Line";
 import Measure from "../views/Measure";
@@ -11,7 +12,6 @@ import Clef from "../views/Clef";
 import Key from "../views/Key";
 import TimeSignature from "../views/TimeSignature";
 import Dynamic from "../views/Dynamic";
-import ChordSymbol from "../views/ChordSymbol";
 import Score from "../views/Score";
 
 const typeToConstructor = {
@@ -19,6 +19,7 @@ const typeToConstructor = {
     note: (props, children) => new Note(props, children),
     rest: (props, children) => new Rest(props, children),
     chord: (props, children) => new Chord(props, children),
+    chordSymbol: (props, children) => new ChordSymbol(props, children),
     system: (props, children) => new System(props, children),
     line: (props, children) => new Line(props, children),
     measure: (props, children) => new Measure(props, children),
