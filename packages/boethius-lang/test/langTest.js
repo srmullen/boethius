@@ -105,6 +105,49 @@ describe("parser", () => {
         });
     });
 
+    describe("chord symbols", () => {
+        it("should create a chord symbol with csym", () => {
+            const [chord] = parser.parse("(csym cmaj 4)");
+            expect(chord).to.eql({
+                props: {
+                    value: "cmaj",
+                    measure: 4,
+                    beat: 0
+                },
+                type: "chordSymbol"
+            });
+        });
+
+        it("should take a beat param as integer", () => {
+            const [chord] = parser.parse("(csym cmaj 2 3)");
+            expect(chord).to.eql({
+                props: {
+                    value: "cmaj",
+                    measure: 2,
+                    beat: 3
+                },
+                type: "chordSymbol"
+            });
+        });
+
+        it("should take a beat param as float", () => {
+            const [chord] = parser.parse("(csym cmaj 5 1.5)");
+            expect(chord).to.eql({
+                props: {
+                    value: "cmaj",
+                    measure: 5,
+                    beat: 1.5
+                },
+                type: "chordSymbol"
+            });
+        });
+
+        it("should handle multiple chord symbols", () => {
+            expect(parser.parse("(csym cmaj 5 1.5) (csym fmin 0)").length).to.equal(2);
+            expect(parser.parse("(csym cmaj 5 1.5) c4 <d4 f4> (csym fmin 0)").length).to.equal(4);
+        });
+    });
+
     describe("multiple items", () => {
         it("should return an array of all items", () => {
             let parsed = parser.parse("g4 c5/8 r/8 <c4 e4 g4 c5>/1");

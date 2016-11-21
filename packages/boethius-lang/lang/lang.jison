@@ -4,6 +4,7 @@
     var NOTE = "note";
     var REST = "rest";
     var CHORD = "chord";
+    var CHORDSYMBOL = "chordSymbol";
 
     var NOTES = {
         "C":  0,  "c":  0,  "b#":  0,   "B#":  0,  "Dbb": 0,   "DBB": 0, "dbb": 0, "dBB": 0,
@@ -104,6 +105,7 @@ r                        return 'REST'
 \.+                      return 'DOTS'
 true|false               return 'BOOL'
 [0-9]+                   return 'INTEGER'
+csym                     return 'CSYM'
 [a-zA-Z][a-zA-Z0-9]*     return 'IDENTIFIER'
 <<EOF>>                  return 'EOF'
 .                        return 'INVALID'
@@ -184,12 +186,23 @@ chord:
         }
     ;
 
+chordSymbol:
+    LPAREN CSYM IDENTIFIER INTEGER RPAREN
+        {$$ = {type: CHORDSYMBOL, props: {value: $3, measure: Number($4), beat: 0}}}
+    | LPAREN CSYM IDENTIFIER INTEGER INTEGER RPAREN
+        {$$ = {type: CHORDSYMBOL, props: {value: $3, measure: Number($4), beat: Number($5)}}}
+    | LPAREN CSYM IDENTIFIER INTEGER float RPAREN
+        {$$ = {type: CHORDSYMBOL, props: {value: $3, measure: Number($4), beat: Number($5)}}}
+    ;
+
 item:
     note
         {$$ = $1}
     | rest
         {$$ = $1}
     | chord
+        {$$ = $1}
+    | chordSymbol
         {$$ = $1}
     ;
 
