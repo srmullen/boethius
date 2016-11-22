@@ -3,6 +3,7 @@ import {map} from "lodash";
 import Voice from "../views/Voice";
 import Note from "../views/Note";
 import Rest from "../views/Rest";
+import Repeat from "../views/Repeat";
 import Chord from "../views/Chord";
 import ChordSymbol from "../views/ChordSymbol";
 import System from "../views/System";
@@ -18,6 +19,7 @@ const typeToConstructor = {
     voice: (props, children) => new Voice(props, children),
     note: (props, children) => new Note(props, children),
     rest: (props, children) => new Rest(props, children),
+    repeat: (props, children) => new Repeat(props,children),
     chord: (props, children) => new Chord(props, children),
     chordSymbol: (props, children) => new ChordSymbol(props, children),
     system: (props, children) => new System(props, children),
