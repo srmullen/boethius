@@ -15,7 +15,8 @@ const constants = {
 		key: "key",
 		timeSig: "timeSig",
 		dynamic: "dynamic",
-		page: "page"
+		page: "page",
+		repeat: "repeat"
 	},
 	font: {
 		clefs: {

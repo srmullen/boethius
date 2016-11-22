@@ -14,6 +14,7 @@ import Dynamic from "./views/Dynamic";
 import ChordSymbol from "./views/ChordSymbol";
 import Score from "./views/Score";
 import Page from "./views/Page";
+import Repeat from "./views/Repeat";
 
 import {parse} from "./utils/parser";
 import * as lineUtils from "./utils/line";
@@ -124,6 +125,10 @@ Scored.prototype.system = function system (context={}, children) {
 
 Scored.prototype.score = function score (context={}, children) {
 	return new Score(context, children);
+};
+
+Scored.prototype.repeat = function repeat(context={}) {
+	return new Repeat(context);
 };
 
 Scored.prototype.clone = common.clone;

@@ -9,6 +9,7 @@ import {
     isMeasure,
     isNote,
     isRest,
+    isRepeat,
     isScore,
     isSystem,
     isTimeSignature,
@@ -82,6 +83,13 @@ describe("types", () => {
         it("should return true if the given item is a Rest, false otherwise", () => {
             expect(isRest(scored.rest())).to.be.true;
             expect(isRest(scored.note())).to.be.false;
+        });
+    });
+
+    describe("isRepeat", () => {
+        it("should return true if the given item is a Repeat, false otherwise", () => {
+            expect(isRepeat(scored.repeat())).to.be.true;
+            expect(isRepeat(scored.note())).to.be.false;
         });
     });
 

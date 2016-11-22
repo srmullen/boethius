@@ -22,7 +22,8 @@ TODOS:
     - end slur and start new slur on same note.
     - Voices crossing lines.
     - placement.commonShortestDuration implementation.
-    - Chord Symbols
+    - Repeats
+    - Da Capo / Dal Segno
 
     # Lower priority
     - SMuFL
@@ -42,7 +43,6 @@ TODOS:
     - improved dynamic positioning
     - Ability to turn features on/off for performance reasons.
     - Fix double rendering of ledger lines.
-    - Time and/or TimeContext classes
     - Lyrics
     - Ability to specify horizontal position of systems.
 

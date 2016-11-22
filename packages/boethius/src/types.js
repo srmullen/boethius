@@ -26,6 +26,7 @@ const isSlur = _.partial(isType, constants.type.slur);
 const isSystem = _.partial(isType, constants.type.system);
 const isTimeSignature = _.partial(isType, constants.type.timeSig);
 const isVoice = _.partial(isType, constants.type.voice);
+const isRepeat = _.partial(isType, constants.type.repeat);
 const isMarking = item => isClef(item) || isKey(item) || isTimeSignature(item);
 const isPitched = item => isNote(item) || isChord(item);
 const hasDuration = item => isNote(item) || isChord(item) || isRest(item);
@@ -40,6 +41,7 @@ export {
     isMeasure,
     isNote,
     isRest,
+    isRepeat,
     isScore,
     isSlur,
     isSystem,
