@@ -157,6 +157,9 @@ const offsets = {
 	},
 	[constants.type.chordSymbol]: function () {
 		return -16;
+	},
+	[constants.type.repeat]: function () {
+		return 0;
 	}
 };
 

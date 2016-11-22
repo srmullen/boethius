@@ -266,6 +266,35 @@ function drawDots (point, dots) {
 	return dotArr;
 }
 
+function drawRepeat () {
+	const dotArr = [];
+	const distance = Scored.config.layout.lineSpacing;
+	const linePosition = -Scored.config.note.head.width/2;
+	const line = new paper.Path.Line({
+		from: [linePosition, 0],
+		to: [linePosition, Scored.config.layout.lineSpacing * 4],
+		strokeColor: "black",
+		strokeWidth: 1
+	});
+
+	const dot1 = new paper.Path.Circle({
+		center: new paper.Point(0, distance * 1.5),
+		radius: 2,
+		fillColor: "black"
+	});
+
+	const dot2 = new paper.Path.Circle({
+		center: new paper.Point(0, distance * 2.5),
+		radius: 2,
+		fillColor: "black"
+	});
+
+	return new paper.Group({
+		name: "repeat",
+		children: [line, dot1, dot2]
+	});
+}
+
 /*
  * @param point - center of the staccato dot.
  * @return Path
@@ -619,6 +648,7 @@ export {
 	drawTimeSig,
 	drawHead,
 	drawDots,
+	drawRepeat,
 	drawStaccato,
 	drawTenuto,
 	drawAccidental,

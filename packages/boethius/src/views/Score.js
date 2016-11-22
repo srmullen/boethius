@@ -147,8 +147,8 @@ function getStartContext (score, time) {
 
 export function scoreToMeasures (score) {
     const numMeasures = _.sum(score.systems, system => system.measures);
-    // Optimize here. Measures shouldn't need to be recreated every time the score is re-rendered.
-    return createMeasures(numMeasures, score.timeSigs);
+    const repeats = score.lines.map(line => line);
+    return createMeasures(numMeasures, [...score.timeSigs, repeats]);
 }
 
 /*

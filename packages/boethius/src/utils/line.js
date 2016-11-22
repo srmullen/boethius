@@ -96,13 +96,15 @@ function positionMarkings (lineCenter, cursor, {items}) {
     const {
 		clef: clefs,
 		key: keys,
-		timeSig: timeSigs
+		timeSig: timeSigs,
+		repeat: repeats
 	} = _.groupBy(items, item => item.type);
 
 	// place the markings
 	if (clefs) cursor += placement.placeMarking(lineCenter, cursor, clefs[0]);
 	if (keys) cursor += placement.placeMarking(lineCenter, cursor, keys[0]);
 	if (timeSigs) cursor += placement.placeMarking(lineCenter, cursor, timeSigs[0]);
+	if (repeats) cursor += placement.placeMarking(lineCenter, cursor, repeats[0]);
 
     return cursor;
 }

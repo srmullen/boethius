@@ -1,4 +1,5 @@
 import constants from "../constants";
+import {drawRepeat} from "../engraver";
 
 const TYPE = constants.type.repeat;
 
@@ -10,7 +11,7 @@ function Repeat ({value, measure}) {
 Repeat.prototype.type = TYPE;
 
 Repeat.prototype.render = function () {
-    const group = this.group = new paper.Group();
+    const group = this.group = drawRepeat();
 
     return group;
 };
