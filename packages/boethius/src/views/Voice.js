@@ -14,7 +14,7 @@ import {calculateDuration, parseSignature, calculateTupletDuration, sumDurations
  */
 function calculateAndSetTimes (items, offset=0) {
     return items.reduce((acc, item) => {
-        let previousItem = _.last(acc);
+        const previousItem = _.last(acc);
 
         if (previousItem) {
             item.time = F(previousItem.time).add(calculateDuration(previousItem)).add(offset).valueOf();

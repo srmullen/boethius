@@ -3,6 +3,9 @@ import {drawRepeat} from "../engraver";
 
 const TYPE = constants.type.repeat;
 
+const REGULAR = "regular";
+const INVERSE = "inverse";
+
 function Repeat ({value, measure}) {
     this.value = value;
     this.measure = measure;

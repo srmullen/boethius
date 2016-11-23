@@ -1,6 +1,6 @@
 import _ from "lodash";
 import F from "fraction.js";
-import {isNote, isChord, isRest, isTimeSignature} from "../types";
+import {isNote, isChord, isRest, isTimeSignature, isRepeat} from "../types";
 
 /*
  * @param signature - TimeSignaure or time signature value or tuplet represented as a String. ex. TimeSig({value: "4/4"}) or "4/4", "h"
@@ -196,14 +196,14 @@ function splitByTime (events) {
  */
 function calculateDuration (item) {
 
-	// If the event has no type it has no duration.
-	// if (!item.type) return 0;
-	if (!(isNote(item) || isChord(item) || isRest(item))) return 0;
+	// The item doesn't have a duration unless it's one of the following types.
+	if (!(isNote(item) || isChord(item) || isRest(item) ||isRepeat(item))) return 0;
 
-	let s = item.tuplet ? item.tuplet.split("/") : null,
-		tuplet = s ? new F(s[0], s[1]) : null,
-		dur = new F(1, item.value),
-		dots = item.dots || 0;
+	const s = item.tuplet ? item.tuplet.split("/") : null;
+	const tuplet = s ? new F(s[0], s[1]) : null;
+	const dots = item.dots || 0;
+
+	let dur = new F(1, item.value);
 
 	for (let i = 0; i < dots; i++) {
 		dur = dur.mul(1.5);
