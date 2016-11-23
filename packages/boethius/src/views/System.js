@@ -241,13 +241,12 @@ System.prototype.renderLines = function (lines, length) {
 };
 
 System.prototype.renderMeasures = function (measures, lengths, systemGroup) {
-	let measureGroups = _.reduce(measures, (groups, measure, i) => {
-		let measureLength = lengths[i],
-			previousGroup = _.last(groups),
-			leftBarline;
+	const measureGroups = _.reduce(measures, (groups, measure, i) => {
+		const measureLength = lengths[i];
+		const previousGroup = _.last(groups);
 
-		leftBarline = previousGroup ? _.last(previousGroup.children) : null;
-		let measureGroup = measure.render(systemGroup, leftBarline, measureLength);
+		const leftBarline = previousGroup ? _.last(previousGroup.children) : null;
+		const measureGroup = measure.render(systemGroup, leftBarline, measureLength);
 
 		groups.push(measureGroup);
 		return groups;

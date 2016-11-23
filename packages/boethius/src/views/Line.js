@@ -2,10 +2,6 @@ import constants from "../constants";
 import {mapDeep} from "../utils/common";
 import {drawLine} from "../engraver";
 import {getMeasureNumber} from "../utils/timeUtils";
-import {createMeasures} from "../utils/measure";
-import * as placement from "../utils/placement";
-import * as lineUtils from "../utils/line";
-import {getAccidentalContexts} from "../utils/accidental";
 import {isPitched} from "../types";
 import _ from "lodash";
 

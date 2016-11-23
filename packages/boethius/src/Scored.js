@@ -22,7 +22,6 @@ import * as noteUtils from "./utils/note";
 import * as accidental from './utils/accidental';
 import * as common from "./utils/common";
 import * as timeUtils from "./utils/timeUtils";
-import * as measureUtils from "./utils/measure";
 import constants from "./constants";
 import vScore from "./virtual-score";
 

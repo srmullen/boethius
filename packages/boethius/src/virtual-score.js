@@ -6,7 +6,7 @@ import Rest from "./views/Rest";
 import Chord from "./views/Chord";
 import System from "./views/System";
 import Line from "./views/Line";
-import Measure from "./views/Measure";
+import Measure, {createMeasures} from "./views/Measure";
 import Clef from "./views/Clef";
 import Key from "./views/Key";
 import TimeSignature from "./views/TimeSignature";
@@ -15,7 +15,6 @@ import ChordSymbol from "./views/ChordSymbol";
 import Score, {scoreToMeasures, getSystemTimeContexts, createLineTimeContext, renderDecorations} from "./views/Score";
 
 import constants from "./constants";
-import {createMeasures} from "./utils/measure";
 import {map, reductions, partitionWhen, clone, concat, set} from "./utils/common";
 import {getTimeContexts} from "./utils/line";
 import {getStaffItems, iterateByTime} from "./utils/system";
