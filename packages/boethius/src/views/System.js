@@ -98,7 +98,8 @@ System.renderTimeContexts = function ({system, lines, measures, voices, timeCont
 	// Placement Phase //
 	/////////////////////
 	const lineCenters = _.map(lineGroups, b);
-	const cursors = placeTimes(timeContexts, measures, cursorFn);
+	const cursors = placeTimes(timeContexts, measures, measureLengths, cursorFn);
+	// console.log(cursors);
 
 	// Render stems, beams, tuplets, articulations, and ledger lines.
 	if (timeContexts) {
@@ -162,7 +163,7 @@ function calculateTimeLengths (timeContexts, shortestDuration) {
 	});
 }
 
-function placeTimes (timeContexts, measures, cursorFn) {
+function placeTimes (timeContexts, measures, measureLengths, cursorFn) {
 	return _.reduce(timeContexts, (cursors, timeContext, i) => {
 		const lineIndices = _.filter(_.map(timeContext.lines, (ctx, i) => ctx ? i : undefined), _.isNumber);
 		const previousTime = _.last(cursors) ? _.last(cursors).time : 0;
@@ -172,6 +173,7 @@ function placeTimes (timeContexts, measures, cursorFn) {
 		if (currentTime.measure !== previousTime.measure) {
 			const measure = _.find(measures, measure => measure.value === currentTime.measure);
 			cursor = placement.calculateCursor(measure);
+			// cursor = _.sum(measureLengths.slice(0, measure.value)) + Scored.config.note.head.width;
 		}
 
 		timeContext.group.translate(cursor, 0);

@@ -2,17 +2,20 @@ import constants from "../constants";
 import {drawBarline} from "../engraver";
 import _ from "lodash";
 
-import {isMeasure, isTimeSignature} from "../types";
+import {isMeasure, isTimeSignature, isRepeat} from "../types";
 import {getMeasureDuration} from "../utils/timeUtils";
 
 const TYPE = constants.type.measure;
+
+const DEFAULTBAR = "default";
+const REPEATBAR = "repeat";
 
 /*
  * @param value - The measure number.
  * @param timeSig - TimeSignature. Required.
  * @param startsAt - Time the measure starts at.
  */
-function Measure ({value, timeSig, startsAt=0}, children=[]) {
+function Measure ({value, timeSig, startsAt=0, barType=DEFAULTBAR}, children=[]) {
 	if (!timeSig) {
 		throw new Error("Time Signature is required when initializing Measure");
 	}
@@ -20,6 +23,7 @@ function Measure ({value, timeSig, startsAt=0}, children=[]) {
 	this.value = value;
 	this.timeSig = timeSig;
 	this.startsAt = startsAt;
+	this.barType = barType;
 	this.children = children;
 }
 
@@ -28,14 +32,21 @@ Measure.prototype.type = TYPE;
 /*
  * @param lines Group<Line>[]
  */
+ //FIXME: Need to take width of barlines into account when calculating measure lengths.
+ // ex. repeat barlines are wider than regular barlines.
 Measure.prototype.render = function (lines, leftBarline, width) {
 	const group = new paper.Group({
 		name: TYPE
 	});
 
+	let barType = this.barType;
+	if (_.filter(this.children, isRepeat).length) {
+		barType = REPEATBAR;
+	}
+
 	leftBarline = leftBarline || drawBarline(lines);
-	const previousBarlinePosition = leftBarline.position.x;
-	const rightBarline = drawBarline(lines, previousBarlinePosition + width, this.barType);
+	const previousBarlinePosition = leftBarline.bounds.right;
+	const rightBarline = drawBarline(lines, previousBarlinePosition + width, barType);
 	const bounds = this.drawGroupBounds(previousBarlinePosition, rightBarline);
 
 	group.addChildren([bounds, leftBarline, rightBarline]);
@@ -61,11 +72,11 @@ Measure.prototype.drawGroupBounds = function (previousBarlinePosition, barline) 
  * @param children - Measures or Markings
  */
 export function createMeasures (numMeasures, children) {
-	let measures = new Array(numMeasures);
+	const measures = new Array(numMeasures);
 
 	// get the Measures from children and add them to the measures array
-	let [explicitMeasures, markings] = _.partition(_.filter(children, c => !!c), isMeasure),
-		measureMarkings = _.groupBy(markings, marking => marking.measure || 0);
+	const [explicitMeasures, markings] = _.partition(_.filter(children, c => !!c), isMeasure);
+	const measureMarkings = _.groupBy(markings, marking => marking.measure || 0);
 
 	{	// Put each measure in the right position in the measures array.
 		// If a measure does not have an index property put it in the next available location.

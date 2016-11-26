@@ -76,6 +76,29 @@ const barlineTypes = {
 
 		return barGroup;
 	},
+
+	repeat: (staves, xPos) => {
+		const firstLine = staves[0];
+		const lastLine = staves[staves.length - 1];
+		const barGroup = new paper.Group({name: "barline"});
+		const thickBar = new paper.Path.Line(lineUtils.f(firstLine).add(xPos, 0), lineUtils.e(lastLine).add(xPos, 0));
+		const thinBar = new paper.Path.Line(lineUtils.f(firstLine).add(xPos-5, 0), lineUtils.e(lastLine).add(xPos-5, 0));
+
+
+		// draw the bar line
+		barGroup.addChildren([thickBar, thinBar]);
+		barGroup.strokeColor = "black";
+		thickBar.strokeWidth = 3;
+		thinBar.strokeWidth = 1;
+
+		staves.map(line => {
+			const dots = drawRepeatDots(xPos - Scored.config.note.head.width, lineUtils.f(line).y);
+			barGroup.addChildren(dots);
+		});
+
+		return barGroup;
+	},
+
 	default: (staves, xPos) => {
 		const firstLine = staves[0];
 		const lastLine = staves[staves.length - 1];
@@ -266,8 +289,24 @@ function drawDots (point, dots) {
 	return dotArr;
 }
 
+function drawRepeatDots (xPos = 0, yPos = 0) {
+	const distance = Scored.config.layout.lineSpacing;
+	const dot1 = new paper.Path.Circle({
+		center: new paper.Point(xPos, yPos + (distance * 1.5)),
+		radius: 2,
+		fillColor: "black"
+	});
+
+	const dot2 = new paper.Path.Circle({
+		center: new paper.Point(xPos, yPos + (distance * 2.5)),
+		radius: 2,
+		fillColor: "black"
+	});
+
+	return [dot1, dot2];
+}
+
 function drawRepeat () {
-	const dotArr = [];
 	const distance = Scored.config.layout.lineSpacing;
 	const linePosition = -Scored.config.note.head.width/2;
 	const line = new paper.Path.Line({
@@ -277,21 +316,11 @@ function drawRepeat () {
 		strokeWidth: 1
 	});
 
-	const dot1 = new paper.Path.Circle({
-		center: new paper.Point(0, distance * 1.5),
-		radius: 2,
-		fillColor: "black"
-	});
-
-	const dot2 = new paper.Path.Circle({
-		center: new paper.Point(0, distance * 2.5),
-		radius: 2,
-		fillColor: "black"
-	});
+	const dots = drawRepeatDots();
 
 	return new paper.Group({
 		name: "repeat",
-		children: [line, dot1, dot2]
+		children: [line, ...dots]
 	});
 }
 

@@ -44,7 +44,7 @@ Score.render = function (score, {measures, voices=[], chordSymbols=[], repeats=[
     const scoreGroup = score.render();
 
     // Optimize here. Measures shouldn't need to be recreated every time the score is re-rendered.
-    measures = measures || scoreToMeasures(score);
+    measures = measures || scoreToMeasures(score, repeats);
 
     const systemsToRender = _.reduce(score.systems, (acc, system, index) => {
         return _.contains(pages, system.page) ? concat(acc, {system, index}) : acc;
@@ -145,10 +145,9 @@ function getStartContext (score, time) {
     return score.lines.map(line => line.contextAt(time));
 }
 
-export function scoreToMeasures (score) {
+export function scoreToMeasures (score, repeats) {
     const numMeasures = _.sum(score.systems, system => system.measures);
-    const repeats = score.lines.map(line => line);
-    return createMeasures(numMeasures, [...score.timeSigs, repeats]);
+    return createMeasures(numMeasures, [...score.timeSigs, ...repeats]);
 }
 
 /*

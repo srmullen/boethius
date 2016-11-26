@@ -379,7 +379,7 @@ var examples = {
 
         // create voices
         var soprano = scored.voice({name: "treble"}, [
-            n({value: 1, pitch: "f5"}), scored.repeat({value: 1}), n({value: 1, pitch: "c4"}), n({value: 1, pitch: "c4"})
+            n({value: 1, pitch: "f5"}), n({value: 1, pitch: "f5"}), n({value: 1, pitch: "c4"}), n({value: 1, pitch: "c4"})
         ]);
 
         var bass = scored.voice({name: "bass"}, [
@@ -390,7 +390,7 @@ var examples = {
         var fourfour = scored.timeSig({value: "4/4", measure: 0});
         var system1 = scored.system({measures: 6});
         var system2 = scored.system({measures: 6});
-        var repeatM4 = scored.repeat({measure: 4});
+        var repeatM4 = scored.repeat({measure: 2});
 
         var score = scored.score({length: 1000, systemHeights: [0, 150]}, [fourfour, page0, system1, system2, trebleLine, bassLine]);
 
