@@ -3,7 +3,8 @@ import compile from "../src/main";
 
 describe("boethius compilation", () => {
     describe("note info", () => {
-        const [note] = compile("a4");
+        const {voices} = compile("(voice=mel a4)");
+        const note = voices.mel[0];
 
         it("should add midi property", () => {
             expect(note.props.midi).to.equal(69);
@@ -21,4 +22,8 @@ describe("boethius compilation", () => {
             expect(note.props.interval).to.equal(9);
         });
     });
+
+    // it("should return object with voices", () => {
+    //     expect()
+    // });
 });

@@ -85,6 +85,20 @@
             return Boolean(string);
         }
     }
+
+    function toMusic (parsed) {
+        return parsed.reduce((acc, item) => {
+            if (item && item.type === "chordSymbol") {
+                acc.chordSymbols.push(item);
+            } else if (acc.voices[item.props.voice]) {
+                acc.voices[item.props.voice].push(item);
+            } else {
+                acc.voices[item.props.voice] = [item];
+            }
+
+            return acc;
+        }, {chordSymbols: [], voices: {}});
+    }
 %}
 
 /* lexical grammar */
@@ -125,9 +139,9 @@ csym                     return 'CSYM'
 
 expressions:
     EOF
-        {return [];}
+        {return {voices: {}, chordSymbols: []};}
     | list EOF
-        {return $1;}
+        {return toMusic($1);}
     ;
 
 float:
