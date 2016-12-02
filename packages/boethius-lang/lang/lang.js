@@ -430,7 +430,7 @@ parse: function parse(input) {
 
     function toMusic (parsed) {
         return parsed.reduce((acc, item) => {
-            if (item && item.type === "chordSymbol") {
+            if (item && item.type === CHORDSYMBOL) {
                 acc.chordSymbols.push(item);
             } else if (acc.voices[item.props.voice]) {
                 acc.voices[item.props.voice].push(item);
