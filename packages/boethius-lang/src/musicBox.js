@@ -1,3 +1,7 @@
+const NOTE = "note";
+const REST = "rest";
+const CHORD = "chord";
+const CHORDSYMBOL = "chordSymbol";
 
 const NOTES = {
     "C":  0,  "c":  0,  "b#":  0,   "B#":  0,  "Dbb": 0,   "DBB": 0, "dbb": 0, "dBB": 0,
@@ -34,23 +38,43 @@ function octaveNoteToMidi (octave, interval) {
 }
 
 export function noteInfo (noteString) {
-    const [note, pitchClass, octave] = validateNoteString(noteString);
-    const interval = NOTES[pitchClass];
-    const midi = octaveNoteToMidi(octave, interval);
-    const frequency = midiToHz(midi);
+    var validated = validateNoteString(noteString);
+    var pitchClass = validated[1];
+    var octave = validated[2];
+    var interval = NOTES[pitchClass];
+    var midi = octaveNoteToMidi(octave, interval);
     return {
-        note, pitchClass, octave, interval, midi, frequency
+        pitch: validated[0],
+        pitchClass: pitchClass,
+        octave: Number(octave),
+        interval: interval,
+        midi: midi,
+        frequency: midiToHz(midi)
     }
 }
 
-export function noteToMidi (note) {
+function noteToMidi (note) {
     return noteInfo(note).midi;
 }
 
-export function midiToHz (midi) {
+function midiToHz (midi) {
     return Math.pow(2, (midi - 69) / 12) * 440;
 }
 
-export function noteToHz (note) {
+function noteToHz (note) {
     return midiToHz(noteInfo(note).midi);
+}
+
+export function toMusic (parsed) {
+    return parsed.reduce((acc, item) => {
+        if (item && item.type === CHORDSYMBOL) {
+            acc.chordSymbols.push(item);
+        } else if (acc.voices[item.props.voice]) {
+            acc.voices[item.props.voice].push(item);
+        } else {
+            acc.voices[item.props.voice] = [item];
+        }
+
+        return acc;
+    }, {chordSymbols: [], voices: {}});
 }
