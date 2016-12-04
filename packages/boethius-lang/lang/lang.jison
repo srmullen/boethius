@@ -151,6 +151,8 @@ item:
         {$$ = $1}
     | chordSymbol
         {$$ = $1}
+    | voice
+        {$$ = $1}
     ;
 
 ratio:
@@ -161,14 +163,14 @@ ratio:
 voice:
     LBRKT IDENTIFIER list RBRKT
         {
-            if (!yy.voices[$4]) {
+            if (!yy.voices[$2]) {
                 // create array for voice items
-                yy.voices[$4] = $5;
+                yy.voices[$2] = $3;
             } else {
-                yy.voices[$4] = yy.voices[$4].concat($5);
+                yy.voices[$2] = yy.voices[$2].concat($3);
             }
 
-            $$ = $5;
+            $$ = $3;
         }
     ;
 
