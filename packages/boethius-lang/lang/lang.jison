@@ -42,6 +42,7 @@ r                        return 'REST'
 \.+                      return 'DOTS'
 true|false               return 'BOOL'
 [0-9]+                   return 'INTEGER'
+/*voice                    return 'VOICE'*/
 csym                     return 'CSYM'
 [a-zA-Z][a-zA-Z0-9]*     return 'IDENTIFIER'
 <<EOF>>                  return 'EOF'
@@ -62,7 +63,7 @@ csym                     return 'CSYM'
 
 expressions:
     EOF
-        {return {voices: {}, chordSymbols: []};}
+        {return {voices: yy.voices, chordSymbols: yy.chordSymbols};}
     | list EOF
         {return yy.toMusic($1);}
     ;
@@ -120,11 +121,23 @@ chord:
 
 chordSymbol:
     LPAREN CSYM IDENTIFIER INTEGER RPAREN
-        {$$ = {type: CHORDSYMBOL, props: {value: $3, measure: Number($4), beat: 0}}}
+        {
+            var chordSymbol = {type: CHORDSYMBOL, props: {value: $3, measure: Number($4), beat: 0}};
+            yy.chordSymbols.push(chordSymbol);
+            $$ = chordSymbol;
+        }
     | LPAREN CSYM IDENTIFIER INTEGER INTEGER RPAREN
-        {$$ = {type: CHORDSYMBOL, props: {value: $3, measure: Number($4), beat: Number($5)}}}
+        {
+            var chordSymbol = {type: CHORDSYMBOL, props: {value: $3, measure: Number($4), beat: Number($5)}}
+            yy.chordSymbols.push(chordSymbol);
+            $$ = chordSymbol;
+        }
     | LPAREN CSYM IDENTIFIER INTEGER float RPAREN
-        {$$ = {type: CHORDSYMBOL, props: {value: $3, measure: Number($4), beat: Number($5)}}}
+        {
+            var chordSymbol = {type: CHORDSYMBOL, props: {value: $3, measure: Number($4), beat: Number($5)}}
+            yy.chordSymbols.push(chordSymbol);
+            $$ = chordSymbol;
+        }
     ;
 
 item:
@@ -141,6 +154,20 @@ item:
 ratio:
     INTEGER FWDSLASH INTEGER
         {$$ = "" + $1 + $2 + $3}
+    ;
+
+voice:
+    LPAREN VOICE EQUALS IDENTIFIER list RPAREN
+        {
+            if (!yy.voices[$4]) {
+                // create array for voice items
+                yy.voices[$4] = $5;
+            } else {
+                yy.voices[$4] = yy.voices[$4].concat($5);
+            }
+
+            $$ = $5;
+        }
     ;
 
 propertydef:
