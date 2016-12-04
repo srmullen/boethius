@@ -214,6 +214,18 @@ propscope:
             // resulting props are placed on the item.
             return Object.assign({}, item, {props: props});
         });}
+    | LPAREN list RPAREN
+        {
+            $$ = $2;
+        }
+    ;
+
+assignment:
+    IDENTIFIER EQUALS propscope
+        {
+            yy.vars[$1] = $3;
+            $$ = $3;
+        }
     ;
 
 list:
@@ -225,4 +237,6 @@ list:
         {$$ = $1}
     | list propscope
         {$$ = $1.concat($2)}
+    | assignment
+        {$$ = $1}
     ;

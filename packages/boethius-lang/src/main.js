@@ -6,6 +6,7 @@ function compile (program) {
     parser.yy.toMusic = toMusic;
     parser.yy.voices = {};
     parser.yy.chordSymbols = [];
+    parser.yy.vars = {};
 
     const parsed = parser.parse(program);
 

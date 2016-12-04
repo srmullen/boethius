@@ -36,4 +36,14 @@ describe("boethius compilation", () => {
             expect(voices.chords.length).to.equal(2);
         });
     });
+
+    describe("assignment", () => {
+        it("should parse", () => {
+            expect(compile("melvar = (a4 bb4 c5)")).to.be.ok;
+        });
+
+        it("should expand variables in voices", () => {
+            expect(compile("melvar = (a4 bb4 c5) [mel melvar]")).to.be.ok;
+        });
+    });
 });
