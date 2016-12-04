@@ -9,7 +9,7 @@ function compile (program) {
 
     const parsed = parser.parse(program);
 
-    return {...parsed, chordSymbols: parser.yy.chordSymbols};
+    return {voices: parser.yy.voices, chordSymbols: parser.yy.chordSymbols};
 }
 
 export default compile;

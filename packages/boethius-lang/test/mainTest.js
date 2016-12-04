@@ -4,6 +4,7 @@ import compile from "../src/main";
 describe("boethius compilation", () => {
     describe("note info", () => {
         const {voices} = compile("(voice=mel a4)");
+        console.log(voices);
         const note = voices.mel[0];
 
         it("should add midi property", () => {
@@ -23,7 +24,4 @@ describe("boethius compilation", () => {
         });
     });
 
-    // it("should return object with voices", () => {
-    //     expect()
-    // });
 });

@@ -33,6 +33,8 @@
 \|                       /* ignore barlines */
 \(                       return 'LPAREN'
 \)                       return 'RPAREN'
+\[                       return 'LBRKT'
+\]                       return 'RBRKT'
 \<                       return 'OPENBRKT'
 \>                       return 'CLOSEBRKT'
 \/                       return 'FWDSLASH'
@@ -65,7 +67,7 @@ expressions:
     EOF
         {return {voices: yy.voices, chordSymbols: yy.chordSymbols};}
     | list EOF
-        {return yy.toMusic($1);}
+        {return $1;}
     ;
 
 float:
@@ -157,7 +159,7 @@ ratio:
     ;
 
 voice:
-    LPAREN VOICE EQUALS IDENTIFIER list RPAREN
+    LBRKT IDENTIFIER list RBRKT
         {
             if (!yy.voices[$4]) {
                 // create array for voice items
