@@ -38,11 +38,27 @@ describe("boethius compilation", () => {
 
     describe("assignment", () => {
         it("should parse", () => {
-            expect(compile("melvar = (a4 bb4 c5)")).to.be.ok;
+            expect(compile("~melvar = (a4 bb4 c5)")).to.be.ok;
         });
 
-        xit("should expand variables in voices", () => {
-            expect(compile("melvar = (a4 bb4 c5) [mel melvar]")).to.be.ok;
+        it("should expand declared variable in list", () => {
+            expect(compile("~melvar = (a4 bb4 c5) ~melvar2 = (r/8 ~melvar)")).to.be.ok;
+        });
+
+        it("should expand variables in voices", () => {
+            expect(compile("~melvar = (a4 bb4 c5) [mel ~melvar]")).to.be.ok;
+        });
+
+        it("should expand declared variable in list", () => {
+            const {voices} = compile("~melvar = (a4 bb4 c5) ~melvar2 = (r/8 ~melvar) [mel ~melvar2]");
+            expect(voices.mel.length).to.equal(4);
+        });
+
+        it("should return unique objects for expanded variables", () => {
+            const {voices} = compile("~melvar = (a4) [mel ~melvar ~melvar a4]");
+            expect(voices.mel.length).to.equal(3);
+            expect(voices.mel[0]).not.to.equal(voices.mel[2]);
+            expect(voices.mel[0]).not.to.equal(voices.mel[1]);
         });
     });
 });

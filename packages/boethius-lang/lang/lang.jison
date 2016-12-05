@@ -44,8 +44,8 @@ r                        return 'REST'
 \.+                      return 'DOTS'
 true|false               return 'BOOL'
 [0-9]+                   return 'INTEGER'
-/*voice                    return 'VOICE'*/
 csym                     return 'CSYM'
+\~[a-zA-Z][a-zA-Z0-9]*   return 'VAR'
 [a-zA-Z][a-zA-Z0-9]*     return 'IDENTIFIER'
 <<EOF>>                  return 'EOF'
 .                        return 'INVALID'
@@ -223,6 +223,18 @@ list:
         {$$ = [$1]}
     | list item
         {$$ = $1.concat($2)}
+    | VAR
+        {
+            var element = yy.vars[$1];
+            if (!element) this.throw("Unknown variable: " + $1);
+            $$ = [].concat(element);
+        }
+    | list VAR
+        {
+            var element = yy.vars[$2];
+            if (!element) this.throw("Unknown variable: " + $2);
+            $$ = $1.concat(element);
+        }
     | propscope
         {$$ = $1}
     | list propscope
@@ -230,7 +242,7 @@ list:
     ;
 
 assignment:
-    IDENTIFIER EQUALS propscope
+    VAR EQUALS propscope
         {
             yy.vars[$1] = $3;
             $$ = $3;
