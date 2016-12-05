@@ -22,6 +22,47 @@
             return Boolean(string);
         }
     }
+
+    function NoteNode (props) {
+        this.props = props;
+    }
+
+    NoteNode.prototype.type = NOTE;
+
+    NoteNode.prototype.clone = function () {
+        var props = Object.assign({}, this.props);
+        return new NoteNode(props);
+    }
+
+    function RestNode (props) {
+        this.props = props;
+    }
+
+    RestNode.prototype.type = REST;
+
+    RestNode.prototype.clone = function () {
+
+    }
+
+    function ChordNode (props, children) {
+        this.props = props;
+    }
+
+    ChordNode.prototype.type = CHORD;
+
+    ChordNode.prototype.clone = function () {
+
+    }
+
+    function ChordSymbolNode (props) {
+        this.props = props;
+    }
+
+    ChordSymbolNode.prototype.type = CHORDSYMBOL;
+
+    ChordSymbolNode.prototype.clone = function () {
+
+    }
 %}
 
 /* lexical grammar */
@@ -87,14 +128,14 @@ note:
         {
             var props = yy.noteInfo($1);
             // default values
-            $$ = {type: NOTE, props: props};
+            $$ = new NoteNode(props);
         }
     | PITCH duration
         {
             var props = yy.noteInfo($1);
             props.value = $2.value;
             props.dots = $2.dots;
-            $$ = {type: NOTE, props: props}
+            $$ = new NoteNode(props);
         }
     ;
 
@@ -107,9 +148,9 @@ notelist:
 
 rest:
     REST
-        {$$ = {type: REST, props: {}}}
+        {$$ = new RestNode({});}
     | REST duration
-        {$$ = {type: REST, props: {value: $2.value, dots: $2.dots}}}
+        {$$ = new RestNode({value: $2.value, dots: $2.dots});}
     ;
 
 chord:
@@ -227,13 +268,13 @@ list:
         {
             var element = yy.vars[$1];
             if (!element) this.throw("Unknown variable: " + $1);
-            $$ = [].concat(element);
+            $$ = [].concat(element.map(function (el) {return el.clone()}));
         }
     | list VAR
         {
             var element = yy.vars[$2];
             if (!element) this.throw("Unknown variable: " + $2);
-            $$ = $1.concat(element);
+            $$ = $1.concat(element.map(function (el) {return el.clone()}));
         }
     | propscope
         {$$ = $1}

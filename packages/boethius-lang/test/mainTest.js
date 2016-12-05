@@ -60,5 +60,12 @@ describe("boethius compilation", () => {
             expect(voices.mel[0]).not.to.equal(voices.mel[2]);
             expect(voices.mel[0]).not.to.equal(voices.mel[1]);
         });
+
+        it("should return unique objects for expanded variables", () => {
+            const {voices} = compile("~melvar = (a4) [mel bb4 ~melvar ~melvar a4]");
+            expect(voices.mel.length).to.equal(4);
+            expect(voices.mel[1]).not.to.equal(voices.mel[3]);
+            expect(voices.mel[1]).not.to.equal(voices.mel[2]);
+        });
     });
 });

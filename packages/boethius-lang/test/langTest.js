@@ -9,50 +9,42 @@ describe("parser", () => {
     describe("notes", () => {
         it("should return an object with type and pitch", () => {
             const {voices} = compile("[mel e4]");
-            expect(voices.mel[0]).to.eql({
-                type: "note",
-                props: {
-                    pitch: "e4",
-                    frequency: 329.6275569128699,
-                    interval: 4,
-                    midi: 64,
-                    octave: 4,
-                    pitchClass: "e"
-                }
+            expect(voices.mel[0].type).to.eql("note");
+            expect(voices.mel[0].props).to.eql({
+                pitch: "e4",
+                frequency: 329.6275569128699,
+                interval: 4,
+                midi: 64,
+                octave: 4,
+                pitchClass: "e"
             });
         });
 
         it("should return an object with type, pitch, and value", () => {
             const {voices} = compile("[mel c#3/8]");
-            expect(voices.mel[0]).to.eql({
-                type: "note",
-                props: {
-                    frequency: 138.59131548843604,
-                    interval: 1,
-                    midi: 49,
-                    octave: 3,
-                    pitch: "c#3",
-                    pitchClass: "c#",
-                    value: 8,
-                    dots: 0
-                }
+            expect(voices.mel[0].props).to.eql({
+                frequency: 138.59131548843604,
+                interval: 1,
+                midi: 49,
+                octave: 3,
+                pitch: "c#3",
+                pitchClass: "c#",
+                value: 8,
+                dots: 0
             });
         });
 
         it("should return an object with type, pitch, value, and dots", () => {
             const {voices} = compile("[mel bb5/1..]");
-            expect(voices.mel[0]).to.eql({
-                type: "note",
-                props: {
-                    "frequency": 932.3275230361799,
-                    "interval": 10,
-                    "midi": 82,
-                    "octave": 5,
-                    "pitch": "bb5",
-                    "pitchClass": "bb",
-                    "value": 1,
-                    "dots": 2
-                }
+            expect(voices.mel[0].props).to.eql({
+                "frequency": 932.3275230361799,
+                "interval": 10,
+                "midi": 82,
+                "octave": 5,
+                "pitch": "bb5",
+                "pitchClass": "bb",
+                "value": 1,
+                "dots": 2
             });
         });
 
@@ -72,17 +64,17 @@ describe("parser", () => {
     describe("rests", () => {
         it("should return an object with a type of rest", () => {
             const {voices} = compile("[mel r]");
-            expect(voices.mel[0]).to.eql({type: "rest", props: {}});
+            expect(voices.mel[0].type).to.eql("rest");
         });
 
         it("should return an object with type and value", () => {
             const {voices} = compile("[mel r/2]");
-            expect(voices.mel[0]).to.eql({type: "rest", props: {value: 2, dots: 0}});
+            expect(voices.mel[0].props).to.eql({value: 2, dots: 0});
         });
 
         it("should return an object with type, value, and dots", () => {
             const {voices} = compile("[mel r/16.]");
-            expect(voices.mel[0]).to.eql({type: "rest", props: {value: 16, dots: 1}});
+            expect(voices.mel[0].props).to.eql({value: 16, dots: 1});
         });
     });
 
