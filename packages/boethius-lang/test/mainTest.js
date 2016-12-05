@@ -54,15 +54,29 @@ describe("boethius compilation", () => {
             expect(voices.mel.length).to.equal(4);
         });
 
-        it("should return unique objects for expanded variables", () => {
+        it("should return unique notes for expanded variables", () => {
             const {voices} = compile("~melvar = (a4) [mel ~melvar ~melvar a4]");
             expect(voices.mel.length).to.equal(3);
             expect(voices.mel[0]).not.to.equal(voices.mel[2]);
             expect(voices.mel[0]).not.to.equal(voices.mel[1]);
         });
 
-        it("should return unique objects for expanded variables", () => {
+        it("should return unique notes for expanded variables", () => {
             const {voices} = compile("~melvar = (a4) [mel bb4 ~melvar ~melvar a4]");
+            expect(voices.mel.length).to.equal(4);
+            expect(voices.mel[1]).not.to.equal(voices.mel[3]);
+            expect(voices.mel[1]).not.to.equal(voices.mel[2]);
+        });
+
+        it("should return unique rests for expanded variables", () => {
+            const {voices} = compile("~melvar = (r/16) [mel ~melvar ~melvar r/16]");
+            expect(voices.mel.length).to.equal(3);
+            expect(voices.mel[0]).not.to.equal(voices.mel[2]);
+            expect(voices.mel[0]).not.to.equal(voices.mel[1]);
+        });
+
+        it("should return unique rests for expanded variables", () => {
+            const {voices} = compile("~melvar = (r/8) [mel r/8 ~melvar ~melvar r/8]");
             expect(voices.mel.length).to.equal(4);
             expect(voices.mel[1]).not.to.equal(voices.mel[3]);
             expect(voices.mel[1]).not.to.equal(voices.mel[2]);

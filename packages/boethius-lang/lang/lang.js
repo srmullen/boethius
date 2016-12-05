@@ -422,7 +422,8 @@ parse: function parse(input) {
     RestNode.prototype.type = REST;
 
     RestNode.prototype.clone = function () {
-
+        var props = Object.assign({}, this.props);
+        return new RestNode(props);
     }
 
     function ChordNode (props, children) {
