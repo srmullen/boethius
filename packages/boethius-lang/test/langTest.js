@@ -78,23 +78,23 @@ describe("parser", () => {
         });
     });
 
-    xdescribe("chords", () => {
+    describe("chords", () => {
         it("should return and object with type and children", () => {
             const {voices} = compile("[mel <c4 e4 g4>]");
-            const notes = compile("(c4 e4 g4");
-            expect(voices.mel[0]).to.eql({type: "chord", props: {}, children: notes});
+            expect(voices.mel[0].type).to.eql("chord");
+            expect(voices.mel[0].props).to.eql({});
+            expect(voices.mel[0].children.length).to.equal(3);
         });
 
         it("should return an object with type, children, and value", () => {
-            let parsed = compile("<c4 e4>/8");
-            let notes = compile("c4 e4");
-            expect(parsed[0]).to.eql({type: "chord", children: notes, props: {value: 8, dots: 0}});
+            const {voices} = compile("[mel <c4 e4>/8]");
+            expect(voices.mel[0].props).to.eql({value: 8, dots: 0});
+            expect(voices.mel[0].children.length).to.eql(2);
         });
 
         it("should return an object with type, children, dots, and value", () => {
-            let parsed = compile("<c4 e4>/32...");
-            let notes = compile("c4 e4");
-            expect(parsed[0]).to.eql({type: "chord", children: notes, props: {value: 32, dots: 3}});
+            const {voices} = compile("[mel <c4 e4>/32...]");
+            expect(voices.mel[0].props).to.eql({value: 32, dots: 3});
         });
     });
 

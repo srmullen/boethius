@@ -81,5 +81,19 @@ describe("boethius compilation", () => {
             expect(voices.mel[1]).not.to.equal(voices.mel[3]);
             expect(voices.mel[1]).not.to.equal(voices.mel[2]);
         });
+
+        it("should return unique chords for expanded variables", () => {
+            const {voices} = compile("~melvar = (<c4 e4>) [mel ~melvar ~melvar <c4 e4>]");
+            expect(voices.mel.length).to.equal(3);
+            expect(voices.mel[0]).not.to.equal(voices.mel[2]);
+            expect(voices.mel[0]).not.to.equal(voices.mel[1]);
+        });
+
+        it("should return unique chords for expanded variables", () => {
+            const {voices} = compile("~melvar = (<d5 bb5>) [mel <d5 bb5> ~melvar ~melvar <d5 bb5>]");
+            expect(voices.mel.length).to.equal(4);
+            expect(voices.mel[1]).not.to.equal(voices.mel[3]);
+            expect(voices.mel[1]).not.to.equal(voices.mel[2]);
+        });
     });
 });

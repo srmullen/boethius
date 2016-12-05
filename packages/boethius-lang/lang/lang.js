@@ -126,11 +126,12 @@ case 11:
 this.$ = new RestNode({value: $$[$0].value, dots: $$[$0].dots});
 break;
 case 12:
-this.$ = {type: CHORD, props: {}, children: $$[$0-1]}
+this.$ = new ChordNode({}, $$[$0-1]);
 break;
 case 13:
 
-            this.$ = {type: CHORD, children: $$[$0-2], props: {value: $$[$0].value, dots: $$[$0].dots}};
+            /*this.$ = {type: CHORD, children: $$[$0-2], props: {value: $$[$0].value, dots: $$[$0].dots}};*/
+            this.$ = new ChordNode({value: $$[$0].value, dots: $$[$0].dots}, $$[$0-2]);
         
 break;
 case 14:
@@ -428,12 +429,15 @@ parse: function parse(input) {
 
     function ChordNode (props, children) {
         this.props = props;
+        this.children = children;
     }
 
     ChordNode.prototype.type = CHORD;
 
     ChordNode.prototype.clone = function () {
-
+        var props = Object.assign({}, this.props);
+        var children = this.children.map(function (child) {return child.clone()});
+        return new ChordNode(props, children);
     }
 
     function ChordSymbolNode (props) {

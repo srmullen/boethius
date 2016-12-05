@@ -47,12 +47,15 @@
 
     function ChordNode (props, children) {
         this.props = props;
+        this.children = children;
     }
 
     ChordNode.prototype.type = CHORD;
 
     ChordNode.prototype.clone = function () {
-
+        var props = Object.assign({}, this.props);
+        var children = this.children.map(function (child) {return child.clone()});
+        return new ChordNode(props, children);
     }
 
     function ChordSymbolNode (props) {
@@ -156,10 +159,11 @@ rest:
 
 chord:
     OPENBRKT notelist CLOSEBRKT
-        {$$ = {type: CHORD, props: {}, children: $2}}
+        {$$ = new ChordNode({}, $2);}
     | OPENBRKT notelist CLOSEBRKT duration
         {
-            $$ = {type: CHORD, children: $2, props: {value: $4.value, dots: $4.dots}};
+            /*$$ = {type: CHORD, children: $2, props: {value: $4.value, dots: $4.dots}};*/
+            $$ = new ChordNode({value: $4.value, dots: $4.dots}, $2);
         }
     ;
 
