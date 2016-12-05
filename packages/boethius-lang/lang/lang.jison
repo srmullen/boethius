@@ -66,7 +66,7 @@ csym                     return 'CSYM'
 expressions:
     EOF
         {return {voices: yy.voices, chordSymbols: yy.chordSymbols};}
-    | list EOF
+    | statements EOF
         {return $1;}
     ;
 
@@ -151,8 +151,6 @@ item:
         {$$ = $1}
     | chordSymbol
         {$$ = $1}
-    | voice
-        {$$ = $1}
     ;
 
 ratio:
@@ -220,14 +218,6 @@ propscope:
         }
     ;
 
-assignment:
-    IDENTIFIER EQUALS propscope
-        {
-            yy.vars[$1] = $3;
-            $$ = $3;
-        }
-    ;
-
 list:
     item
         {$$ = [$1]}
@@ -237,6 +227,30 @@ list:
         {$$ = $1}
     | list propscope
         {$$ = $1.concat($2)}
-    | assignment
+    ;
+
+assignment:
+    IDENTIFIER EQUALS propscope
+        {
+            yy.vars[$1] = $3;
+            $$ = $3;
+        }
+    ;
+
+statement:
+    assignment
         {$$ = $1}
+    | item
+        {$$ = $1}
+    | propscope
+        {$$ = $1}
+    | voice
+        {$$ = $1}
+    ;
+
+statements:
+    statement
+        {$$ = [$1]}
+    | statements statement
+        {$$ = $1.concat($2)}
     ;

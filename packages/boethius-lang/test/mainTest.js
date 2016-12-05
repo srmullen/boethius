@@ -4,7 +4,6 @@ import compile from "../src/main";
 describe("boethius compilation", () => {
     describe("note info", () => {
         const {voices} = compile("[mel a4]");
-        console.log(voices);
         const note = voices.mel[0];
 
         it("should add midi property", () => {
@@ -42,7 +41,7 @@ describe("boethius compilation", () => {
             expect(compile("melvar = (a4 bb4 c5)")).to.be.ok;
         });
 
-        it("should expand variables in voices", () => {
+        xit("should expand variables in voices", () => {
             expect(compile("melvar = (a4 bb4 c5) [mel melvar]")).to.be.ok;
         });
     });
