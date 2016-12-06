@@ -83,6 +83,17 @@
             return el.clone(props);
         }
     }
+
+    var errors = {
+        unitializedVar: function (variable, self) {
+            return (
+                "Uninitialized variable: " + variable +
+                ". Line: " + self._$.first_line + "-" + self._$.last_line +
+                ", Column: " + self._$.first_column + "-" + self._$.last_column + "."
+            );
+        }
+    };
+
 %}
 
 /* lexical grammar */
@@ -297,7 +308,7 @@ list:
     | VAR
         {
             var element = yy.vars[$1];
-            if (!element) this.throw("Unknown variable: " + $1);
+            if (!element) throw new Error(errors.unitializedVar($1, this));
             $$ = [].concat(element.reduce(function (acc, el) {
                 return acc.concat(clone(el));
             }, []));
@@ -305,7 +316,7 @@ list:
     | list VAR
         {
             var element = yy.vars[$2];
-            if (!element) this.throw("Unknown variable: " + $2);
+            if (!element) throw new Error(errors.unitializedVar($2, this));
             $$ = $1.concat(element.reduce(function (acc, el) {
                 return acc.concat(clone(el));
             }, []));
