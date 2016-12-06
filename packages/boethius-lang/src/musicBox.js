@@ -37,14 +37,11 @@ function octaveNoteToMidi (octave, interval) {
     return (octave * 12) + interval + 12;
 }
 
-export function noteInfo (noteString) {
-    var validated = validateNoteString(noteString);
-    var pitchClass = validated[1];
-    var octave = validated[2];
-    var interval = NOTES[pitchClass];
-    var midi = octaveNoteToMidi(octave, interval);
+export function noteInfo ({pitchClass, octave}) {
+    const interval = NOTES[pitchClass];
+    const midi = octaveNoteToMidi(octave, interval);
     return {
-        pitch: validated[0],
+        pitch: `${pitchClass}${octave}`,
         pitchClass: pitchClass,
         octave: Number(octave),
         interval: interval,

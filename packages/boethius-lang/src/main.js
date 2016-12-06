@@ -1,9 +1,6 @@
 import {parser} from "../lang/lang";
-import {noteInfo, toMusic} from "./musicBox";
 
 function compile (program) {
-    parser.yy.noteInfo = noteInfo;
-    parser.yy.toMusic = toMusic;
     parser.yy.voices = {};
     parser.yy.chordSymbols = [];
     parser.yy.vars = {};

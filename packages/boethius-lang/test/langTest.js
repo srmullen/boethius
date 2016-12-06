@@ -11,10 +11,6 @@ describe("parser", () => {
             const {voices} = compile("[mel e4]");
             expect(voices.mel[0].type).to.eql("note");
             expect(voices.mel[0].props).to.eql({
-                pitch: "e4",
-                frequency: 329.6275569128699,
-                interval: 4,
-                midi: 64,
                 octave: 4,
                 pitchClass: "e"
             });
@@ -23,11 +19,7 @@ describe("parser", () => {
         it("should return an object with type, pitch, and value", () => {
             const {voices} = compile("[mel c#3/8]");
             expect(voices.mel[0].props).to.eql({
-                frequency: 138.59131548843604,
-                interval: 1,
-                midi: 49,
                 octave: 3,
-                pitch: "c#3",
                 pitchClass: "c#",
                 value: 8,
                 dots: 0
@@ -37,11 +29,7 @@ describe("parser", () => {
         it("should return an object with type, pitch, value, and dots", () => {
             const {voices} = compile("[mel bb5/1..]");
             expect(voices.mel[0].props).to.eql({
-                "frequency": 932.3275230361799,
-                "interval": 10,
-                "midi": 82,
                 "octave": 5,
-                "pitch": "bb5",
                 "pitchClass": "bb",
                 "value": 1,
                 "dots": 2
@@ -49,15 +37,22 @@ describe("parser", () => {
         });
 
         it("should take capitalized notes", () => {
-            const {voices} = compile("[mel A4 B4 C4 D4 E4 F4 G4]");
+            const {voices} = compile("[mel A1 B2 C3 D4 E5 F6 G7]");
             const [a, b, c, d, e, f, g] = voices.mel;
-            expect(a.props.pitch).to.equal("A4");
-            expect(b.props.pitch).to.equal("B4");
-            expect(c.props.pitch).to.equal("C4");
-            expect(d.props.pitch).to.equal("D4");
-            expect(e.props.pitch).to.equal("E4");
-            expect(f.props.pitch).to.equal("F4");
-            expect(g.props.pitch).to.equal("G4");
+            expect(a.props.pitchClass).to.equal("A");
+            expect(b.props.pitchClass).to.equal("B");
+            expect(c.props.pitchClass).to.equal("C");
+            expect(d.props.pitchClass).to.equal("D");
+            expect(e.props.pitchClass).to.equal("E");
+            expect(f.props.pitchClass).to.equal("F");
+            expect(g.props.pitchClass).to.equal("G");
+            expect(a.props.octave).to.equal(1);
+            expect(b.props.octave).to.equal(2);
+            expect(c.props.octave).to.equal(3);
+            expect(d.props.octave).to.equal(4);
+            expect(e.props.octave).to.equal(5);
+            expect(f.props.octave).to.equal(6);
+            expect(g.props.octave).to.equal(7);
         });
     });
 
@@ -247,8 +242,8 @@ describe("parser", () => {
                 `[mel c4 ; d4
                 e4]`);
             const [note1, note2] = mel;
-            expect(note1.props.pitch).to.equal("c4");
-            expect(note2.props.pitch).to.equal("e4");
+            expect(note1.props).to.eql({pitchClass: "c", octave: 4});
+            expect(note2.props).to.eql({pitchClass: "e", octave: 4});
         });
     });
 

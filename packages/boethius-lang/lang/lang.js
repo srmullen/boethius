@@ -72,12 +72,12 @@
   }
 */
 var lang = (function(){
-var o=function(k,v,o,l){for(o=o||{},l=k.length;l--;o[k[l]]=v);return o},$V0=[1,16],$V1=[1,17],$V2=[1,18],$V3=[1,14],$V4=[1,15],$V5=[1,9],$V6=[4,12,15,17,20,27,35],$V7=[4,12,15,17,20,23,27,29,35],$V8=[1,22],$V9=[1,28],$Va=[4,12,15,17,18,20,23,27,29,35],$Vb=[1,32],$Vc=[1,39],$Vd=[1,45],$Ve=[12,15,17,20,22,35],$Vf=[12,15,17,20,23,29,35],$Vg=[12,18],$Vh=[1,64];
+var o=function(k,v,o,l){for(o=o||{},l=k.length;l--;o[k[l]]=v);return o},$V0=[1,19],$V1=[1,17],$V2=[1,18],$V3=[1,14],$V4=[1,15],$V5=[1,9],$V6=[4,12,16,18,21,28,36],$V7=[4,12,16,18,21,24,28,30,36],$V8=[1,23],$V9=[1,29],$Va=[4,12,16,18,19,21,24,28,30,36],$Vb=[1,33],$Vc=[4,10,12,16,18,19,21,24,28,30,36],$Vd=[1,41],$Ve=[1,47],$Vf=[12,16,18,21,23,36],$Vg=[12,16,18,21,24,30,36],$Vh=[12,19],$Vi=[1,66];
 var parser = {trace: function trace() { },
 yy: {},
-symbols_: {"error":2,"expressions":3,"EOF":4,"statements":5,"float":6,"INTEGER":7,"DOTS":8,"duration":9,"FWDSLASH":10,"note":11,"PITCH":12,"notelist":13,"rest":14,"REST":15,"chord":16,"OPENBRKT":17,"CLOSEBRKT":18,"chordSymbol":19,"LPAREN":20,"CSYM":21,"IDENTIFIER":22,"RPAREN":23,"item":24,"ratio":25,"voice":26,"LBRKT":27,"list":28,"RBRKT":29,"propertydef":30,"EQUALS":31,"BOOL":32,"propertylist":33,"propscope":34,"VAR":35,"assignment":36,"statement":37,"$accept":0,"$end":1},
-terminals_: {2:"error",4:"EOF",7:"INTEGER",8:"DOTS",10:"FWDSLASH",12:"PITCH",15:"REST",17:"OPENBRKT",18:"CLOSEBRKT",20:"LPAREN",21:"CSYM",22:"IDENTIFIER",23:"RPAREN",27:"LBRKT",29:"RBRKT",31:"EQUALS",32:"BOOL",35:"VAR"},
-productions_: [0,[3,1],[3,2],[6,3],[9,2],[9,3],[11,1],[11,2],[13,1],[13,2],[14,1],[14,2],[16,3],[16,4],[19,5],[19,6],[19,6],[24,1],[24,1],[24,1],[24,1],[25,3],[26,4],[30,3],[30,3],[30,3],[30,3],[30,3],[33,1],[33,2],[34,4],[34,4],[34,3],[28,1],[28,2],[28,1],[28,2],[28,1],[28,2],[36,3],[37,1],[37,1],[37,1],[37,1],[5,1],[5,2]],
+symbols_: {"error":2,"expressions":3,"EOF":4,"statements":5,"float":6,"INTEGER":7,"DOTS":8,"duration":9,"FWDSLASH":10,"pitch":11,"PITCHCLASS":12,"note":13,"notelist":14,"rest":15,"REST":16,"chord":17,"OPENBRKT":18,"CLOSEBRKT":19,"chordSymbol":20,"LPAREN":21,"CSYM":22,"IDENTIFIER":23,"RPAREN":24,"item":25,"ratio":26,"voice":27,"LBRKT":28,"list":29,"RBRKT":30,"propertydef":31,"EQUALS":32,"BOOL":33,"propertylist":34,"propscope":35,"VAR":36,"assignment":37,"statement":38,"$accept":0,"$end":1},
+terminals_: {2:"error",4:"EOF",7:"INTEGER",8:"DOTS",10:"FWDSLASH",12:"PITCHCLASS",16:"REST",18:"OPENBRKT",19:"CLOSEBRKT",21:"LPAREN",22:"CSYM",23:"IDENTIFIER",24:"RPAREN",28:"LBRKT",30:"RBRKT",32:"EQUALS",33:"BOOL",36:"VAR"},
+productions_: [0,[3,1],[3,2],[6,3],[9,2],[9,3],[11,1],[11,2],[13,1],[13,2],[14,1],[14,2],[15,1],[15,2],[17,3],[17,4],[20,5],[20,6],[20,6],[25,1],[25,1],[25,1],[25,1],[26,3],[27,4],[31,3],[31,3],[31,3],[31,3],[31,3],[34,1],[34,2],[35,4],[35,4],[35,3],[29,1],[29,2],[29,1],[29,2],[29,1],[29,2],[37,3],[38,1],[38,1],[38,1],[38,1],[5,1],[5,2]],
 performAction: function anonymous(yytext, yyleng, yylineno, yy, yystate /* action[1] */, $$ /* vstack */, _$ /* lstack */) {
 /* this == yyval */
 
@@ -99,62 +99,68 @@ case 5:
 this.$ = {value: Number($$[$0-1]), dots: $$[$0].length}
 break;
 case 6:
-
-            var props = yy.noteInfo($$[$0]);
-            // default values
-            this.$ = new NoteNode(props);
-        
+this.$ = {pitchClass: $$[$0]}
 break;
 case 7:
+this.$ = {pitchClass: $$[$0-1], octave: Number($$[$0])}
+break;
+case 8:
 
-            var props = yy.noteInfo($$[$0-1]);
-            props.value = $$[$0].value;
-            props.dots = $$[$0].dots;
-            this.$ = new NoteNode(props);
+            // default values
+            this.$ = new NoteNode($$[$0]);
         
 break;
-case 8: case 33: case 44:
+case 9:
+
+            this.$ = new NoteNode(Object.assign({}, $$[$0-1], $$[$0]));
+        
+break;
+case 10: case 35: case 46:
 this.$ = [$$[$0]]
 break;
-case 9: case 34: case 38: case 45:
+case 11: case 36: case 40: case 47:
 this.$ = $$[$0-1].concat($$[$0])
 break;
-case 10:
+case 12:
 this.$ = new RestNode({});
 break;
-case 11:
+case 13:
 this.$ = new RestNode({value: $$[$0].value, dots: $$[$0].dots});
 break;
-case 12:
+case 14:
 this.$ = new ChordNode({}, $$[$0-1]);
 break;
-case 13:
+case 15:
 
             /*this.$ = {type: CHORD, children: $$[$0-2], props: {value: $$[$0].value, dots: $$[$0].dots}};*/
             this.$ = new ChordNode({value: $$[$0].value, dots: $$[$0].dots}, $$[$0-2]);
         
 break;
-case 14:
+case 16:
 
             var chordSymbol = {type: CHORDSYMBOL, props: {value: $$[$0-2], measure: Number($$[$0-1]), beat: 0}};
             yy.chordSymbols.push(chordSymbol);
             this.$ = chordSymbol;
         
 break;
-case 15: case 16:
+case 17: case 18:
 
             var chordSymbol = {type: CHORDSYMBOL, props: {value: $$[$0-3], measure: Number($$[$0-2]), beat: Number($$[$0-1])}}
             yy.chordSymbols.push(chordSymbol);
             this.$ = chordSymbol;
         
 break;
-case 17: case 18: case 19: case 20: case 37: case 40: case 41: case 42: case 43:
+case 19: case 20: case 21: case 22: case 39: case 42: case 43: case 44: case 45:
 this.$ = $$[$0]
 break;
-case 21:
+case 23:
 this.$ = "" + $$[$0-2] + $$[$0-1] + $$[$0]
 break;
-case 22:
+case 24:
+
+            /*var expantion = $$[$0-1].map(function (item) {
+                return item.expand();
+            });*/
 
             if (!yy.voices[$$[$0-2]]) {
                 // create array for voice items
@@ -166,62 +172,68 @@ case 22:
             this.$ = $$[$0-1];
         
 break;
-case 23:
+case 25:
 this.$ = {key: $$[$0-2], value: toBoolean($$[$0])}
 break;
-case 24:
+case 26:
 this.$ = {key: $$[$0-2], value: Number($$[$0])}
 break;
-case 25: case 26: case 27:
+case 27: case 28: case 29:
 this.$ = {key: $$[$0-2], value: $$[$0]}
 break;
-case 28:
+case 30:
 
             var props = {};
             props[$$[$0].key] = $$[$0].value;
             this.$ = props;
         
 break;
-case 29:
+case 31:
 
             var props = {};
             props[$$[$0].key] = $$[$0].value;
             this.$ = Object.assign({}, $$[$0-1], props);
         
 break;
-case 30:
+case 32:
 this.$ = $$[$0-1].map(function (item) {
-            return applyProperty(item, $$[$0-2], true);
+            var props = {};
+            props[$$[$0-2]] = true;
+            return clone(item, props);
         });
 break;
-case 31:
+case 33:
 this.$ = $$[$0-1].map(function (item) {
             // items properties overwrite the proplist's properties
             var props = Object.assign({}, $$[$0-2], item.props);
             // resulting props are placed on the item.
-            return Object.assign({}, item, {props: props});
+            return item.clone(props);
         });
 break;
-case 32:
+case 34:
 
             this.$ = $$[$0-1];
         
 break;
-case 35:
+case 37:
 
             var element = yy.vars[$$[$0]];
             if (!element) this.throw("Unknown variable: " + $$[$0]);
-            this.$ = [].concat(element.map(function (el) {return el.clone()}));
+            this.$ = [].concat(element.reduce(function (acc, el) {
+                return acc.concat(clone(el));
+            }, []));
         
 break;
-case 36:
+case 38:
 
             var element = yy.vars[$$[$0]];
             if (!element) this.throw("Unknown variable: " + $$[$0]);
-            this.$ = $$[$0-1].concat(element.map(function (el) {return el.clone()}));
+            this.$ = $$[$0-1].concat(element.reduce(function (acc, el) {
+                return acc.concat(clone(el));
+            }, []));
         
 break;
-case 39:
+case 41:
 
             yy.vars[$$[$0-2]] = $$[$0];
             this.$ = $$[$0];
@@ -229,8 +241,8 @@ case 39:
 break;
 }
 },
-table: [{3:1,4:[1,2],5:3,11:10,12:$V0,14:11,15:$V1,16:12,17:$V2,19:13,20:$V3,24:6,26:8,27:$V4,34:7,35:$V5,36:5,37:4},{1:[3]},{1:[2,1]},{4:[1,19],11:10,12:$V0,14:11,15:$V1,16:12,17:$V2,19:13,20:$V3,24:6,26:8,27:$V4,34:7,35:$V5,36:5,37:20},o($V6,[2,44]),o($V6,[2,40]),o($V6,[2,41]),o($V6,[2,42]),o($V6,[2,43]),{31:[1,21]},o($V7,[2,17]),o($V7,[2,18]),o($V7,[2,19]),o($V7,[2,20]),{11:10,12:$V0,14:11,15:$V1,16:12,17:$V2,19:13,20:$V3,21:[1,25],22:$V8,24:27,28:24,30:26,33:23,34:29,35:$V9},{22:[1,30]},o($Va,[2,6],{9:31,10:$Vb}),o($V7,[2,10],{9:33,10:$Vb}),{11:35,12:$V0,13:34},{1:[2,2]},o($V6,[2,45]),{20:[1,37],34:36},{11:10,12:$V0,14:11,15:$V1,16:12,17:$V2,19:13,20:$V3,24:27,28:38,31:$Vc,34:29,35:$V9},{11:10,12:$V0,14:11,15:$V1,16:12,17:$V2,19:13,20:$V3,22:[1,42],24:27,28:40,30:41,34:29,35:$V9},{11:10,12:$V0,14:11,15:$V1,16:12,17:$V2,19:13,20:$V3,23:[1,43],24:44,34:46,35:$Vd},{22:[1,47]},o($Ve,[2,28]),o($Vf,[2,33]),o($Vf,[2,35]),o($Vf,[2,37]),{11:10,12:$V0,14:11,15:$V1,16:12,17:$V2,19:13,20:$V3,24:27,28:48,34:29,35:$V9},o($Va,[2,7]),{7:[1,49]},o($V7,[2,11]),{11:51,12:$V0,18:[1,50]},o($Vg,[2,8]),o($V6,[2,39]),{11:10,12:$V0,14:11,15:$V1,16:12,17:$V2,19:13,20:$V3,22:$V8,24:27,28:24,30:26,33:23,34:29,35:$V9},{11:10,12:$V0,14:11,15:$V1,16:12,17:$V2,19:13,20:$V3,23:[1,52],24:44,34:46,35:$Vd},{6:57,7:[1,54],22:[1,55],25:56,32:[1,53]},{11:10,12:$V0,14:11,15:$V1,16:12,17:$V2,19:13,20:$V3,23:[1,58],24:44,34:46,35:$Vd},o($Ve,[2,29]),{31:$Vc},o($V7,[2,32]),o($Vf,[2,34]),o($Vf,[2,36]),o($Vf,[2,38]),{7:[1,59]},{11:10,12:$V0,14:11,15:$V1,16:12,17:$V2,19:13,20:$V3,24:44,29:[1,60],34:46,35:$Vd},o($Va,[2,4],{8:[1,61]}),o($V7,[2,12],{9:62,10:$Vb}),o($Vg,[2,9]),o($V7,[2,30]),o($Ve,[2,23]),o($Ve,[2,24],{8:$Vh,10:[1,63]}),o($Ve,[2,25]),o($Ve,[2,26]),o($Ve,[2,27]),o($V7,[2,31]),{6:67,7:[1,66],23:[1,65]},o($V6,[2,22]),o($Va,[2,5]),o($V7,[2,13]),{7:[1,68]},{7:[1,69]},o($V7,[2,14]),{8:$Vh,23:[1,70]},{23:[1,71]},o($Ve,[2,21]),o([12,15,17,20,22,23,35],[2,3]),o($V7,[2,15]),o($V7,[2,16])],
-defaultActions: {2:[2,1],19:[2,2]},
+table: [{3:1,4:[1,2],5:3,11:16,12:$V0,13:10,15:11,16:$V1,17:12,18:$V2,20:13,21:$V3,25:6,27:8,28:$V4,35:7,36:$V5,37:5,38:4},{1:[3]},{1:[2,1]},{4:[1,20],11:16,12:$V0,13:10,15:11,16:$V1,17:12,18:$V2,20:13,21:$V3,25:6,27:8,28:$V4,35:7,36:$V5,37:5,38:21},o($V6,[2,46]),o($V6,[2,42]),o($V6,[2,43]),o($V6,[2,44]),o($V6,[2,45]),{32:[1,22]},o($V7,[2,19]),o($V7,[2,20]),o($V7,[2,21]),o($V7,[2,22]),{11:16,12:$V0,13:10,15:11,16:$V1,17:12,18:$V2,20:13,21:$V3,22:[1,26],23:$V8,25:28,29:25,31:27,34:24,35:30,36:$V9},{23:[1,31]},o($Va,[2,8],{9:32,10:$Vb}),o($V7,[2,12],{9:34,10:$Vb}),{11:16,12:$V0,13:36,14:35},o($Vc,[2,6],{7:[1,37]}),{1:[2,2]},o($V6,[2,47]),{21:[1,39],35:38},{11:16,12:$V0,13:10,15:11,16:$V1,17:12,18:$V2,20:13,21:$V3,25:28,29:40,32:$Vd,35:30,36:$V9},{11:16,12:$V0,13:10,15:11,16:$V1,17:12,18:$V2,20:13,21:$V3,23:[1,44],25:28,29:42,31:43,35:30,36:$V9},{11:16,12:$V0,13:10,15:11,16:$V1,17:12,18:$V2,20:13,21:$V3,24:[1,45],25:46,35:48,36:$Ve},{23:[1,49]},o($Vf,[2,30]),o($Vg,[2,35]),o($Vg,[2,37]),o($Vg,[2,39]),{11:16,12:$V0,13:10,15:11,16:$V1,17:12,18:$V2,20:13,21:$V3,25:28,29:50,35:30,36:$V9},o($Va,[2,9]),{7:[1,51]},o($V7,[2,13]),{11:16,12:$V0,13:53,19:[1,52]},o($Vh,[2,10]),o($Vc,[2,7]),o($V6,[2,41]),{11:16,12:$V0,13:10,15:11,16:$V1,17:12,18:$V2,20:13,21:$V3,23:$V8,25:28,29:25,31:27,34:24,35:30,36:$V9},{11:16,12:$V0,13:10,15:11,16:$V1,17:12,18:$V2,20:13,21:$V3,24:[1,54],25:46,35:48,36:$Ve},{6:59,7:[1,56],23:[1,57],26:58,33:[1,55]},{11:16,12:$V0,13:10,15:11,16:$V1,17:12,18:$V2,20:13,21:$V3,24:[1,60],25:46,35:48,36:$Ve},o($Vf,[2,31]),{32:$Vd},o($V7,[2,34]),o($Vg,[2,36]),o($Vg,[2,38]),o($Vg,[2,40]),{7:[1,61]},{11:16,12:$V0,13:10,15:11,16:$V1,17:12,18:$V2,20:13,21:$V3,25:46,30:[1,62],35:48,36:$Ve},o($Va,[2,4],{8:[1,63]}),o($V7,[2,14],{9:64,10:$Vb}),o($Vh,[2,11]),o($V7,[2,32]),o($Vf,[2,25]),o($Vf,[2,26],{8:$Vi,10:[1,65]}),o($Vf,[2,27]),o($Vf,[2,28]),o($Vf,[2,29]),o($V7,[2,33]),{6:69,7:[1,68],24:[1,67]},o($V6,[2,24]),o($Va,[2,5]),o($V7,[2,15]),{7:[1,70]},{7:[1,71]},o($V7,[2,16]),{8:$Vi,24:[1,72]},{24:[1,73]},o($Vf,[2,23]),o([12,16,18,21,23,24,36],[2,3]),o($V7,[2,17]),o($V7,[2,18])],
+defaultActions: {2:[2,1],20:[2,2]},
 parseError: function parseError(str, hash) {
     if (hash.recoverable) {
         this.trace(str);
@@ -387,15 +399,16 @@ parse: function parse(input) {
     var REST = "rest";
     var CHORD = "chord";
     var CHORDSYMBOL = "chordSymbol";
-
+/*
     var applyProperty = function (item, prop, val) {
         if (item.props[prop] !== undefined) {
             return item;
         } else {
-            item.props[prop] = val;
-            return item;
+            var props = [];
+            props[prop] = val;
+            return item.clone(props);
         }
-    }
+    }*/
 
     var toBoolean = function (string) {
         if (string === "false") {
@@ -411,10 +424,10 @@ parse: function parse(input) {
 
     NoteNode.prototype.type = NOTE;
 
-    NoteNode.prototype.clone = function () {
-        var props = Object.assign({}, this.props);
+    NoteNode.prototype.clone = function (newprops) {
+        var props = Object.assign({}, this.props, newprops);
         return new NoteNode(props);
-    }
+    };
 
     function RestNode (props) {
         this.props = props;
@@ -422,10 +435,14 @@ parse: function parse(input) {
 
     RestNode.prototype.type = REST;
 
-    RestNode.prototype.clone = function () {
-        var props = Object.assign({}, this.props);
+    RestNode.prototype.clone = function (newprops) {
+        var props = Object.assign({}, this.props, newprops);
         return new RestNode(props);
-    }
+    };
+
+    RestNode.prototype.expand = function () {
+        return this;
+    };
 
     function ChordNode (props, children) {
         this.props = props;
@@ -434,11 +451,15 @@ parse: function parse(input) {
 
     ChordNode.prototype.type = CHORD;
 
-    ChordNode.prototype.clone = function () {
-        var props = Object.assign({}, this.props);
-        var children = this.children.map(function (child) {return child.clone()});
+    ChordNode.prototype.clone = function (newprops) {
+        var props = Object.assign({}, this.props, newprops);
+        var children = this.children.map(function (child) {return child.clone(newprops)});
         return new ChordNode(props, children);
-    }
+    };
+
+    ChordNode.prototype.expand = function () {
+        return this;
+    };
 
     function ChordSymbolNode (props) {
         this.props = props;
@@ -446,8 +467,25 @@ parse: function parse(input) {
 
     ChordSymbolNode.prototype.type = CHORDSYMBOL;
 
-    ChordSymbolNode.prototype.clone = function () {
+    ChordSymbolNode.prototype.clone = function () {};
 
+    function ScopeNode (props, list) {
+        this.props = props;
+        this.list = list;
+    }
+
+    ScopeNode.prototype.clone = function () {
+
+    };
+
+    function clone (el, props) {
+        if (el instanceof Array) {
+            return el.map(function (item) {
+                return clone(item, props);
+            });
+        } else {
+            return el.clone(props);
+        }
     }
 /* generated by jison-lex 0.3.4 */
 var lexer = (function(){
@@ -783,37 +821,37 @@ case 1:/* ignore comments */
 break;
 case 2:/* ignore barlines */
 break;
-case 3:return 20
+case 3:return 21
 break;
-case 4:return 23
+case 4:return 24
 break;
-case 5:return 27
+case 5:return 28
 break;
-case 6:return 29
+case 6:return 30
 break;
-case 7:return 17
+case 7:return 18
 break;
-case 8:return 18
+case 8:return 19
 break;
 case 9:return 10
 break;
-case 10:return 31
+case 10:return 32
 break;
-case 11:return 12
+case 11:return 16
 break;
-case 12:return 15
+case 12:return 8
 break;
-case 13:return 8
+case 13:return 33
 break;
-case 14:return 32
+case 14:return 7
 break;
-case 15:return 7
+case 15:return 22
 break;
-case 16:return 21
+case 16:return 12
 break;
-case 17:return 35
+case 17:return 36
 break;
-case 18:return 22
+case 18:return 23
 break;
 case 19:return 4
 break;
@@ -821,7 +859,7 @@ case 20:return 'INVALID'
 break;
 }
 },
-rules: [/^(?:\s+)/,/^(?:;.*)/,/^(?:\|)/,/^(?:\()/,/^(?:\))/,/^(?:\[)/,/^(?:\])/,/^(?:<)/,/^(?:>)/,/^(?:\/)/,/^(?:=)/,/^(?:[a-gA-G][b|#]{0,2}[\d]+)/,/^(?:r\b)/,/^(?:\.+)/,/^(?:true|false\b)/,/^(?:[0-9]+)/,/^(?:csym\b)/,/^(?:~[a-zA-Z][a-zA-Z0-9]*)/,/^(?:[a-zA-Z][a-zA-Z0-9]*)/,/^(?:$)/,/^(?:.)/],
+rules: [/^(?:\s+)/,/^(?:;.*)/,/^(?:\|)/,/^(?:\()/,/^(?:\))/,/^(?:\[)/,/^(?:\])/,/^(?:<)/,/^(?:>)/,/^(?:\/)/,/^(?:=)/,/^(?:r\b)/,/^(?:\.+)/,/^(?:true|false\b)/,/^(?:[0-9]+)/,/^(?:csym\b)/,/^(?:[a-gA-G][b|#]{0,2}(?![a-zA-Z]))/,/^(?:~[a-zA-Z][a-zA-Z0-9]*)/,/^(?:[a-zA-Z][a-zA-Z0-9]*)/,/^(?:$)/,/^(?:.)/],
 conditions: {"INITIAL":{"rules":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20],"inclusive":true}}
 });
 return lexer;

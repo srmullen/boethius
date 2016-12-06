@@ -2,27 +2,6 @@ import {expect} from "chai";
 import compile from "../src/main";
 
 describe("boethius compilation", () => {
-    describe("note info", () => {
-        const {voices} = compile("[mel a4]");
-        const note = voices.mel[0];
-
-        it("should add midi property", () => {
-            expect(note.props.midi).to.equal(69);
-        });
-
-        it("should add frequency property", () => {
-            expect(note.props.frequency).to.equal(440);
-        });
-
-        it("should add octave property", () => {
-            expect(note.props.octave).to.equal(4);
-        });
-
-        it("should add interval property", () => {
-            expect(note.props.interval).to.equal(9);
-        });
-    });
-
     describe("voices", () => {
         it("should not return notes outside of a voice", () => {
             const {voices} = compile("b4 [mel a4] c4");
@@ -94,6 +73,39 @@ describe("boethius compilation", () => {
             expect(voices.mel.length).to.equal(4);
             expect(voices.mel[1]).not.to.equal(voices.mel[3]);
             expect(voices.mel[1]).not.to.equal(voices.mel[2]);
+        });
+    });
+
+    describe("pitch class and octave", () => {
+        it("should allow entry of pitch classes without octave", () => {
+            const {voices} = compile(
+                `~lower = (a b c d e f g)
+                ~upper = (A B C D E F G)
+                ~accdtls = (Ab gbb F# d##)
+                [lower ~lower]
+                [upper ~upper]
+                [accdtls ~accdtls]`
+            );
+            expect(voices.lower.length).to.equal(7);
+            expect(voices.upper.length).to.equal(7);
+            expect(voices.accdtls.length).to.equal(4);
+        });
+
+        it("should assign octave as property", () => {
+            const {voices} = compile("~mel = (a (octave=8 a)) [mel ~mel]");
+            expect(voices.mel[0].props.octave).not.to.be.ok;
+            expect(voices.mel[1].props.octave).to.equal(8);
+        });
+    });
+
+    describe("nested scopes", () => {
+        it("should flatten nested scopes", () => {
+            const {voices} = compile("~mel = (a3 (foo=1 a4 (bar=2 a4))) [mel ~mel]");
+            expect(voices.mel.length).to.equal(3);
+            expect(voices.mel[1].props.foo).to.equal(1);
+            expect(voices.mel[1].props.bar).not.to.be.ok;
+            expect(voices.mel[2].props.foo).to.equal(1);
+            expect(voices.mel[2].props.bar).to.equal(2);
         });
     });
 });

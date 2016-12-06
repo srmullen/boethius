@@ -6,15 +6,6 @@
     var CHORD = "chord";
     var CHORDSYMBOL = "chordSymbol";
 
-    var applyProperty = function (item, prop, val) {
-        if (item.props[prop] !== undefined) {
-            return item;
-        } else {
-            item.props[prop] = val;
-            return item;
-        }
-    }
-
     var toBoolean = function (string) {
         if (string === "false") {
             return false;
@@ -29,10 +20,10 @@
 
     NoteNode.prototype.type = NOTE;
 
-    NoteNode.prototype.clone = function () {
-        var props = Object.assign({}, this.props);
+    NoteNode.prototype.clone = function (newprops) {
+        var props = Object.assign({}, this.props, newprops);
         return new NoteNode(props);
-    }
+    };
 
     function RestNode (props) {
         this.props = props;
@@ -40,10 +31,14 @@
 
     RestNode.prototype.type = REST;
 
-    RestNode.prototype.clone = function () {
-        var props = Object.assign({}, this.props);
+    RestNode.prototype.clone = function (newprops) {
+        var props = Object.assign({}, this.props, newprops);
         return new RestNode(props);
-    }
+    };
+
+    RestNode.prototype.expand = function () {
+        return this;
+    };
 
     function ChordNode (props, children) {
         this.props = props;
@@ -52,11 +47,15 @@
 
     ChordNode.prototype.type = CHORD;
 
-    ChordNode.prototype.clone = function () {
-        var props = Object.assign({}, this.props);
-        var children = this.children.map(function (child) {return child.clone()});
+    ChordNode.prototype.clone = function (newprops) {
+        var props = Object.assign({}, this.props, newprops);
+        var children = this.children.map(function (child) {return child.clone(newprops)});
         return new ChordNode(props, children);
-    }
+    };
+
+    ChordNode.prototype.expand = function () {
+        return this;
+    };
 
     function ChordSymbolNode (props) {
         this.props = props;
@@ -64,8 +63,25 @@
 
     ChordSymbolNode.prototype.type = CHORDSYMBOL;
 
-    ChordSymbolNode.prototype.clone = function () {
+    ChordSymbolNode.prototype.clone = function () {};
 
+    function ScopeNode (props, list) {
+        this.props = props;
+        this.list = list;
+    }
+
+    ScopeNode.prototype.clone = function () {
+
+    };
+
+    function clone (el, props) {
+        if (el instanceof Array) {
+            return el.map(function (item) {
+                return clone(item, props);
+            });
+        } else {
+            return el.clone(props);
+        }
     }
 %}
 
@@ -73,27 +89,27 @@
 %lex
 %%
 
-\s+                      /* skip whitespace */
-\;.*                     /* ignore comments */
-\|                       /* ignore barlines */
-\(                       return 'LPAREN'
-\)                       return 'RPAREN'
-\[                       return 'LBRKT'
-\]                       return 'RBRKT'
-\<                       return 'OPENBRKT'
-\>                       return 'CLOSEBRKT'
-\/                       return 'FWDSLASH'
-\=                       return 'EQUALS'
-[a-gA-G][b|#]{0,2}[\d]+  return 'PITCH'
-r                        return 'REST'
-\.+                      return 'DOTS'
-true|false               return 'BOOL'
-[0-9]+                   return 'INTEGER'
-csym                     return 'CSYM'
-\~[a-zA-Z][a-zA-Z0-9]*   return 'VAR'
-[a-zA-Z][a-zA-Z0-9]*     return 'IDENTIFIER'
-<<EOF>>                  return 'EOF'
-.                        return 'INVALID'
+\s+                                /* skip whitespace */
+\;.*                               /* ignore comments */
+\|                                 /* ignore barlines */
+\(                                 return 'LPAREN'
+\)                                 return 'RPAREN'
+\[                                 return 'LBRKT'
+\]                                 return 'RBRKT'
+\<                                 return 'OPENBRKT'
+\>                                 return 'CLOSEBRKT'
+\/                                 return 'FWDSLASH'
+\=                                 return 'EQUALS'
+r                                  return 'REST'
+\.+                                return 'DOTS'
+true|false                         return 'BOOL'
+[0-9]+                             return 'INTEGER'
+csym                               return 'CSYM'
+[a-gA-G][b|#]{0,2}(?![a-zA-Z])     return 'PITCHCLASS'
+\~[a-zA-Z][a-zA-Z0-9]*             return 'VAR'
+[a-zA-Z][a-zA-Z0-9]*               return 'IDENTIFIER'
+<<EOF>>                            return 'EOF'
+.                                  return 'INVALID'
 
 /lex
 
@@ -127,19 +143,22 @@ duration:
         {$$ = {value: Number($2), dots: $3.length}}
     ;
 
+pitch:
+    PITCHCLASS
+        {$$ = {pitchClass: $1}}
+    | PITCHCLASS INTEGER
+        {$$ = {pitchClass: $1, octave: Number($2)}}
+    ;
+
 note:
-    PITCH
+    pitch
         {
-            var props = yy.noteInfo($1);
             // default values
-            $$ = new NoteNode(props);
+            $$ = new NoteNode($1);
         }
-    | PITCH duration
+    | pitch duration
         {
-            var props = yy.noteInfo($1);
-            props.value = $2.value;
-            props.dots = $2.dots;
-            $$ = new NoteNode(props);
+            $$ = new NoteNode(Object.assign({}, $1, $2));
         }
     ;
 
@@ -207,6 +226,10 @@ ratio:
 voice:
     LBRKT IDENTIFIER list RBRKT
         {
+            /*var expantion = $3.map(function (item) {
+                return item.expand();
+            });*/
+
             if (!yy.voices[$2]) {
                 // create array for voice items
                 yy.voices[$2] = $3;
@@ -249,14 +272,16 @@ propertylist:
 propscope:
     LPAREN IDENTIFIER list RPAREN
         {$$ = $3.map(function (item) {
-            return applyProperty(item, $2, true);
+            var props = {};
+            props[$2] = true;
+            return clone(item, props);
         });}
     | LPAREN propertylist list RPAREN
         {$$ = $3.map(function (item) {
             // items properties overwrite the proplist's properties
             var props = Object.assign({}, $2, item.props);
             // resulting props are placed on the item.
-            return Object.assign({}, item, {props: props});
+            return item.clone(props);
         });}
     | LPAREN list RPAREN
         {
@@ -273,13 +298,17 @@ list:
         {
             var element = yy.vars[$1];
             if (!element) this.throw("Unknown variable: " + $1);
-            $$ = [].concat(element.map(function (el) {return el.clone()}));
+            $$ = [].concat(element.reduce(function (acc, el) {
+                return acc.concat(clone(el));
+            }, []));
         }
     | list VAR
         {
             var element = yy.vars[$2];
             if (!element) this.throw("Unknown variable: " + $2);
-            $$ = $1.concat(element.map(function (el) {return el.clone()}));
+            $$ = $1.concat(element.reduce(function (acc, el) {
+                return acc.concat(clone(el));
+            }, []));
         }
     | propscope
         {$$ = $1}
