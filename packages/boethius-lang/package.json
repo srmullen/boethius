@@ -2,11 +2,11 @@
   "name": "boethius-lang",
   "version": "0.3.0",
   "description": "Music description language",
-  "main": "lang/lang.js",
+  "main": "lang.js",
   "scripts": {
     "dev": "watchify examples/index.js -t [babelify] -o examples/index-compiled.js -v -d",
     "compile": "jison lang/lang.jison -o lang/lang.js",
-    "build": "npm run compile && babelify",
+    "build": "npm run compile && browserify src/main -t [babelify] -o lang.js",
     "test": "npm run compile && mocha --compilers js:babel-register"
   },
   "author": "Sean Mullen <srmullen13@gmail.com> (http://seanmullen.me/)",
