@@ -59,15 +59,22 @@ Score.render = function (score, {measures, voices=[], chordSymbols=[], repeats=[
         const timeFrame = [startTimes[_.first(systemsToRender).index], startTimes[_.last(systemsToRender).index + 1]];
 
         // get voice time frames for rendering decorations.
-        const voiceTimeFrames = voices.map(voice => voice.getTimeFrame(timeFrame[0].time, timeFrame[1].time));
+        const voiceTimeFrames = voices.map(voice => {
+            if (isVoiceUsed(voice, score.lines)) {
+                return voice.getTimeFrame(timeFrame[0].time, timeFrame[1].time);
+            } else {
+                return null;
+            }
+        });
         // slurs are grouped by voice.
-        const slurs = voiceTimeFrames.map(voice => Slur.groupSlurs(voice, startTimes).map(slurred => {
-            const slurStartTime = _.first(slurred).time;
-            const slurEndTime = _.last(slurred).time;
-            const systemBreak = _.contains(startTimes.map(time => time.time), slurEndTime);
-            const isEnd = !!systemBreak && slurred.length === 1;
-            return Slur.of({systemBreak, isEnd}, slurred);
-        }));
+        const slurs = voiceTimeFrames.map(voice => {
+            return Slur.groupSlurs(voice, startTimes).map(slurred => {
+                const slurStartTime = _.first(slurred).time;
+                const slurEndTime = _.last(slurred).time;
+                const systemBreak = _.contains(startTimes.map(time => time.time), slurEndTime);
+                const isEnd = !!systemBreak && slurred.length === 1;
+                return Slur.of({systemBreak, isEnd}, slurred);
+        })});
 
         const systemTimeContexts = partitionBySystem(createTimeContexts(score.lines, voices, measures, chordSymbols), startMeasures);
 
@@ -126,8 +133,6 @@ Score.render = function (score, {measures, voices=[], chordSymbols=[], repeats=[
         const slurGroups = _.flatten(slurs).map(slur => slur.render());
         scoreGroup.addChildren(slurGroups);
         scoreGroup.addChildren(systemGroups);
-
-        // renderDecorations(scoreGroup, voices);
     }
 
     return scoreGroup;
@@ -141,6 +146,10 @@ Score.prototype.render = function () {
     return group;
 };
 
+function isVoiceUsed (voice, lines) {
+    return _.some(lines, line => _.some(line.voices, linesVoice => linesVoice === voice.name));
+}
+
 function getStartContext (score, time) {
     return score.lines.map(line => line.contextAt(time));
 }
@@ -148,21 +157,6 @@ function getStartContext (score, time) {
 export function scoreToMeasures (score, repeats) {
     const numMeasures = _.sum(score.systems, system => system.measures);
     return createMeasures(numMeasures, [...score.timeSigs, ...repeats]);
-}
-
-/*
- * mutates scoreGroup
- */
-export function renderDecorations (scoreGroup, voices) {
-	const decorationGroups = renderSlurs(voices);
-	decorationGroups.map(group => scoreGroup.addChildren(group));
-}
-
-function renderSlurs (voices) {
-	return _.map(voices, voice => {
-		// slurs only need to know voice
-		return voice.renderSlurs();
-	});
 }
 
 /*
