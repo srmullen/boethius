@@ -43,6 +43,11 @@ function calculateDuration (item) {
 		dur = dur.mul(s[1]).div(s[0]);
 	}
 
+    if (item.tempo) {
+		// 60 bpm is the default tempo where beat is a quarter note
+		dur = dur.mul((60*4)/item.tempo);
+	}
+
 	return dur;
 }
 
