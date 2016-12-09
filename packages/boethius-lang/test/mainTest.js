@@ -108,4 +108,85 @@ describe("boethius compilation", () => {
             expect(voices.mel[2].props.bar).to.equal(2);
         });
     });
+
+    describe("time", () => {
+        it("should set time as 0 on first item of voices", () => {
+            const {voices} = compile("[mel a4]");
+            expect(voices.mel[0].props.time).to.equal(0);
+        });
+
+        it("should default to quarter note values", () => {
+            const {voices} = compile("[mel a4 g4]");
+            expect(voices.mel[0].props.time).to.equal(0);
+            expect(voices.mel[1].props.time).to.equal(0.25);
+        });
+
+        it("should handle duration style input", () => {
+            const {voices} = compile("[mel a4/8 g4]");
+            expect(voices.mel[0].props.time).to.equal(0);
+            expect(voices.mel[1].props.time).to.equal(0.125);
+        });
+
+        it("should handle property style input", () => {
+            const {voices} = compile("[mel (value=8 a4 g4)]");
+            expect(voices.mel[0].props.time).to.equal(0);
+            expect(voices.mel[1].props.time).to.equal(0.125);
+        });
+
+        it("should prioritize duration input over property input", () => {
+            const {voices} = compile("[mel (value=2 a4/8 g4 f4)]");
+            expect(voices.mel[0].props.time).to.equal(0);
+            expect(voices.mel[1].props.time).to.equal(0.125);
+            expect(voices.mel[2].props.time).to.equal(0.625);
+        });
+
+        it("should work with rests", () => {
+            const {voices} = compile("[mel (value=2 r/8 r) r]");
+            expect(voices.mel[0].props.time).to.equal(0);
+            expect(voices.mel[1].props.time).to.equal(0.125);
+            expect(voices.mel[2].props.time).to.equal(0.625);
+        });
+
+        it("should work with chords", () => {
+            const {voices} = compile("[mel (value=2 <c4 e4>/8 <d4 f#4>) <g3 bb3 g4>]");
+            expect(voices.mel[0].props.time).to.equal(0);
+            expect(voices.mel[1].props.time).to.equal(0.125);
+            expect(voices.mel[2].props.time).to.equal(0.625);
+        });
+
+        it("should work with variables", () => {
+            const {voices} = compile(`
+                ~theme = (a4/2 bb5/8 c6/16 c6/16 d2/4)
+                [mel ~theme ~theme]
+            `);
+            expect(voices.mel[0].props.time).to.equal(0);
+            expect(voices.mel[1].props.time).to.equal(0.5);
+            expect(voices.mel[2].props.time).to.equal(0.625);
+            expect(voices.mel[3].props.time).to.equal(0.6875);
+            expect(voices.mel[4].props.time).to.equal(0.75);
+            expect(voices.mel[5].props.time).to.equal(1);
+            expect(voices.mel[6].props.time).to.equal(1.5);
+            expect(voices.mel[7].props.time).to.equal(1.625);
+            expect(voices.mel[8].props.time).to.equal(1.6875);
+            expect(voices.mel[9].props.time).to.equal(1.75);
+        });
+
+        it("should work with multiple voices", () => {
+            const {voices} = compile(`
+                ~theme = (a4/2 bb5/8 c6/16 c6/16 d2/4)
+                [mel1 ~theme]
+                [mel2 ~theme]
+            `);
+            expect(voices.mel1[0].props.time).to.equal(0);
+            expect(voices.mel1[1].props.time).to.equal(0.5);
+            expect(voices.mel1[2].props.time).to.equal(0.625);
+            expect(voices.mel1[3].props.time).to.equal(0.6875);
+            expect(voices.mel1[4].props.time).to.equal(0.75);
+            expect(voices.mel2[0].props.time).to.equal(0);
+            expect(voices.mel2[1].props.time).to.equal(0.5);
+            expect(voices.mel2[2].props.time).to.equal(0.625);
+            expect(voices.mel2[3].props.time).to.equal(0.6875);
+            expect(voices.mel2[4].props.time).to.equal(0.75);
+        });
+    });
 });

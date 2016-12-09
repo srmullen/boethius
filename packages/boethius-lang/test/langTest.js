@@ -12,7 +12,8 @@ describe("parser", () => {
             expect(voices.mel[0].type).to.eql("note");
             expect(voices.mel[0].props).to.eql({
                 octave: 4,
-                pitchClass: "e"
+                pitchClass: "e",
+                time: 0
             });
         });
 
@@ -22,7 +23,8 @@ describe("parser", () => {
                 octave: 3,
                 pitchClass: "c#",
                 value: 8,
-                dots: 0
+                dots: 0,
+                time: 0
             });
         });
 
@@ -32,7 +34,8 @@ describe("parser", () => {
                 "octave": 5,
                 "pitchClass": "bb",
                 "value": 1,
-                "dots": 2
+                "dots": 2,
+                time: 0
             });
         });
 
@@ -64,12 +67,12 @@ describe("parser", () => {
 
         it("should return an object with type and value", () => {
             const {voices} = compile("[mel r/2]");
-            expect(voices.mel[0].props).to.eql({value: 2, dots: 0});
+            expect(voices.mel[0].props).to.eql({value: 2, dots: 0, time: 0});
         });
 
         it("should return an object with type, value, and dots", () => {
             const {voices} = compile("[mel r/16.]");
-            expect(voices.mel[0].props).to.eql({value: 16, dots: 1});
+            expect(voices.mel[0].props).to.eql({value: 16, dots: 1, time: 0});
         });
     });
 
@@ -77,19 +80,19 @@ describe("parser", () => {
         it("should return and object with type and children", () => {
             const {voices} = compile("[mel <c4 e4 g4>]");
             expect(voices.mel[0].type).to.eql("chord");
-            expect(voices.mel[0].props).to.eql({});
+            expect(voices.mel[0].props).to.eql({time: 0});
             expect(voices.mel[0].children.length).to.equal(3);
         });
 
         it("should return an object with type, children, and value", () => {
             const {voices} = compile("[mel <c4 e4>/8]");
-            expect(voices.mel[0].props).to.eql({value: 8, dots: 0});
+            expect(voices.mel[0].props).to.eql({value: 8, dots: 0, time: 0});
             expect(voices.mel[0].children.length).to.eql(2);
         });
 
         it("should return an object with type, children, dots, and value", () => {
             const {voices} = compile("[mel <c4 e4>/32...]");
-            expect(voices.mel[0].props).to.eql({value: 32, dots: 3});
+            expect(voices.mel[0].props).to.eql({value: 32, dots: 3, time: 0});
         });
     });
 
@@ -242,34 +245,14 @@ describe("parser", () => {
                 `[mel c4 ; d4
                 e4]`);
             const [note1, note2] = mel;
-            expect(note1.props).to.eql({pitchClass: "c", octave: 4});
-            expect(note2.props).to.eql({pitchClass: "e", octave: 4});
+            expect(note1.props).to.eql({pitchClass: "c", octave: 4, time: 0});
+            expect(note2.props).to.eql({pitchClass: "e", octave: 4, time: 0.25});
         });
     });
 
     describe("barlines", () => {
         it("should ignore them", () => {
             expect(compile("c4/1 | d4/1")).to.be.ok;
-        });
-    });
-
-    xdescribe("time", () => {
-        it("should add a time property", () => {
-            const [parsedNote] = compile("c4");
-            expect(parsedNote.props.time).to.equal(0);
-
-            const [parsedRest] = compile("r");
-            expect(parsedRest.props.time).to.equal(0);
-
-            const [parsedChord] = compile("<d4 f4>");
-            expect(parsedChord.props.time).to.equal(0);
-        });
-
-        it("should increment time for subsequent items", () => {
-            const items = compile("c4 d4/8 r");
-            expect(items[0].props.time).to.equal(0);
-            expect(items[1].props.time).to.equal(0.25);
-            expect(items[2].props.time).to.equal(0.375);
         });
     });
 });

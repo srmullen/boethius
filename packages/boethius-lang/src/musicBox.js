@@ -1,7 +1,3 @@
-const NOTE = "note";
-const REST = "rest";
-const CHORD = "chord";
-const CHORDSYMBOL = "chordSymbol";
 
 const NOTES = {
     "C":  0,  "c":  0,  "b#":  0,   "B#":  0,  "Dbb": 0,   "DBB": 0, "dbb": 0, "dBB": 0,
@@ -17,16 +13,6 @@ const NOTES = {
     "A#": 10, "a#": 10, "Bb":  10,  "bb":  10, "BB":  10,  "bB":  10,
     "B":  11, "b":  11, "a##" :11,  "A##": 11, "Cb":  11,  "cb":  11, "CB": 11, "cB": 11
 };
-
-const NOTE_RE = /([a-gA-g][#bB]*?)([0-9]+)/;
-
-/*
- * @param noteString - string representing a note.
- * @return [noteString, pitchClass, octave]
- */
-function validateNoteString (noteString) {
-    return noteString.match(NOTE_RE);
-}
 
 /*
  * @param octave - number
@@ -60,18 +46,4 @@ function midiToHz (midi) {
 
 function noteToHz (note) {
     return midiToHz(noteInfo(note).midi);
-}
-
-export function toMusic (parsed) {
-    return parsed.reduce((acc, item) => {
-        if (item && item.type === CHORDSYMBOL) {
-            // acc.chordSymbols.push(item);
-        } else if (acc.voices[item.props.voice]) {
-            acc.voices[item.props.voice].push(item);
-        } else {
-            acc.voices[item.props.voice] = [item];
-        }
-
-        return acc;
-    }, {chordSymbols: [], voices: {}});
 }
