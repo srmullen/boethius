@@ -2160,7 +2160,7 @@ exports.default = compile;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
-	value: true
+  value: true
 });
 exports.calculateAndSetTimes = calculateAndSetTimes;
 
@@ -2171,23 +2171,23 @@ var _fraction2 = _interopRequireDefault(_fraction);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function isNote(item) {
-	return item.type === "note";
+  return item.type === "note";
 }
 
 function isChord(item) {
-	return item.type === "chord";
+  return item.type === "chord";
 }
 
 function isRest(item) {
-	return item.type === "rest";
+  return item.type === "rest";
 }
 
 function isTimeSignature(item) {
-	return item.type === "timeSig";
+  return item.type === "timeSig";
 }
 
 function isRepeat(item) {
-	return item.type === "repeat";
+  return item.type === "repeat";
 }
 
 /*
@@ -2196,29 +2196,24 @@ function isRepeat(item) {
  */
 function calculateDuration(item) {
 
-	// The item doesn't have a duration unless it's one of the following types.
-	if (!(isNote(item) || isChord(item) || isRest(item) || isRepeat(item))) return 0;
+  // The item doesn't have a duration unless it's one of the following types.
+  if (!(isNote(item) || isChord(item) || isRest(item) || isRepeat(item))) return 0;
 
-	var s = item.props.tuplet ? item.props.tuplet.split("/") : null;
-	var tuplet = s ? new _fraction2.default(s[0], s[1]) : null;
-	var dots = item.props.dots || 0;
+  var s = item.props.tuplet ? item.props.tuplet.split("/") : null;
+  var tuplet = s ? new _fraction2.default(s[0], s[1]) : null;
+  var dots = item.props.dots || 0;
 
-	var dur = new _fraction2.default(1, item.props.value || 4);
+  var dur = new _fraction2.default(1, item.props.value || 4);
 
-	for (var i = 0; i < dots; i++) {
-		dur = dur.mul(1.5);
-	}
+  for (var i = 0; i < dots; i++) {
+    dur = dur.mul(1.5);
+  }
 
-	if (tuplet && dur) {
-		dur = dur.mul(s[1]).div(s[0]);
-	}
+  if (tuplet && dur) {
+    dur = dur.mul(s[1]).div(s[0]);
+  }
 
-	if (item.tempo) {
-		// 60 bpm is the default tempo where beat is a quarter note
-		dur = dur.mul(60 * 4 / item.tempo);
-	}
-
-	return dur;
+  return dur;
 }
 
 /*
@@ -2226,19 +2221,19 @@ function calculateDuration(item) {
  * @param offset - Optional amount of time that will be added to the items times.
  */
 function calculateAndSetTimes(items) {
-	var offset = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+  var offset = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
 
-	return items.reduce(function (acc, item) {
-		var previousItem = acc[acc.length - 1];
+  return items.reduce(function (acc, item) {
+    var previousItem = acc[acc.length - 1];
 
-		if (previousItem) {
-			item.props.time = (0, _fraction2.default)(previousItem.props.time).add(calculateDuration(previousItem)).add(offset).valueOf();
-		} else {
-			item.props.time = 0;
-		}
+    if (previousItem) {
+      item.props.time = (0, _fraction2.default)(previousItem.props.time).add(calculateDuration(previousItem)).add(offset).valueOf();
+    } else {
+      item.props.time = 0;
+    }
 
-		return acc.concat([item]);
-	}, []);
+    return acc.concat([item]);
+  }, []);
 }
 
 },{"fraction.js":3}]},{},[6]);
