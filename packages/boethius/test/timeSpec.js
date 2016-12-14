@@ -4,7 +4,7 @@ import _ from "lodash";
 import {
     getBeat, getTime, getMeasureNumber, getMeasureByTime, calculateDuration, calculateTupletDuration, equals
 } from "../src/utils/timeUtils";
-import {createMeasures} from "../src/utils/measure";
+import {createMeasures} from "../src/views/Measure";
 import Scored from "../src/Scored";
 
 describe("timeUtils", () => {

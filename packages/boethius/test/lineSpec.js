@@ -1,6 +1,6 @@
 import {expect} from "chai";
 import Line from "../src/views/Line";
-import * as Measure from "../src/utils/measure";
+import {createMeasures} from "../src/views/Measure";
 import Scored from "../src/Scored";
 import {getTimeContexts, getAccidentals, getLineItems} from "../src/utils/line";
 
@@ -65,7 +65,7 @@ describe("Line", () => {
             let bassClef = scored.clef({value: "bass", measure: 0}),
                 twofour = scored.timeSig({value: "2/4", measure: 0}),
                 dsharp = scored.key({value: "d#", measure: 0}),
-                measures = Measure.createMeasures(1, [bassClef, twofour, dsharp]);
+                measures = createMeasures(1, [bassClef, twofour, dsharp]);
             let line = scored.line({}, [bassClef, twofour, dsharp]);
 
             expect(line.contextAt({measure: 0})).to.eql({clef: bassClef, timeSig: twofour, key: dsharp});
@@ -78,7 +78,7 @@ describe("Line", () => {
                 altoClef = scored.clef({value: "alto", measure: 1}),
                 threeeighth = scored.timeSig({value: "3/8", measure: 2}),
                 gflat = scored.key({value: "gb", measure: 3}),
-                measures = Measure.createMeasures(4, [bassClef, twofour, dsharp, altoClef, threeeighth, gflat]);
+                measures = createMeasures(4, [bassClef, twofour, dsharp, altoClef, threeeighth, gflat]);
             let line = scored.line({}, [bassClef, twofour, dsharp, altoClef, threeeighth, gflat]);
 
             expect(line.contextAt({measure: 0})).to.eql({clef: bassClef, timeSig: twofour, key: dsharp});
@@ -94,7 +94,7 @@ describe("Line", () => {
                 altoClef = scored.clef({value: "alto", measure: 0, beat: 1}),
                 fiveeight = scored.timeSig({value: "5/8", measure: 1}),
                 gflat = scored.key({value: "gb", measure: 1, beat: 3}),
-                measures = Measure.createMeasures(3, [bassClef, twofour, dsharp, altoClef, fiveeight, gflat]);
+                measures = createMeasures(3, [bassClef, twofour, dsharp, altoClef, fiveeight, gflat]);
             let line = scored.line({}, [bassClef, twofour, dsharp, altoClef, fiveeight, gflat]);
 
             expect(line.contextAt({measure: 0})).to.eql({clef: bassClef, timeSig: twofour, key: dsharp});

@@ -24,6 +24,7 @@ TODOS:
     - placement.commonShortestDuration implementation.
     - Repeats
     - Da Capo / Dal Segno
+    - Break notes crossing barlines.
 
     # Lower priority
     - SMuFL

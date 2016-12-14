@@ -1,7 +1,7 @@
 import {expect} from "chai";
 import * as common from "../src/utils/common";
 import Measure from "../src/views/Measure";
-import {createMeasures} from "../src/utils/measure";
+import {createMeasures} from "../src/views/Measure";
 import Scored from "../src/Scored";
 
 describe("Measure", () => {
