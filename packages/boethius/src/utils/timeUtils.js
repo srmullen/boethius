@@ -238,6 +238,30 @@ function sumDurations (items) {
 	}, F(0)).valueOf();
 }
 
+export function gt (t1, t2) {
+	const time1 = _.isObject(t1) ? t1.time : t1;
+	const time2 = _.isObject(t2) ? t2.time : t2;
+	return time1 > time2;
+}
+
+export function lt (t1, t2) {
+	const time1 = _.isObject(t1) ? t1.time : t1;
+	const time2 = _.isObject(t2) ? t2.time : t2;
+	return time1 < time2;
+}
+
+export function gte (t1, t2) {
+	const time1 = _.isObject(t1) ? t1.time : t1;
+	const time2 = _.isObject(t2) ? t2.time : t2;
+	return time1 >= time2;
+}
+
+export function lte (t1, t2) {
+	const time1 = _.isObject(t1) ? t1.time : t1;
+	const time2 = _.isObject(t2) ? t2.time : t2;
+	return time1 <= time2;
+}
+
 export {
 	getTime,
 	getMeasure,

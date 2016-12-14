@@ -2,7 +2,8 @@ import {expect} from "chai";
 import _ from "lodash";
 
 import {
-    getBeat, getTime, getMeasureNumber, getMeasureByTime, calculateDuration, calculateTupletDuration, equals
+    getBeat, getTime, getMeasureNumber, getMeasureByTime, calculateDuration, calculateTupletDuration, equals,
+    gt, lt, gte, lte
 } from "../src/utils/timeUtils";
 import {createMeasures} from "../src/views/Measure";
 import Scored from "../src/Scored";
@@ -157,6 +158,94 @@ describe("timeUtils", () => {
             expect(calculateTupletDuration("3/2", 4)).to.equal(0.5);
             expect(calculateTupletDuration("3/2", 8)).to.equal(0.25);
             expect(calculateTupletDuration("5/4", 16)).to.equal(0.25);
+        });
+    });
+
+    describe("gt", () => {
+        it("should handle time as a number", () => {
+            const t1 = 1;
+            const t2 = 2;
+            const t3 = 2;
+
+            expect(gt(t1, t2)).to.be.false;
+            expect(gt(t2, t3)).to.be.false;
+            expect(gt(t2, t1)).to.be.true;
+        });
+
+        it("should handle time as an object", () => {
+            const t1 = {time: 1};
+            const t2 = {time: 2};
+            const t3 = {time: 2};
+
+            expect(gt(t1, t2)).to.be.false;
+            expect(gt(t2, t3)).to.be.false;
+            expect(gt(t2, t1)).to.be.true;
+        });
+    });
+
+    describe("gte", () => {
+        it("should handle time as a number", () => {
+            const t1 = 1;
+            const t2 = 2;
+            const t3 = 2;
+
+            expect(gte(t1, t2)).to.be.false;
+            expect(gte(t2, t3)).to.be.true;
+            expect(gte(t2, t1)).to.be.true;
+        });
+
+        it("should handle time as an object", () => {
+            const t1 = {time: 1};
+            const t2 = {time: 2};
+            const t3 = {time: 2};
+
+            expect(gte(t1, t2)).to.be.false;
+            expect(gte(t2, t3)).to.be.true;
+            expect(gte(t2, t1)).to.be.true;
+        });
+    });
+
+    describe("lt", () => {
+        it("should handle time as a number", () => {
+            const t1 = 1;
+            const t2 = 2;
+            const t3 = 2;
+
+            expect(lt(t1, t2)).to.be.true;
+            expect(lt(t2, t3)).to.be.false;
+            expect(lt(t2, t1)).to.be.false;
+        });
+
+        it("should handle time as an object", () => {
+            const t1 = {time: 1};
+            const t2 = {time: 2};
+            const t3 = {time: 2};
+
+            expect(lt(t1, t2)).to.be.true;
+            expect(lt(t2, t3)).to.be.false;
+            expect(lt(t2, t1)).to.be.false;
+        });
+    });
+
+    describe("lte", () => {
+        it("should handle time as a number", () => {
+            const t1 = 1;
+            const t2 = 2;
+            const t3 = 2;
+
+            expect(lte(t1, t2)).to.be.true;
+            expect(lte(t2, t3)).to.be.true;
+            expect(lte(t2, t1)).to.be.false;
+        });
+
+        it("should handle time as an object", () => {
+            const t1 = {time: 1};
+            const t2 = {time: 2};
+            const t3 = {time: 2};
+
+            expect(lte(t1, t2)).to.be.true;
+            expect(lte(t2, t3)).to.be.true;
+            expect(lte(t2, t1)).to.be.false;
         });
     });
 });
