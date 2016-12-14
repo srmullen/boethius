@@ -47,7 +47,7 @@ System.renderTimeContexts = function ({system, lines, measures, voices, timeCont
 
 	const timeContextGroups = _.map(timeContexts, timeContext => timeContext.render(lineHeights));
 
-	const shortestDuration = 0.125; // need function to calculate this.
+	const shortestDuration = Scored.config.shortestDuration; // need function to calculate this.
 
 	const timeLengths = calculateTimeLengths(timeContexts, shortestDuration);
 
@@ -114,7 +114,7 @@ System.renderTimeContexts = function ({system, lines, measures, voices, timeCont
 					const items = itemsByMeasure[measure.value] || [];
 
 					// Nothing to do if there are no items in the measure.
-					if (!items) return;
+					if (!items.length) return;
 
 					// stems and beams need to know both line and voice
 					const context = line.contextAt({measure: measure.value});

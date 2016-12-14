@@ -7,6 +7,7 @@ const Config = (function () {
 	const defaultConfig = {
 		fontSize: FONT_SIZE,
 		fontFamily: FONT_FAMILY,
+		shortestDuration: 0.0625, // sixteenth note
 		note: {
 			minWidth: 45,
 			head: {

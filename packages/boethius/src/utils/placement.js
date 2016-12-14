@@ -174,7 +174,7 @@ function getYOffset (item) {
 
 function calculateCursor (item) {
 	const noteHeadWidth = Scored.config.note.head.width;
-	const shortestDuration = 0.125;
+	const shortestDuration = Scored.config.shortestDuration;
 
 	let cursor = 0;
 
