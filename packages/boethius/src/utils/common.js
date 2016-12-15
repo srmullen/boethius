@@ -133,9 +133,9 @@ function isOdd (n) {
 	return !isEven(n);
 }
 
-function clone (item) {
+function clone (item, props={}) {
 	const Constructor = item.constructor;
-	return new Constructor(item);
+	return new Constructor(Object.assign({}, item, props));
 }
 
 export {

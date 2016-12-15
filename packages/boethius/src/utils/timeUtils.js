@@ -262,6 +262,50 @@ export function lte (t1, t2) {
 	return time1 <= time2;
 }
 
+const f1 = F(1);
+const f2 = F(1, 2);
+const f4 = F(1, 4)
+const f8 = F(1, 8);
+const f16 = F(1, 16);
+const f32 = F(1, 32);
+const f64 = F(1, 64);
+const f128 = F(1, 128);
+const f256 = F(1, 256);
+const durationTable = {
+	// basic
+	[f1.toFraction()]: Object.freeze({value: 1}),
+	[f2.toFraction()]: Object.freeze({value: 2}),
+	[f4.toFraction()]: Object.freeze({value: 4}),
+	[f8.toFraction()]: Object.freeze({value: 8}),
+	[f16.toFraction()]: Object.freeze({value: 16}),
+	[f32.toFraction()]: Object.freeze({value: 32}),
+	[f64.toFraction()]: Object.freeze({value: 64}),
+	// single dot
+	[f1.add(f2).toFraction()]: Object.freeze({value: 1, dots: 1}),
+	[f2.add(f4).toFraction()]: Object.freeze({value: 2, dots: 1}),
+	[f4.add(f8).toFraction()]: Object.freeze({value: 4, dots: 1}),
+	[f8.add(f16).toFraction()]: Object.freeze({value: 8, dots: 1}),
+	[f16.add(f32).toFraction()]: Object.freeze({value: 16, dots: 1}),
+	[f32.add(f64).toFraction()]: Object.freeze({value: 32, dots: 1}),
+	[f64.add(f128).toFraction()]: Object.freeze({value: 64, dots: 1}),
+	// double dot
+	[f1.add(f2).add(f4).toFraction()]: Object.freeze({value: 1, dots: 2}),
+	[f2.add(f4).add(f8).toFraction()]: Object.freeze({value: 2, dots: 2}),
+	[f4.add(f8).add(f16).toFraction()]: Object.freeze({value: 4, dots: 2}),
+	[f8.add(f16).add(f32).toFraction()]: Object.freeze({value: 8, dots: 2}),
+	[f16.add(f32).add(f64).toFraction()]: Object.freeze({value: 16, dots: 2}),
+	[f32.add(f64).add(f128).toFraction()]: Object.freeze({value: 32, dots: 2}),
+	[f64.add(f128).add(f256).toFraction()]: Object.freeze({value: 64, dots: 2}),
+}
+
+/*
+ * @param abs {Number} - Duration in absolute time.
+ * @return {Object} - {value, dots, tuplet};
+ */
+export function absoluteToRelativeDuration (abs) {
+	return durationTable[F(abs).toFraction()];
+}
+
 export {
 	getTime,
 	getMeasure,

@@ -21,6 +21,7 @@
   "license": "Sean Mullen",
   "devDependencies": {
     "babel-core": "^6.3.26",
+    "babel-plugin-transform-object-rest-spread": "^6.20.2",
     "babel-preset-es2015": "^6.3.13",
     "babel-register": "^6.3.13",
     "babelify": "^7.3.0",

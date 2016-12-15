@@ -3,7 +3,7 @@ import _ from "lodash";
 
 import {
     getBeat, getTime, getMeasureNumber, getMeasureByTime, calculateDuration, calculateTupletDuration, equals,
-    gt, lt, gte, lte
+    gt, lt, gte, lte, absoluteToRelativeDuration
 } from "../src/utils/timeUtils";
 import {createMeasures} from "../src/views/Measure";
 import Scored from "../src/Scored";
@@ -246,6 +246,36 @@ describe("timeUtils", () => {
             expect(lte(t1, t2)).to.be.true;
             expect(lte(t2, t3)).to.be.true;
             expect(lte(t2, t1)).to.be.false;
+        });
+    });
+
+    describe("absoluteToRelativeDuration", () => {
+        it("should handle basic note values", () => {
+            expect(absoluteToRelativeDuration(1)).to.eql({value: 1});
+            expect(absoluteToRelativeDuration(1/2)).to.eql({value: 2});
+            expect(absoluteToRelativeDuration(1/4)).to.eql({value: 4});
+            expect(absoluteToRelativeDuration(1/8)).to.eql({value: 8});
+            expect(absoluteToRelativeDuration(1/16)).to.eql({value: 16});
+            expect(absoluteToRelativeDuration(1/32)).to.eql({value: 32});
+            expect(absoluteToRelativeDuration(1/64)).to.eql({value: 64});
+        });
+        it("should handle single dotted items", () => {
+            expect(absoluteToRelativeDuration(1 + 1/2)).to.eql({value: 1, dots: 1});
+            expect(absoluteToRelativeDuration(1/2 + 1/4)).to.eql({value: 2, dots: 1});
+            expect(absoluteToRelativeDuration(1/4 + 1/8)).to.eql({value: 4, dots: 1});
+            expect(absoluteToRelativeDuration(1/8 + 1/16)).to.eql({value: 8, dots: 1});
+            expect(absoluteToRelativeDuration(1/16 + 1/32)).to.eql({value: 16, dots: 1});
+            expect(absoluteToRelativeDuration(1/32 + 1/64)).to.eql({value: 32, dots: 1});
+            expect(absoluteToRelativeDuration(1/64 + 1/128)).to.eql({value: 64, dots: 1});
+        });
+        it("should handle double dotted items", () => {
+            expect(absoluteToRelativeDuration(1 + 1/2 + 1/4)).to.eql({value: 1, dots: 2});
+            expect(absoluteToRelativeDuration(1/2 + 1/4 + 1/8)).to.eql({value: 2, dots: 2});
+            expect(absoluteToRelativeDuration(1/4 + 1/8 + 1/16)).to.eql({value: 4, dots: 2});
+            expect(absoluteToRelativeDuration(1/8 + 1/16 + 1/32)).to.eql({value: 8, dots: 2});
+            expect(absoluteToRelativeDuration(1/16 + 1/32 + 1/64)).to.eql({value: 16, dots: 2});
+            expect(absoluteToRelativeDuration(1/32 + 1/64 + 1/128)).to.eql({value: 32, dots: 2});
+            expect(absoluteToRelativeDuration(1/64 + 1/128 + 1/256)).to.eql({value: 64, dots: 2});
         });
     });
 });

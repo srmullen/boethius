@@ -149,5 +149,9 @@ describe("common", () => {
             expect(keyClone.randomProperty).not.to.be.defined;
             expect(clefClone.otherProp).not.to.be.defined;
         });
+
+        xit("should deep clone children", () => {
+            expect("fixme").to.equal(0);
+        });
     });
 });

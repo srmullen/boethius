@@ -1,0 +1,21 @@
+import {calculateDuration, absoluteToRelativeDuration, gte, lt} from "./timeUtils";
+import {clone} from "./common";
+import {isNote, isRest, isChord} from "../types";
+
+/*
+ * Breaks a durationed item so it doesn't run over boundaries such as a barline or invisible barline.
+ */
+export function divide (time, item) {
+    if (gte(item.time, time)) {
+        return item;
+    }
+    const duration = calculateDuration(item);
+    if (lt(item.time + duration, time)) {
+        return item;
+    }
+
+    // get duration of new items
+    const dur1 = absoluteToRelativeDuration(time - item.time);
+    const dur2 = absoluteToRelativeDuration(item.time + duration - time);
+    return [clone(item, dur1), clone(item, {...dur2, time})];
+}
