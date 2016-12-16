@@ -76,14 +76,14 @@ System.renderTimeContexts = function ({system, lines, measures, voices, timeCont
 
 		const measureScale = length / minLineLength;
 
-		noteScale = (length - totalMarkingLength) / (minLineLength - totalMarkingLength);
+		// noteScale = (length - totalMarkingLength) / (minLineLength - totalMarkingLength);
 
 		const measureGroups = system.renderMeasures(measures, _.map(measureLengths, measureLength => measureLength * measureScale), lineGroups);
 
 		systemGroup.addChildren(measureGroups);
 
 		cursorFn = (possibleNextPositions, cursor) => {
-			return placement.scaleCursor(noteScale, cursor, _.min(possibleNextPositions) + cursor);
+			return placement.scaleCursor(measureScale, cursor, _.min(possibleNextPositions) + cursor);
 		};
 	}
 

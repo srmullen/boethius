@@ -172,25 +172,6 @@ function getYOffset (item) {
 	return offsetFn(item);
 }
 
-function calculateCursor (item) {
-	const noteHeadWidth = Scored.config.note.head.width;
-	const shortestDuration = Scored.config.shortestDuration;
-
-	let cursor = 0;
-
-	if (isMarking(item)) {
-		// FIXME: needs a little work for perfect positioning
-		cursor = item.group.children.length ? item.group.bounds.width + noteHeadWidth : 0;
-	} else if (item.type === constants.type.measure) {
-		const leftBarline = item.barlines[0];
-		cursor = leftBarline.position.x + noteHeadWidth;
-	} else {
-		cursor = item.group.bounds.width + (noteHeadWidth * getStaffSpace(shortestDuration, item));
-	}
-
-	return cursor;
-}
-
 /*
  * Aligns the notes so they are all at the same x position.
  * @param xPos - Number
@@ -274,13 +255,32 @@ function calculateTimeLength (items, shortestDuration) {
 	const keyLength = keys ? _.max(keys.map(getMarkingWidth)) : 0;
 	const timeSigLength = timeSigs ? _.max(timeSigs.map(getMarkingWidth)) : 0;
 	const markingsLength = _.sum([clefLength, keyLength, timeSigLength]);
-	// dynamics should affect measure length. remove them.
-	const voiceItemLengths = _.map(_.reject(voiceItems, isDynamic), item => {
+	// dynamics should not affect measure length. remove them.
+	const voiceItemLengths = _.map(_.reject(voiceItems, isDynamic), item => { // these should use the same calculations as cursor
 		return item.group.bounds.width + (noteHeadWidth * getStaffSpace(shortestDuration, item));
 	});
 	const totalVoiceItemsLength = voiceItemLengths.length ? _.min(voiceItemLengths) : 0;
 
 	return [markingsLength, totalVoiceItemsLength];
+}
+
+function calculateCursor (item) {
+	const noteHeadWidth = Scored.config.note.head.width;
+	const shortestDuration = Scored.config.shortestDuration;
+
+	let cursor = 0;
+
+	if (isMarking(item)) {
+		// FIXME: needs a little work for perfect positioning
+		cursor = item.group.children.length ? item.group.bounds.width + noteHeadWidth : 0;
+	} else if (item.type === constants.type.measure) {
+		const leftBarline = item.barlines[0];
+		cursor = leftBarline.position.x + noteHeadWidth;
+	} else {
+		cursor = item.group.bounds.width + (noteHeadWidth * getStaffSpace(shortestDuration, item));
+	}
+
+	return cursor;
 }
 
 function placeMarking (lineCenter, cursor, marking) {
