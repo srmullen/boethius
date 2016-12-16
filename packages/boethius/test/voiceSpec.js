@@ -249,5 +249,14 @@ describe("Voice", () => {
                 expect(v.children.length).to.equal(6);
             });
         });
+
+        it ("should not break notes that end on the given time", () => {
+            const v = scored.voice({name: "v3"}, [
+                r({value: 2}), r({value: 4}), r({value: 8}), n({value: 8}), n({value: 8})
+            ]);
+            expect(v.children.length).to.equal(5);
+            v.breakDurations([0, 1]);
+            expect(v.children.length).to.equal(5);
+        });
     });
 });

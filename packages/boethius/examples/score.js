@@ -563,7 +563,6 @@ var examples = {
         var system1 = scored.system({measures: 2});
 
         var score = scored.score({length: 1000}, [fourfour, page0, system1, l1, l2, l3, l4]);
-        // var score = scored.score({}, [fourfour, page0, system1, l1, l2, l3, l4]);
 
         // render it all as a score.
         return scored.render(score, {

@@ -235,13 +235,6 @@ Voice.prototype[Symbol.iterator] = Voice.prototype.iterate = function () {
  */
 Voice.prototype.breakDurations = function (times) {
     let timeIndex = 0;
-    // let children = []
-    // for (let items of this) {
-    //     const time = times[timeIndex];
-    //     children = children.concat(items.reduce((acc, item) => {
-    //         return acc.concat(divide(time, item));
-    //     }, []));
-    // }
     const children = this.children.reduce((acc, item) => {
         if (item.time >= times[timeIndex]) {
             timeIndex = _.findIndex(times, time => time > item.time);
