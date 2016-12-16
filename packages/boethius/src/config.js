@@ -8,6 +8,7 @@ const Config = (function () {
 		fontSize: FONT_SIZE,
 		fontFamily: FONT_FAMILY,
 		shortestDuration: 0.0625, // sixteenth note
+		// shortestDuration: 0.03125,
 		note: {
 			minWidth: 45,
 			head: {

@@ -46,6 +46,13 @@ Score.render = function (score, {measures, voices=[], chordSymbols=[], repeats=[
     // Optimize here. Measures shouldn't need to be recreated every time the score is re-rendered.
     measures = measures || scoreToMeasures(score, repeats);
 
+    {
+        const times = measures.map(measure => measure.startsAt);
+        voices.map(voice => {
+            voice.breakDurations(times);
+        });
+    }
+
     const systemsToRender = _.reduce(score.systems, (acc, system, index) => {
         return _.contains(pages, system.page) ? concat(acc, {system, index}) : acc;
     }, []);

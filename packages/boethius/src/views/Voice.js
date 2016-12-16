@@ -7,6 +7,7 @@ import {concat, partitionBy, reductions} from "../utils/common";
 import {beam, drawTuplets} from "../engraver";
 import {getAverageStemDirection} from "../utils/note";
 import {calculateDuration, parseSignature, calculateTupletDuration, sumDurations} from "../utils/timeUtils";
+import {divide} from "../utils/barline";
 
 /*
  * @param items - Item[]
@@ -27,12 +28,10 @@ function calculateAndSetTimes (items, offset=0) {
 }
 
 function Voice ({value, name, stemDirection}, children=[]) {
-    // FIXME: Is value used? For what?
-    this.value = value;
-
     this.name = name;
 
     this.children = calculateAndSetTimes(children);
+    // this.children = children;
 
     this.stemDirection = stemDirection;
 }
@@ -227,6 +226,29 @@ Voice.prototype[Symbol.iterator] = Voice.prototype.iterate = function () {
             };
         }
     }
+};
+
+/*
+ * Mutates children array.
+ * Breaks notes extending over given time into two notes.
+ * @params [time] - Times at which to break durationed items.
+ */
+Voice.prototype.breakDurations = function (times) {
+    let timeIndex = 0;
+    // let children = []
+    // for (let items of this) {
+    //     const time = times[timeIndex];
+    //     children = children.concat(items.reduce((acc, item) => {
+    //         return acc.concat(divide(time, item));
+    //     }, []));
+    // }
+    const children = this.children.reduce((acc, item) => {
+        if (item.time >= times[timeIndex]) {
+            timeIndex = _.findIndex(times, time => time > item.time);
+        }
+        return acc.concat(divide(times[timeIndex], item));
+    }, []);
+    this.children = children;
 };
 
 export default Voice;

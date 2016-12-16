@@ -202,4 +202,52 @@ describe("Voice", () => {
             expect(times).to.eql([0, 0.125, 0.375]);
         });
     });
+
+    describe("breakDurations", () => {
+        const r = scored.rest;
+        const n = scored.note;
+        describe("whole note", () => {
+            it("should break into two half notes", () => {
+                const v = scored.voice({name: "v1"}, [
+                    r({value: 2}), n({value: 1})
+                ]);
+                expect(v.children.length).to.equal(2);
+                v.breakDurations([0, 1]);
+                expect(v.children.length).to.equal(3);
+            });
+        });
+
+        describe("half note", () => {
+            it("should break into two quarter notes", () => {
+                const v = scored.voice({name: "v2"}, [
+                    r({value: 2}), r({value: 4}), n({value: 2})
+                ]);
+                expect(v.children.length).to.equal(3);
+                v.breakDurations([0, 1]);
+                expect(v.children.length).to.equal(4);
+            });
+        });
+
+        describe("quarter note", () => {
+            it("should break into two eighth notes", () => {
+                const v = scored.voice({name: "v3"}, [
+                    r({value: 2}), r({value: 4}), r({value: 8}), n({value: 4})
+                ]);
+                expect(v.children.length).to.equal(4);
+                v.breakDurations([0, 1]);
+                expect(v.children.length).to.equal(5);
+            });
+        });
+
+        describe("eighth note", () => {
+            it("should break into two sixteenth notes", () => {
+                const v = scored.voice({name: "v4"}, [
+                    r({value: 2}), r({value: 4}), r({value: 8}), r({value: 16}), n({value: 8})
+                ]);
+                expect(v.children.length).to.equal(5);
+                v.breakDurations([0, 1]);
+                expect(v.children.length).to.equal(6);
+            });
+        });
+    });
 });
