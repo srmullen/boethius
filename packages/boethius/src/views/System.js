@@ -17,22 +17,19 @@ const TYPE = constants.type.system;
 /*
  * @measures - the number of measures on the system.
  * @startMeasure - the index of the first measure on the stave.
+ * @page - The page the system is rendered on.
  */
  // TODO: What are the children of a system now? It's more of a view onto the lines, rather than something with children in it's own right.
  // @param children <Line, Measure, Marking>[] - A marking that is given to the system will be rendered on all lines. If it is
  // 	given to a line it will only affect that line.
-function System ({page=0, startMeasure=0, measures=4, lineHeights=[]}, children=[]) {
+function System ({page=0, startMeasure=0, measures=4, lineHeights=[], length}, children=[]) {
 	this.page = page;
-
 	this.startMeasure = startMeasure;
-
 	this.measures = measures;
-
 	this.children = children;
-
 	this.markings = _.filter(children, isMarking);
-
 	this.lineHeights = lineHeights;
+	this.length = length;
 }
 
 /*

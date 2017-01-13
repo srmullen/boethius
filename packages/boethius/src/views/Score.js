@@ -124,7 +124,7 @@ Score.render = function (score, {measures, voices=[], chordSymbols=[], repeats=[
                 system, voices, timeContexts, chordSymbols,
                 lines: score.lines,
                 measures: systemMeasures,
-                length: score.length
+                length: system.length || score.length
             });
 
             const systemTranslation = (!_.contains(pages, system.page)) ?
