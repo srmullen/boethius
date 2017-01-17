@@ -516,11 +516,14 @@ var examples = {
             r({value: 8, dots: 1}), r({value: 4}), r({value: 4}), r({value: 8}), r({value: 16, dots: 1}), n({value: 8})
         ]);
 
+        // 1/4. => 1/4 1/8
+        // 1/2 => 1/8 1/4.
         var l5 = scored.line({voices: ["v5"]}, [
             scored.clef({value: "treble", measure: 0}), scored.key({value: "C", measure: 0}), scored.timeSig({value: "4/4", measure: 0})
         ]);
         var v5 = scored.voice({name: "v5"}, [
-            r({value: 2}), r({value: 4}), n({value: 4, dots: 1})
+            r({value: 2}), r({value: 4}), n({value: 4, dots: 1}), r({value: 8}),
+            r({value: 4}), r({value: 4}), r({value: 8}), n({value: 2})
         ]);
 
         var page0 = scored.page();

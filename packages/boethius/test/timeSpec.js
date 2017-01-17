@@ -251,13 +251,13 @@ describe("timeUtils", () => {
 
     describe("absoluteToRelativeDuration", () => {
         it("should handle basic note values", () => {
-            expect(absoluteToRelativeDuration(1)).to.eql({value: 1});
-            expect(absoluteToRelativeDuration(1/2)).to.eql({value: 2});
-            expect(absoluteToRelativeDuration(1/4)).to.eql({value: 4});
-            expect(absoluteToRelativeDuration(1/8)).to.eql({value: 8});
-            expect(absoluteToRelativeDuration(1/16)).to.eql({value: 16});
-            expect(absoluteToRelativeDuration(1/32)).to.eql({value: 32});
-            expect(absoluteToRelativeDuration(1/64)).to.eql({value: 64});
+            expect(absoluteToRelativeDuration(1)).to.eql({value: 1, dots: 0});
+            expect(absoluteToRelativeDuration(1/2)).to.eql({value: 2, dots: 0});
+            expect(absoluteToRelativeDuration(1/4)).to.eql({value: 4, dots: 0});
+            expect(absoluteToRelativeDuration(1/8)).to.eql({value: 8, dots: 0});
+            expect(absoluteToRelativeDuration(1/16)).to.eql({value: 16, dots: 0});
+            expect(absoluteToRelativeDuration(1/32)).to.eql({value: 32, dots: 0});
+            expect(absoluteToRelativeDuration(1/64)).to.eql({value: 64, dots: 0});
         });
         it("should handle single dotted items", () => {
             expect(absoluteToRelativeDuration(1 + 1/2)).to.eql({value: 1, dots: 1});

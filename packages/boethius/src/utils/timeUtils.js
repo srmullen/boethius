@@ -273,13 +273,13 @@ const f128 = F(1, 128);
 const f256 = F(1, 256);
 const durationTable = {
 	// basic
-	[f1.toFraction()]: Object.freeze({value: 1}),
-	[f2.toFraction()]: Object.freeze({value: 2}),
-	[f4.toFraction()]: Object.freeze({value: 4}),
-	[f8.toFraction()]: Object.freeze({value: 8}),
-	[f16.toFraction()]: Object.freeze({value: 16}),
-	[f32.toFraction()]: Object.freeze({value: 32}),
-	[f64.toFraction()]: Object.freeze({value: 64}),
+	[f1.toFraction()]: Object.freeze({value: 1, dots: 0}),
+	[f2.toFraction()]: Object.freeze({value: 2, dots: 0}),
+	[f4.toFraction()]: Object.freeze({value: 4, dots: 0}),
+	[f8.toFraction()]: Object.freeze({value: 8, dots: 0}),
+	[f16.toFraction()]: Object.freeze({value: 16, dots: 0}),
+	[f32.toFraction()]: Object.freeze({value: 32, dots: 0}),
+	[f64.toFraction()]: Object.freeze({value: 64, dots: 0}),
 	// single dot
 	[f1.add(f2).toFraction()]: Object.freeze({value: 1, dots: 1}),
 	[f2.add(f4).toFraction()]: Object.freeze({value: 2, dots: 1}),

@@ -94,6 +94,22 @@ describe("barline", () => {
                 expect(division[1].value).to.equal(32);
                 expect(division[1].time).to.equal(1);
             });
+
+            it("1/4. => 1/4 1/8", () => {
+                const n = new Note({value: 4, dots: 1, time: 0.75});
+                const division = divide(1, n);
+                expect(division[0].value).to.equal(4);
+                expect(division[1].value).to.equal(8);
+                expect(division[1].dots).not.to.be.ok;
+            });
+
+            it("1/2 => 1/8 1/4.", () => {
+                const n = new Note({value: 2, time: 0.75 + 1/8});
+                const division = divide(1, n);
+                expect(division[0].value).to.equal(8);
+                expect(division[1].value).to.equal(4);
+                expect(division[1].dots).to.equal(1);
+            })
         });
     });
 });
