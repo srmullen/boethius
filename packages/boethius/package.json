@@ -5,6 +5,7 @@
   "main": "src/Scored.js",
   "scripts": {
     "dev": "watchify src/Scored.js -t [babelify] -o dist/boethius.js -v -d",
+    "serve": "node ./server.js",
     "build": "browserify src/Scored.js -t babelify --outfile dist/boethius.js",
     "es6compile": "babel --modules umd src/ --out-dir lib/ -s",
     "es6watch": "babel --modules umd src/ --watch --out-dir lib/ -s",
@@ -27,6 +28,8 @@
     "babelify": "^7.3.0",
     "browserify": "^13.0.1",
     "chai": "^3.3.0",
+    "koa": "^1.2.4",
+    "koa-static": "^2.0.0",
     "mocha": "^2.3.3",
     "palestrina.js": "^1.3.2",
     "watchify": "^3.7.0"
