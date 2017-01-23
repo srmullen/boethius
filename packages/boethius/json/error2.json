@@ -1,0 +1,98 @@
+{
+  "error": {},
+  "layout": {
+    "_id": "p/Star_Spangled_Banner/layout/1482699809626",
+    "_rev": "14-533492aca39b02f7f95ea2dbb87d3d4b",
+    "name": "",
+    "title": "Lead",
+    "composer": "",
+    "timeSignatures": [
+      {
+        "value": [
+          4,
+          4
+        ],
+        "measure": 0,
+        "beat": 0
+      }
+    ],
+    "selected": {
+      "system": 2,
+      "line": 0,
+      "measure": 3,
+      "beat": 1.5
+    },
+    "currentPage": 0,
+    "project": "p/Star_Spangled_Banner",
+    "pages": [
+      {
+        "systems": 4,
+        "staffSpacing": []
+      },
+      {
+        "systems": 4,
+        "staffSpacing": []
+      }
+    ],
+    "lines": [
+      {
+        "name": "",
+        "clefs": [
+          {
+            "value": "treble",
+            "measure": 0,
+            "beat": 0
+          }
+        ],
+        "keys": [
+          {
+            "root": "C",
+            "mode": "major",
+            "measure": 0,
+            "beat": 0
+          }
+        ],
+        "voices": [
+          "theme"
+        ]
+      }
+    ],
+    "systems": [
+      {
+        "measures": 3,
+        "lineSpacing": [
+          0
+        ],
+        "length": 800
+      },
+      {
+        "measures": 4,
+        "lineSpacing": []
+      },
+      {
+        "measures": 4,
+        "lineSpacing": [],
+        "length": 800
+      },
+      {
+        "measures": 4,
+        "lineSpacing": []
+      },
+      {
+        "measures": 4,
+        "lineSpacing": []
+      },
+      {
+        "measures": 4,
+        "lineSpacing": []
+      },
+      {
+        "measures": 3,
+        "lineSpacing": []
+      }
+    ]
+  },
+  "voices": [],
+  "chordSymbols": [],
+  "options": {}
+}
