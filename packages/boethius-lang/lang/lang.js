@@ -419,6 +419,10 @@ parse: function parse(input) {
         return new NoteNode(props);
     };
 
+    NoteNode.prototype.toJSON = function () {
+        return Object.assign({}, this, {type: NOTE});
+    };
+
     function RestNode (props) {
         this.props = props;
     }
@@ -428,6 +432,10 @@ parse: function parse(input) {
     RestNode.prototype.clone = function (newprops) {
         var props = Object.assign({}, this.props, newprops);
         return new RestNode(props);
+    };
+
+    RestNode.prototype.toJSON = function () {
+        return Object.assign({}, this, {type: REST});
     };
 
     RestNode.prototype.expand = function () {
@@ -445,6 +453,10 @@ parse: function parse(input) {
         var props = Object.assign({}, this.props, newprops);
         var children = this.children.map(function (child) {return child.clone(newprops)});
         return new ChordNode(props, children);
+    };
+
+    ChordNode.prototype.toJSON = function () {
+        return Object.assign({}, this, {type: CHORD});
     };
 
     ChordNode.prototype.expand = function () {
