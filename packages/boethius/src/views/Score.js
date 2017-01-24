@@ -5,7 +5,7 @@ import TimeContext from "./TimeContext";
 import Slur from "./Slur";
 import {createMeasures} from "./Measure";
 import constants from "../constants";
-import {map, reductions, partitionWhen, clone, concat} from "../utils/common";
+import {map, reductions, clone, concat} from "../utils/common";
 import {getTimeContexts} from "../utils/line";
 import {getStaffItems, iterateByTime} from "../utils/system";
 import {getAccidentalContexts} from "../utils/accidental";
@@ -94,7 +94,9 @@ Score.render = function (score, {measures, voices=[], chordSymbols=[], repeats=[
             if (firstTime) {
                 const time = firstTime.time
                 if (startTime.time < time.time) {
-                    throw new Error("Gap in time");
+                    // Add a new TimeContext for the startTime of the system.
+                    const systemTimeContext = _.map(startContext, _.partial(createLineTimeContext, startTime));
+                    systemTimeContexts[index] = [new TimeContext(systemTimeContext), ...systemContext];
                 } else {
                     _.each(firstTime.lines, (timeContext, i) => {
                         if (timeContext) { // there are items at the time.
@@ -206,12 +208,27 @@ function createTimeContexts (lines, voices, measures, chordSymbols) {
 export function partitionBySystem (timeContexts, startMeasures) {
     // split staffTimes and measures
     let systemIdx = 0;
-    const systemTimeContexts = partitionWhen(timeContexts, (timeContext) => {
+
+    const systemTimeContexts =  _.reduce(timeContexts, (acc, timeContext) => {
         const measure = timeContext.time.measure;
-        const ret = measure >= startMeasures[systemIdx + 1];
-        if (ret) systemIdx++;
-        return ret;
-    });
+        const shouldPartition = measure >= startMeasures[systemIdx + 1];
+		if (shouldPartition) {
+            systemIdx++;
+            while (measure >= startMeasures[systemIdx + 1]) {
+                acc.push([]);
+                systemIdx++;
+            }
+			let partition = [timeContext];
+			acc.push(partition);
+		} else {
+            if (!acc[acc.length-1]) {
+                acc.push([timeContext]);
+            } else {
+                acc[acc.length-1].push(timeContext);
+            }
+		}
+		return acc;
+	}, []);
 
     // add empty contexts for any remaining systemIdxs'
     _.each(_.drop(startMeasures, systemIdx + 2), () => systemTimeContexts.push([]));

@@ -7,14 +7,22 @@
     "title": "Lead",
     "composer": "",
     "timeSignatures": [
-      {
-        "value": [
-          4,
-          4
-        ],
-        "measure": 0,
-        "beat": 0
-      }
+        {
+            "value": [
+                4,
+                4
+            ],
+            "measure": 0,
+            "beat": 0
+        },
+        {
+            "value": [
+                3,
+                4
+            ],
+            "measure": 5,
+            "beat": 0
+        }
     ],
     "selected": {
       "system": 2,
