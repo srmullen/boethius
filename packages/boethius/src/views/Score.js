@@ -133,7 +133,7 @@ Score.render = function (score, {measures, voices=[], chordSymbols=[], repeats=[
                 score.pages[system.page].staffSpacing[i] || i * 250 :
                 score.pages[system.page].staffSpacing[i] || i * 250 + _.indexOf(pages, system.page) * score.pageHeight;
 
-            systemGroup.translate(0, systemTranslation);
+            systemGroup.translate(system.indentation, systemTranslation);
 
             return systemGroup;
         });

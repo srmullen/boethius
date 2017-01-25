@@ -1,0 +1,1287 @@
+{
+  "error": {},
+  "layout": {
+    "_id": "p/Star_Spangled_Banner/layout/1482699809626",
+    "_rev": "16-31b70ad134f997a1fce031f848953a8f",
+    "name": "",
+    "title": "Lead",
+    "composer": "",
+    "timeSignatures": [
+      {
+        "value": [
+          3,
+          4
+        ],
+        "measure": 0,
+        "beat": 0
+      }
+    ],
+    "selected": {
+      "system": 0,
+      "line": 0,
+      "measure": 0,
+      "beat": 0
+    },
+    "currentPage": 0,
+    "project": "p/Star_Spangled_Banner",
+    "pages": [
+      {
+        "systems": 4,
+        "staffSpacing": []
+      }
+    ],
+    "lines": [
+      {
+        "name": "",
+        "clefs": [
+          {
+            "value": "treble",
+            "measure": 0,
+            "beat": 0
+          }
+        ],
+        "keys": [
+          {
+            "root": "C",
+            "mode": "major",
+            "measure": 0,
+            "beat": 0
+          }
+        ],
+        "voices": [
+          "theme"
+        ]
+      }
+    ],
+    "systems": [
+      {
+        "measures": 3,
+        "lineSpacing": [
+          0
+        ],
+        "length": 800
+      },
+      {
+        "measures": 4,
+        "lineSpacing": []
+      },
+      {
+        "measures": 4,
+        "lineSpacing": [],
+        "length": 800
+      },
+      {
+        "measures": 4,
+        "lineSpacing": []
+      },
+      {
+        "measures": 4,
+        "lineSpacing": []
+      },
+      {
+        "measures": 4,
+        "lineSpacing": []
+      },
+      {
+        "measures": 3,
+        "lineSpacing": []
+      }
+    ]
+  },
+  "voices": [
+    {
+      "type": "voice",
+      "props": {
+        "name": "theme"
+      },
+      "children": [
+        {
+          "props": {
+            "value": 4,
+            "dots": 0,
+            "part": "lead",
+            "tempo": 100,
+            "time": 0
+          },
+          "type": "rest"
+        },
+        {
+          "props": {
+            "value": 4,
+            "dots": 0,
+            "part": "lead",
+            "tempo": 100,
+            "time": 0.25
+          },
+          "type": "rest"
+        },
+        {
+          "props": {
+            "pitchClass": "g",
+            "octave": 4,
+            "value": 8,
+            "dots": 1,
+            "part": "lead",
+            "tempo": 100,
+            "time": 0.5
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "e",
+            "octave": 4,
+            "value": 6,
+            "dots": 0,
+            "part": "lead",
+            "tempo": 100,
+            "time": 0.6875
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "c",
+            "octave": 4,
+            "part": "lead",
+            "tempo": 100,
+            "time": 0.8541666666666666
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "e",
+            "octave": 4,
+            "part": "lead",
+            "tempo": 100,
+            "time": 1.1041666666666667
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "g",
+            "octave": 4,
+            "part": "lead",
+            "tempo": 100,
+            "time": 1.3541666666666667
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "c",
+            "octave": 5,
+            "slur": true,
+            "part": "lead",
+            "tempo": 100,
+            "time": 1.6041666666666667
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "c",
+            "octave": 5,
+            "value": 4,
+            "dots": 1,
+            "slur": true,
+            "part": "lead",
+            "tempo": 100,
+            "time": 1.8541666666666667
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "value": 8,
+            "dots": 0,
+            "part": "lead",
+            "tempo": 100,
+            "time": 2.2291666666666665
+          },
+          "type": "rest"
+        },
+        {
+          "props": {
+            "pitchClass": "e",
+            "octave": 5,
+            "value": 4,
+            "dots": 1,
+            "part": "lead",
+            "tempo": 100,
+            "time": 2.3541666666666665
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "d",
+            "octave": 5,
+            "value": 8,
+            "dots": 0,
+            "part": "lead",
+            "tempo": 100,
+            "time": 2.7291666666666665
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "c",
+            "octave": 5,
+            "part": "lead",
+            "tempo": 100,
+            "time": 2.8541666666666665
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "e",
+            "octave": 4,
+            "part": "lead",
+            "tempo": 100,
+            "time": 3.1041666666666665
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "f#",
+            "octave": 4,
+            "part": "lead",
+            "tempo": 100,
+            "time": 3.3541666666666665
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "g",
+            "octave": 4,
+            "value": 4,
+            "dots": 0,
+            "part": "lead",
+            "tempo": 100,
+            "time": 3.6041666666666665
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "value": 4,
+            "dots": 0,
+            "part": "lead",
+            "tempo": 100,
+            "time": 3.8541666666666665
+          },
+          "type": "rest"
+        },
+        {
+          "props": {
+            "pitchClass": "g",
+            "octave": 4,
+            "part": "lead",
+            "tempo": 100,
+            "time": 4.104166666666667
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "e",
+            "octave": 5,
+            "value": 4,
+            "dots": 1,
+            "part": "lead",
+            "tempo": 100,
+            "time": 4.354166666666667
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "d",
+            "octave": 5,
+            "value": 8,
+            "dots": 0,
+            "part": "lead",
+            "tempo": 100,
+            "time": 4.729166666666667
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "c",
+            "octave": 5,
+            "part": "lead",
+            "tempo": 100,
+            "time": 4.854166666666667
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "b",
+            "octave": 4,
+            "value": 2,
+            "dots": 0,
+            "part": "lead",
+            "tempo": 100,
+            "time": 5.104166666666667
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "a",
+            "octave": 4,
+            "value": 8,
+            "dots": 0,
+            "part": "lead",
+            "tempo": 100,
+            "time": 5.604166666666667
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "b",
+            "octave": 4,
+            "value": 8,
+            "dots": 0,
+            "part": "lead",
+            "tempo": 100,
+            "time": 5.729166666666667
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "c",
+            "octave": 5,
+            "part": "lead",
+            "tempo": 100,
+            "time": 5.854166666666667
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "c",
+            "octave": 5,
+            "part": "lead",
+            "tempo": 100,
+            "time": 6.104166666666667
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "g",
+            "octave": 4,
+            "part": "lead",
+            "tempo": 100,
+            "time": 6.354166666666667
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "e",
+            "octave": 4,
+            "part": "lead",
+            "tempo": 100,
+            "time": 6.604166666666667
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "c",
+            "octave": 4,
+            "part": "lead",
+            "tempo": 100,
+            "time": 6.854166666666667
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "value": 4,
+            "dots": 0,
+            "part": "lead",
+            "tempo": 100,
+            "time": 7.104166666666667
+          },
+          "type": "rest"
+        },
+        {
+          "props": {
+            "value": 4,
+            "dots": 0,
+            "part": "lead",
+            "tempo": 100,
+            "time": 7.354166666666667
+          },
+          "type": "rest"
+        },
+        {
+          "props": {
+            "pitchClass": "g",
+            "octave": 4,
+            "value": 8,
+            "dots": 1,
+            "part": "lead",
+            "tempo": 100,
+            "time": 7.604166666666667
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "e",
+            "octave": 4,
+            "value": 6,
+            "dots": 0,
+            "part": "lead",
+            "tempo": 100,
+            "time": 7.791666666666667
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "c",
+            "octave": 4,
+            "part": "lead",
+            "tempo": 100,
+            "time": 7.958333333333333
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "e",
+            "octave": 4,
+            "part": "lead",
+            "tempo": 100,
+            "time": 8.208333333333334
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "g",
+            "octave": 4,
+            "part": "lead",
+            "tempo": 100,
+            "time": 8.458333333333334
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "c",
+            "octave": 5,
+            "slur": true,
+            "part": "lead",
+            "tempo": 100,
+            "time": 8.708333333333334
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "c",
+            "octave": 5,
+            "value": 4,
+            "dots": 1,
+            "slur": true,
+            "part": "lead",
+            "tempo": 100,
+            "time": 8.958333333333334
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "value": 8,
+            "dots": 0,
+            "part": "lead",
+            "tempo": 100,
+            "time": 9.333333333333334
+          },
+          "type": "rest"
+        },
+        {
+          "props": {
+            "pitchClass": "e",
+            "octave": 5,
+            "value": 4,
+            "dots": 1,
+            "part": "lead",
+            "tempo": 100,
+            "time": 9.458333333333334
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "d",
+            "octave": 5,
+            "value": 8,
+            "dots": 0,
+            "part": "lead",
+            "tempo": 100,
+            "time": 9.833333333333334
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "c",
+            "octave": 5,
+            "part": "lead",
+            "tempo": 100,
+            "time": 9.958333333333334
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "e",
+            "octave": 4,
+            "part": "lead",
+            "tempo": 100,
+            "time": 10.208333333333334
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "f#",
+            "octave": 4,
+            "part": "lead",
+            "tempo": 100,
+            "time": 10.458333333333334
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "g",
+            "octave": 4,
+            "value": 4,
+            "dots": 0,
+            "part": "lead",
+            "tempo": 100,
+            "time": 10.708333333333334
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "value": 4,
+            "dots": 0,
+            "part": "lead",
+            "tempo": 100,
+            "time": 10.958333333333334
+          },
+          "type": "rest"
+        },
+        {
+          "props": {
+            "pitchClass": "g",
+            "octave": 4,
+            "part": "lead",
+            "tempo": 100,
+            "time": 11.208333333333334
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "e",
+            "octave": 5,
+            "value": 4,
+            "dots": 1,
+            "part": "lead",
+            "tempo": 100,
+            "time": 11.458333333333334
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "d",
+            "octave": 5,
+            "value": 8,
+            "dots": 0,
+            "part": "lead",
+            "tempo": 100,
+            "time": 11.833333333333334
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "c",
+            "octave": 5,
+            "part": "lead",
+            "tempo": 100,
+            "time": 11.958333333333334
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "b",
+            "octave": 4,
+            "value": 2,
+            "dots": 0,
+            "part": "lead",
+            "tempo": 100,
+            "time": 12.208333333333334
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "a",
+            "octave": 4,
+            "value": 8,
+            "dots": 0,
+            "part": "lead",
+            "tempo": 100,
+            "time": 12.708333333333334
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "b",
+            "octave": 4,
+            "value": 8,
+            "dots": 0,
+            "part": "lead",
+            "tempo": 100,
+            "time": 12.833333333333334
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "c",
+            "octave": 5,
+            "part": "lead",
+            "tempo": 100,
+            "time": 12.958333333333334
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "c",
+            "octave": 5,
+            "part": "lead",
+            "tempo": 100,
+            "time": 13.208333333333334
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "g",
+            "octave": 4,
+            "part": "lead",
+            "tempo": 100,
+            "time": 13.458333333333334
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "e",
+            "octave": 4,
+            "part": "lead",
+            "tempo": 100,
+            "time": 13.708333333333334
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "c",
+            "octave": 4,
+            "part": "lead",
+            "tempo": 100,
+            "time": 13.958333333333334
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "e",
+            "octave": 5,
+            "value": 4,
+            "dots": 1,
+            "part": "lead",
+            "tempo": 100,
+            "time": 14.208333333333334
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "e",
+            "octave": 5,
+            "value": 8,
+            "dots": 0,
+            "attack": 0.01,
+            "part": "lead",
+            "tempo": 100,
+            "time": 14.583333333333334
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "e",
+            "octave": 5,
+            "part": "lead",
+            "tempo": 100,
+            "time": 14.708333333333334
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "f",
+            "octave": 5,
+            "part": "lead",
+            "tempo": 100,
+            "time": 14.958333333333334
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "g",
+            "octave": 5,
+            "part": "lead",
+            "tempo": 100,
+            "time": 15.208333333333334
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "g",
+            "octave": 5,
+            "value": 2,
+            "dots": 0,
+            "part": "lead",
+            "tempo": 100,
+            "time": 15.458333333333334
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "f",
+            "octave": 5,
+            "value": 8,
+            "dots": 0,
+            "part": "lead",
+            "tempo": 100,
+            "time": 15.958333333333334
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "e",
+            "octave": 5,
+            "value": 8,
+            "dots": 0,
+            "part": "lead",
+            "tempo": 100,
+            "time": 16.083333333333332
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "d",
+            "octave": 5,
+            "part": "lead",
+            "tempo": 100,
+            "time": 16.208333333333332
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "e",
+            "octave": 5,
+            "part": "lead",
+            "tempo": 100,
+            "time": 16.458333333333332
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "f",
+            "octave": 5,
+            "part": "lead",
+            "tempo": 100,
+            "time": 16.708333333333332
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "f",
+            "octave": 5,
+            "value": 2,
+            "dots": 0,
+            "part": "lead",
+            "tempo": 100,
+            "time": 16.958333333333332
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "f",
+            "octave": 5,
+            "part": "lead",
+            "tempo": 100,
+            "time": 17.458333333333332
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "e",
+            "octave": 5,
+            "value": 4,
+            "dots": 1,
+            "part": "lead",
+            "tempo": 100,
+            "time": 17.708333333333332
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "d",
+            "octave": 5,
+            "value": 8,
+            "dots": 0,
+            "part": "lead",
+            "tempo": 100,
+            "time": 18.083333333333332
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "c",
+            "octave": 5,
+            "part": "lead",
+            "tempo": 100,
+            "time": 18.208333333333332
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "b",
+            "octave": 4,
+            "value": 2,
+            "dots": 0,
+            "part": "lead",
+            "tempo": 100,
+            "time": 18.458333333333332
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "a",
+            "octave": 4,
+            "value": 8,
+            "dots": 0,
+            "part": "lead",
+            "tempo": 100,
+            "time": 18.958333333333332
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "b",
+            "octave": 4,
+            "value": 8,
+            "dots": 0,
+            "part": "lead",
+            "tempo": 100,
+            "time": 19.083333333333332
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "c",
+            "octave": 5,
+            "part": "lead",
+            "tempo": 100,
+            "time": 19.208333333333332
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "e",
+            "octave": 4,
+            "part": "lead",
+            "tempo": 100,
+            "time": 19.458333333333332
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "f#",
+            "octave": 4,
+            "part": "lead",
+            "tempo": 100,
+            "time": 19.708333333333332
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "g",
+            "octave": 4,
+            "value": 2,
+            "dots": 0,
+            "part": "lead",
+            "tempo": 100,
+            "time": 19.958333333333332
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "g",
+            "octave": 4,
+            "part": "lead",
+            "tempo": 100,
+            "time": 20.458333333333332
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "c",
+            "octave": 5,
+            "part": "lead",
+            "tempo": 100,
+            "time": 20.708333333333332
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "c",
+            "octave": 5,
+            "part": "lead",
+            "tempo": 100,
+            "time": 20.958333333333332
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "c",
+            "octave": 5,
+            "value": 8,
+            "dots": 0,
+            "part": "lead",
+            "tempo": 100,
+            "time": 21.208333333333332
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "b",
+            "octave": 4,
+            "value": 8,
+            "dots": 0,
+            "part": "lead",
+            "tempo": 100,
+            "time": 21.333333333333332
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "a",
+            "octave": 4,
+            "part": "lead",
+            "tempo": 100,
+            "time": 21.458333333333332
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "a",
+            "octave": 4,
+            "part": "lead",
+            "tempo": 100,
+            "time": 21.708333333333332
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "a",
+            "octave": 4,
+            "part": "lead",
+            "tempo": 100,
+            "time": 21.958333333333332
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "d",
+            "octave": 5,
+            "part": "lead",
+            "tempo": 100,
+            "time": 22.208333333333332
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "f",
+            "octave": 5,
+            "value": 8,
+            "part": "lead",
+            "tempo": 100,
+            "time": 22.458333333333332
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "e",
+            "octave": 5,
+            "value": 8,
+            "part": "lead",
+            "tempo": 100,
+            "time": 22.583333333333332
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "d",
+            "octave": 5,
+            "value": 8,
+            "part": "lead",
+            "tempo": 100,
+            "time": 22.708333333333332
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "c",
+            "octave": 5,
+            "value": 8,
+            "part": "lead",
+            "tempo": 100,
+            "time": 22.833333333333332
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "c",
+            "octave": 5,
+            "part": "lead",
+            "tempo": 100,
+            "time": 22.958333333333332
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "b",
+            "octave": 4,
+            "value": 2,
+            "dots": 0,
+            "part": "lead",
+            "tempo": 100,
+            "time": 23.208333333333332
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "g",
+            "octave": 4,
+            "value": 4,
+            "dots": 0,
+            "part": "lead",
+            "tempo": 100,
+            "time": 23.708333333333332
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "c",
+            "octave": 5,
+            "value": 4,
+            "dots": 1,
+            "part": "lead",
+            "tempo": 100,
+            "time": 23.958333333333332
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "d",
+            "octave": 5,
+            "value": 8,
+            "part": "lead",
+            "tempo": 100,
+            "time": 24.333333333333332
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "e",
+            "octave": 5,
+            "value": 8,
+            "part": "lead",
+            "tempo": 100,
+            "time": 24.458333333333332
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "f",
+            "octave": 5,
+            "value": 8,
+            "part": "lead",
+            "tempo": 100,
+            "time": 24.583333333333332
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "g",
+            "octave": 5,
+            "value": 2,
+            "dots": 0,
+            "part": "lead",
+            "tempo": 100,
+            "time": 24.708333333333332
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "c",
+            "octave": 5,
+            "value": 8,
+            "dots": 0,
+            "part": "lead",
+            "tempo": 100,
+            "time": 25.208333333333332
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "d",
+            "octave": 5,
+            "value": 8,
+            "dots": 0,
+            "part": "lead",
+            "tempo": 100,
+            "time": 25.333333333333332
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "e",
+            "octave": 5,
+            "value": 4,
+            "dots": 1,
+            "part": "lead",
+            "tempo": 100,
+            "time": 25.458333333333332
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "f",
+            "octave": 5,
+            "value": 8,
+            "dots": 0,
+            "part": "lead",
+            "tempo": 100,
+            "time": 25.833333333333332
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "d",
+            "octave": 5,
+            "value": 2,
+            "dots": 0,
+            "part": "lead",
+            "tempo": 100,
+            "time": 25.958333333333332
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "c",
+            "octave": 5,
+            "value": 2,
+            "dots": 0,
+            "part": "lead",
+            "tempo": 100,
+            "time": 26.458333333333332
+          },
+          "type": "note"
+        }
+      ]
+    }
+  ],
+  "chordSymbols": [],
+  "options": {}
+}

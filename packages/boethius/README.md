@@ -24,7 +24,6 @@ TODOS:
     - placement.commonShortestDuration implementation.
     - Repeats
     - Da Capo / Dal Segno
-    - Break notes crossing barlines.
 
     # Lower priority
     - SMuFL
@@ -46,5 +45,6 @@ TODOS:
     - Fix double rendering of ledger lines.
     - Lyrics
     - Ability to specify horizontal position of systems.
+    - How to handle non-standard note durations? ex. a4/6
 
 ISSUES:
