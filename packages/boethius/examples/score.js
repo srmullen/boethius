@@ -125,6 +125,7 @@ var examples = {
         var page2 = scored.page();
 
         var score = scored.score({
+            title: "Test Pages",
             length: 1000,
             systemHeights: [0, 350, 0, 0]
         }, [fourfour, system1, system2, system3, system4, trebleLine, bassLine, page0, page1, page2]);

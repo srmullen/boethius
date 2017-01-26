@@ -121,7 +121,7 @@ Score.render = function (score, {measures, voices=[], chordSymbols=[], repeats=[
 
         let systemOffset = 0;
 
-        if (score.title) {
+        if (score.title && _.contains(pages, 0)) {
             const titleGroup = score.title.render();
             titleGroup.translate(score.length/2, 0);
             systemOffset = titleGroup.bounds.height;
