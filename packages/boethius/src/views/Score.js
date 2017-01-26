@@ -123,7 +123,8 @@ Score.render = function (score, {measures, voices=[], chordSymbols=[], repeats=[
 
         if (score.title && _.contains(pages, 0)) {
             const titleGroup = score.title.render();
-            titleGroup.translate(score.length/2, 0);
+            const xTranslate = (score.length || score.pageWidth)/2;
+            titleGroup.translate(xTranslate, 0);
             systemOffset = titleGroup.bounds.height;
             scoreGroup.addChild(titleGroup);
         }

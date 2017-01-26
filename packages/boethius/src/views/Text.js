@@ -10,11 +10,14 @@ const Text = function ({value="", fontSize=32, fontFamily="gonvillealpha", fillC
 Text.prototype.type = constants.type.text;
 
 Text.prototype.render = function () {
-    return new paper.PointText({
-        content: this.value,
-        fontFamily: this.fontFamily,
-        fontSize: this.fontSize,
-        fillColor: this.fillColor,
+    return new paper.Group({
+        name: constants.type.text,
+        children: [new paper.PointText({
+            content: this.value,
+            fontFamily: this.fontFamily,
+            fontSize: this.fontSize,
+            fillColor: this.fillColor,
+        })]
     });
 }
 
