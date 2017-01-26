@@ -9,6 +9,7 @@ import Line from "./views/Line";
 import Measure from "./views/Measure";
 import Clef from "./views/Clef";
 import Key from "./views/Key";
+import Text from "./views/Text";
 import TimeSignature from "./views/TimeSignature";
 import Dynamic from "./views/Dynamic";
 import ChordSymbol from "./views/ChordSymbol";
@@ -84,6 +85,10 @@ Scored.prototype.clef = function clef (context={}) {
 
 Scored.prototype.key = function key (context={}) {
 	return new Key(context);
+};
+
+Scored.prototype.text = function text (context={}) {
+	return new Text(context);
 };
 
 Scored.prototype.timeSig = function timeSignature (context={}) {

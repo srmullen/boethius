@@ -1,10 +1,10 @@
 import constants from "../constants";
 
-const Text = function ({value="", fontSize=Scored.config.fontSize, fontFamily="gonvillealpha", fillColor="black"}) {
+const Text = function ({value="", fontSize=32, fontFamily="gonvillealpha", fillColor="black"}) {
     this.value = value;
-    this.fontSize;
-    this.fontFamily;
-    this.fillColor;
+    this.fontSize = fontSize;
+    this.fontFamily = fontFamily;
+    this.fillColor = fillColor;
 }
 
 Text.prototype.type = constants.type.text;

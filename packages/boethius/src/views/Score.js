@@ -3,6 +3,7 @@ import _ from "lodash";
 import System from "./System";
 import TimeContext from "./TimeContext";
 import Slur from "./Slur";
+import Text from "./Text";
 import {createMeasures} from "./Measure";
 import constants from "../constants";
 import {map, reductions, clone, concat} from "../utils/common";
@@ -10,7 +11,7 @@ import {getTimeContexts} from "../utils/line";
 import {getStaffItems, iterateByTime} from "../utils/system";
 import {getAccidentalContexts} from "../utils/accidental";
 import {getTime, equals} from "../utils/timeUtils";
-import {isClef, isKey, isTimeSignature} from "../types";
+import {isClef, isKey, isText, isTimeSignature} from "../types";
 
 const TYPE = constants.type.score;
 
@@ -20,7 +21,7 @@ const TYPE = constants.type.score;
  * @param pageWidth - pixels given 72 dpi
  * @param pageHeight - pixels given 72 dpi
  */
-function Score ({pageWidth=595, pageHeight=842, length}, children=[]) {
+function Score ({pageWidth=595, pageHeight=842, length, title}, children=[]) {
     /*
      * A score should have both systems and lines.
      * A line represents all measures from 0 to the end of the score. It is one-dimentional.
@@ -35,6 +36,7 @@ function Score ({pageWidth=595, pageHeight=842, length}, children=[]) {
     this.length = length;
     this.pageWidth = pageWidth;
     this.pageHeight = pageHeight;
+    this.title = parseTitle(title);
 }
 
 Score.prototype.type = TYPE;
@@ -117,6 +119,15 @@ Score.render = function (score, {measures, voices=[], chordSymbols=[], repeats=[
             }
         }, systemsToRender);
 
+        let systemOffset = 0;
+
+        if (score.title) {
+            const titleGroup = score.title.render();
+            titleGroup.translate(score.length/2, 0);
+            systemOffset = titleGroup.bounds.height;
+            scoreGroup.addChild(titleGroup);
+        }
+
         const systemGroups = _.map(systemsToRender, ({system, index}, i) => {
             const endMeasure = startMeasures[index] + system.measures;
             const systemMeasures = _.slice(measures, startMeasures[index], endMeasure);
@@ -133,7 +144,7 @@ Score.render = function (score, {measures, voices=[], chordSymbols=[], repeats=[
                 score.pages[system.page].staffSpacing[i] || i * 250 :
                 score.pages[system.page].staffSpacing[i] || i * 250 + _.indexOf(pages, system.page) * score.pageHeight;
 
-            systemGroup.translate(system.indentation, systemTranslation);
+            systemGroup.translate(system.indentation, systemTranslation + systemOffset);
 
             return systemGroup;
         });
@@ -240,6 +251,18 @@ function getLineByVoice (voice, lines) {
     return _.find(lines, (line) => {
         return _.indexOf(line.voices, voice) !== -1;
     });
+}
+
+function parseTitle (title) {
+    if (isText(title)) {
+        return title;
+    } else if (_.isObject(title)) {
+        return new Text(title);
+    } else if (_.isString(title)) {
+        return new Text({value: title});
+    } else {
+        return null;
+    }
 }
 
 Score.getLineByVoice = getLineByVoice;

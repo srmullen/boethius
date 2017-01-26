@@ -9,7 +9,7 @@ import constants from "./constants";
  * @return - Boolean. True if items type is equal to type.
  */
 function isType (type, item) {
-    return type === item.type;
+    return item && type === item.type;
 }
 
 const isChord = _.partial(isType, constants.type.chord);
@@ -27,6 +27,7 @@ const isSystem = _.partial(isType, constants.type.system);
 const isTimeSignature = _.partial(isType, constants.type.timeSig);
 const isVoice = _.partial(isType, constants.type.voice);
 const isRepeat = _.partial(isType, constants.type.repeat);
+const isText = _.partial(isType, constants.type.text);
 const isMarking = item => isClef(item) || isKey(item) || isTimeSignature(item) || isRepeat(item);
 const isPitched = item => isNote(item) || isChord(item);
 const hasDuration = item => isNote(item) || isChord(item) || isRest(item);
@@ -45,6 +46,7 @@ export {
     isScore,
     isSlur,
     isSystem,
+    isText,
     isTimeSignature,
     isVoice,
     isMarking,

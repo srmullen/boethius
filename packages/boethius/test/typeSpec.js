@@ -12,6 +12,7 @@ import {
     isRepeat,
     isScore,
     isSystem,
+    isText,
     isTimeSignature,
     isVoice,
     isMarking,
@@ -101,9 +102,16 @@ describe("types", () => {
     });
 
     describe("isSystem", () => {
-        it("should return true if the given item is a Staff, false otherwise", () => {
+        it("should return true if the given item is a System, false otherwise", () => {
             expect(isSystem(scored.system())).to.be.true;
             expect(isSystem(scored.chord({}, ["c4", "d4"]))).to.be.false;
+        });
+    });
+
+    describe("isText", () => {
+        it("should return true if the given item is a Text, false otherwise", () => {
+            expect(isText(scored.text({value: "hello"}))).to.be.true;
+            expect(isText(scored.chord({}, ["c4", "d4"]))).to.be.false;
         });
     });
 

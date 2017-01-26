@@ -608,7 +608,9 @@ var examples = {
 
         var page0 = scored.page();
 
-        var score = scored.score({length: 1000, systemHeights: [0, 350]}, [fourfour, system1, system2, trebleLine, bassLine, page0]);
+        var score = scored.score({
+            length: 1000, systemHeights: [0, 350], title: {value: "Test Title", fontSize: 50}
+        }, [fourfour, system1, system2, trebleLine, bassLine, page0]);
 
         // render it all as a score.
         return scored.render(score, {voices: [soprano, bass]});
