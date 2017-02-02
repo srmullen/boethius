@@ -96,6 +96,11 @@ describe("boethius compilation", () => {
             expect(voices.mel[0].props.octave).not.to.be.ok;
             expect(voices.mel[1].props.octave).to.equal(8);
         });
+
+        it("should translate integers as pitches", () => {
+            const {voices} = compile("[mel 69 70]");
+            expect(voices.mel[0]).to.be.ok;
+        });
     });
 
     describe("nested scopes", () => {

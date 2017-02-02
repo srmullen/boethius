@@ -1,0 +1,3 @@
+[submodule "src/palestrina"]
+	path = src/palestrina
+	url = https://github.com/srmullen/palestrina.git

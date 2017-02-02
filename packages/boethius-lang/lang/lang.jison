@@ -167,6 +167,10 @@ duration:
     ;
 
 pitch:
+    /*float
+        {$$ = {pitchClass: "a"}}*/
+    /*INTEGER
+        {$$ = {pitchClass: "b"}}*/
     PITCHCLASS
         {$$ = {pitchClass: $1}}
     | PITCHCLASS INTEGER

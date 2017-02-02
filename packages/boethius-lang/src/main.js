@@ -1,5 +1,6 @@
 import {parser} from "../lang/lang";
 import {calculateAndSetTimes} from "./time.js";
+import {scale} from "./palestrina";
 
 function compile (program) {
     parser.yy.voices = {};
