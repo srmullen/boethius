@@ -98,8 +98,8 @@ describe("boethius compilation", () => {
         });
 
         it("should translate integers as pitches", () => {
-            const {voices} = compile("[mel 69 70]");
-            expect(voices.mel[0]).to.be.ok;
+            const {voices} = compile("[mel a 4]");
+            expect(voices.mel[0].props.pitchClass).to.be.ok;
         });
     });
 

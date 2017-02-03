@@ -106,9 +106,20 @@
         }
     };
 
+    function parsePitch (pitch) {
+        var pitchClass = pitch.match(/[a-gA-G][b|#]{0,2}(?![a-zA-Z])/)[0];
+        var octave = pitch.match(/[0-9]+/);
+        if (octave && octave[0].length) {
+            return {pitchClass: pitchClass, octave: Number(octave)};
+        } else {
+            return {pitchClass: pitchClass};
+        }
+    }
+
 %}
 
 /* lexical grammar */
+
 %lex
 %%
 
@@ -128,7 +139,8 @@ r                                  return 'REST'
 true|false                         return 'BOOL'
 [0-9]+                             return 'INTEGER'
 csym                               return 'CSYM'
-[a-gA-G][b|#]{0,2}(?![a-zA-Z])     return 'PITCHCLASS'
+[a-gA-G][b|#]{0,2}(?![a-zA-Z])([0-9]+)?    return 'PITCHCLASS'
+/*[a-gA-G][b|#]{0,2}([0-9]+)?     return 'PITCHCLASS'*/
 \~[a-zA-Z][a-zA-Z0-9]*             return 'VAR'
 [a-zA-Z][a-zA-Z0-9]*               return 'IDENTIFIER'
 <<EOF>>                            return 'EOF'
@@ -167,14 +179,10 @@ duration:
     ;
 
 pitch:
-    /*float
-        {$$ = {pitchClass: "a"}}*/
-    /*INTEGER
-        {$$ = {pitchClass: "b"}}*/
-    PITCHCLASS
-        {$$ = {pitchClass: $1}}
-    | PITCHCLASS INTEGER
-        {$$ = {pitchClass: $1, octave: Number($2)}}
+    INTEGER
+        {$$ = {midi: Number($1)};}
+    | PITCHCLASS
+        {$$ = parsePitch($1);}
     ;
 
 note:
