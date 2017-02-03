@@ -1,9 +1,5 @@
 /* description: Parses end executes boethius expressions. */
 %{
-    // types
-    var NOTE = "note";
-    var REST = "rest";
-    var CHORD = "chord";
     var CHORDSYMBOL = "chordSymbol";
 
     var toBoolean = function (string) {
@@ -13,69 +9,6 @@
             return Boolean(string);
         }
     }
-
-    function NoteNode (props) {
-        this.props = props;
-    }
-
-    NoteNode.prototype.type = NOTE;
-
-    NoteNode.prototype.clone = function (newprops) {
-        var props = Object.assign({}, this.props, newprops);
-        return new NoteNode(props);
-    };
-
-    NoteNode.prototype.toJSON = function () {
-        return Object.assign({}, this, {type: NOTE});
-    };
-
-    function RestNode (props) {
-        this.props = props;
-    }
-
-    RestNode.prototype.type = REST;
-
-    RestNode.prototype.clone = function (newprops) {
-        var props = Object.assign({}, this.props, newprops);
-        return new RestNode(props);
-    };
-
-    RestNode.prototype.toJSON = function () {
-        return Object.assign({}, this, {type: REST});
-    };
-
-    RestNode.prototype.expand = function () {
-        return this;
-    };
-
-    function ChordNode (props, children) {
-        this.props = props;
-        this.children = children;
-    }
-
-    ChordNode.prototype.type = CHORD;
-
-    ChordNode.prototype.clone = function (newprops) {
-        var props = Object.assign({}, this.props, newprops);
-        var children = this.children.map(function (child) {return child.clone(newprops)});
-        return new ChordNode(props, children);
-    };
-
-    ChordNode.prototype.toJSON = function () {
-        return Object.assign({}, this, {type: CHORD});
-    };
-
-    ChordNode.prototype.expand = function () {
-        return this;
-    };
-
-    function ChordSymbolNode (props) {
-        this.props = props;
-    }
-
-    ChordSymbolNode.prototype.type = CHORDSYMBOL;
-
-    ChordSymbolNode.prototype.clone = function () {};
 
     function ScopeNode (props, list) {
         this.props = props;
@@ -189,11 +122,11 @@ note:
     pitch
         {
             // default values
-            $$ = new NoteNode($1);
+            $$ = new yy.NoteNode($1);
         }
     | pitch duration
         {
-            $$ = new NoteNode(Object.assign({}, $1, $2));
+            $$ = new yy.NoteNode(Object.assign({}, $1, $2));
         }
     ;
 
@@ -206,18 +139,18 @@ notelist:
 
 rest:
     REST
-        {$$ = new RestNode({});}
+        {$$ = new yy.RestNode({});}
     | REST duration
-        {$$ = new RestNode({value: $2.value, dots: $2.dots});}
+        {$$ = new yy.RestNode({value: $2.value, dots: $2.dots});}
     ;
 
 chord:
     OPENBRKT notelist CLOSEBRKT
-        {$$ = new ChordNode({}, $2);}
+        {$$ = new yy.ChordNode({}, $2);}
     | OPENBRKT notelist CLOSEBRKT duration
         {
             /*$$ = {type: CHORD, children: $2, props: {value: $4.value, dots: $4.dots}};*/
-            $$ = new ChordNode({value: $4.value, dots: $4.dots}, $2);
+            $$ = new yy.ChordNode({value: $4.value, dots: $4.dots}, $2);
         }
     ;
 

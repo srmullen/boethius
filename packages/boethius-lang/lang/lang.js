@@ -107,12 +107,12 @@ break;
 case 8:
 
             // default values
-            this.$ = new NoteNode($$[$0]);
+            this.$ = new yy.NoteNode($$[$0]);
         
 break;
 case 9:
 
-            this.$ = new NoteNode(Object.assign({}, $$[$0-1], $$[$0]));
+            this.$ = new yy.NoteNode(Object.assign({}, $$[$0-1], $$[$0]));
         
 break;
 case 10: case 35: case 46:
@@ -122,18 +122,18 @@ case 11: case 36: case 40: case 47:
 this.$ = $$[$0-1].concat($$[$0])
 break;
 case 12:
-this.$ = new RestNode({});
+this.$ = new yy.RestNode({});
 break;
 case 13:
-this.$ = new RestNode({value: $$[$0].value, dots: $$[$0].dots});
+this.$ = new yy.RestNode({value: $$[$0].value, dots: $$[$0].dots});
 break;
 case 14:
-this.$ = new ChordNode({}, $$[$0-1]);
+this.$ = new yy.ChordNode({}, $$[$0-1]);
 break;
 case 15:
 
             /*this.$ = {type: CHORD, children: $$[$0-2], props: {value: $$[$0].value, dots: $$[$0].dots}};*/
-            this.$ = new ChordNode({value: $$[$0].value, dots: $$[$0].dots}, $$[$0-2]);
+            this.$ = new yy.ChordNode({value: $$[$0].value, dots: $$[$0].dots}, $$[$0-2]);
         
 break;
 case 16:
@@ -394,10 +394,6 @@ parse: function parse(input) {
     return true;
 }};
 
-    // types
-    var NOTE = "note";
-    var REST = "rest";
-    var CHORD = "chord";
     var CHORDSYMBOL = "chordSymbol";
 
     var toBoolean = function (string) {
@@ -407,69 +403,6 @@ parse: function parse(input) {
             return Boolean(string);
         }
     }
-
-    function NoteNode (props) {
-        this.props = props;
-    }
-
-    NoteNode.prototype.type = NOTE;
-
-    NoteNode.prototype.clone = function (newprops) {
-        var props = Object.assign({}, this.props, newprops);
-        return new NoteNode(props);
-    };
-
-    NoteNode.prototype.toJSON = function () {
-        return Object.assign({}, this, {type: NOTE});
-    };
-
-    function RestNode (props) {
-        this.props = props;
-    }
-
-    RestNode.prototype.type = REST;
-
-    RestNode.prototype.clone = function (newprops) {
-        var props = Object.assign({}, this.props, newprops);
-        return new RestNode(props);
-    };
-
-    RestNode.prototype.toJSON = function () {
-        return Object.assign({}, this, {type: REST});
-    };
-
-    RestNode.prototype.expand = function () {
-        return this;
-    };
-
-    function ChordNode (props, children) {
-        this.props = props;
-        this.children = children;
-    }
-
-    ChordNode.prototype.type = CHORD;
-
-    ChordNode.prototype.clone = function (newprops) {
-        var props = Object.assign({}, this.props, newprops);
-        var children = this.children.map(function (child) {return child.clone(newprops)});
-        return new ChordNode(props, children);
-    };
-
-    ChordNode.prototype.toJSON = function () {
-        return Object.assign({}, this, {type: CHORD});
-    };
-
-    ChordNode.prototype.expand = function () {
-        return this;
-    };
-
-    function ChordSymbolNode (props) {
-        this.props = props;
-    }
-
-    ChordSymbolNode.prototype.type = CHORDSYMBOL;
-
-    ChordSymbolNode.prototype.clone = function () {};
 
     function ScopeNode (props, list) {
         this.props = props;
