@@ -39,7 +39,14 @@ describe("barline", () => {
             expect(division[1]).to.be.instanceof(Rest);
         });
 
-        it("should return notes if passed a Note", () => {
+        it("should not slur rests", () => {
+            const r = new Rest({value: 1, time: 0.5});
+            const division = divide(1, r);
+            expect(division[0].slur).not.to.be.ok;
+            expect(division[1].slur).not.to.be.ok;
+        });
+
+        xit("should return notes if passed a Chord", () => {
             const c = new Chord({value: 1, time: 0.5}, ["a4", "b4"]);
             const division = divide(1, c);
             expect(division[0]).to.be.instanceof(Chord);

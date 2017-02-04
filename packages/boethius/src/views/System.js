@@ -184,18 +184,18 @@ function placeTimes (timeContexts, measures, measureLengths, cursorFn) {
 /*
  * mutates systemGroup
  */
-function renderDecorations (systemGroup, voices) {
-	const decorationGroups = renderSlurs(voices);
-	decorationGroups.map(group => systemGroup.addChildren(group));
-	return systemGroup;
-}
-
-function renderSlurs (voices) {
-	return _.map(voices, voice => {
-		// slurs only need to know voice
-		return voice.renderSlurs();
-	});
-}
+// function renderDecorations (systemGroup, voices) {
+// 	const decorationGroups = renderSlurs(voices);
+// 	decorationGroups.map(group => systemGroup.addChildren(group));
+// 	return systemGroup;
+// }
+//
+// function renderSlurs (voices) {
+// 	return _.map(voices, voice => {
+// 		// slurs only need to know voice
+// 		return voice.renderSlurs();
+// 	});
+// }
 
 /*
  * @param Items[][] - Array of voices on the line

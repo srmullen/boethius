@@ -21,5 +21,11 @@ export function divide (time, item) {
     // get duration of new items
     const dur1 = absoluteToRelativeDuration(time - item.time);
     const dur2 = absoluteToRelativeDuration(item.time + duration - time);
-    return [clone(item, {...dur1, slur: BREAK}), clone(item, {...dur2, time, slur: BREAK})];
+    if (isNote(item)) {
+        return [clone(item, {...dur1, slur: BREAK}), clone(item, {...dur2, time, slur: BREAK})];
+    } else if (isRest(item)) {
+        return [clone(item, {...dur1}), clone(item, {...dur2, time})];
+    } else {
+        throw new Error("Unsure how to divide item");
+    }
 }
