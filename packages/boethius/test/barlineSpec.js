@@ -46,7 +46,7 @@ describe("barline", () => {
             expect(division[1].slur).not.to.be.ok;
         });
 
-        xit("should return notes if passed a Chord", () => {
+        it("should return notes if passed a Chord", () => {
             const c = new Chord({value: 1, time: 0.5}, ["a4", "b4"]);
             const division = divide(1, c);
             expect(division[0]).to.be.instanceof(Chord);

@@ -135,7 +135,8 @@ function isOdd (n) {
 
 function clone (item, props={}) {
 	const Constructor = item.constructor;
-	return new Constructor(Object.assign({}, item, props));
+	const children = item.children ? _.map(item.children, clone) : undefined;
+	return new Constructor(Object.assign({}, item, props), children);
 }
 
 export {

@@ -150,8 +150,15 @@ describe("common", () => {
             expect(clefClone.otherProp).not.to.be.defined;
         });
 
-        xit("should deep clone children", () => {
-            expect("fixme").to.equal(0);
+        it("should deep clone children", () => {
+            const n1 = scored.note({value: 4, pitch: "f5"});
+            const n2 = scored.note({value: 8, pitch: "a6"});
+            const chord = scored.chord({value: 1}, [n1, n2]);
+            const cloned = clone(chord);
+            expect(cloned.children[0].equals(chord.children[0])).to.be.true;
+            expect(cloned.children[0]).not.to.equal(chord.children[0]);
+            expect(cloned.children[1].equals(chord.children[1])).to.be.true;
+            expect(cloned.children[1]).not.to.equal(chord.children[1]);
         });
     });
 });

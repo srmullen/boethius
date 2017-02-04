@@ -23,6 +23,7 @@ function Note ({pitch, pitchClass="a", octave=4, value=4, dots=0, slur, tuplet, 
 	this.pitch = pitch || (pitchClass + octave);
 	this.pitchClass = pitchClass;
 	this.octave = this.octave;
+	// FIXME: doesn't get cloned. Possible bugs could result.
 	this.note = teoria.note(this.pitch, {value: value, dots: dots});
 	this.value = value;
 	this.dots = dots;
