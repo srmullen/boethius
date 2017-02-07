@@ -139,7 +139,7 @@ System.renderTimeContexts = function ({system, lines, measures, voices, timeCont
 		}, lines, lineGroups, lineCenters);
 	}
 
-	const measureNumber = renderMeasureNumber(measures[0].startsAt);
+	const measureNumber = renderMeasureNumber(measures[0].value);
 	measureNumber.translate(0, -20);
 	systemGroup.addChild(measureNumber);
 
