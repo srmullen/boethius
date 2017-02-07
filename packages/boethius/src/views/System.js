@@ -22,9 +22,8 @@ const TYPE = constants.type.system;
  // TODO: What are the children of a system now? It's more of a view onto the lines, rather than something with children in it's own right.
  // @param children <Line, Measure, Marking>[] - A marking that is given to the system will be rendered on all lines. If it is
  // 	given to a line it will only affect that line.
-function System ({page=0, startMeasure=0, measures=4, lineHeights=[], indentation=0, length}, children=[]) {
+function System ({page=0, measures=4, lineHeights=[], indentation=0, length}, children=[]) {
 	this.page = page;
-	this.startMeasure = startMeasure;
 	this.measures = measures;
 	this.children = children;
 	this.markings = _.filter(children, isMarking);
@@ -140,6 +139,10 @@ System.renderTimeContexts = function ({system, lines, measures, voices, timeCont
 		}, lines, lineGroups, lineCenters);
 	}
 
+	const measureNumber = renderMeasureNumber(measures[0].startsAt);
+	measureNumber.translate(0, -20);
+	systemGroup.addChild(measureNumber);
+
 	return systemGroup;
 };
 
@@ -182,22 +185,6 @@ function placeTimes (timeContexts, measures, measureLengths, cursorFn) {
 }
 
 /*
- * mutates systemGroup
- */
-// function renderDecorations (systemGroup, voices) {
-// 	const decorationGroups = renderSlurs(voices);
-// 	decorationGroups.map(group => systemGroup.addChildren(group));
-// 	return systemGroup;
-// }
-//
-// function renderSlurs (voices) {
-// 	return _.map(voices, voice => {
-// 		// slurs only need to know voice
-// 		return voice.renderSlurs();
-// 	});
-// }
-
-/*
  * @param Items[][] - Array of voices on the line
  * @param voiceIndex - the index of the voice to get the stemDirection for.
  * @return - String if the voice has a required stemDirection, else undefined.
@@ -209,6 +196,15 @@ function getStemDirection (lineItems, voiceIndex) {
 function renderLedgerLines (items, centerLine) {
 	const pitched = _.filter(items, isPitched);
     pitched.map(note => note.drawLegerLines(centerLine, Scored.config.lineSpacing));
+}
+
+function renderMeasureNumber (measureNumber) {
+	return new paper.PointText({
+		content: measureNumber,
+		fontFamily: 'gonvillealpha',
+		fontSize: Scored.config.fontSize / 1.5,
+		fillColor: "black"
+	});
 }
 
 System.prototype.type = TYPE;

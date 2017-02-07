@@ -24,6 +24,7 @@ TODOS:
     - placement.commonShortestDuration implementation.
     - Repeats
     - Da Capo / Dal Segno
+    - Anacrusis
 
     # Lower priority
     - SMuFL
