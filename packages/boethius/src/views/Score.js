@@ -108,7 +108,7 @@ Score.render = function (score, {measures, voices=[], chordSymbols=[], repeats=[
                             if (!_.find(timeContext.items, isKey)) items.push(clone(context.key));
                             if (!_.find(timeContext.items, isTimeSignature)) items.push(clone(context.timeSig));
                         } else { // create a context and marking items for the line
-                            firstTime[i] = createLineTimeContext(startTime, startContext[i]);
+                            firstTime.lines[i] = createLineTimeContext(startTime, startContext[i]);
                         }
                     });
                 }
