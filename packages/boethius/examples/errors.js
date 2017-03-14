@@ -13,7 +13,7 @@ const keys = roots.reduce((acc, root) => {
     return acc;
 }, {});
 
-var files = ["error1", "error2", "error3"];
+var files = ["error1", "error2", "error3", "tuplet_rest"];
 
 var jsons = {};
 

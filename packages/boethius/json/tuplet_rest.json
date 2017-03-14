@@ -1,0 +1,168 @@
+{
+  "error": {},
+  "layout": {
+    "_id": "p/Gloria's_Step/layout/1489510010188",
+    "_rev": "4-521b388c82c275d7f227c6321cac3d0d",
+    "name": "",
+    "title": "",
+    "composer": "",
+    "timeSignatures": [
+      {
+        "value": [
+          4,
+          4
+        ],
+        "measure": 0
+      }
+    ],
+    "selected": {
+      "system": 0,
+      "line": 0,
+      "measure": 0,
+      "beat": 0
+    },
+    "currentPage": 0,
+    "project": "p/Gloria's_Step",
+    "pages": [
+      {
+        "systems": 4,
+        "staffSpacing": []
+      }
+    ],
+    "lines": [
+      {
+        "name": "",
+        "clefs": [
+          {
+            "value": "treble",
+            "measure": 0,
+            "beat": 0
+          }
+        ],
+        "keys": [
+          {
+            "root": "C",
+            "mode": "major",
+            "measure": 0,
+            "beat": 0
+          }
+        ],
+        "voices": [
+          "mel",
+          null
+        ]
+      }
+    ],
+    "systems": [
+      {
+        "measures": 4,
+        "lineSpacing": [
+          0
+        ],
+        "indentation": 0,
+        "length": 750
+      }
+    ]
+  },
+  "voices": [
+    {
+      "type": "voice",
+      "props": {
+        "name": "mel"
+      },
+      "children": [
+        {
+          "props": {
+            "value": 8,
+            "dots": 0,
+            "time": 0
+          },
+          "type": "rest"
+        },
+        {
+          "props": {
+            "pitchClass": "g",
+            "time": 0.125
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "c",
+            "octave": 5,
+            "value": 8,
+            "dots": 0,
+            "time": 0.375
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "b",
+            "octave": 4,
+            "value": 8,
+            "dots": 0,
+            "tuplet": "3/2",
+            "time": 0.5
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "c",
+            "octave": 5,
+            "value": 8,
+            "dots": 0,
+            "tuplet": "3/2",
+            "time": 0.5833333333333334
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "a",
+            "octave": 4,
+            "value": 8,
+            "dots": 0,
+            "tuplet": "3/2",
+            "time": 0.6666666666666666
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "a",
+            "octave": 4,
+            "value": 8,
+            "dots": 0,
+            "tuplet": "3/2",
+            "time": 0.75
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "pitchClass": "e",
+            "octave": 4,
+            "value": 8,
+            "dots": 0,
+            "tuplet": "3/2",
+            "time": 0.8333333333333334
+          },
+          "type": "note"
+        },
+        {
+          "props": {
+            "value": 8,
+            "dots": 0,
+            "tuplet": "3/2",
+            "time": 0.9166666666666666
+          },
+          "type": "rest"
+        }
+      ]
+    }
+  ],
+  "chordSymbols": [],
+  "options": {}
+}

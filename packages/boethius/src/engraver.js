@@ -593,7 +593,11 @@ function beam (items, {line="b4", fulcrum, vector, stemDirections}) {
  * @param - Item with a stem drawn.
  */
 function getStemPoint (item) {
-	return item.group.children["stem"].segments[1].point;
+	if (isNote(item)) {
+		return item.group.children["stem"].segments[1].point;
+	} else {
+		return item.group.bounds.topCenter;
+	}
 }
 
 /*
