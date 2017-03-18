@@ -1,3 +1,4 @@
+import paper from "paper/dist/paper-core";
 import {drawClef} from "../engraver";
 import constants from "../constants";
 import {clefEquals} from "../utils/equality";

@@ -1,3 +1,4 @@
+import paper from "paper/dist/paper-core";
 import {isEqual} from "lodash";
 import {drawTimeSig} from "../engraver";
 import constants from "../constants";

@@ -1,3 +1,4 @@
+import paper from "paper/dist/paper-core";
 import {drawAccidental} from "../engraver";
 import * as placement from "../utils/placement";
 // import _ from "lodash";

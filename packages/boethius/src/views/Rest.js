@@ -1,3 +1,5 @@
+import paper from "paper/dist/paper-core";
+
 import {drawRest, drawDots} from "../engraver";
 import constants from "../constants";
 import {restEquals} from "../utils/equality";

@@ -1,3 +1,4 @@
+import paper from "paper/dist/paper-core";
 import teoria from "teoria";
 import _ from "lodash";
 

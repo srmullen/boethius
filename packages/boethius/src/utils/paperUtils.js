@@ -1,3 +1,4 @@
+import paper from "paper/dist/paper-core";
 import _ from "lodash";
 
 function extractGroups (views) {

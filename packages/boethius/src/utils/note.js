@@ -1,3 +1,4 @@
+import paper from "paper/dist/paper-core";
 import {partitionBy} from "../utils/common";
 import {isNote, isChord} from "../types";
 import teoria from "teoria";

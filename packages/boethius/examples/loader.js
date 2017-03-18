@@ -9,13 +9,6 @@ function start (cb) {
     });
 }
 
-function drawCircle (point, radius, color) {
-    radius = radius || 10;
-    var circ = new paper.Path.Circle(point, radius);
-    circ.fillColor = color || "red";
-    return circ;
-}
-
 function createCanvas (el) {
     el.innerHTML = '<canvas class="scored-canvas parnassus"><canvas>';
 
@@ -27,5 +20,5 @@ start(function () {
     scored = new Scored();
     scored.setup(canvas[0]);
     run();
-    paper.view.update();
+    scored.project.view.update();
 });

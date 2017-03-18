@@ -1,3 +1,5 @@
+import paper from "paper/dist/paper-core";
+
 import Config from "./config";
 
 import Voice from "./views/Voice";
@@ -31,8 +33,7 @@ const Scored = function (options={}) {
 };
 
 Scored.prototype.setup = function (canvas) {
-	// this.project = paper.setup(canvas).project;
-	paper.setup(canvas).project;
+	this.project = paper.setup(canvas).project;
 };
 
 Scored.prototype.render = function (composition, args) {

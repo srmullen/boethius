@@ -1,3 +1,5 @@
+import paper from "paper/dist/paper-core";
+
 import constants from "../constants";
 import {drawBarline} from "../engraver";
 import _ from "lodash";
