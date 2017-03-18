@@ -19,7 +19,7 @@ import Score from "./views/Score";
 import Page from "./views/Page";
 import Repeat from "./views/Repeat";
 
-import {parse} from "./utils/parser";
+import {parse, parseLayout} from "./utils/parser";
 import * as lineUtils from "./utils/line";
 import * as noteUtils from "./utils/note";
 import * as accidental from './utils/accidental';
@@ -42,6 +42,8 @@ Scored.prototype.render = function (composition, args) {
 	// const background = new paper.Path.Rectangle(paper.view.bounds);
 	// background.fillColor = "white";
 
+	if (!composition.type) throw new Error("Layout must have a type");
+
 	switch (composition.type) {
 		case constants.type.note:
 			view = Note.render(composition, args);
@@ -61,7 +63,11 @@ Scored.prototype.render = function (composition, args) {
 
 		case constants.type.score:
 			// view = vScore(composition, args);
-			view = Score.render(composition, args);
+			if (composition instanceof Score) {
+				view = Score.render(composition, args);
+			} else {
+				view = Score.render(parseLayout(composition), args);
+			}
 			break;
 	}
 	paper.view.update();
