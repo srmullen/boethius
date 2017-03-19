@@ -1,5 +1,6 @@
 import {map} from "lodash";
 
+import {clone} from "./common";
 import Voice from "../views/Voice";
 import Note from "../views/Note";
 import Rest from "../views/Rest";
@@ -14,6 +15,7 @@ import Key from "../views/Key";
 import TimeSignature from "../views/TimeSignature";
 import Dynamic from "../views/Dynamic";
 import Score from "../views/Score";
+import Page from "../views/Page";
 
 const typeToConstructor = {
     voice: (props, children) => new Voice(props, children),
@@ -42,11 +44,11 @@ export function parseLayout (layout) {
         return new TimeSignature({value: convertTimeSig(timeSig.value), measure: timeSig.measure});
     });
 
-    const lines = layout.lines.map(makeLine.bind(null, scored, timeSigs));
+    const lines = layout.lines.map(makeLine.bind(null, timeSigs));
 
-    const pages = makePages(scored, layout.pages);
+    const pages = makePages(layout.pages);
 
-    const systems = makeSystems(scored, layout.pages, layout.systems);
+    const systems = makeSystems(layout.pages, layout.systems);
 
     return new Score({}, [...timeSigs, ...pages, ...systems, ...lines]);
 }
@@ -67,11 +69,10 @@ const keys = roots.reduce((acc, root) => {
 }, {});
 
 /*
- * @param scored - {Scored}
  * @param pages - {List}
  * @param systems - {List}
  */
-function makeSystems (scored, pages, systems) {
+function makeSystems (pages, systems) {
     let page = 0;
     let count = 1;
     return systems.map((s) => {
@@ -88,8 +89,8 @@ function makeSystems (scored, pages, systems) {
     });
 }
 
-function makePages (scored, pages) {
-    return pages.map(scored.page);
+function makePages (pages) {
+    return pages.map(page => new Page(page));
 }
 
 /*
@@ -101,11 +102,11 @@ function convertKey ({root, mode}) {
     return keys[root][mode];
 }
 
-function makeLine (scored, timeSigs, line) {
+function makeLine (timeSigs, line) {
     return new Line({voices: line.voices}, [
-        ...line.clefs.map(scored.clef),
-        ...line.keys.map(key => scored.key(Object.assign({}, key, {value: convertKey(key)}))),
-        ...timeSigs.map(scored.clone)
+        ...line.clefs.map((context={}) => new Clef(context)),
+        ...line.keys.map(key => new Key(Object.assign({}, key, {value: convertKey(key)}))),
+        ...timeSigs.map(clone)
     ]);
 };
 
