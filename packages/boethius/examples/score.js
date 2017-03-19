@@ -1,5 +1,5 @@
 var examples = {
-    testDoubleStaffScore: function () {
+    testDoubleStaffScore: function (scored) {
         var n = scored.note;
         var r = scored.rest;
         // create lines
@@ -36,7 +36,7 @@ var examples = {
         return scored.render(score, {voices: [soprano, bass]});
     },
 
-    testVoicePastEndOfScore: function () {
+    testVoicePastEndOfScore: function (scored) {
         var timeSig = scored.timeSig({value: "4/4", measure: 0});
 
         var line = scored.line({voices: ["v"]}, [
@@ -61,7 +61,7 @@ var examples = {
         return scored.render(score, {voices: [voice]});
     },
 
-    testNoStemsOnSecondStave: function () {
+    testNoStemsOnSecondStave: function (scored) {
         var timeSig = scored.timeSig({value: "4/4", measure: 0});
 
         var line = scored.line({voices: ["v"]}, [
@@ -87,7 +87,7 @@ var examples = {
         return scored.render(score, {voices: [voice]});
     },
 
-    testPages: function () {
+    testPages: function (scored) {
         var n = scored.note;
         var r = scored.rest;
         // create lines
@@ -134,7 +134,7 @@ var examples = {
         return scored.render(score, {voices: [soprano, bass], pages: [1]});
     },
 
-    testChords: function () {
+    testChords: function (scored) {
         var n = scored.note;
         var r = scored.rest;
         var c = scored.chord;
@@ -174,7 +174,7 @@ var examples = {
         return scored.render(score, {voices: [soprano, bass]});
     },
 
-    testSlurs: function () {
+    testSlurs: function (scored) {
         var n = scored.note;
         var r = scored.rest;
         var c = scored.chord;
@@ -221,7 +221,7 @@ var examples = {
         return scored.render(score, {voices: [soprano, bass], pages: [1]});
     },
 
-    testClefChange: function () {
+    testClefChange: function (scored) {
         var n = scored.note;
         var r = scored.rest;
         // create lines
@@ -261,7 +261,7 @@ var examples = {
         return scored.render(score, {voices: [soprano, bass], pages: [0]});
     },
 
-    testTimeSigChange: function () {
+    testTimeSigChange: function (scored) {
         var n = scored.note;
         var r = scored.rest;
         // create lines
@@ -304,7 +304,7 @@ var examples = {
         return scored.render(score, {voices: [soprano, bass], pages: [0]});
     },
 
-    testChordSymbols: function () {
+    testChordSymbols: function (scored) {
         var n = scored.note;
         var r = scored.rest;
         var c = scored.chord;
@@ -359,7 +359,7 @@ var examples = {
         });
     },
 
-    testRepeats: function () {
+    testRepeats: function (scored) {
         var n = scored.note;
         var r = scored.rest;
         var c = scored.chord;
@@ -403,7 +403,7 @@ var examples = {
         });
     },
 
-    testPitchClassOctave: () => {
+    testPitchClassOctave: (scored) => {
         var n = scored.note;
         var c = scored.chord;
         // create lines
@@ -436,7 +436,7 @@ var examples = {
     },
 
     // Some rendering still is attempted on voices even if they aren't on a line. Causing errors.
-    testUnusedVoices: () => {
+    testUnusedVoices: (scored) => {
         var n = scored.note;
         var c = scored.chord;
         // create lines
@@ -471,7 +471,7 @@ var examples = {
         });
     },
 
-    testBarlineNoteBreaks: () => {
+    testBarlineNoteBreaks: (scored) => {
         var n = scored.note;
         var c = scored.chord;
         var r = scored.rest;
@@ -541,7 +541,7 @@ var examples = {
         });
     },
 
-    testBarlineRestBreaks: () => {
+    testBarlineRestBreaks: (scored) => {
         var n = scored.note;
         var c = scored.chord;
         var r = scored.rest;
@@ -610,7 +610,7 @@ var examples = {
         });
     },
 
-    testBarlineChordBreaks: () => {
+    testBarlineChordBreaks: (scored) => {
         var c = scored.chord;
         var r = scored.rest;
 
@@ -679,7 +679,7 @@ var examples = {
         });
     },
 
-    testSystemLength () {
+    testSystemLength (scored) {
         var n = scored.note;
         var c = scored.chord;
         var r = scored.rest;
@@ -716,7 +716,7 @@ var examples = {
         });
     },
 
-    testSystemIndentation () {
+    testSystemIndentation (scored) {
         var n = scored.note;
         var r = scored.rest;
         // create lines
@@ -755,7 +755,7 @@ var examples = {
         return scored.render(score, {voices: [soprano, bass]});
     },
 
-    testTuplets () {
+    testTuplets (scored) {
         var n = scored.note;
         var r = scored.rest;
         // create lines
@@ -812,15 +812,15 @@ function createSelect () {
     return select;
 }
 
-function run () {
+function run (scored) {
     var select = createSelect();
     var example = window.location.hash.slice(1) ? window.location.hash.slice(1) : Object.keys(examples)[0];
-    var score = examples[example]().translate(25, 50);
+    var score = examples[example](scored).translate(25, 50);
 
     select.onchange = function (e) {
         var example = e.target.value;
         window.location.hash = example;
         if (score) score.remove();
-        score = examples[example]().translate(25, 50);
+        score = examples[example](scored).translate(25, 50);
     };
 }

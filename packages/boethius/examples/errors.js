@@ -18,7 +18,7 @@ function createSelect () {
     return select;
 }
 
-function getJSON (file) {
+function getJSON (file, scored) {
     return new Promise((resolve, reject) => {
         fetch("/json/" + file + ".json").then(res => {
             if (res.ok) {
@@ -35,13 +35,13 @@ function getJSON (file) {
     });
 }
 
-function run () {
+function run (scored) {
     var select = createSelect();
     var filename = window.location.hash.slice(1) ? window.location.hash.slice(1) : files[0];
     select.value = filename;
     var score;
 
-    getJSON(filename).then(rendered => {
+    getJSON(filename, scored).then(rendered => {
         score = rendered;
     }).catch(err => {
         console.error(err);
@@ -51,7 +51,7 @@ function run () {
         var file = e.target.value;
         window.location.hash = file;
         if (score) score.remove();
-        getJSON(file).then(rendered => {
+        getJSON(file, scored).then(rendered => {
             score = rendered;
         }).catch(err => {
             console.error(err);

@@ -1,5 +1,3 @@
-var scored;
-
 function start (cb) {
     var fontLoader = WebFont.load({
         custom: {
@@ -17,8 +15,8 @@ function createCanvas (el) {
 
 start(function () {
     var canvas = createCanvas(document.getElementById("music"));
-    scored = new Scored();
+    var scored = new Scored();
     scored.setup(canvas[0]);
-    run();
+    run(scored);
     scored.project.view.update();
 });
