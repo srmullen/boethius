@@ -1,30 +1,26 @@
 const path = require("path");
 const webpack = require("webpack");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
-const DashboardPlugin = require("webpack-dashboard/plugin");
 
 module.exports = {
-    devtool: "eval-source-map",
+    devtool: "source-map",
     entry: [
         "./examples/loader"
     ],
     output: {
         path: path.join(__dirname),
-        filename: "boethius.js"
+        filename: "bundle.js"
     },
     plugins:[
-        new DashboardPlugin({
-            port: 4001
+        new webpack.optimize.UglifyJsPlugin({
+            compressor: {
+                warnings: false
+            }
         }),
+        new webpack.optimize.OccurrenceOrderPlugin(),
         new HtmlWebpackPlugin({
-            filename: "score.html",
             inject: "head",
             template: "./examples/score.html"
-        }),
-        new HtmlWebpackPlugin({
-            filename: "errors.html",
-            inject: "head",
-            template: "./examples/errors.html"
         })
     ],
     module: {
@@ -36,16 +32,10 @@ module.exports = {
             test: /\.js$/,
             loaders: ["babel-loader"],
             include: [path.join(__dirname, "src"), path.join(__dirname, "examples")]
-        }, {
-            test: /\.html/,
-            loader: "raw-loader"
         },
         {
             test   : /\.(ttf|eot|svg|woff(2)?)(\?[a-z0-9=&.]+)?$/,
             loader : 'file-loader'
         }]
-    },
-    devServer: {
-        contentBase: "."
     }
 }

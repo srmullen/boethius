@@ -800,7 +800,7 @@ var examples = {
 function createSelect () {
     var select = document.createElement("select");
 
-    for (k in examples) {
+    for (let k in examples) {
         var option = document.createElement("option");
         option.innerHTML = k;
         option.value = k;
@@ -812,7 +812,7 @@ function createSelect () {
     return select;
 }
 
-function run (scored) {
+export function run (scored) {
     var select = createSelect();
     var example = window.location.hash.slice(1) ? window.location.hash.slice(1) : Object.keys(examples)[0];
     var score = examples[example](scored).translate(25, 50);

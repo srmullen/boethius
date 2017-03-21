@@ -1,3 +1,8 @@
+import "../styles/index.css";
+import WebFont from "webfontloader";
+import Scored from "../src/Scored";
+import {run} from "./score";
+
 function start (cb) {
     var fontLoader = WebFont.load({
         custom: {
