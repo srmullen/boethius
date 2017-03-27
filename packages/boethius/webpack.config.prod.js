@@ -4,12 +4,12 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
     devtool: "source-map",
-    entry: [
-        "./examples/loader"
-    ],
+    entry: {
+        "./site/bundle": "./examples/loader"
+    },
     output: {
-        path: path.join(__dirname),
-        filename: "bundle.js"
+        path: "./",
+        filename: "[name].js"
     },
     plugins:[
         new webpack.optimize.UglifyJsPlugin({
@@ -19,7 +19,6 @@ module.exports = {
         }),
         new webpack.optimize.OccurrenceOrderPlugin(),
         new HtmlWebpackPlugin({
-            inject: "head",
             template: "./examples/score.html"
         })
     ],
@@ -34,8 +33,8 @@ module.exports = {
             include: [path.join(__dirname, "src"), path.join(__dirname, "examples")]
         },
         {
-            test   : /\.(ttf|eot|svg|woff(2)?)(\?[a-z0-9=&.]+)?$/,
-            loader : 'file-loader'
+            test: /\.(ttf|eot|svg|woff(2)?)(\?[a-z0-9=&.]+)?$/,
+            loader: 'file-loader?name=./site/[path][name].[ext]'
         }]
     }
 }

@@ -5,12 +5,12 @@ const DashboardPlugin = require("webpack-dashboard/plugin");
 
 module.exports = {
     devtool: "eval-source-map",
-    entry: [
-        "./examples/loader"
-    ],
+    entry: {
+        "./site/bundle": "./examples/loader"
+    },
     output: {
-        path: path.join(__dirname),
-        filename: "boethius.js"
+        path: "/",
+        filename: "[name].js"
     },
     plugins:[
         new DashboardPlugin({
@@ -18,12 +18,10 @@ module.exports = {
         }),
         new HtmlWebpackPlugin({
             filename: "score.html",
-            inject: "head",
             template: "./examples/score.html"
         }),
         new HtmlWebpackPlugin({
             filename: "errors.html",
-            inject: "head",
             template: "./examples/errors.html"
         })
     ],
