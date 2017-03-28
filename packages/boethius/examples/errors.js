@@ -35,7 +35,7 @@ function getJSON (file, scored) {
     });
 }
 
-function run (scored) {
+export function run (scored) {
     var select = createSelect();
     var filename = window.location.hash.slice(1) ? window.location.hash.slice(1) : files[0];
     select.value = filename;
