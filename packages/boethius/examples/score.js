@@ -1,4 +1,7 @@
-var examples = {
+import "../styles/index.css";
+import {start} from "./loader";
+
+const examples = {
     testDoubleStaffScore: function (scored) {
         var n = scored.note;
         var r = scored.rest;
@@ -824,3 +827,5 @@ export function run (scored) {
         score = examples[example](scored).translate(25, 50);
     };
 }
+
+start(run);

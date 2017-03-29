@@ -40,7 +40,7 @@ export function parse (element) {
 }
 
 export function parseLayout (layout) {
-    const timeSigs = layout.timeSignatures.map(timeSig => {
+    const timeSigs = [...layout.timeSignatures].map(timeSig => {
         return new TimeSignature({value: convertTimeSig(timeSig.value), measure: timeSig.measure});
     });
 
@@ -50,7 +50,7 @@ export function parseLayout (layout) {
 
     const systems = makeSystems(layout.pages, layout.systems);
 
-    return new Score({}, [...timeSigs, ...pages, ...systems, ...lines]);
+    return new Score({title: layout.title}, [...timeSigs, ...pages, ...systems, ...lines]);
 }
 
 const roots = [

@@ -6,7 +6,8 @@ const DashboardPlugin = require("webpack-dashboard/plugin");
 module.exports = {
     devtool: "eval-source-map",
     entry: {
-        "./site/bundle": "./examples/loader"
+        "./site/score": "./examples/score",
+        "./site/errors": "./examples/errors"
     },
     output: {
         path: "/",
@@ -18,11 +19,13 @@ module.exports = {
         }),
         new HtmlWebpackPlugin({
             filename: "score.html",
-            template: "./examples/score.html"
+            template: "./examples/score.html",
+            chunks: ["./site/score"]
         }),
         new HtmlWebpackPlugin({
             filename: "errors.html",
-            template: "./examples/errors.html"
+            template: "./examples/errors.html",
+            chunks: ["./site/errors"]
         })
     ],
     module: {

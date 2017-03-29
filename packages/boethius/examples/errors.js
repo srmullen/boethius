@@ -1,3 +1,5 @@
+import "../styles/index.css";
+import {start} from "./loader";
 
 var files = ["error1", "error2", "error3", "tuplet_rest"];
 
@@ -66,3 +68,5 @@ function renderScore (scored, layout, voices, chordSymbols) {
         chordSymbols: chordSymbols.map(Scored.parse)
     });
 }
+
+start(run);
