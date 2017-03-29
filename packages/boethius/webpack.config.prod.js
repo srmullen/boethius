@@ -5,7 +5,8 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 module.exports = {
     devtool: "source-map",
     entry: {
-        "./site/bundle": "./examples/loader"
+        "./site/score": "./examples/score",
+        "./site/errors": "./examples/errors"
     },
     output: {
         path: "./",
@@ -19,7 +20,8 @@ module.exports = {
         }),
         new webpack.optimize.OccurrenceOrderPlugin(),
         new HtmlWebpackPlugin({
-            template: "./examples/score.html"
+            template: "./examples/score.html",
+            chunks: ["./site/score"]
         })
     ],
     module: {
