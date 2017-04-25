@@ -38,17 +38,6 @@
             );
         }
     };
-
-    function parsePitch (pitch) {
-        var pitchClass = pitch.match(/[a-gA-G][b|#]{0,2}(?![a-zA-Z])/)[0];
-        var octave = pitch.match(/[0-9]+/);
-        if (octave && octave[0].length) {
-            return {pitchClass: pitchClass, octave: Number(octave)};
-        } else {
-            return {pitchClass: pitchClass};
-        }
-    }
-
 %}
 
 /* lexical grammar */
@@ -115,7 +104,7 @@ pitch:
     INTEGER
         {$$ = {midi: Number($1)};}
     | PITCHCLASS
-        {$$ = parsePitch($1);}
+        {$$ = yy.parsePitch($1);}
     ;
 
 note:

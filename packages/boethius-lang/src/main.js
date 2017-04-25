@@ -1,6 +1,6 @@
 import {parser} from "../lang/lang";
 import {calculateAndSetTimes} from "./time.js";
-import {scale} from "./palestrina";
+import {scale, pitch} from "./palestrina";
 import NoteNode from "./NoteNode";
 import RestNode from "./RestNode";
 import ChordNode from "./ChordNode";
@@ -12,6 +12,7 @@ function compile (program) {
     parser.yy.NoteNode = NoteNode;
     parser.yy.RestNode = RestNode;
     parser.yy.ChordNode = ChordNode;
+    parser.yy.parsePitch = pitch.parsePitch;
 
     const parsed = parser.parse(program);
 
