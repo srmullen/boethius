@@ -12,3 +12,7 @@ TODO
 - Math
 - Scales
 - Transposition
+
+Docs
+----
+- To build the command line application run `npm run bin`.

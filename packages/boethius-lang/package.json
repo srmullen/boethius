@@ -1,12 +1,16 @@
 {
   "name": "boethius-lang",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Music description language",
   "main": "lang.js",
+  "bin": {
+    "bth": "./bin/index.js"
+  },
   "scripts": {
     "dev": "watchify examples/index.js -t [babelify] -o examples/index-compiled.js -v -d",
     "compile": "jison lang/lang.jison -o lang/lang.js",
     "build": "npm run compile && browserify src/main -t [babelify] -o lang.js",
+    "bin": "webpack",
     "test": "npm run compile && mocha --compilers js:babel-register"
   },
   "author": "Sean Mullen <srmullen13@gmail.com> (http://seanmullen.me/)",
@@ -20,9 +24,12 @@
     "chai": "^3.5.0",
     "jison": "^0.4.17",
     "mocha": "^2.4.5",
-    "watchify": "^3.7.0"
+    "watchify": "^3.7.0",
+    "webpack": "^3.10.0"
   },
   "dependencies": {
+    "chalk": "^2.3.0",
+    "commander": "^2.13.0",
     "fraction.js": "^3.3.1"
   }
 }
