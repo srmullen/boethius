@@ -26,4 +26,19 @@ if (program.file) {
     fs.writeFileSync(path.join(outdir, name + '.json'), JSON.stringify(compiled, null, '\t'));
 
     console.log(chalk.green('Success!'));
+} else if (program.indir) {
+    const dir = fs.readdirSync(program.indir);
+    console.log("Compiling Directory");
+    dir.forEach(item => {
+        const fullpath = path.join(program.indir, item);
+        if (fs.lstatSync(fullpath).isFile() && path.parse(item).ext === '.bth') {
+            const bth = fs.readFileSync(fullpath, 'utf8');
+            const {name} = path.parse(item);
+            const compiled = compile(bth);
+
+            fs.writeFileSync(path.join(outdir, name + '.json'), JSON.stringify(compiled, null, '\t'));
+        }
+    });
+
+    console.log(chalk.green('Success!'));
 }

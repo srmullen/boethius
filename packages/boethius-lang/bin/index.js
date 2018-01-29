@@ -13492,6 +13492,21 @@ if (__WEBPACK_IMPORTED_MODULE_3_commander___default.a.file) {
     __WEBPACK_IMPORTED_MODULE_0_fs___default.a.writeFileSync(__WEBPACK_IMPORTED_MODULE_1_path___default.a.join(outdir, name + '.json'), JSON.stringify(compiled, null, '\t'));
 
     console.log(__WEBPACK_IMPORTED_MODULE_2_chalk___default.a.green('Success!'));
+} else if (__WEBPACK_IMPORTED_MODULE_3_commander___default.a.indir) {
+    const dir = __WEBPACK_IMPORTED_MODULE_0_fs___default.a.readdirSync(__WEBPACK_IMPORTED_MODULE_3_commander___default.a.indir);
+    console.log("Compiling Directory");
+    dir.forEach(item => {
+        const fullpath = __WEBPACK_IMPORTED_MODULE_1_path___default.a.join(__WEBPACK_IMPORTED_MODULE_3_commander___default.a.indir, item);
+        if (__WEBPACK_IMPORTED_MODULE_0_fs___default.a.lstatSync(fullpath).isFile() && __WEBPACK_IMPORTED_MODULE_1_path___default.a.parse(item).ext === '.bth') {
+            const bth = __WEBPACK_IMPORTED_MODULE_0_fs___default.a.readFileSync(fullpath, 'utf8');
+            const {name} = __WEBPACK_IMPORTED_MODULE_1_path___default.a.parse(item);
+            const compiled = Object(__WEBPACK_IMPORTED_MODULE_4__src_main__["a" /* default */])(bth);
+
+            __WEBPACK_IMPORTED_MODULE_0_fs___default.a.writeFileSync(__WEBPACK_IMPORTED_MODULE_1_path___default.a.join(outdir, name + '.json'), JSON.stringify(compiled, null, '\t'));
+        }
+    });
+
+    console.log(__WEBPACK_IMPORTED_MODULE_2_chalk___default.a.green('Success!'));
 }
 
 
