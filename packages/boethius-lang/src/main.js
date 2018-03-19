@@ -1,6 +1,6 @@
 import {parser} from "../lang/lang";
 import {calculateAndSetTimes} from "./time.js";
-import {scale, pitch} from "./palestrina";
+import {scale, pitch} from "./palestrina/src/palestrina";
 import NoteNode from "./NoteNode";
 import RestNode from "./RestNode";
 import ChordNode from "./ChordNode";
