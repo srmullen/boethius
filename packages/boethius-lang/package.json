@@ -1,8 +1,8 @@
 {
   "name": "boethius-lang",
-  "version": "0.4.3",
+  "version": "0.5.0",
   "description": "Music description language",
-  "main": "lang.js",
+  "main": "./src/main.js",
   "bin": {
     "bth": "./bin/index.js"
   },

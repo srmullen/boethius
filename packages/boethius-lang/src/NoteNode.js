@@ -1,4 +1,4 @@
-const NOTE = "note";
+import { NOTE } from './constants';
 
 function NoteNode (props) {
     this.props = props;

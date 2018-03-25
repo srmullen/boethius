@@ -1,4 +1,4 @@
-const CHORDSYMBOL = "chordSymbol";
+import { CHORDSYMBOL } from './constants';
 
 function ChordSymbolNode (props) {
     this.props = props;

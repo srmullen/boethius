@@ -1,4 +1,4 @@
-const REST = "rest";
+import { REST } from './constants';
 
 function RestNode (props) {
     this.props = props;

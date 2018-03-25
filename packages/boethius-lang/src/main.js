@@ -4,6 +4,7 @@ import {scale, pitch} from "./palestrina/src/palestrina";
 import NoteNode from "./NoteNode";
 import RestNode from "./RestNode";
 import ChordNode from "./ChordNode";
+import { NOTE, REST, CHORD, CHORDSYMBOL } from './constants';
 
 function compile (program) {
     parser.yy.voices = {};
@@ -24,5 +25,7 @@ function compile (program) {
 
     return {voices: parser.yy.voices, chordSymbols: parser.yy.chordSymbols};
 }
+
+export const TYPES = { NOTE, REST, CHORD, CHORDSYMBOL };
 
 export default compile;

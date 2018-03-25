@@ -1,4 +1,4 @@
-const CHORD = "chord";
+import { CHORD } from './constants';
 
 function ChordNode (props, children) {
     this.props = props;
