@@ -9,7 +9,6 @@
   "scripts": {
     "dev": "watchify examples/index.js -t [babelify] -o examples/index-compiled.js -v -d",
     "compile": "jison lang/lang.jison -o lang/lang.js",
-    "build": "npm run compile && browserify src/main -t [babelify] -o lang.js",
     "bin": "webpack",
     "test": "npm run compile && mocha --compilers js:babel-register"
   },
