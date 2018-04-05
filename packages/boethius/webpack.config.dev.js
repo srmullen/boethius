@@ -46,11 +46,6 @@ module.exports = {
             loader : 'file-loader'
         }]
     },
-    resolve: {
-        alias: {
-            'lodash-v4': path.resolve(__dirname, 'lodash')
-        }
-    },
     devServer: {
         contentBase: "."
     }

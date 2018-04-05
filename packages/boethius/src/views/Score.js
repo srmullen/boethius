@@ -57,7 +57,7 @@ Score.render = function (score, {measures, voices=[], chordSymbols=[], repeats=[
     }
 
     const systemsToRender = _.reduce(score.systems, (acc, system, index) => {
-        return _.contains(pages, system.page) ? concat(acc, {system, index}) : acc;
+        return _.includes(pages, system.page) ? concat(acc, {system, index}) : acc;
     }, []);
 
     if (systemsToRender.length) {
@@ -81,7 +81,7 @@ Score.render = function (score, {measures, voices=[], chordSymbols=[], repeats=[
             return Slur.groupSlurs(voice, startTimes).map(slurred => {
                 const slurStartTime = _.first(slurred).time;
                 const slurEndTime = _.last(slurred).time;
-                const systemBreak = _.contains(startTimes.map(time => time.time), slurEndTime);
+                const systemBreak = _.includes(startTimes.map(time => time.time), slurEndTime);
                 const isEnd = !!systemBreak && slurred.length === 1;
                 return Slur.of({systemBreak, isEnd}, slurred);
         })});
@@ -122,7 +122,7 @@ Score.render = function (score, {measures, voices=[], chordSymbols=[], repeats=[
 
         let systemOffset = 0;
 
-        if (score.title && _.contains(pages, 0)) {
+        if (score.title && _.includes(pages, 0)) {
             const titleGroup = score.title.render();
             const xTranslate = (score.length || score.pageWidth)/2;
             titleGroup.translate(xTranslate, 0);
@@ -142,7 +142,7 @@ Score.render = function (score, {measures, voices=[], chordSymbols=[], repeats=[
                 length: system.length || score.length
             });
 
-            const systemTranslation = (!_.contains(pages, system.page)) ?
+            const systemTranslation = (!_.includes(pages, system.page)) ?
                 score.pages[system.page].staffSpacing[i] || i * 250 :
                 score.pages[system.page].staffSpacing[i] || i * 250 + _.indexOf(pages, system.page) * score.pageHeight;
 
@@ -177,7 +177,7 @@ function getStartContext (score, time) {
 }
 
 export function scoreToMeasures (score, repeats) {
-    const numMeasures = _.sum(score.systems, system => system.measures);
+    const numMeasures = _.sumBy(score.systems, system => system.measures);
     return createMeasures(numMeasures, [...score.timeSigs, ...repeats]);
 }
 

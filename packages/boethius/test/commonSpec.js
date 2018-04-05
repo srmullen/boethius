@@ -1,6 +1,9 @@
 import {expect} from "chai";
 
-import {concat, partitionBy, partitionWhen, map, mapDeep, juxt, reductions, isEven, isOdd, nexts, clone} from "../src/utils/common";
+import {
+    concat, partitionBy, partitionWhen, map, mapDeep, juxt, reductions, isEven,
+    isOdd, nexts, clone, doTimes
+} from "../src/utils/common";
 import Scored from "../src/Scored";
 
 describe("common", () => {
@@ -159,6 +162,12 @@ describe("common", () => {
             expect(cloned.children[0]).not.to.equal(chord.children[0]);
             expect(cloned.children[1].equals(chord.children[1])).to.be.true;
             expect(cloned.children[1]).not.to.equal(chord.children[1]);
+        });
+    });
+
+    describe('doTimes', () => {
+        it('run the given function the given number of times and return each value in array', () => {
+            expect(doTimes(5, (i) => i + 1)).to.eql([1,2,3,4,5]);
         });
     });
 });

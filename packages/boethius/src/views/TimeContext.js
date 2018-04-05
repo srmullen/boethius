@@ -36,7 +36,7 @@ TimeContext.prototype.render = function (lineHeights) {
             const cursor = positionMarkings(rootY, 0, line);
 
             if (pitchedItems.length) {
-                const widestItem = _.max(pitchedItems, item => item.group.bounds.width);
+                const widestItem = _.maxBy(pitchedItems, item => item.group.bounds.width);
                 placeY(rootY, line.context, widestItem);
                 placeAt(cursor, widestItem);
                 // mutation of notes array

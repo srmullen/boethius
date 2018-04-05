@@ -79,13 +79,13 @@ function nextTimes (times) {
 
     if (!_.compact(ctxs).length) return []; // return nothing if there are no more contexts
 
-    const nextTime = _.min(ctxs, getTimeFromContext).time.time;
+    const nextTime = _.minBy(ctxs, getTimeFromContext).time.time;
     const nexts = [];
     const rests = [];
     for (let i = 0; i < ctxs.length; i++) {
         if (getTimeFromContext(ctxs[i]) === nextTime) {
             nexts.push(ctxs[i]);
-            rests.push(_.rest(times[i]));
+            rests.push(_.tail(times[i]));
         } else {
             nexts.push(null);
             rests.push(times[i]);

@@ -142,7 +142,7 @@ function hasPitch(key, {name, accidental}) {
 		return false;
 	}
 	let pitches = _.map(key.getPitches(), parsePitch);
-	return !!_.findWhere(pitches, {name, accidental});
+	return !!_.find(pitches, {name, accidental});
 }
 
 export {

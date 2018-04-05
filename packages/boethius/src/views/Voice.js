@@ -46,9 +46,9 @@ Voice.prototype.type = constants.type.voice;
 function nextBeaming (items, groupingTime) {
     const item = _.first(items);
     if (!isPitched(item)) {
-        return [null, _.rest(items)];
+        return [null, _.tail(items)];
     } else if (item.value <= 4) { // and item doesn't get beamed if it is a quarter note or greater.
-        return [[_.first(items)], _.rest(items)];
+        return [[_.first(items)], _.tail(items)];
     } else {
         const splitIndex = _.findIndex(items, item => ((item.time >= groupingTime || item.value <= 4) || !isPitched(item)));
         if (splitIndex === -1) {
@@ -74,7 +74,7 @@ Voice.findBeaming = function findBeaming (timeSig, items) {
     const [, denominator] = parseSignature(timeSig);
     const groupingDurations = timeSig.beatStructure.map(beats => beats * (1/denominator));
     const baseTime = items[0].time; // the time from which the groupings are reckoned.
-    const groupingTimes = _.rest(reductions((acc, el) => acc + el, groupingDurations, baseTime));
+    const groupingTimes = _.tail(reductions((acc, el) => acc + el, groupingDurations, baseTime));
 
     const beamings = [];
     let groupingTimeIndex = 0;
@@ -113,7 +113,7 @@ Voice.groupTuplets = function groupTuplets (items) {
             previousTuplet = item.tuplet;
         } else { // add the item to the previous grouping.
             let grouping = _.last(groupings);
-            let longestDuration = _.min(grouping, item => item.value).value;
+            let longestDuration = _.minBy(grouping, item => item.value).value;
             let currentTupletDuration = sumDurations(grouping);
             let maxTupletDuration = calculateTupletDuration(previousTuplet, longestDuration);
             if (currentTupletDuration < maxTupletDuration) { // floating point error

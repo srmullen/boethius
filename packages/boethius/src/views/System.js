@@ -70,7 +70,7 @@ System.renderTimeContexts = function ({system, lines, measures, voices, timeCont
 	} else {
 		lineGroups = system.renderLines(lines, length);
 
-		const totalMarkingLength = _.sum(timeLengths, ({length}) => length[0]);
+		const totalMarkingLength = _.sumBy(timeLengths, ({length}) => length[0]);
 
 		const measureScale = length / minLineLength;
 

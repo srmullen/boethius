@@ -91,11 +91,11 @@ function createAccidentalContext (c1, c2) {
 	return _.union(
 		_.map(_.difference(_.union(diatonics1, diatonics2), _.intersection(diatonics1, diatonics2)),
 			(diatonic) => {
-				let accidental = _.findWhere(c2, diatonic);
+				let accidental = _.find(c2, diatonic);
 				if (accidental) {
 					return accidental;
 				} else {
-					return _.findWhere(c1, diatonic);
+					return _.find(c1, diatonic);
 				}
 			}),
 		c2);

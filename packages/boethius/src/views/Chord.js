@@ -60,7 +60,7 @@ Chord.renderAccidentals = function (chord, context={}) {
 	// calculate the default position of all the accidentals
 	let positions = _.map(chord.children, calculateDefaultAccidentalPosition);
 	// get default leftmost accidental. All other accidentals will be set to this position before translating because of overlaps
-	let startingXPos = _.min(positions, position => position.x).x;
+	let startingXPos = _.minBy(positions, position => position.x).x;
 
 	// render the accidentals in their default location.
 	let accidentalGroups = map((note, accidental, position) => {

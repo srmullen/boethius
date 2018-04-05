@@ -17,7 +17,7 @@ function Line ({voices={}}, children=[]) {
 	this.children = children;
 
 	// collect all marking arrays into one and sort them by time
-	this.markings = _.sortByAll(_.reduce(_.omit(types, constants.type.measure), (arr, v) => {
+	this.markings = _.sortBy(_.reduce(_.omit(types, constants.type.measure), (arr, v) => {
 		return arr.concat(v);
 	}, []), "measure", (marking) => marking.beat ? marking.beat : 0); // if no beat on the marking then default to 0
 

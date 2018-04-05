@@ -152,7 +152,7 @@ const examples = {
 
         // create voices
         var soprano = scored.voice({name: "treble"}, [
-            c({value: 2}, [{value: 4, pitch: "c4"}, "eb4", "g4", "c5"]), n({value: 4, dots: 1}), n({value:8, pitch: "d#4"}),
+            c({value: 2}, [{value: 4, pitch: "c4"}, "eb4", "g4", "c5"]), c({value: 4, dots: 1}, ['c#4', 'd#4']), n({value:8, pitch: "d#4"}),
             n({value:2, pitch: "d#4"}), n({value:2, pitch: "e4"}), n({value:1, pitch: "f4"}),
     		n({value:1, pitch: "g4"}), n({value:1, pitch: "a4"}), n({value:1, pitch: "b4"}), n({value:1, pitch: "c5"}),
     		n({value:1, pitch: "d5"}), n({value:1, pitch: "e5"}), n({value:1, pitch: "f5"}), n({value:1, pitch: "g5"})
