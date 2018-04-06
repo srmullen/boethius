@@ -1,5 +1,5 @@
 import WebFont from "webfontloader";
-import "styles/fonts.css";
+import "../../styles/fonts.css";
 
 export default function load () {
     return new Promise((resolve, reject) => {
