@@ -25,12 +25,15 @@ import * as noteUtils from "./utils/note";
 import * as accidental from './utils/accidental';
 import * as common from "./utils/common";
 import * as timeUtils from "./utils/timeUtils";
+import loadFonts from "./utils/fonts";
 import constants from "./constants";
 import vScore from "./virtual-score";
 
 const Scored = function (options={}) {
 	Scored.config = new Config(options.config);
 };
+
+Scored.loadFonts = loadFonts;
 
 Scored.prototype.setup = function (canvas) {
 	this.project = paper.setup(canvas).project;
