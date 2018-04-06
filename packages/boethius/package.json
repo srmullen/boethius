@@ -39,9 +39,9 @@
     "palestrina.js": "^1.3.2",
     "raw-loader": "^0.5.1",
     "style-loader": "^0.14.1",
-    "webpack": "^2.2.1",
-    "webpack-dashboard": "^0.3.0",
-    "webpack-dev-server": "^2.4.2"
+    "webpack": "^3.11.0",
+    "webpack-dashboard": "^1.1.1",
+    "webpack-dev-server": "^2.11.2"
   },
   "dependencies": {
     "fraction.js": "^3.0.0",
