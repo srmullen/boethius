@@ -46,7 +46,7 @@
   "dependencies": {
     "fraction.js": "^3.0.0",
     "lodash": "^4.17.4",
-    "paper": "^0.10.3",
+    "paper": "^0.11.5",
     "teoria": "^1.12.0",
     "webfontloader": "^1.6.20"
   },
