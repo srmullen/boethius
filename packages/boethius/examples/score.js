@@ -1,4 +1,4 @@
-import "../styles/index.css";
+import "styles/index.css";
 import {start} from "./loader";
 
 const examples = {

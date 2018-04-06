@@ -1,5 +1,4 @@
 @import "score.css";
-@import "fonts.css";
 
 .layout-code {
 	border: 1px solid #000;
@@ -53,6 +52,11 @@
   /*top: 0px;*/
   right: -45%;
   width: 50%;
+}
+
+p {
+	font-family: 'gonville';
+	font-size: 2em;
 }
 
 .mrs {

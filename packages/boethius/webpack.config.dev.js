@@ -28,7 +28,11 @@ module.exports = {
             chunks: ["./site/errors"]
         })
     ],
-    // FIXME: Use webpack 3 syntax.
+    resolve: {
+        alias: {
+            styles: path.join(__dirname, "styles")
+        }
+    },
     module: {
         rules: [{
             test: /\.css$/,

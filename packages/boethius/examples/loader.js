@@ -1,5 +1,5 @@
-import WebFont from "webfontloader";
 import Scored from "../src/Scored";
+import loadFonts from '../src/utils/fonts';
 
 function createCanvas (el) {
     el.innerHTML = '<canvas class="scored-canvas parnassus"><canvas>';
@@ -12,11 +12,10 @@ export function start (cb) {
     var canvas = createCanvas(document.getElementById("music"));
     var scored = new Scored();
     scored.setup(canvas[0]);
-    var fontLoader = WebFont.load({
-        custom: {
-            families: ["gonville", "gonvillealpha"]
-        },
-        active: () => {cb(scored);}
+    loadFonts().then(() => {
+        cb(scored)
+    }).catch((err) => {
+        console.error(err);
     });
     scored.project.view.update();
 }
