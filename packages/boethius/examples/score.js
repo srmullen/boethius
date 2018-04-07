@@ -797,6 +797,17 @@ const examples = {
 
         // render it all as a score.
         return scored.render(score, {voices: [soprano, bass]});
+    },
+
+    testParsing (scored) {
+        // Scored should parse json if given a parse param.
+        const layout = createLayout();
+        const music = {
+            voices: {
+                mel: [['a4'], ['b4'], ['c5']].map(note => createNote.apply(null, note))
+            }
+        };
+        return scored.render(layout, music, {parse: true});
     }
 };
 
@@ -825,6 +836,71 @@ export function run (scored) {
         window.location.hash = example;
         if (score) score.remove();
         score = examples[example](scored).translate(25, 50);
+    };
+}
+
+function createNote (pitch, value=4) {
+    return {
+        type: 'note',
+        props: {
+            pitch,
+            value
+        }
+    };
+}
+
+function createLayout () {
+    return {
+        "type": "score",
+        "timeSignatures": [
+          {
+            "value": [
+              4,
+              4
+            ],
+            "measure": 0,
+            "beat": 0
+          }
+        ],
+        "currentPage": 0,
+        "pages": [
+          {
+            "systems": 4,
+            "staffSpacing": []
+          }
+        ],
+        "lines": [
+          {
+            "name": "",
+            "clefs": [
+              {
+                "value": "treble",
+                "measure": 0,
+                "beat": 0
+              }
+            ],
+            "keys": [
+              {
+                "root": "C",
+                "mode": "major",
+                "measure": 0,
+                "beat": 0
+              }
+            ],
+            "voices": [
+              "mel"
+            ]
+          }
+        ],
+        "systems": [
+          {
+            "measures": 3,
+            "lineSpacing": [
+              0
+            ],
+            "length": 800
+          }
+        ]
     };
 }
 

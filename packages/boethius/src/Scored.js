@@ -19,7 +19,7 @@ import Score from "./views/Score";
 import Page from "./views/Page";
 import Repeat from "./views/Repeat";
 
-import {parse, parseLayout} from "./utils/parser";
+import {parse, parseLayout, parseMusic} from "./utils/parser";
 import * as lineUtils from "./utils/line";
 import * as noteUtils from "./utils/note";
 import * as accidental from './utils/accidental';
@@ -39,38 +39,39 @@ Scored.prototype.setup = function (canvas) {
 	this.project = paper.setup(canvas).project;
 };
 
-Scored.prototype.render = function (composition, args) {
+Scored.prototype.render = function (layout, music, options={}) {
 	let view;
 	// create a white background for images. Possible memleak issue.
 	// const background = new paper.Path.Rectangle(paper.view.bounds);
 	// background.fillColor = "white";
 
-	if (!composition.type) throw new Error("Layout must have a type");
+	if (options.parse) {
+		layout = parseLayout(layout);
+		music = parseMusic(music);
+	}
 
-	switch (composition.type) {
+	if (!layout.type) throw new Error("Layout must have a type");
+
+	switch (layout.type) {
 		case constants.type.note:
-			view = Note.render(composition, args);
+			view = Note.render(layout, music);
 			break;
 
 		case constants.type.rest:
-			view = Rest.render(composition, args);
+			view = Rest.render(layout, music);
 			break;
 
 		case constants.type.chord:
-			view = Chord.render(composition, args);
+			view = Chord.render(layout, music);
 			break;
 
 		case constants.type.system:
-			view = System.render(composition, args);
+			view = System.render(layout, music);
 			break;
 
 		case constants.type.score:
 			// view = vScore(composition, args);
-			if (composition instanceof Score) {
-				view = Score.render(composition, args);
-			} else {
-				view = Score.render(parseLayout(composition), args);
-			}
+			view = Score.render(layout, music);
 			break;
 	}
 	paper.view.update();

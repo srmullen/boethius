@@ -118,3 +118,26 @@ function makeLine (timeSigs, line) {
 function convertTimeSig ([numerator, denominator]) {
     return `${numerator}/${denominator}`;
 }
+
+/*
+ * Create an object capable of being parsed.
+ */
+function createElement (type, props, children) {
+    return {type, props, children};
+}
+
+function parseVoices (voices) {
+    return map(voices, (v, k) => {
+        return parse(createElement("voice", {name: k}, v));
+    });
+}
+
+export function parseMusic (music) {
+    const voices = music.voices || {};
+    const chordSymbols = music.chordSymbols || [];
+    return {
+        voices: parseVoices(voices),
+        // pages: [layout.currentPage],
+        chordSymbols: chordSymbols.map(parse)
+    };
+}
