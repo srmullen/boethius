@@ -40,6 +40,7 @@ Scored.prototype.setup = function (canvas) {
 };
 
 Scored.prototype.render = function (layout, music, options={}) {
+	this.project.activate();
 	let view;
 	// create a white background for images. Possible memleak issue.
 	// const background = new paper.Path.Rectangle(paper.view.bounds);
