@@ -72,12 +72,12 @@
   }
 */
 var lang = (function(){
-var o=function(k,v,o,l){for(o=o||{},l=k.length;l--;o[k[l]]=v);return o},$V0=[1,19],$V1=[1,20],$V2=[1,17],$V3=[1,18],$V4=[1,14],$V5=[1,15],$V6=[1,9],$V7=[4,7,12,16,18,21,28,36],$V8=[4,7,12,16,18,21,24,28,30,36],$V9=[1,24],$Va=[1,30],$Vb=[4,7,12,16,18,19,21,24,28,30,36],$Vc=[1,34],$Vd=[4,7,10,12,16,18,19,21,24,28,30,36],$Ve=[1,41],$Vf=[1,47],$Vg=[7,12,16,18,21,23,36],$Vh=[7,12,16,18,21,24,30,36],$Vi=[7,12,19],$Vj=[1,66];
+var o=function(k,v,o,l){for(o=o||{},l=k.length;l--;o[k[l]]=v);return o},$V0=[1,18],$V1=[1,24],$V2=[1,20],$V3=[1,22],$V4=[1,23],$V5=[1,16],$V6=[1,17],$V7=[1,9],$V8=[4,7,13,15,20,22,25,32,39],$V9=[4,7,13,15,20,22,25,28,32,33,39],$Va=[1,28],$Vb=[1,34],$Vc=[1,37],$Vd=[4,7,13,15,20,22,23,25,28,32,33,39],$Ve=[1,40],$Vf=[1,47],$Vg=[1,53],$Vh=[7,13,15,16,20,22,25,39],$Vi=[7,13,15,20,22,25,28,33,39],$Vj=[13,23];
 var parser = {trace: function trace() { },
 yy: {},
-symbols_: {"error":2,"expressions":3,"EOF":4,"statements":5,"float":6,"INTEGER":7,"DOTS":8,"duration":9,"FWDSLASH":10,"pitch":11,"PITCHCLASS":12,"note":13,"notelist":14,"rest":15,"REST":16,"chord":17,"OPENBRKT":18,"CLOSEBRKT":19,"chordSymbol":20,"LPAREN":21,"CSYM":22,"IDENTIFIER":23,"RPAREN":24,"item":25,"ratio":26,"voice":27,"LBRKT":28,"list":29,"RBRKT":30,"propertydef":31,"EQUALS":32,"BOOL":33,"propertylist":34,"propscope":35,"VAR":36,"assignment":37,"statement":38,"$accept":0,"$end":1},
-terminals_: {2:"error",4:"EOF",7:"INTEGER",8:"DOTS",10:"FWDSLASH",12:"PITCHCLASS",16:"REST",18:"OPENBRKT",19:"CLOSEBRKT",21:"LPAREN",22:"CSYM",23:"IDENTIFIER",24:"RPAREN",28:"LBRKT",30:"RBRKT",32:"EQUALS",33:"BOOL",36:"VAR"},
-productions_: [0,[3,1],[3,2],[6,3],[9,2],[9,3],[11,1],[11,1],[13,1],[13,2],[14,1],[14,2],[15,1],[15,2],[17,3],[17,4],[20,5],[20,6],[20,6],[25,1],[25,1],[25,1],[25,1],[26,3],[27,4],[31,3],[31,3],[31,3],[31,3],[31,3],[34,1],[34,2],[35,4],[35,4],[35,3],[29,1],[29,2],[29,1],[29,2],[29,1],[29,2],[37,3],[38,1],[38,1],[38,1],[38,1],[5,1],[5,2]],
+symbols_: {"error":2,"expressions":3,"EOF":4,"statements":5,"float":6,"INTEGER":7,"DOTS":8,"number":9,"duration":10,"FWDSLASH":11,"pitch":12,"PITCHCLASS":13,"keyword":14,"COLON":15,"IDENTIFIER":16,"note":17,"notelist":18,"rest":19,"REST":20,"chord":21,"OPENBRKT":22,"CLOSEBRKT":23,"builtin":24,"LPAREN":25,"BUILTIN":26,"list":27,"RPAREN":28,"item":29,"ratio":30,"voice":31,"LBRKT":32,"RBRKT":33,"propertydef":34,"EQUALS":35,"BOOL":36,"propertylist":37,"propscope":38,"VAR":39,"assignment":40,"statement":41,"$accept":0,"$end":1},
+terminals_: {2:"error",4:"EOF",7:"INTEGER",8:"DOTS",11:"FWDSLASH",13:"PITCHCLASS",15:"COLON",16:"IDENTIFIER",20:"REST",22:"OPENBRKT",23:"CLOSEBRKT",25:"LPAREN",26:"BUILTIN",28:"RPAREN",32:"LBRKT",33:"RBRKT",35:"EQUALS",36:"BOOL",39:"VAR"},
+productions_: [0,[3,1],[3,2],[6,3],[9,1],[9,1],[10,2],[10,3],[12,1],[14,2],[17,1],[17,2],[18,1],[18,2],[19,1],[19,2],[21,3],[21,4],[24,4],[29,1],[29,1],[29,1],[29,1],[29,1],[29,1],[30,3],[31,4],[34,3],[34,3],[34,3],[34,3],[34,3],[37,1],[37,2],[38,4],[38,4],[38,3],[27,1],[27,2],[27,1],[27,2],[27,1],[27,2],[40,3],[41,1],[41,1],[41,1],[41,1],[5,1],[5,2]],
 performAction: function anonymous(yytext, yyleng, yylineno, yy, yystate /* action[1] */, $$ /* vstack */, _$ /* lstack */) {
 /* this == yyval */
 
@@ -92,71 +92,66 @@ break;
 case 3:
 this.$ = parseFloat($$[$0-2] + "." + $$[$0])
 break;
-case 4:
-this.$ = {value: Number($$[$0]), dots: 0}
-break;
-case 5:
-this.$ = {value: Number($$[$0-1]), dots: $$[$0].length}
+case 4: case 5: case 19: case 20: case 21: case 22: case 23: case 24: case 41: case 44: case 45: case 46: case 47:
+this.$ = $$[$0]
 break;
 case 6:
-this.$ = {midi: Number($$[$0])};
+this.$ = {value: Number($$[$0]), dots: 0}
 break;
 case 7:
-this.$ = yy.parsePitch($$[$0]);
+this.$ = {value: Number($$[$0-1]), dots: $$[$0].length}
 break;
 case 8:
+this.$ = yy.parsePitch($$[$0]);
+break;
+case 9:
+this.$ = ':' + $$[$0]
+break;
+case 10:
 
             // default values
             this.$ = new yy.NoteNode($$[$0]);
         
 break;
-case 9:
+case 11:
 
             this.$ = new yy.NoteNode(Object.assign({}, $$[$0-1], $$[$0]));
         
 break;
-case 10: case 35: case 46:
+case 12: case 37: case 48:
 this.$ = [$$[$0]]
 break;
-case 11: case 36: case 40: case 47:
+case 13: case 38: case 42: case 49:
 this.$ = $$[$0-1].concat($$[$0])
 break;
-case 12:
+case 14:
 this.$ = new yy.RestNode({});
 break;
-case 13:
+case 15:
 this.$ = new yy.RestNode({value: $$[$0].value, dots: $$[$0].dots});
 break;
-case 14:
+case 16:
 this.$ = new yy.ChordNode({}, $$[$0-1]);
 break;
-case 15:
+case 17:
 
             /*this.$ = {type: CHORD, children: $$[$0-2], props: {value: $$[$0].value, dots: $$[$0].dots}};*/
             this.$ = new yy.ChordNode({value: $$[$0].value, dots: $$[$0].dots}, $$[$0-2]);
         
 break;
-case 16:
+case 18:
 
-            var chordSymbol = {type: CHORDSYMBOL, props: {value: $$[$0-2], measure: Number($$[$0-1]), beat: 0}};
-            yy.chordSymbols.push(chordSymbol);
-            this.$ = chordSymbol;
+            // var chordSymbol = {type: CHORDSYMBOL, props: {value: $$[$0-1], measure: Number($$[$0]), beat: 0}};
+            // yy.chordSymbols.push(chordSymbol);
+            // this.$ = chordSymbol;
+            // this.$ = BUILTINS.chordSymbol(yy, [$$[$0-1], $$[$0]]);
+            this.$ = BUILTINS.chordSymbol(yy, $$[$0-1]);
         
 break;
-case 17: case 18:
-
-            var chordSymbol = {type: CHORDSYMBOL, props: {value: $$[$0-3], measure: Number($$[$0-2]), beat: Number($$[$0-1])}}
-            yy.chordSymbols.push(chordSymbol);
-            this.$ = chordSymbol;
-        
-break;
-case 19: case 20: case 21: case 22: case 39: case 42: case 43: case 44: case 45:
-this.$ = $$[$0]
-break;
-case 23:
+case 25:
 this.$ = "" + $$[$0-2] + $$[$0-1] + $$[$0]
 break;
-case 24:
+case 26:
 
             /*var expantion = $$[$0-1].map(function (item) {
                 return item.expand();
@@ -172,37 +167,37 @@ case 24:
             this.$ = $$[$0-1];
         
 break;
-case 25:
+case 27:
 this.$ = {key: $$[$0-2], value: toBoolean($$[$0])}
 break;
-case 26:
+case 28:
 this.$ = {key: $$[$0-2], value: Number($$[$0])}
 break;
-case 27: case 28: case 29:
+case 29: case 30: case 31:
 this.$ = {key: $$[$0-2], value: $$[$0]}
 break;
-case 30:
+case 32:
 
             var props = {};
             props[$$[$0].key] = $$[$0].value;
             this.$ = props;
         
 break;
-case 31:
+case 33:
 
             var props = {};
             props[$$[$0].key] = $$[$0].value;
             this.$ = Object.assign({}, $$[$0-1], props);
         
 break;
-case 32:
+case 34:
 this.$ = $$[$0-1].map(function (item) {
             var props = {};
             props[$$[$0-2]] = true;
             return clone(item, props);
         });
 break;
-case 33:
+case 35:
 this.$ = $$[$0-1].map(function (item) {
             // items properties overwrite the proplist's properties
             var props = Object.assign({}, $$[$0-2], item.props);
@@ -210,12 +205,12 @@ this.$ = $$[$0-1].map(function (item) {
             return item.clone(props);
         });
 break;
-case 34:
+case 36:
 
             this.$ = $$[$0-1];
         
 break;
-case 37:
+case 39:
 
             var element = yy.vars[$$[$0]];
             if (!element) throw new Error(errors.unitializedVar($$[$0], this));
@@ -224,7 +219,7 @@ case 37:
             }, []));
         
 break;
-case 38:
+case 40:
 
             var element = yy.vars[$$[$0]];
             if (!element) throw new Error(errors.unitializedVar($$[$0], this));
@@ -233,7 +228,7 @@ case 38:
             }, []));
         
 break;
-case 41:
+case 43:
 
             yy.vars[$$[$0-2]] = $$[$0];
             this.$ = $$[$0];
@@ -241,8 +236,8 @@ case 41:
 break;
 }
 },
-table: [{3:1,4:[1,2],5:3,7:$V0,11:16,12:$V1,13:10,15:11,16:$V2,17:12,18:$V3,20:13,21:$V4,25:6,27:8,28:$V5,35:7,36:$V6,37:5,38:4},{1:[3]},{1:[2,1]},{4:[1,21],7:$V0,11:16,12:$V1,13:10,15:11,16:$V2,17:12,18:$V3,20:13,21:$V4,25:6,27:8,28:$V5,35:7,36:$V6,37:5,38:22},o($V7,[2,46]),o($V7,[2,42]),o($V7,[2,43]),o($V7,[2,44]),o($V7,[2,45]),{32:[1,23]},o($V8,[2,19]),o($V8,[2,20]),o($V8,[2,21]),o($V8,[2,22]),{7:$V0,11:16,12:$V1,13:10,15:11,16:$V2,17:12,18:$V3,20:13,21:$V4,22:[1,27],23:$V9,25:29,29:26,31:28,34:25,35:31,36:$Va},{23:[1,32]},o($Vb,[2,8],{9:33,10:$Vc}),o($V8,[2,12],{9:35,10:$Vc}),{7:$V0,11:16,12:$V1,13:37,14:36},o($Vd,[2,6]),o($Vd,[2,7]),{1:[2,2]},o($V7,[2,47]),{21:[1,39],35:38},{7:$V0,11:16,12:$V1,13:10,15:11,16:$V2,17:12,18:$V3,20:13,21:$V4,25:29,29:40,32:$Ve,35:31,36:$Va},{7:$V0,11:16,12:$V1,13:10,15:11,16:$V2,17:12,18:$V3,20:13,21:$V4,23:[1,44],25:29,29:42,31:43,35:31,36:$Va},{7:$V0,11:16,12:$V1,13:10,15:11,16:$V2,17:12,18:$V3,20:13,21:$V4,24:[1,45],25:46,35:48,36:$Vf},{23:[1,49]},o($Vg,[2,30]),o($Vh,[2,35]),o($Vh,[2,37]),o($Vh,[2,39]),{7:$V0,11:16,12:$V1,13:10,15:11,16:$V2,17:12,18:$V3,20:13,21:$V4,25:29,29:50,35:31,36:$Va},o($Vb,[2,9]),{7:[1,51]},o($V8,[2,13]),{7:$V0,11:16,12:$V1,13:53,19:[1,52]},o($Vi,[2,10]),o($V7,[2,41]),{7:$V0,11:16,12:$V1,13:10,15:11,16:$V2,17:12,18:$V3,20:13,21:$V4,23:$V9,25:29,29:26,31:28,34:25,35:31,36:$Va},{7:$V0,11:16,12:$V1,13:10,15:11,16:$V2,17:12,18:$V3,20:13,21:$V4,24:[1,54],25:46,35:48,36:$Vf},{6:59,7:[1,56],23:[1,57],26:58,33:[1,55]},{7:$V0,11:16,12:$V1,13:10,15:11,16:$V2,17:12,18:$V3,20:13,21:$V4,24:[1,60],25:46,35:48,36:$Vf},o($Vg,[2,31]),{32:$Ve},o($V8,[2,34]),o($Vh,[2,36]),o($Vh,[2,38]),o($Vh,[2,40]),{7:[1,61]},{7:$V0,11:16,12:$V1,13:10,15:11,16:$V2,17:12,18:$V3,20:13,21:$V4,25:46,30:[1,62],35:48,36:$Vf},o($Vb,[2,4],{8:[1,63]}),o($V8,[2,14],{9:64,10:$Vc}),o($Vi,[2,11]),o($V8,[2,32]),o($Vg,[2,25]),o($Vg,[2,26],{8:$Vj,10:[1,65]}),o($Vg,[2,27]),o($Vg,[2,28]),o($Vg,[2,29]),o($V8,[2,33]),{6:69,7:[1,68],24:[1,67]},o($V7,[2,24]),o($Vb,[2,5]),o($V8,[2,15]),{7:[1,70]},{7:[1,71]},o($V8,[2,16]),{8:$Vj,24:[1,72]},{24:[1,73]},o($Vg,[2,23]),o([7,12,16,18,21,23,24,36],[2,3]),o($V8,[2,17]),o($V8,[2,18])],
-defaultActions: {2:[2,1],21:[2,2]},
+table: [{3:1,4:[1,2],5:3,6:19,7:$V0,9:10,12:21,13:$V1,14:11,15:$V2,17:12,19:13,20:$V3,21:14,22:$V4,24:15,25:$V5,29:6,31:8,32:$V6,38:7,39:$V7,40:5,41:4},{1:[3]},{1:[2,1]},{4:[1,25],6:19,7:$V0,9:10,12:21,13:$V1,14:11,15:$V2,17:12,19:13,20:$V3,21:14,22:$V4,24:15,25:$V5,29:6,31:8,32:$V6,38:7,39:$V7,40:5,41:26},o($V8,[2,48]),o($V8,[2,44]),o($V8,[2,45]),o($V8,[2,46]),o($V8,[2,47]),{35:[1,27]},o($V9,[2,19]),o($V9,[2,20]),o($V9,[2,21]),o($V9,[2,22]),o($V9,[2,23]),o($V9,[2,24]),{6:19,7:$V0,9:10,12:21,13:$V1,14:11,15:$V2,16:$Va,17:12,19:13,20:$V3,21:14,22:$V4,24:15,25:$V5,26:[1,31],27:30,29:33,34:32,37:29,38:35,39:$Vb},{16:[1,36]},o($V9,[2,4],{8:$Vc}),o($V9,[2,5]),{16:[1,38]},o($Vd,[2,10],{10:39,11:$Ve}),o($V9,[2,14],{10:41,11:$Ve}),{12:21,13:$V1,17:43,18:42},o([4,7,11,13,15,20,22,23,25,28,32,33,39],[2,8]),{1:[2,2]},o($V8,[2,49]),{25:[1,45],38:44},{6:19,7:$V0,9:10,12:21,13:$V1,14:11,15:$V2,17:12,19:13,20:$V3,21:14,22:$V4,24:15,25:$V5,27:46,29:33,35:$Vf,38:35,39:$Vb},{6:19,7:$V0,9:10,12:21,13:$V1,14:11,15:$V2,16:[1,50],17:12,19:13,20:$V3,21:14,22:$V4,24:15,25:$V5,27:48,29:33,34:49,38:35,39:$Vb},{6:19,7:$V0,9:10,12:21,13:$V1,14:11,15:$V2,17:12,19:13,20:$V3,21:14,22:$V4,24:15,25:$V5,28:[1,51],29:52,38:54,39:$Vg},{6:19,7:$V0,9:10,12:21,13:$V1,14:11,15:$V2,17:12,19:13,20:$V3,21:14,22:$V4,24:15,25:$V5,27:55,29:33,38:35,39:$Vb},o($Vh,[2,32]),o($Vi,[2,37]),o($Vi,[2,39]),o($Vi,[2,41]),{6:19,7:$V0,9:10,12:21,13:$V1,14:11,15:$V2,17:12,19:13,20:$V3,21:14,22:$V4,24:15,25:$V5,27:56,29:33,38:35,39:$Vb},{7:[1,57]},o($V9,[2,9]),o($Vd,[2,11]),{7:[1,58]},o($V9,[2,15]),{12:21,13:$V1,17:60,23:[1,59]},o($Vj,[2,12]),o($V8,[2,43]),{6:19,7:$V0,9:10,12:21,13:$V1,14:11,15:$V2,16:$Va,17:12,19:13,20:$V3,21:14,22:$V4,24:15,25:$V5,27:30,29:33,34:32,37:29,38:35,39:$Vb},{6:19,7:$V0,9:10,12:21,13:$V1,14:11,15:$V2,17:12,19:13,20:$V3,21:14,22:$V4,24:15,25:$V5,28:[1,61],29:52,38:54,39:$Vg},{6:66,7:[1,63],16:[1,64],30:65,36:[1,62]},{6:19,7:$V0,9:10,12:21,13:$V1,14:11,15:$V2,17:12,19:13,20:$V3,21:14,22:$V4,24:15,25:$V5,28:[1,67],29:52,38:54,39:$Vg},o($Vh,[2,33]),{35:$Vf},o($V9,[2,36]),o($Vi,[2,38]),o($Vi,[2,40]),o($Vi,[2,42]),{6:19,7:$V0,9:10,12:21,13:$V1,14:11,15:$V2,17:12,19:13,20:$V3,21:14,22:$V4,24:15,25:$V5,28:[1,68],29:52,38:54,39:$Vg},{6:19,7:$V0,9:10,12:21,13:$V1,14:11,15:$V2,17:12,19:13,20:$V3,21:14,22:$V4,24:15,25:$V5,29:52,33:[1,69],38:54,39:$Vg},o([4,7,13,15,16,20,22,25,28,32,33,39],[2,3]),o($Vd,[2,6],{8:[1,70]}),o($V9,[2,16],{10:71,11:$Ve}),o($Vj,[2,13]),o($V9,[2,34]),o($Vh,[2,27]),o($Vh,[2,28],{8:$Vc,11:[1,72]}),o($Vh,[2,29]),o($Vh,[2,30]),o($Vh,[2,31]),o($V9,[2,35]),o($V9,[2,18]),o($V8,[2,26]),o($Vd,[2,7]),o($V9,[2,17]),{7:[1,73]},o($Vh,[2,25])],
+defaultActions: {2:[2,1],25:[2,2]},
 parseError: function parseError(str, hash) {
     if (hash.recoverable) {
         this.trace(str);
@@ -395,6 +390,20 @@ parse: function parse(input) {
 }};
 
     var CHORDSYMBOL = "chordSymbol";
+
+    var BUILTINS = {
+        // timeSignature: function (numerator, denominator) {
+        //
+        // },
+        chordSymbol: function (yy, args) {
+            var value = args[0];
+            var measure = Number(args[1]);
+            var beat = args[2] ? Number(args[2]) : 0;
+            var chordSymbol = {type: CHORDSYMBOL, props: {value: value, measure: measure, beat: beat}};
+            yy.chordSymbols.push(chordSymbol);
+            return chordSymbol;
+        }
+    };
 
     var toBoolean = function (string) {
         if (string === "false") {
@@ -766,46 +775,48 @@ case 1:/* ignore comments */
 break;
 case 2:/* ignore barlines */
 break;
-case 3:return 21
+case 3:return 25
 break;
-case 4:return 24
+case 4:return 28
 break;
-case 5:return 28
+case 5:return 32
 break;
-case 6:return 30
+case 6:return 33
 break;
-case 7:return 18
+case 7:return 22
 break;
-case 8:return 19
+case 8:return 23
 break;
-case 9:return 10
+case 9:return 11
 break;
-case 10:return 32
+case 10:return 35
 break;
-case 11:return 16
+case 11:return 15
 break;
-case 12:return 8
+case 12:return 20
 break;
-case 13:return 33
+case 13:return 8
 break;
-case 14:return 7
+case 14:return 36
 break;
-case 15:return 22
+case 15:return 7
 break;
-case 16:return 12
+case 16:return 26
 break;
-case 17:return 36
+case 17:return 13
 break;
-case 18:return 23
+case 18:return 39
 break;
-case 19:return 4
+case 19:return 16
 break;
-case 20:return 'INVALID'
+case 20:return 4
+break;
+case 21:return 'INVALID'
 break;
 }
 },
-rules: [/^(?:\s+)/,/^(?:;.*)/,/^(?:\|)/,/^(?:\()/,/^(?:\))/,/^(?:\[)/,/^(?:\])/,/^(?:<)/,/^(?:>)/,/^(?:\/)/,/^(?:=)/,/^(?:r\b)/,/^(?:\.+)/,/^(?:true|false\b)/,/^(?:[0-9]+)/,/^(?:csym\b)/,/^(?:[a-gA-G][b|#]{0,2}(?![a-zA-Z])([0-9]+)?)/,/^(?:~[a-zA-Z][a-zA-Z0-9]*)/,/^(?:[a-zA-Z][a-zA-Z0-9]*)/,/^(?:$)/,/^(?:.)/],
-conditions: {"INITIAL":{"rules":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20],"inclusive":true}}
+rules: [/^(?:\s+)/,/^(?:;.*)/,/^(?:\|)/,/^(?:\()/,/^(?:\))/,/^(?:\[)/,/^(?:\])/,/^(?:<)/,/^(?:>)/,/^(?:\/)/,/^(?:=)/,/^(?::)/,/^(?:r\b)/,/^(?:\.+)/,/^(?:true|false\b)/,/^(?:[0-9]+)/,/^(?:csym\b)/,/^(?:[a-gA-G][b|#]{0,2}(?![a-zA-Z])([0-9]+)?)/,/^(?:~[a-zA-Z][a-zA-Z0-9]*)/,/^(?:[a-zA-Z][a-zA-Z0-9]*)/,/^(?:$)/,/^(?:.)/],
+conditions: {"INITIAL":{"rules":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21],"inclusive":true}}
 });
 return lexer;
 })();

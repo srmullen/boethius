@@ -97,7 +97,7 @@ describe("boethius compilation", () => {
             expect(voices.mel[1].props.octave).to.equal(8);
         });
 
-        it("should translate integers as pitches", () => {
+        xit("should translate integers as pitches", () => {
             const {voices} = compile("[mel a 4]");
             expect(voices.mel[0].props.pitchClass).to.be.ok;
         });
@@ -192,6 +192,16 @@ describe("boethius compilation", () => {
             expect(voices.mel2[2].props.time).to.equal(0.625);
             expect(voices.mel2[3].props.time).to.equal(0.6875);
             expect(voices.mel2[4].props.time).to.equal(0.75);
+        });
+    });
+
+    xdescribe('layout', () => {
+        it('should add layout', () => {
+            const {layout} = compile(`
+                #(timeSignature [3 4])
+            `);
+
+            expect(layout.timeSignatures).to.be.array;
         });
     });
 });

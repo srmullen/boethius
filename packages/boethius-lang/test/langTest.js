@@ -98,10 +98,10 @@ describe("parser", () => {
 
     describe("chord symbols", () => {
         it("should create a chord symbol with csym", () => {
-            const {chordSymbols} = compile("(csym cmaj 4)");
+            const {chordSymbols} = compile("(csym :cmaj 4)");
             expect(chordSymbols[0]).to.eql({
                 props: {
-                    value: "cmaj",
+                    value: ":cmaj",
                     measure: 4,
                     beat: 0
                 },
@@ -110,10 +110,10 @@ describe("parser", () => {
         });
 
         it("should take a beat param as integer", () => {
-            const {chordSymbols} = compile("(csym cmaj 2 3)");
+            const {chordSymbols} = compile("(csym :cmaj 2 3)");
             expect(chordSymbols[0]).to.eql({
                 props: {
-                    value: "cmaj",
+                    value: ":cmaj",
                     measure: 2,
                     beat: 3
                 },
@@ -122,10 +122,10 @@ describe("parser", () => {
         });
 
         it("should take a beat param as float", () => {
-            const {chordSymbols} = compile("(csym cmaj 5 1.5)");
+            const {chordSymbols} = compile("(csym :cmaj 5 1.5)");
             expect(chordSymbols[0]).to.eql({
                 props: {
-                    value: "cmaj",
+                    value: ":cmaj",
                     measure: 5,
                     beat: 1.5
                 },
@@ -134,8 +134,8 @@ describe("parser", () => {
         });
 
         it("should handle multiple chord symbols", () => {
-            expect(compile("(csym cmaj 5 1.5) (csym fmin 0)").chordSymbols.length).to.equal(2);
-            expect(compile("(csym cmaj 5 1.5) c4 <d4 f4> (csym fmin 0)").chordSymbols.length).to.equal(2);
+            expect(compile("(csym :cmaj 5 1.5) (csym :fmin 0)").chordSymbols.length).to.equal(2);
+            expect(compile("(csym :cmaj 5 1.5) c4 <d4 f4> (csym :fmin 0)").chordSymbols.length).to.equal(2);
         });
     });
 
@@ -253,6 +253,13 @@ describe("parser", () => {
     describe("barlines", () => {
         it("should ignore them", () => {
             expect(compile("c4/1 | d4/1")).to.be.ok;
+        });
+    });
+
+    // Keywords can be used as inputs to built in functions
+    describe('keywords', () => {
+        it('should not fail', () => {
+            expect(compile(':hello')).to.be.ok;
         });
     });
 });

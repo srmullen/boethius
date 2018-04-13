@@ -2,6 +2,20 @@
 %{
     var CHORDSYMBOL = "chordSymbol";
 
+    var BUILTINS = {
+        // timeSignature: function (numerator, denominator) {
+        //
+        // },
+        chordSymbol: function (yy, args) {
+            var value = args[0];
+            var measure = Number(args[1]);
+            var beat = args[2] ? Number(args[2]) : 0;
+            var chordSymbol = {type: CHORDSYMBOL, props: {value: value, measure: measure, beat: beat}};
+            yy.chordSymbols.push(chordSymbol);
+            return chordSymbol;
+        }
+    };
+
     var toBoolean = function (string) {
         if (string === "false") {
             return false;
@@ -56,11 +70,13 @@
 \>                                 return 'CLOSEBRKT'
 \/                                 return 'FWDSLASH'
 \=                                 return 'EQUALS'
+\:                                 return 'COLON'
 r                                  return 'REST'
 \.+                                return 'DOTS'
 true|false                         return 'BOOL'
 [0-9]+                             return 'INTEGER'
-csym                               return 'CSYM'
+csym                               return 'BUILTIN'
+// csym                               return 'BUILTIN'
 [a-gA-G][b|#]{0,2}(?![a-zA-Z])([0-9]+)?    return 'PITCHCLASS'
 /*[a-gA-G][b|#]{0,2}([0-9]+)?     return 'PITCHCLASS'*/
 \~[a-zA-Z][a-zA-Z0-9]*             return 'VAR'
@@ -93,6 +109,13 @@ float:
         {$$ = parseFloat($1 + "." + $3)}
     ;
 
+number:
+    INTEGER
+        {$$ = $1}
+    | float
+        {$$ = $1}
+    ;
+
 duration:
     FWDSLASH INTEGER
         {$$ = {value: Number($2), dots: 0}}
@@ -101,10 +124,16 @@ duration:
     ;
 
 pitch:
-    INTEGER
-        {$$ = {midi: Number($1)};}
-    | PITCHCLASS
+    // INTEGER
+    //     {$$ = {midi: Number($1)};}
+    // |
+    PITCHCLASS
         {$$ = yy.parsePitch($1);}
+    ;
+
+keyword:
+    COLON IDENTIFIER
+        {$$ = ':' + $2}
     ;
 
 note:
@@ -143,35 +172,47 @@ chord:
         }
     ;
 
-chordSymbol:
-    LPAREN CSYM IDENTIFIER INTEGER RPAREN
+builtin:
+    LPAREN BUILTIN list RPAREN
         {
-            var chordSymbol = {type: CHORDSYMBOL, props: {value: $3, measure: Number($4), beat: 0}};
-            yy.chordSymbols.push(chordSymbol);
-            $$ = chordSymbol;
+            // var chordSymbol = {type: CHORDSYMBOL, props: {value: $3, measure: Number($4), beat: 0}};
+            // yy.chordSymbols.push(chordSymbol);
+            // $$ = chordSymbol;
+            // $$ = BUILTINS.chordSymbol(yy, [$3, $4]);
+            $$ = BUILTINS.chordSymbol(yy, $3);
         }
-    | LPAREN CSYM IDENTIFIER INTEGER INTEGER RPAREN
-        {
-            var chordSymbol = {type: CHORDSYMBOL, props: {value: $3, measure: Number($4), beat: Number($5)}}
-            yy.chordSymbols.push(chordSymbol);
-            $$ = chordSymbol;
-        }
-    | LPAREN CSYM IDENTIFIER INTEGER float RPAREN
-        {
-            var chordSymbol = {type: CHORDSYMBOL, props: {value: $3, measure: Number($4), beat: Number($5)}}
-            yy.chordSymbols.push(chordSymbol);
-            $$ = chordSymbol;
-        }
+    // LPAREN BUILTIN IDENTIFIER INTEGER RPAREN
+    //     {
+    //         var chordSymbol = {type: CHORDSYMBOL, props: {value: $3, measure: Number($4), beat: 0}};
+    //         yy.chordSymbols.push(chordSymbol);
+    //         $$ = chordSymbol;
+    //     }
+    // | LPAREN BUILTIN IDENTIFIER INTEGER INTEGER RPAREN
+    //     {
+    //         var chordSymbol = {type: CHORDSYMBOL, props: {value: $3, measure: Number($4), beat: Number($5)}}
+    //         yy.chordSymbols.push(chordSymbol);
+    //         $$ = chordSymbol;
+    //     }
+    // | LPAREN BUILTIN IDENTIFIER INTEGER float RPAREN
+    //     {
+    //         var chordSymbol = {type: CHORDSYMBOL, props: {value: $3, measure: Number($4), beat: Number($5)}}
+    //         yy.chordSymbols.push(chordSymbol);
+    //         $$ = chordSymbol;
+    //     }
     ;
 
 item:
-    note
+    number
+        {$$ = $1}
+    | keyword
+        {$$ = $1}
+    | note
         {$$ = $1}
     | rest
         {$$ = $1}
     | chord
         {$$ = $1}
-    | chordSymbol
+    | builtin
         {$$ = $1}
     ;
 
