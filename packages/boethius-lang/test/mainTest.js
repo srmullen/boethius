@@ -195,13 +195,100 @@ describe("boethius compilation", () => {
         });
     });
 
-    xdescribe('layout', () => {
-        it('should add layout', () => {
+    describe('layout', () => {
+        it('should add have layout property', () => {
             const {layout} = compile(`
-                #(timeSignature [3 4])
+                (timesig 3 4)
             `);
 
-            expect(layout.timeSignatures).to.be.array;
+            expect(layout).to.be.ok;
+        });
+
+        describe('timesig', () => {
+            it('should create timeSignatures array', () => {
+                const {layout} = compile(`
+                    (timesig 3 4)
+                `);
+
+                expect(layout.timeSignatures).to.be.an('array');
+                expect(layout.timeSignatures[0].value).to.eql([3, 4]);
+                expect(layout.timeSignatures[0].measure).to.equal(0);
+                expect(layout.timeSignatures[0].beat).to.equal(0);
+            });
+        });
+
+        describe('line', () => {
+            it('should create a lines array', () => {
+                const {layout} = compile(`
+                    (line :voice1)
+                `);
+
+                expect(layout.lines).to.be.an('array');
+                expect(layout.lines.length).to.equal(1);
+            });
+
+            it('should add keywords to the lines voices', () => {
+                const {layout} = compile(`
+                    (line :voice1 :voice2)
+                `);
+
+                expect(layout.lines[0].voices.length).to.equal(2);
+                expect(layout.lines[0].voices[0]).to.equal('voice1');
+                expect(layout.lines[0].voices[1]).to.equal('voice2');
+            });
+
+            it('should add clefs to the line', () => {
+                const {layout} = compile(`
+                    (line :voice1 (clef :treble))
+                `);
+
+                expect(layout.lines[0].clefs.length).to.equal(1);
+                expect(layout.lines[0].clefs[0].value).to.equal('treble');
+            });
+
+            it('should add measure and beat to the clefs', () => {
+                const {layout} = compile(`
+                    (line :voice1 (clef :treble) (clef :bass 4 2))
+                `);
+
+                expect(layout.lines[0].clefs.length).to.equal(2);
+                expect(layout.lines[0].clefs[0].value).to.equal('treble');
+                expect(layout.lines[0].clefs[1].value).to.equal('bass');
+                expect(layout.lines[0].clefs[1].measure).to.equal(4);
+                expect(layout.lines[0].clefs[1].beat).to.equal(2);
+            });
+
+            it('should add keys to the line', () => {
+                const {layout} = compile(`
+                    (line :voice1 (key :e :minor))
+                `);
+
+                expect(layout.lines[0].keys.length).to.equal(1);
+                expect(layout.lines[0].keys[0].root).to.equal('e');
+                expect(layout.lines[0].keys[0].mode).to.equal('minor');
+            });
+
+            it('should add measure and beat to the keys', () => {
+                const {layout} = compile(`
+                    (line :voice1 (key :ab :dorian) (key :c :major 5 0))
+                `);
+
+                expect(layout.lines[0].keys.length).to.equal(2);
+                expect(layout.lines[0].keys[0].root).to.equal('ab');
+                expect(layout.lines[0].keys[0].mode).to.equal('dorian');
+                expect(layout.lines[0].keys[1].root).to.equal('c');
+                expect(layout.lines[0].keys[1].mode).to.equal('major');
+                expect(layout.lines[0].keys[1].measure).to.equal(5);
+                expect(layout.lines[0].keys[1].beat).to.equal(0);
+            });
+
+            it('should have properties from the scope set upon it', () => {
+                const {layout} = compile(`
+                    (name=myline (line :voice1))
+                `);
+
+                expect(layout.lines[0].name).to.equal('notmyline');
+            });
         });
     });
 });

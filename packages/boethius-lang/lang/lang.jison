@@ -1,21 +1,5 @@
 /* description: Parses end executes boethius expressions. */
 %{
-    var CHORDSYMBOL = "chordSymbol";
-
-    var BUILTINS = {
-        // timeSignature: function (numerator, denominator) {
-        //
-        // },
-        chordSymbol: function (yy, args) {
-            var value = args[0];
-            var measure = Number(args[1]);
-            var beat = args[2] ? Number(args[2]) : 0;
-            var chordSymbol = {type: CHORDSYMBOL, props: {value: value, measure: measure, beat: beat}};
-            yy.chordSymbols.push(chordSymbol);
-            return chordSymbol;
-        }
-    };
-
     var toBoolean = function (string) {
         if (string === "false") {
             return false;
@@ -59,30 +43,29 @@
 %lex
 %%
 
-\s+                                /* skip whitespace */
-\;.*                               /* ignore comments */
-\|                                 /* ignore barlines */
-\(                                 return 'LPAREN'
-\)                                 return 'RPAREN'
-\[                                 return 'LBRKT'
-\]                                 return 'RBRKT'
-\<                                 return 'OPENBRKT'
-\>                                 return 'CLOSEBRKT'
-\/                                 return 'FWDSLASH'
-\=                                 return 'EQUALS'
-\:                                 return 'COLON'
-r                                  return 'REST'
-\.+                                return 'DOTS'
-true|false                         return 'BOOL'
-[0-9]+                             return 'INTEGER'
-csym                               return 'BUILTIN'
-// csym                               return 'BUILTIN'
+\s+                                        /* skip whitespace */
+\;.*                                       /* ignore comments */
+\|                                         /* ignore barlines */
+\(                                         return 'LPAREN'
+\)                                         return 'RPAREN'
+\[                                         return 'LBRKT'
+\]                                         return 'RBRKT'
+\<                                         return 'OPENBRKT'
+\>                                         return 'CLOSEBRKT'
+\/                                         return 'FWDSLASH'
+\=                                         return 'EQUALS'
+\:                                         return 'COLON'
+r                                          return 'REST'
+\.+                                        return 'DOTS'
+true|false                                 return 'BOOL'
+[0-9]+                                     return 'INTEGER'
+csym|timesig|line|clef|key                 return 'BUILTIN'
 [a-gA-G][b|#]{0,2}(?![a-zA-Z])([0-9]+)?    return 'PITCHCLASS'
 /*[a-gA-G][b|#]{0,2}([0-9]+)?     return 'PITCHCLASS'*/
-\~[a-zA-Z][a-zA-Z0-9]*             return 'VAR'
-[a-zA-Z][a-zA-Z0-9]*               return 'IDENTIFIER'
-<<EOF>>                            return 'EOF'
-.                                  return 'INVALID'
+\~[a-zA-Z][a-zA-Z0-9]*                     return 'VAR'
+[a-zA-Z][a-zA-Z0-9]*                       return 'IDENTIFIER'
+<<EOF>>                                    return 'EOF'
+.                                          return 'INVALID'
 
 /lex
 
@@ -99,7 +82,9 @@ csym                               return 'BUILTIN'
 
 expressions:
     EOF
-        {return {voices: yy.voices, chordSymbols: yy.chordSymbols};}
+        {
+            return {voices: yy.voices, chordSymbols: yy.chordSymbols, layout: yy.layout};
+        }
     | statements EOF
         {return $1;}
     ;
@@ -124,16 +109,15 @@ duration:
     ;
 
 pitch:
-    // INTEGER
-    //     {$$ = {midi: Number($1)};}
-    // |
     PITCHCLASS
         {$$ = yy.parsePitch($1);}
     ;
 
 keyword:
     COLON IDENTIFIER
-        {$$ = ':' + $2}
+        {$$ = new yy.Keyword($2)}
+    | COLON PITCHCLASS 
+        {$$ = new yy.Keyword($2)}
     ;
 
 note:
@@ -175,30 +159,8 @@ chord:
 builtin:
     LPAREN BUILTIN list RPAREN
         {
-            // var chordSymbol = {type: CHORDSYMBOL, props: {value: $3, measure: Number($4), beat: 0}};
-            // yy.chordSymbols.push(chordSymbol);
-            // $$ = chordSymbol;
-            // $$ = BUILTINS.chordSymbol(yy, [$3, $4]);
-            $$ = BUILTINS.chordSymbol(yy, $3);
+            $$ = yy.BUILTINS[$2](yy, $3);
         }
-    // LPAREN BUILTIN IDENTIFIER INTEGER RPAREN
-    //     {
-    //         var chordSymbol = {type: CHORDSYMBOL, props: {value: $3, measure: Number($4), beat: 0}};
-    //         yy.chordSymbols.push(chordSymbol);
-    //         $$ = chordSymbol;
-    //     }
-    // | LPAREN BUILTIN IDENTIFIER INTEGER INTEGER RPAREN
-    //     {
-    //         var chordSymbol = {type: CHORDSYMBOL, props: {value: $3, measure: Number($4), beat: Number($5)}}
-    //         yy.chordSymbols.push(chordSymbol);
-    //         $$ = chordSymbol;
-    //     }
-    // | LPAREN BUILTIN IDENTIFIER INTEGER float RPAREN
-    //     {
-    //         var chordSymbol = {type: CHORDSYMBOL, props: {value: $3, measure: Number($4), beat: Number($5)}}
-    //         yy.chordSymbols.push(chordSymbol);
-    //         $$ = chordSymbol;
-    //     }
     ;
 
 item:

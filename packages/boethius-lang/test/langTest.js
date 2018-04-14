@@ -1,9 +1,10 @@
 import {expect} from "chai";
 import compile from "../src/main";
+import {SCORE} from "../src/constants";
 
 describe("parser", () => {
     it("should return an empty array for an empty file", () => {
-        expect(compile("")).to.eql({voices: {}, chordSymbols: []});
+        expect(compile("")).to.eql({voices: {}, chordSymbols: [], layout: {type: SCORE}});
     });
 
     describe("notes", () => {
@@ -101,7 +102,7 @@ describe("parser", () => {
             const {chordSymbols} = compile("(csym :cmaj 4)");
             expect(chordSymbols[0]).to.eql({
                 props: {
-                    value: ":cmaj",
+                    value: "cmaj",
                     measure: 4,
                     beat: 0
                 },
@@ -113,7 +114,7 @@ describe("parser", () => {
             const {chordSymbols} = compile("(csym :cmaj 2 3)");
             expect(chordSymbols[0]).to.eql({
                 props: {
-                    value: ":cmaj",
+                    value: "cmaj",
                     measure: 2,
                     beat: 3
                 },
@@ -125,7 +126,7 @@ describe("parser", () => {
             const {chordSymbols} = compile("(csym :cmaj 5 1.5)");
             expect(chordSymbols[0]).to.eql({
                 props: {
-                    value: ":cmaj",
+                    value: "cmaj",
                     measure: 5,
                     beat: 1.5
                 },
@@ -232,7 +233,7 @@ describe("parser", () => {
 
     describe("comments", () => {
         it("should ignore text after ;", () => {
-            expect(compile("; i'm a comment")).to.eql({voices: {}, chordSymbols: []});
+            expect(compile("; i'm a comment")).to.eql({voices: {}, chordSymbols: [], layout: {type: SCORE}});
             const {voices: {mel}} = compile(`[mel c4 ; d4
             ]`);
             const [note1, note2] = mel;
