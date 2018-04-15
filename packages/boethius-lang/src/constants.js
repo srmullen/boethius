@@ -4,5 +4,6 @@ export const CHORD = 'chord';
 export const CHORDSYMBOL = 'chordSymbol';
 
 export const SCORE = 'score';
+export const LINE = 'line';
 export const CLEF = 'clef';
 export const KEY = 'key';

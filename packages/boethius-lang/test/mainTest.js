@@ -215,6 +215,20 @@ describe("boethius compilation", () => {
                 expect(layout.timeSignatures[0].measure).to.equal(0);
                 expect(layout.timeSignatures[0].beat).to.equal(0);
             });
+
+            it('should handle multiple time signatures', () => {
+                const {layout} = compile(`
+                    (timesig 3 4)
+                    (timesig 7 8 3 0)
+                `);
+
+                expect(layout.timeSignatures[0].value).to.eql([3, 4]);
+                expect(layout.timeSignatures[0].measure).to.equal(0);
+                expect(layout.timeSignatures[0].beat).to.equal(0);
+                expect(layout.timeSignatures[1].value).to.eql([7, 8]);
+                expect(layout.timeSignatures[1].measure).to.eql(3);
+                expect(layout.timeSignatures[1].beat).to.eql(0);
+            });
         });
 
         describe('line', () => {

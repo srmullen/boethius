@@ -116,7 +116,7 @@ pitch:
 keyword:
     COLON IDENTIFIER
         {$$ = new yy.Keyword($2)}
-    | COLON PITCHCLASS 
+    | COLON PITCHCLASS
         {$$ = new yy.Keyword($2)}
     ;
 

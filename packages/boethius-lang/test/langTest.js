@@ -1,10 +1,12 @@
 import {expect} from "chai";
 import compile from "../src/main";
-import {SCORE} from "../src/constants";
+import Layout from '../src/Layout';
 
 describe("parser", () => {
     it("should return an empty array for an empty file", () => {
-        expect(compile("")).to.eql({voices: {}, chordSymbols: [], layout: {type: SCORE}});
+        expect(compile("")).to.eql({
+            voices: {}, chordSymbols: [], layout: new Layout().serialize()
+        });
     });
 
     describe("notes", () => {
@@ -233,7 +235,9 @@ describe("parser", () => {
 
     describe("comments", () => {
         it("should ignore text after ;", () => {
-            expect(compile("; i'm a comment")).to.eql({voices: {}, chordSymbols: [], layout: {type: SCORE}});
+            expect(compile("; i'm a comment")).to.eql({
+                voices: {}, chordSymbols: [], layout: new Layout().serialize()
+            });
             const {voices: {mel}} = compile(`[mel c4 ; d4
             ]`);
             const [note1, note2] = mel;

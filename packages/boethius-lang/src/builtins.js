@@ -1,4 +1,5 @@
 import Keyword from './Keyword';
+import LineNode from './LineNode';
 import {CHORDSYMBOL, CLEF, KEY} from './constants';
 
 const BUILTINS = {
@@ -13,20 +14,20 @@ const BUILTINS = {
     timesig: function (yy, args) {
         const numerator = Number(args[0]);
         const denominator = Number(args[1]);
+        const measure = args[2] ? Number(args[2]) : 0;
+        const beat = args[3] ? Number(args[3]) : 0;
         const timeSignature = {
             value: [numerator, denominator],
-            measure: 0,
-            beat: 0
+            measure,
+            beat
         };
-        if (yy.layout.timeSignatures) {
-            yy.layout.push(timeSignature);
-        } else {
-            yy.layout.timeSignatures = [timeSignature];
-        }
+
+        yy.layout.timeSignatures.push(timeSignature);
+
         return timeSignature;
     },
     line: function (yy, args) {
-        const line = args.reduce(function (acc, arg) {
+        const line = new LineNode(args.reduce(function (acc, arg) {
             if (arg instanceof Keyword) {
                 acc.voices.push(arg.toString());
             } else if (arg.type === CLEF) {
@@ -35,12 +36,10 @@ const BUILTINS = {
                 acc.keys.push(arg);
             }
             return acc;
-        }, {keys: [], clefs: [], voices: []});
-        if (yy.layout.lines) {
-            yy.layout.lines.push(line);
-        } else {
-            yy.layout.lines = [line];
-        }
+        }, {keys: [], clefs: [], voices: []}));
+
+        yy.layout.lines.push(line);
+
         return line;
     },
     clef: function (yy, args) {

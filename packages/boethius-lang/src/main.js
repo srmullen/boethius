@@ -5,13 +5,14 @@ import NoteNode from "./NoteNode";
 import RestNode from "./RestNode";
 import ChordNode from "./ChordNode";
 import Keyword from './Keyword';
+import Layout from './Layout';
 import BUILTINS from './builtins';
-import { NOTE, REST, CHORD, CHORDSYMBOL, SCORE } from './constants';
+import { NOTE, REST, CHORD, CHORDSYMBOL } from './constants';
 
 function compile (program) {
     parser.yy.voices = {};
     parser.yy.chordSymbols = [];
-    parser.yy.layout = {type: SCORE};
+    parser.yy.layout = new Layout();
     parser.yy.vars = {};
     parser.yy.BUILTINS = BUILTINS;
     parser.yy.NoteNode = NoteNode;
@@ -28,10 +29,14 @@ function compile (program) {
         }
     }
 
+    // const layout = Object.assign({}, parser.yy.layout, {
+    //     lines: parser.yy.layout.lines.map(line => line.toJSON())
+    // });
+
     return {
         voices: parser.yy.voices,
         chordSymbols: parser.yy.chordSymbols,
-        layout: parser.yy.layout
+        layout: parser.yy.layout.serialize()
     };
 }
 
