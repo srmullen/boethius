@@ -94,8 +94,8 @@ break;
 case 3:
 this.$ = parseFloat($$[$0-2] + "." + $$[$0])
 break;
-case 4: case 5: case 20: case 21: case 22: case 23: case 24: case 25: case 42: case 45: case 46: case 47: case 48:
-this.$ = $$[$0]
+case 4: case 5:
+this.$ = new yy.NumberNode($$[$0])
 break;
 case 6:
 this.$ = {value: Number($$[$0]), dots: 0}
@@ -143,17 +143,16 @@ case 18:
 break;
 case 19:
 
-            this.$ = yy.BUILTINS[$$[$0-2]](yy, $$[$0-1]);
+            this.$ = yy.BUILTINS[$$[$0-2].trim()](yy, $$[$0-1]);
         
+break;
+case 20: case 21: case 22: case 23: case 24: case 25: case 42: case 45: case 46: case 47: case 48:
+this.$ = $$[$0]
 break;
 case 26:
 this.$ = "" + $$[$0-2] + $$[$0-1] + $$[$0]
 break;
 case 27:
-
-            /*var expantion = $$[$0-1].map(function (item) {
-                return item.expand();
-            });*/
 
             if (!yy.voices[$$[$0-2]]) {
                 // create array for voice items
@@ -797,7 +796,7 @@ case 21:return 'INVALID'
 break;
 }
 },
-rules: [/^(?:\s+)/,/^(?:;.*)/,/^(?:\|)/,/^(?:\()/,/^(?:\))/,/^(?:\[)/,/^(?:\])/,/^(?:<)/,/^(?:>)/,/^(?:\/)/,/^(?:=)/,/^(?::)/,/^(?:r\b)/,/^(?:\.+)/,/^(?:true|false\b)/,/^(?:[0-9]+)/,/^(?:csym|timesig|line|clef|key\b)/,/^(?:[a-gA-G][b|#]{0,2}(?![a-zA-Z])([0-9]+)?)/,/^(?:~[a-zA-Z][a-zA-Z0-9]*)/,/^(?:[a-zA-Z][a-zA-Z0-9]*)/,/^(?:$)/,/^(?:.)/],
+rules: [/^(?:\s+)/,/^(?:;.*)/,/^(?:\|)/,/^(?:\()/,/^(?:\))/,/^(?:\[)/,/^(?:\])/,/^(?:<)/,/^(?:>)/,/^(?:\/)/,/^(?:=)/,/^(?::)/,/^(?:r\b)/,/^(?:\.+)/,/^(?:true|false\b)/,/^(?:[0-9]+)/,/^(?:(csym|timesig|system|line|clef|key)\s)/,/^(?:[a-gA-G][b|#]{0,2}(?![a-zA-Z])([0-9]+)?)/,/^(?:~[a-zA-Z][a-zA-Z0-9]*)/,/^(?:[a-zA-Z][a-zA-Z0-9]*)/,/^(?:$)/,/^(?:.)/],
 conditions: {"INITIAL":{"rules":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21],"inclusive":true}}
 });
 return lexer;

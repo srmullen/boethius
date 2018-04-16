@@ -59,7 +59,7 @@ r                                          return 'REST'
 \.+                                        return 'DOTS'
 true|false                                 return 'BOOL'
 [0-9]+                                     return 'INTEGER'
-csym|timesig|line|clef|key                 return 'BUILTIN'
+(csym|timesig|system|line|clef|key)\s      return 'BUILTIN'
 [a-gA-G][b|#]{0,2}(?![a-zA-Z])([0-9]+)?    return 'PITCHCLASS'
 /*[a-gA-G][b|#]{0,2}([0-9]+)?     return 'PITCHCLASS'*/
 \~[a-zA-Z][a-zA-Z0-9]*                     return 'VAR'
@@ -96,9 +96,9 @@ float:
 
 number:
     INTEGER
-        {$$ = $1}
+        {$$ = new yy.NumberNode($1)}
     | float
-        {$$ = $1}
+        {$$ = new yy.NumberNode($1)}
     ;
 
 duration:
@@ -159,7 +159,7 @@ chord:
 builtin:
     LPAREN BUILTIN list RPAREN
         {
-            $$ = yy.BUILTINS[$2](yy, $3);
+            $$ = yy.BUILTINS[$2.trim()](yy, $3);
         }
     ;
 
@@ -186,10 +186,6 @@ ratio:
 voice:
     LBRKT IDENTIFIER list RBRKT
         {
-            /*var expantion = $3.map(function (item) {
-                return item.expand();
-            });*/
-
             if (!yy.voices[$2]) {
                 // create array for voice items
                 yy.voices[$2] = $3;

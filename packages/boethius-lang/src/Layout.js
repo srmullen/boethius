@@ -10,6 +10,7 @@ Layout.prototype.serialize = function () {
     return {
         type: SCORE,
         lines: this.lines.map(line => line.toJSON()),
+        systems: this.systems.map(system => system.toJSON()),
         timeSignatures: this.timeSignatures
     };
 }

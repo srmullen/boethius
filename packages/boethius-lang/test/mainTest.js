@@ -232,7 +232,7 @@ describe("boethius compilation", () => {
         });
 
         describe('line', () => {
-            it('should create a lines array', () => {
+            it('should be added to the layout.lines array', () => {
                 const {layout} = compile(`
                     (line :voice1)
                 `);
@@ -302,6 +302,38 @@ describe("boethius compilation", () => {
                 `);
 
                 expect(layout.lines[0].name).to.equal('myline');
+            });
+        });
+
+        describe('System', () => {
+            it('should be added to the layout.systems array', () => {
+                const {layout} = compile(`
+                    (system 4)
+                `);
+
+                expect(layout.systems.length).to.equal(1);
+            });
+
+            it('should add measures to the system', () => {
+                const {layout} = compile(`
+                    (system 4)
+                    (system 3)
+                `);
+
+                expect(layout.systems[0].measures).to.equal(4);
+                expect(layout.systems[1].measures).to.equal(3);
+            });
+
+            it('should take lineSpacing list', () => {
+                const {layout} = compile(`
+                    (system 4 0 200 300)
+                    (system 3 20 30 40)
+                    (system 5)
+                `);
+
+                expect(layout.systems[0].lineSpacing).to.eql([0, 200, 300]);
+                expect(layout.systems[1].lineSpacing).to.eql([20, 30, 40]);
+                expect(layout.systems[2].lineSpacing).to.eql([0]);
             });
         });
     });
