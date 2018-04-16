@@ -29,10 +29,6 @@ function compile (program) {
         }
     }
 
-    // const layout = Object.assign({}, parser.yy.layout, {
-    //     lines: parser.yy.layout.lines.map(line => line.toJSON())
-    // });
-
     return {
         voices: parser.yy.voices,
         chordSymbols: parser.yy.chordSymbols,

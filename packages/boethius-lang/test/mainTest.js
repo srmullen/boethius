@@ -301,7 +301,7 @@ describe("boethius compilation", () => {
                     (name=myline (line :voice1))
                 `);
 
-                expect(layout.lines[0].name).to.equal('notmyline');
+                expect(layout.lines[0].name).to.equal('myline');
             });
         });
     });

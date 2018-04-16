@@ -192,7 +192,7 @@ case 35:
 this.$ = $$[$0-1].map(function (item) {
             var props = {};
             props[$$[$0-2]] = true;
-            return clone(item, props);
+            return set(item, props);
         });
 break;
 case 36:
@@ -200,7 +200,7 @@ this.$ = $$[$0-1].map(function (item) {
             // items properties overwrite the proplist's properties
             var props = Object.assign({}, $$[$0-2], item.props);
             // resulting props are placed on the item.
-            return item.clone(props);
+            return item.set(props);
         });
 break;
 case 37:
@@ -213,7 +213,7 @@ case 40:
             var element = yy.vars[$$[$0]];
             if (!element) throw new Error(errors.unitializedVar($$[$0], this));
             this.$ = [].concat(element.reduce(function (acc, el) {
-                return acc.concat(clone(el));
+                return acc.concat(set(el));
             }, []));
         
 break;
@@ -222,7 +222,7 @@ case 41:
             var element = yy.vars[$$[$0]];
             if (!element) throw new Error(errors.unitializedVar($$[$0], this));
             this.$ = $$[$0-1].concat(element.reduce(function (acc, el) {
-                return acc.concat(clone(el));
+                return acc.concat(set(el));
             }, []));
         
 break;
@@ -400,17 +400,17 @@ parse: function parse(input) {
         this.list = list;
     }
 
-    ScopeNode.prototype.clone = function () {
+    ScopeNode.prototype.set = function () {
 
     };
 
-    function clone (el, props) {
+    function set (el, props) {
         if (el instanceof Array) {
             return el.map(function (item) {
-                return clone(item, props);
+                return set(item, props);
             });
         } else {
-            return el.clone(props);
+            return el.set(props);
         }
     }
 

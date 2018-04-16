@@ -13,17 +13,17 @@
         this.list = list;
     }
 
-    ScopeNode.prototype.clone = function () {
+    ScopeNode.prototype.set = function () {
 
     };
 
-    function clone (el, props) {
+    function set (el, props) {
         if (el instanceof Array) {
             return el.map(function (item) {
-                return clone(item, props);
+                return set(item, props);
             });
         } else {
-            return el.clone(props);
+            return el.set(props);
         }
     }
 
@@ -234,14 +234,14 @@ propscope:
         {$$ = $3.map(function (item) {
             var props = {};
             props[$2] = true;
-            return clone(item, props);
+            return set(item, props);
         });}
     | LPAREN propertylist list RPAREN
         {$$ = $3.map(function (item) {
             // items properties overwrite the proplist's properties
             var props = Object.assign({}, $2, item.props);
             // resulting props are placed on the item.
-            return item.clone(props);
+            return item.set(props);
         });}
     | LPAREN list RPAREN
         {
@@ -259,7 +259,7 @@ list:
             var element = yy.vars[$1];
             if (!element) throw new Error(errors.unitializedVar($1, this));
             $$ = [].concat(element.reduce(function (acc, el) {
-                return acc.concat(clone(el));
+                return acc.concat(set(el));
             }, []));
         }
     | list VAR
@@ -267,7 +267,7 @@ list:
             var element = yy.vars[$2];
             if (!element) throw new Error(errors.unitializedVar($2, this));
             $$ = $1.concat(element.reduce(function (acc, el) {
-                return acc.concat(clone(el));
+                return acc.concat(set(el));
             }, []));
         }
     | propscope

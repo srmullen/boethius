@@ -6,7 +6,7 @@ function RestNode (props) {
 
 RestNode.prototype.type = REST;
 
-RestNode.prototype.clone = function (newprops) {
+RestNode.prototype.set = function (newprops) {
     var props = Object.assign({}, this.props, newprops);
     return new RestNode(props);
 };

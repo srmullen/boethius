@@ -7,9 +7,9 @@ function ChordNode (props, children) {
 
 ChordNode.prototype.type = CHORD;
 
-ChordNode.prototype.clone = function (newprops) {
+ChordNode.prototype.set = function (newprops) {
     var props = Object.assign({}, this.props, newprops);
-    var children = this.children.map(function (child) {return child.clone(newprops)});
+    var children = this.children.map(function (child) {return child.set(newprops)});
     return new ChordNode(props, children);
 };
 

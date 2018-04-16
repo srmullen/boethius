@@ -27,7 +27,7 @@ const BUILTINS = {
         return timeSignature;
     },
     line: function (yy, args) {
-        const line = new LineNode(args.reduce(function (acc, arg) {
+        const props = args.reduce(function (acc, arg) {
             if (arg instanceof Keyword) {
                 acc.voices.push(arg.toString());
             } else if (arg.type === CLEF) {
@@ -36,7 +36,9 @@ const BUILTINS = {
                 acc.keys.push(arg);
             }
             return acc;
-        }, {keys: [], clefs: [], voices: []}));
+        }, {keys: [], clefs: [], voices: []})
+
+        const line = new LineNode(props, yy.layout);
 
         yy.layout.lines.push(line);
 

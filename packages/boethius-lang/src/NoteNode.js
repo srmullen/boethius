@@ -6,7 +6,7 @@ function NoteNode (props) {
 
 NoteNode.prototype.type = NOTE;
 
-NoteNode.prototype.clone = function (newprops) {
+NoteNode.prototype.set = function (newprops) {
     var props = Object.assign({}, this.props, newprops);
     return new NoteNode(props);
 };

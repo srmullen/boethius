@@ -6,6 +6,6 @@ function ChordSymbolNode (props) {
 
 ChordSymbolNode.prototype.type = CHORDSYMBOL;
 
-ChordSymbolNode.prototype.clone = function () {};
+ChordSymbolNode.prototype.set = function () {};
 
 export default ChordSymbolNode;
