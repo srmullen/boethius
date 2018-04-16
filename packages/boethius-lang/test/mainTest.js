@@ -335,6 +335,14 @@ describe("boethius compilation", () => {
                 expect(layout.systems[1].lineSpacing).to.eql([20, 30, 40]);
                 expect(layout.systems[2].lineSpacing).to.eql([0]);
             });
+
+            it('should have properties from the scope set upon it', () => {
+                const {layout} = compile(`
+                    (length=500 (system 3))
+                `);
+
+                expect(layout.systems[0].length).to.equal(500);
+            });
         });
     });
 });

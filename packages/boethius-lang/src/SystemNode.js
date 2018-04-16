@@ -7,8 +7,8 @@ function SystemNode (props) {
 SystemNode.prototype.type = SYSTEM;
 
 SystemNode.prototype.set = function (newprops) {
-    // this.props = Object.assign({}, this.props, newprops);
-    // return this;
+    this.props = Object.assign({}, this.props, newprops);
+    return this;
 }
 
 SystemNode.prototype.toJSON = function () {
