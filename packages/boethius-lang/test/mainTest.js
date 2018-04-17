@@ -344,5 +344,43 @@ describe("boethius compilation", () => {
                 expect(layout.systems[0].length).to.equal(500);
             });
         });
+
+        describe('pages', () => {
+            it('should default to one page', () => {
+                const {layout} = compile(`
+                    [mel a4]
+                `);
+                expect(layout.pages).to.be.an('array');
+                expect(layout.pages.length).to.equal(1);
+            });
+
+            it('default page should contain all the systems', () => {
+                const {layout} = compile(`
+                    (system 3)
+                    (system 3)
+                `);
+
+                expect(layout.pages[0].systems).to.equal(2);
+            });
+
+            it('should create pages', () => {
+                const {layout} = compile(`
+                    (page 4)
+                    (page 5)
+                `);
+
+                expect(layout.pages.length).to.equal(2);
+                expect(layout.pages[0].systems).to.equal(4);
+                expect(layout.pages[1].systems).to.equal(5);
+            });
+
+            it('should have properties from the scope set upon it', () => {
+                const {layout} = compile(`
+                    (name=page1 (page 6))
+                `);
+
+                expect(layout.pages[0].name).to.equal('page1');
+            });
+        });
     });
 });

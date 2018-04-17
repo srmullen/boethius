@@ -1,6 +1,6 @@
 import { SYSTEM } from './constants';
 
-function SystemNode (props) {
+function SystemNode (props = {}) {
     this.props = props;
 }
 

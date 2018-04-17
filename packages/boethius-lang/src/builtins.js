@@ -1,4 +1,5 @@
 import Keyword from './Keyword';
+import PageNode from './PageNode';
 import SystemNode from './SystemNode';
 import LineNode from './LineNode';
 import {CHORDSYMBOL, CLEF, KEY} from './constants';
@@ -26,6 +27,15 @@ const BUILTINS = {
         yy.layout.timeSignatures.push(timeSignature);
 
         return timeSignature;
+    },
+    page: function (yy, args) {
+        const page = new PageNode({
+            systems: args[0].value
+        });
+
+        yy.layout.pages.push(page);
+
+        return page;
     },
     system: function (yy, args) {
         const [measures, ...lineSpacings] = args

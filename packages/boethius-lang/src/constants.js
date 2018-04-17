@@ -4,6 +4,7 @@ export const CHORD = 'chord';
 export const CHORDSYMBOL = 'chordSymbol';
 
 export const SCORE = 'score';
+export const PAGE = 'page';
 export const SYSTEM = 'system';
 export const LINE = 'line';
 export const CLEF = 'clef';
