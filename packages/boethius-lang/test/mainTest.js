@@ -74,6 +74,10 @@ describe("boethius compilation", () => {
             expect(voices.mel[1]).not.to.equal(voices.mel[3]);
             expect(voices.mel[1]).not.to.equal(voices.mel[2]);
         });
+
+        it('should allow dashes in variable names', () => {
+            expect(compile("~mel-var = (a4 bb4 c5) ~mel-var2 = (r/8 ~mel-var)")).to.be.ok;
+        });
     });
 
     describe("pitch class and octave", () => {

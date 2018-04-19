@@ -7,11 +7,11 @@ TODO
 ====
 
 - Repeats
-- built in functions
 - intervals ex. sixth, octave
 - Math
 - Scales
 - Transposition
+- octave guessing based on previous note proximity rather than default.
 
 Docs
 ----

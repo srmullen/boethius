@@ -62,7 +62,7 @@ true|false                                      return 'BOOL'
 (csym|timesig|page|system|line|clef|key)\s      return 'BUILTIN'
 [a-gA-G][b|#]{0,2}(?![a-zA-Z])([0-9]+)?         return 'PITCHCLASS'
 /*[a-gA-G][b|#]{0,2}([0-9]+)?     return 'PITCHCLASS'*/
-\~[a-zA-Z][a-zA-Z0-9]*                          return 'VAR'
+\~[a-zA-Z][a-zA-Z0-9\-]*                        return 'VAR'
 [a-zA-Z][a-zA-Z0-9]*                            return 'IDENTIFIER'
 <<EOF>>                                         return 'EOF'
 .                                               return 'INVALID'
