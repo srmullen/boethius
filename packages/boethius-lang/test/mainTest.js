@@ -387,4 +387,57 @@ describe("boethius compilation", () => {
             });
         });
     });
+
+    describe('easyOctave', () => {
+        it('should default the first note to 4 if not given', () => {
+            const {voices} = compile(`[mel c]`, {easyOctave: true});
+            expect(voices.mel[0].props.octave).to.equal(4);
+        });
+
+        it('should have no effect if note already has an octave', () => {
+            const {voices} = compile(`[mel c6 (octave = 7 a)]`, {easyOctave: true});
+            expect(voices.mel[0].props.octave).to.equal(6);
+            expect(voices.mel[1].props.octave).to.equal(7);
+        });
+
+        it('should increase the octave when the higher octave is the closest pitch', () => {
+            const {voices} = compile(`
+                [v1 b5 c]
+                [v2 a4 c]
+                [v3 g2 c]
+            `, {easyOctave: true});
+            expect(voices.v1[1].props.octave).to.equal(6);
+            expect(voices.v2[1].props.octave).to.equal(5);
+            expect(voices.v3[1].props.octave).to.equal(3);
+        });
+
+        it('should decrease the octave when the lower octave is the closest pitch', () => {
+            const {voices} = compile(`
+                [v1 c5 b]
+                [v2 d4 b]
+                [v3 e2 b]
+            `, {easyOctave: true});
+            expect(voices.v1[1].props.octave).to.equal(4);
+            expect(voices.v2[1].props.octave).to.equal(3);
+            expect(voices.v3[1].props.octave).to.equal(1);
+        });
+
+        it('should keep the same octave in the case of tritones', () => {
+            const {voices} = compile(`
+                [v1 c5 f#]
+                [v2 d4 ab]
+                [v3 e2 a#]
+            `, {easyOctave: true});
+            expect(voices.v1[1].props.octave).to.equal(5);
+            expect(voices.v2[1].props.octave).to.equal(4);
+            expect(voices.v3[1].props.octave).to.equal(2);
+        });
+
+        it('should apply to chords', () => {
+            const {voices} = compile(`[chords <a c e>]`, {easyOctave: true});
+            expect(voices.chords[0].children[0].props.octave).to.equal(4);
+            expect(voices.chords[0].children[1].props.octave).to.equal(5);
+            expect(voices.chords[0].children[2].props.octave).to.equal(5);
+        });
+    });
 });
