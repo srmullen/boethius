@@ -28,6 +28,18 @@ const BUILTINS = {
 
         return timeSignature;
     },
+    layout: function (yy, args) {
+        // args to layout must be even length
+        if (args.length % 2 !== 0) {
+            throw new Error('layout must have even number of arguments.');
+        }
+        const props = {};
+        for (let i = 0; i < args.length; i += 2) {
+            props[args[i].toString()] = args[i + 1];
+        }
+        
+        return yy.layout.set(props);
+    },
     page: function (yy, args) {
         const page = new PageNode({
             systems: args[0].value

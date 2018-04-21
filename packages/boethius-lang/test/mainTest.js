@@ -388,6 +388,31 @@ describe("boethius compilation", () => {
         });
     });
 
+    describe('layout', () => {
+        it('should only take an even number of arguments', () => {
+            expect(() => compile(`(layout :onearg)`)).to.throw(Error);
+            expect(() => compile(`(layout :onearg :twoarg)`)).not.to.throw(Error);
+        });
+
+        it('should set string arguments on the layout', () => {
+            const {layout} = compile(`(layout "title" "awesome composition")`);
+            expect(layout.title).to.equal("awesome composition");
+        });
+
+        it('should set keyword arguments on the layout', () => {
+            const {layout} = compile(`(layout :title "awesome composition")`);
+            expect(layout.title).to.equal("awesome composition");
+        });
+
+        it('should handle multiple items to set', () => {
+            const {layout} = compile(`
+                (layout :title "awesome composition" "composer" "Sean")
+            `);
+            expect(layout.title).to.equal("awesome composition");
+            expect(layout.composer).to.equal('Sean');
+        });
+    });
+
     describe('easyOctave', () => {
         it('should default the first note to 4 if not given', () => {
             const {voices} = compile(`[mel c]`, {easyOctave: true});

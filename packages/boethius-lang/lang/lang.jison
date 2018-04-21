@@ -43,29 +43,30 @@
 %lex
 %%
 
-\s+                                        /* skip whitespace */
-\;.*                                       /* ignore comments */
-\|                                         /* ignore barlines */
-\(                                              return 'LPAREN'
-\)                                              return 'RPAREN'
-\[                                              return 'LBRKT'
-\]                                              return 'RBRKT'
-\<                                              return 'OPENBRKT'
-\>                                              return 'CLOSEBRKT'
-\/                                              return 'FWDSLASH'
-\=                                              return 'EQUALS'
-\:                                              return 'COLON'
-r                                               return 'REST'
-\.+                                             return 'DOTS'
-true|false                                      return 'BOOL'
-[0-9]+                                          return 'INTEGER'
-(csym|timesig|page|system|line|clef|key)\s      return 'BUILTIN'
-[a-gA-G][b|#]{0,2}(?![a-zA-Z])([0-9]+)?         return 'PITCHCLASS'
-/*[a-gA-G][b|#]{0,2}([0-9]+)?     return 'PITCHCLASS'*/
-\~[a-zA-Z][a-zA-Z0-9\-]*                        return 'VAR'
-[a-zA-Z][a-zA-Z0-9]*                            return 'IDENTIFIER'
-<<EOF>>                                         return 'EOF'
-.                                               return 'INVALID'
+\s+                                                 /* skip whitespace */
+\;.*                                                /* ignore comments */
+\|                                                  /* ignore barlines */
+\(                                                  return 'LPAREN'
+\)                                                  return 'RPAREN'
+\[                                                  return 'LBRKT'
+\]                                                  return 'RBRKT'
+\<                                                  return 'OPENBRKT'
+\>                                                  return 'CLOSEBRKT'
+\/                                                  return 'FWDSLASH'
+\=                                                  return 'EQUALS'
+\:                                                  return 'COLON'
+r                                                   return 'REST'
+\.+                                                 return 'DOTS'
+// \"(?:{esc}[\"bfnrt/{esc}]|{esc}u[a-fA-F0-9]{4}|[^\"{esc}])*\" return 'STRING'
+\"(.*?)\"                                           yytext = yytext.substr(1,yyleng-2); return 'STRING'
+true|false                                          return 'BOOL'
+[0-9]+                                              return 'INTEGER'
+(csym|layout|timesig|page|system|line|clef|key)\s   return 'BUILTIN'
+[a-gA-G][b|#]{0,2}(?![a-zA-Z])([0-9]+)?             return 'PITCHCLASS'
+\~[a-zA-Z][a-zA-Z0-9\-]*                            return 'VAR'
+[a-zA-Z][a-zA-Z0-9]*                                return 'IDENTIFIER'
+<<EOF>>                                             return 'EOF'
+.                                                   return 'INVALID'
 
 /lex
 
@@ -166,6 +167,8 @@ builtin:
 item:
     number
         {$$ = $1}
+    | STRING
+        {$$ = $1}
     | keyword
         {$$ = $1}
     | note
@@ -198,7 +201,9 @@ voice:
     ;
 
 propertydef:
-    IDENTIFIER EQUALS BOOL
+    IDENTIFIER EQUALS STRING
+        {$$ = {key: $1, value: $3}}
+    | IDENTIFIER EQUALS BOOL
         {$$ = {key: $1, value: toBoolean($3)}}
     | IDENTIFIER EQUALS INTEGER
         {$$ = {key: $1, value: Number($3)}}
