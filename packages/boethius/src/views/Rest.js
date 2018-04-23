@@ -1,4 +1,4 @@
-import paper from "paper/dist/paper-core";
+import paper from "paper";
 
 import {drawRest, drawDots} from "../engraver";
 import constants from "../constants";

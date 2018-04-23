@@ -1,4 +1,4 @@
-import paper from "paper/dist/paper-core";
+import paper from "paper";
 import _ from "lodash";
 
 import {drawFlag, getFlagOffset, drawStaccato, drawTenuto} from "../engraver";

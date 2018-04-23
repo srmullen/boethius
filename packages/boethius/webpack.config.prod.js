@@ -24,6 +24,12 @@ module.exports = {
             chunks: ["./site/score"]
         })
     ],
+    resolve: {
+        alias: {
+            styles: path.join(__dirname, "styles"),
+            paper: 'paper/dist/paper-core'
+        }
+    },
     module: {
         loaders: [{
             test: /\.css$/,

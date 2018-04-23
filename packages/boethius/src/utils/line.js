@@ -1,4 +1,4 @@
-import paper from "paper/dist/paper-core";
+import paper from "paper";
 import _ from "lodash";
 import {getTime} from "./timeUtils";
 import {isNote} from "../types";

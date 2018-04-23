@@ -1,4 +1,4 @@
-import paper from "paper/dist/paper-core";
+import paper from "paper";
 import {isNote, isChord} from "./types";
 import constants from "./constants";
 import * as placement from "./utils/placement";

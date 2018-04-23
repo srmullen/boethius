@@ -1,4 +1,4 @@
-import paper from "paper/dist/paper-core";
+import paper from "paper";
 import constants from "../constants";
 
 const Text = function ({value="", fontSize=32, fontFamily="gonvillealpha", fillColor="black"}) {

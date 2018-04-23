@@ -30,7 +30,8 @@ module.exports = {
     ],
     resolve: {
         alias: {
-            styles: path.join(__dirname, "styles")
+            styles: path.join(__dirname, "styles"),
+            paper: 'paper/dist/paper-core'
         }
     },
     module: {
