@@ -3,7 +3,7 @@ import _ from "lodash";
 
 import System from "./System";
 import TimeContext from "./TimeContext";
-import Slur from "./Slur";
+import Legato from "./Legato";
 import Text from "./Text";
 import {createMeasures} from "./Measure";
 import constants from "../constants";
@@ -78,12 +78,12 @@ Score.render = function (score, {measures, voices=[], chordSymbols=[], repeats=[
         });
         // slurs are grouped by voice.
         const slurs = voiceTimeFrames.map(voice => {
-            return Slur.groupSlurs(voice, startTimes).map(slurred => {
+            return Legato.groupLegato(voice, startTimes).map(slurred => {
                 const slurStartTime = _.first(slurred).time;
                 const slurEndTime = _.last(slurred).time;
                 const systemBreak = _.includes(startTimes.map(time => time.time), slurEndTime);
                 const isEnd = !!systemBreak && slurred.length === 1;
-                return Slur.of({systemBreak, isEnd}, slurred);
+                return Legato.of({systemBreak, isEnd}, slurred);
         })});
 
         const systemTimeContexts = partitionBySystem(createTimeContexts(score.lines, voices, measures, chordSymbols), startMeasures);

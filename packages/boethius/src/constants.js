@@ -4,6 +4,7 @@ const constants = {
 		staff: "staff",
 		system: "system",
 		slur: "slur",
+		legato: "legato",
 		line: "line",
 		voice: "voice",
 		measure: "measure",

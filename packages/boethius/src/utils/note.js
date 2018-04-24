@@ -104,7 +104,7 @@ function getAverageStemDirection (items, centerLineValue) {
 // 	return path;
 // }
 
-function slur (begin, end, handle) {
+function tie (begin, end, handle) {
 
 	const path = new paper.Path({
 		segments: [begin, end],
@@ -148,7 +148,7 @@ function hasPitch(key, {name, accidental}) {
 export {
 	getStemLength,
 	defaultStemPoint,
-	slur,
+	tie,
 	getSteps,
 	getAverageStemDirection,
 	parsePitch,

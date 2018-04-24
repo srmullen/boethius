@@ -19,7 +19,7 @@ const TYPE = constants.type.note;
  * Only items on the context will be saved back to the music json.
  * All other properties on the view will need to be calculated at runtime.
  */
-function Note ({pitch, pitchClass="a", octave=4, value=4, dots=0, slur, tuplet, time, staccato, tenuto, portato, voice}) {
+function Note ({pitch, pitchClass="a", octave=4, value=4, dots=0, slur, tuplet, time, legato, staccato, tenuto, portato, voice}) {
 
 	this.pitch = pitch || (pitchClass + octave);
 	this.pitchClass = pitchClass;
@@ -32,6 +32,7 @@ function Note ({pitch, pitchClass="a", octave=4, value=4, dots=0, slur, tuplet, 
 	this.time = time;
 	this.voice = voice;
 	this.slur = slur;
+	this.legato = legato;
 
 	// articulations
 	this.staccato = staccato;
