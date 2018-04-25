@@ -83,41 +83,6 @@ function getAverageStemDirection (items, centerLineValue) {
 	return items.map(() => averageDirection);
 }
 
-// function slur (items) {
-// 	const firstItem = items[0];
-// 	const lastItem = _.last(items);
-// 	const firstStem = firstItem.getStemDirection();
-// 	const begin = getSlurPoint(firstItem, null, firstStem);
-// 	const handle = getSlurHandle(firstStem);
-// 	const end = getSlurPoint(lastItem, handle);
-// 		// center = begin.add(end.subtract(begin).divide(2)).add([0, 4]);
-//
-// 	const path = new paper.Path({
-// 		segments: [begin, end],
-// 		strokeColor: "black",
-// 		strokeWidth: 2
-// 	});
-//
-// 	path.segments[0].handleOut = handle;
-// 	path.segments[1].handleIn = handle;
-//
-// 	return path;
-// }
-
-function tie (begin, end, handle) {
-
-	const path = new paper.Path({
-		segments: [begin, end],
-		strokeColor: "black",
-		strokeWidth: 2
-	});
-
-	path.segments[0].handleOut = handle;
-	path.segments[1].handleIn = handle;
-
-	return path;
-}
-
 const arrayToString = (arr) => _.reduce(arr, (acc, c) => acc + c, "");
 
 /*
@@ -148,7 +113,6 @@ function hasPitch(key, {name, accidental}) {
 export {
 	getStemLength,
 	defaultStemPoint,
-	tie,
 	getSteps,
 	getAverageStemDirection,
 	parsePitch,

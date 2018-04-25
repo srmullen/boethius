@@ -4,6 +4,7 @@ import _ from "lodash";
 import System from "./System";
 import TimeContext from "./TimeContext";
 import Legato from "./Legato";
+import Slur from './Slur';
 import Text from "./Text";
 import {createMeasures} from "./Measure";
 import constants from "../constants";
@@ -76,14 +77,22 @@ Score.render = function (score, {measures, voices=[], chordSymbols=[], repeats=[
                 return null;
             }
         });
-        // slurs are grouped by voice.
+
+        // Create Slurs
         const slurs = voiceTimeFrames.map(voice => {
-            return Legato.groupLegato(voice, startTimes).map(slurred => {
-                const slurStartTime = _.first(slurred).time;
-                const slurEndTime = _.last(slurred).time;
-                const systemBreak = _.includes(startTimes.map(time => time.time), slurEndTime);
-                const isEnd = !!systemBreak && slurred.length === 1;
-                return Legato.of({systemBreak, isEnd}, slurred);
+            return Slur.groupSlurs(voice, startTimes).map(slur => {
+                return Slur.of({}, slur);
+            });
+        });
+
+        // legatos are grouped by voice.
+        const legatos = voiceTimeFrames.map(voice => {
+            return Legato.groupLegato(voice, startTimes).map(legato => {
+                const legatoStartTime = _.first(legato).time;
+                const legatoEndTime = _.last(legato).time;
+                const systemBreak = _.includes(startTimes.map(time => time.time), legatoEndTime);
+                const isEnd = !!systemBreak && legato.length === 1;
+                return Legato.of({systemBreak, isEnd}, legato);
         })});
 
         const systemTimeContexts = partitionBySystem(createTimeContexts(score.lines, voices, measures, chordSymbols), startMeasures);
@@ -154,6 +163,11 @@ Score.render = function (score, {measures, voices=[], chordSymbols=[], repeats=[
         // render slurs
         const slurGroups = _.flatten(slurs).map(slur => slur.render());
         scoreGroup.addChildren(slurGroups);
+
+        // render legatos
+        const legatoGroups = _.flatten(legatos).map(legato => legato.render());
+        scoreGroup.addChildren(legatoGroups);
+
         scoreGroup.addChildren(systemGroups);
     }
 

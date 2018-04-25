@@ -2,13 +2,13 @@ import paper from "paper";
 import {filter, first, last} from "lodash";
 
 import constants from "../constants";
-import {isChord} from "../types";
 import {partitionBy} from "../utils/common";
-import {tie} from "../utils/note";
+import {tie, getTiePoint, getTieHandle} from '../utils/tie';
 
 const TYPE = constants.type.legato;
 
 /*
+ * Legato creates a sigle tie over a group of notes.
  * @param systemBreak - true if legato is across systems.
  * @param isEnd - true if legato ends on only item in children. Makes no difference is children contains multiple items.
  */
@@ -72,29 +72,5 @@ Legato.prototype.render = function () {
 Legato.groupLegato = function (items) {
     return filter(partitionBy(items, item => item.legato), ([item]) => !!item.legato);
 };
-
-/*
- * @param item - Note or Chord.
- * @param incoming - the incoming tie handle
- * @param stemDirection - String.
- */
-function getTiePoint (item, incoming, stemDirection) {
-	stemDirection = stemDirection || item.getStemDirection();
-
-	const noteHead = isChord(item) ? item.getBaseNote(stemDirection).noteHead : item.noteHead;
-
-	if (!incoming) {
-		return stemDirection === "down" ? noteHead.bounds.center : noteHead.bounds.bottomCenter;
-	} else if (incoming.y < 0) {
-		return noteHead.bounds.center;
-	} else {
-		return noteHead.bounds.bottomCenter;
-	}
-}
-
-function getTieHandle (stemDirection) {
-	const yVec = stemDirection === "up" ? 10 : -10;
-	return new paper.Point([0, yVec]);
-}
 
 export default Legato;
