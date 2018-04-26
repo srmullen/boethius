@@ -227,7 +227,7 @@ describe("parser", () => {
         });
 
         it("should handle multiple arbitrary properties in one scope", () => {
-            const {voices: {mel}} = compile("[mel (foo=bar bar=baz c4)]");
+            const {voices: {mel}} = compile("[mel ({foo=bar bar=baz} c4)]");
             expect(mel[0].props.foo).to.equal("bar");
             expect(mel[0].props.bar).to.equal("baz");
         });
@@ -266,5 +266,75 @@ describe("parser", () => {
         it('should not fail', () => {
             expect(compile(':hello')).to.be.ok;
         });
+    });
+});
+
+describe('properties', () => {
+    it('should allow single identifier properties', () => {
+        expect(compile('props = {hello}')).to.be.ok;
+    });
+
+    it('should allow multiple identifier properties', () => {
+        expect(compile('props = {hello goodbye}')).to.be.ok;
+    });
+
+    it('should allow single assignment properties', () => {
+        expect(compile('props = {hello=1}')).to.be.ok;
+    });
+
+    it('should allow multiple assignment properties', () => {
+        expect(compile('props = {hello=1 goodbye=2}')).to.be.ok;
+    });
+
+    it('should allow a mix of identifier and assignment properties', () => {
+        expect(compile('props = {one hello=1 two goodbye=2}')).to.be.ok;
+        expect(compile('props = {hello=1 one goodbye=2 two}')).to.be.ok;
+    });
+});
+
+describe('scope', () => {
+    it('should add prop to list items', () => {
+        const {voices} = compile(`
+            [mel ({prop=value} a4)]
+        `);
+        expect(voices.mel[0].props.prop).to.equal('value');
+    });
+
+    it('should handle multiple props', () => {
+        const {voices} = compile(`
+            [mel ({prop1=val1 prop2=val2} a4)]
+        `);
+        expect(voices.mel[0].props.prop1).to.equal('val1');
+        expect(voices.mel[0].props.prop2).to.equal('val2');
+    });
+});
+
+describe('assignment', () => {
+    it('should allow assignment of strings', () => {
+        expect(compile('myvar = "hello"')).to.be.ok;
+    });
+
+    it('should allow assignment of booleans', () => {
+        expect(compile('myvar = true')).to.be.ok;
+        expect(compile('myvar = false')).to.be.ok;
+    });
+
+    it('should allow assignment of numbers', () => {
+        expect(compile('myvar = 3')).to.be.ok;
+        expect(compile('myvar = 5.2')).to.be.ok;
+    });
+
+    it('should allow assignment of ratios', () => {
+        expect(compile('myvar = 3/2')).to.be.ok;
+    });
+
+    it('should allow assignment of scopes', () => {
+        expect(compile('myvar = (a b c)')).to.be.ok;
+        expect(compile('myvar = (legato a b c)')).to.be.ok;
+        expect(compile('myvar = ({legato=true value=16} a b c)')).to.be.ok;
+    });
+
+    it('should allow assignment of properties', () => {
+        expect(compile('myvar = {value=16 legato=true}')).to.be.ok;
     });
 });

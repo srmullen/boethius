@@ -50,6 +50,8 @@
 \)                                                  return 'RPAREN'
 \[                                                  return 'LBRKT'
 \]                                                  return 'RBRKT'
+\{                                                  return 'LCURL'
+\}                                                  return 'RCURL'
 \<                                                  return 'OPENBRKT'
 \>                                                  return 'CLOSEBRKT'
 \/                                                  return 'FWDSLASH'
@@ -57,7 +59,6 @@
 \:                                                  return 'COLON'
 r                                                   return 'REST'
 \.+                                                 return 'DOTS'
-// \"(?:{esc}[\"bfnrt/{esc}]|{esc}u[a-fA-F0-9]{4}|[^\"{esc}])*\" return 'STRING'
 \"(.*?)\"                                           yytext = yytext.substr(1,yyleng-2); return 'STRING'
 true|false                                          return 'BOOL'
 [0-9]+                                              return 'INTEGER'
@@ -200,29 +201,43 @@ voice:
         }
     ;
 
-propertydef:
+assignment:
     IDENTIFIER EQUALS STRING
         {$$ = {key: $1, value: $3}}
     | IDENTIFIER EQUALS BOOL
         {$$ = {key: $1, value: toBoolean($3)}}
-    | IDENTIFIER EQUALS INTEGER
-        {$$ = {key: $1, value: Number($3)}}
     | IDENTIFIER EQUALS IDENTIFIER
         {$$ = {key: $1, value: $3}}
     | IDENTIFIER EQUALS ratio
         {$$ = {key: $1, value: $3}}
-    | IDENTIFIER EQUALS float
+    | IDENTIFIER EQUALS number
+        {$$ = {key: $1, value: $3.value}}
+    | IDENTIFIER EQUALS scope
+        {$$ = {key: $1, value: $3}}
+    | IDENTIFIER EQUALS properties
         {$$ = {key: $1, value: $3}}
     ;
 
 propertylist:
-    propertydef
+    IDENTIFIER
+        {
+            var props = {};
+            props[$1] = true;
+            $$ = props;
+        }
+    | assignment
         {
             var props = {};
             props[$1.key] = $1.value;
             $$ = props;
         }
-    | propertylist propertydef
+    | propertylist IDENTIFIER
+        {
+            var props = {};
+            props[$2] = true;
+            $$ = Object.assign({}, $1, props);
+        }
+    | propertylist assignment
         {
             var props = {};
             props[$2.key] = $2.value;
@@ -230,14 +245,26 @@ propertylist:
         }
     ;
 
-propscope:
+properties:
+    LCURL propertylist RCURL
+        {$$ = $2}
+    ;
+
+scope:
     LPAREN IDENTIFIER list RPAREN
         {$$ = $3.map(function (item) {
             var props = {};
             props[$2] = true;
             return set(item, props);
         });}
-    | LPAREN propertylist list RPAREN
+    | LPAREN assignment list RPAREN
+        {$$ = $3.map(function (item) {
+            var assignProps = {};
+            assignProps[$2.key] = $2.value;
+            var props = Object.assign({}, assignProps, item.props);
+            return item.set(props);
+        });}
+    | LPAREN properties list RPAREN
         {$$ = $3.map(function (item) {
             // items properties overwrite the proplist's properties
             var props = Object.assign({}, $2, item.props);
@@ -271,14 +298,14 @@ list:
                 return acc.concat(set(el));
             }, []));
         }
-    | propscope
+    | scope
         {$$ = $1}
-    | list propscope
+    | list scope
         {$$ = $1.concat($2)}
     ;
 
-assignment:
-    VAR EQUALS propscope
+tassignment:
+    VAR EQUALS scope
         {
             yy.vars[$1] = $3;
             $$ = $3;
@@ -288,9 +315,11 @@ assignment:
 statement:
     assignment
         {$$ = $1}
+    | tassignment
+        {$$ = $1}
     | item
         {$$ = $1}
-    | propscope
+    | scope
         {$$ = $1}
     | voice
         {$$ = $1}
