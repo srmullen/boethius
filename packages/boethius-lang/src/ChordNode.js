@@ -8,10 +8,16 @@ function ChordNode (props, children) {
 ChordNode.prototype.type = CHORD;
 
 ChordNode.prototype.set = function (newprops) {
-    var props = Object.assign({}, this.props, newprops);
-    var children = this.children.map(function (child) {return child.set(newprops)});
+    const props = Object.assign({}, this.props, newprops);
+    const children = this.children.map(function (child) {return child.set(newprops)});
     return new ChordNode(props, children);
 };
+
+ChordNode.prototype.serialize = function (scope) {
+    const props = Object.assign({}, scope, this.props);
+    const children = this.children.map(child => child.serialize(scope));
+    return Object.assign({}, {type: CHORD, props, children});
+}
 
 ChordNode.prototype.toJSON = function () {
     return Object.assign({}, this, {type: CHORD});

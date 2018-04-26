@@ -307,6 +307,15 @@ describe('scope', () => {
         expect(voices.mel[0].props.prop1).to.equal('val1');
         expect(voices.mel[0].props.prop2).to.equal('val2');
     });
+
+    it('should handle nested scopes', () => {
+        const {voices} = compile(`
+            [mel (prop3=val3 ({prop1=val1 prop2=val2} a4))]
+        `);
+        expect(voices.mel[0].props.prop1).to.equal('val1');
+        expect(voices.mel[0].props.prop2).to.equal('val2');
+        expect(voices.mel[0].props.prop3).to.equal('val3');
+    });
 });
 
 describe('assignment', () => {

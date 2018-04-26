@@ -11,6 +11,11 @@ RestNode.prototype.set = function (newprops) {
     return new RestNode(props);
 };
 
+RestNode.prototype.serialize = function (scope) {
+    const props = Object.assign({}, scope, this.props);
+    return Object.assign({}, {type: REST, props});
+}
+
 RestNode.prototype.toJSON = function () {
     return Object.assign({}, this, {type: REST});
 };

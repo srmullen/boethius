@@ -8,15 +8,6 @@
         }
     }
 
-    function ScopeNode (props, list) {
-        this.props = props;
-        this.list = list;
-    }
-
-    ScopeNode.prototype.set = function () {
-
-    };
-
     function set (el, props) {
         if (el instanceof Array) {
             return el.map(function (item) {
@@ -153,7 +144,6 @@ chord:
         {$$ = new yy.ChordNode({}, $2);}
     | OPENBRKT notelist CLOSEBRKT duration
         {
-            /*$$ = {type: CHORD, children: $2, props: {value: $4.value, dots: $4.dots}};*/
             $$ = new yy.ChordNode({value: $4.value, dots: $4.dots}, $2);
         }
     ;
@@ -190,11 +180,15 @@ ratio:
 voice:
     LBRKT IDENTIFIER list RBRKT
         {
+            var list = $3.reduce((acc, item) => {
+                var json = item.serialize();
+                return acc.concat(json);
+            }, []);
             if (!yy.voices[$2]) {
                 // create array for voice items
-                yy.voices[$2] = $3;
+                yy.voices[$2] = list;
             } else {
-                yy.voices[$2] = yy.voices[$2].concat($3);
+                yy.voices[$2] = yy.voices[$2].concat(list);
             }
 
             $$ = $3;
@@ -252,28 +246,43 @@ properties:
 
 scope:
     LPAREN IDENTIFIER list RPAREN
-        {$$ = $3.map(function (item) {
+        {
+            // $$ = $3.map(function (item) {
+            //     var props = {};
+            //     props[$2] = true;
+            //     return set(item, props);
+            // });
             var props = {};
             props[$2] = true;
-            return set(item, props);
-        });}
+            $$ = new yy.ScopeNode(props, $3);
+        }
     | LPAREN assignment list RPAREN
-        {$$ = $3.map(function (item) {
-            var assignProps = {};
-            assignProps[$2.key] = $2.value;
-            var props = Object.assign({}, assignProps, item.props);
-            return item.set(props);
-        });}
+        {
+            // $$ = $3.map(function (item) {
+            //     // var assignProps = {};
+            //     // assignProps[$2.key] = $2.value;
+            //     // var props = Object.assign({}, assignProps, item.props);
+            //     return item.set(props);
+            // });
+            var props = {};
+            props[$2.key] = $2.value;
+            $$ = new yy.ScopeNode(props, $3);
+        }
     | LPAREN properties list RPAREN
-        {$$ = $3.map(function (item) {
-            // items properties overwrite the proplist's properties
-            var props = Object.assign({}, $2, item.props);
-            // resulting props are placed on the item.
-            return item.set(props);
-        });}
+        {
+            // $$ = $3.map(function (item) {
+            //     // items properties overwrite the proplist's properties
+            //     var props = Object.assign({}, $2, item.props);
+            //     // resulting props are placed on the item.
+            //     return item.set(props);
+            // });
+            var props = Object.assign({}, $2);
+            $$ = new yy.ScopeNode(props, $3);
+        }
     | LPAREN list RPAREN
         {
-            $$ = $2;
+            // $$ = $2;
+            $$ = new yy.ScopeNode({}, $2);
         }
     ;
 
@@ -299,7 +308,7 @@ list:
             }, []));
         }
     | scope
-        {$$ = $1}
+        {$$ = [$1]}
     | list scope
         {$$ = $1.concat($2)}
     ;
@@ -307,7 +316,7 @@ list:
 tassignment:
     VAR EQUALS scope
         {
-            yy.vars[$1] = $3;
+            yy.vars[$1] = [$3];
             $$ = $3;
         }
     ;

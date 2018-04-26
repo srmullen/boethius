@@ -11,6 +11,11 @@ NoteNode.prototype.set = function (newprops) {
     return new NoteNode(props);
 };
 
+NoteNode.prototype.serialize = function (scope={}) {
+    const props = Object.assign({}, scope, this.props);
+    return Object.assign({}, {type: NOTE, props});
+}
+
 NoteNode.prototype.toJSON = function () {
     return Object.assign({}, this, {type: NOTE});
 };

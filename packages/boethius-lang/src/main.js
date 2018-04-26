@@ -5,6 +5,7 @@ import {scale, pitch} from "./palestrina/src/palestrina";
 import NumberNode from './NumberNode';
 import NoteNode from "./NoteNode";
 import RestNode from "./RestNode";
+import ScopeNode from "./ScopeNode";
 import ChordNode from "./ChordNode";
 import Keyword from './Keyword';
 import Layout from './Layout';
@@ -26,6 +27,7 @@ function compile (program, opts={}) {
     parser.yy.NumberNode = NumberNode;
     parser.yy.NoteNode = NoteNode;
     parser.yy.RestNode = RestNode;
+    parser.yy.ScopeNode = ScopeNode;
     parser.yy.ChordNode = ChordNode;
     parser.yy.Keyword = Keyword;
     parser.yy.parsePitch = pitch.parsePitch;

@@ -85,6 +85,15 @@ var $0 = $$.length - 1;
 switch (yystate) {
 case 1:
 
+            // var voices = {};
+            // for (var key in yy.voices) {
+            //     if (yy.voices.hasOwnProperty(key)) {
+            //         var voice = yy.voices[key];
+            //         voices[key] = voice.map(function (item) {
+            //             return item.toJSON();
+            //         });
+            //     }
+            // }
             return {voices: yy.voices, chordSymbols: yy.chordSymbols, layout: yy.layout};
         
 break;
@@ -120,7 +129,7 @@ case 12:
             this.$ = new yy.NoteNode(Object.assign({}, $$[$0-1], $$[$0]));
         
 break;
-case 13: case 45: case 57:
+case 13: case 45: case 49: case 57:
 this.$ = [$$[$0]]
 break;
 case 14: case 46: case 50: case 58:
@@ -146,7 +155,7 @@ case 19:
             this.$ = yy.BUILTINS[$$[$0-2].trim()](yy, $$[$0-1]);
         
 break;
-case 20: case 21: case 22: case 23: case 24: case 25: case 26: case 49: case 52: case 53: case 54: case 55: case 56:
+case 20: case 21: case 22: case 23: case 24: case 25: case 26: case 52: case 53: case 54: case 55: case 56:
 this.$ = $$[$0]
 break;
 case 27:
@@ -154,11 +163,15 @@ this.$ = "" + $$[$0-2] + $$[$0-1] + $$[$0]
 break;
 case 28:
 
+            var list = $$[$0-1].reduce((acc, item) => {
+                var json = item.serialize();
+                return acc.concat(json);
+            }, []);
             if (!yy.voices[$$[$0-2]]) {
                 // create array for voice items
-                yy.voices[$$[$0-2]] = $$[$0-1];
+                yy.voices[$$[$0-2]] = list;
             } else {
-                yy.voices[$$[$0-2]] = yy.voices[$$[$0-2]].concat($$[$0-1]);
+                yy.voices[$$[$0-2]] = yy.voices[$$[$0-2]].concat(list);
             }
 
             this.$ = $$[$0-1];
@@ -205,31 +218,46 @@ case 40:
 this.$ = $$[$0-1]
 break;
 case 41:
-this.$ = $$[$0-1].map(function (item) {
+
+            // this.$ = $$[$0-1].map(function (item) {
+            //     var props = {};
+            //     props[$$[$0-2]] = true;
+            //     return set(item, props);
+            // });
             var props = {};
             props[$$[$0-2]] = true;
-            return set(item, props);
-        });
+            this.$ = new yy.ScopeNode(props, $$[$0-1]);
+        
 break;
 case 42:
-this.$ = $$[$0-1].map(function (item) {
-            var assignProps = {};
-            assignProps[$$[$0-2].key] = $$[$0-2].value;
-            var props = Object.assign({}, assignProps, item.props);
-            return item.set(props);
-        });
+
+            // this.$ = $$[$0-1].map(function (item) {
+            //     // var assignProps = {};
+            //     // assignProps[$$[$0-2].key] = $$[$0-2].value;
+            //     // var props = Object.assign({}, assignProps, item.props);
+            //     return item.set(props);
+            // });
+            var props = {};
+            props[$$[$0-2].key] = $$[$0-2].value;
+            this.$ = new yy.ScopeNode(props, $$[$0-1]);
+        
 break;
 case 43:
-this.$ = $$[$0-1].map(function (item) {
-            // items properties overwrite the proplist's properties
-            var props = Object.assign({}, $$[$0-2], item.props);
-            // resulting props are placed on the item.
-            return item.set(props);
-        });
+
+            // this.$ = $$[$0-1].map(function (item) {
+            //     // items properties overwrite the proplist's properties
+            //     var props = Object.assign({}, $$[$0-2], item.props);
+            //     // resulting props are placed on the item.
+            //     return item.set(props);
+            // });
+            var props = Object.assign({}, $$[$0-2]);
+            this.$ = new yy.ScopeNode(props, $$[$0-1]);
+        
 break;
 case 44:
 
-            this.$ = $$[$0-1];
+            // this.$ = $$[$0-1];
+            this.$ = new yy.ScopeNode({}, $$[$0-1]);
         
 break;
 case 47:
@@ -252,7 +280,7 @@ case 48:
 break;
 case 51:
 
-            yy.vars[$$[$0-2]] = $$[$0];
+            yy.vars[$$[$0-2]] = [$$[$0]];
             this.$ = $$[$0];
         
 break;
@@ -418,15 +446,6 @@ parse: function parse(input) {
             return Boolean(string);
         }
     }
-
-    function ScopeNode (props, list) {
-        this.props = props;
-        this.list = list;
-    }
-
-    ScopeNode.prototype.set = function () {
-
-    };
 
     function set (el, props) {
         if (el instanceof Array) {
