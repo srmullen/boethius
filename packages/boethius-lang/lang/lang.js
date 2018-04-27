@@ -145,7 +145,7 @@ case 19:
             this.$ = yy.BUILTINS[$$[$0-2].trim()](yy, $$[$0-1]);
         
 break;
-case 20: case 21: case 22: case 23: case 24: case 25: case 26: case 52: case 53: case 54: case 56:
+case 20: case 21: case 22: case 23: case 24: case 25: case 26: case 52: case 53: case 54:
 this.$ = $$[$0]
 break;
 case 27:
@@ -153,18 +153,7 @@ this.$ = "" + $$[$0-2] + $$[$0-1] + $$[$0]
 break;
 case 28:
 
-            var list = $$[$0-1].reduce((acc, item) => {
-                var json = item.serialize();
-                return acc.concat(json);
-            }, []);
-            if (!yy.voices[$$[$0-2]]) {
-                // create array for voice items
-                yy.voices[$$[$0-2]] = list;
-            } else {
-                yy.voices[$$[$0-2]] = yy.voices[$$[$0-2]].concat(list);
-            }
-
-            this.$ = $$[$0-1];
+            this.$ = new yy.Voice({name: $$[$0-2]}, $$[$0-1]);
         
 break;
 case 29: case 31: case 32: case 34: case 35:
@@ -259,6 +248,9 @@ case 51:
 break;
 case 55:
 this.$ = $$[$0].execute()
+break;
+case 56:
+this.$ = $$[$0].execute(yy)
 break;
 }
 },

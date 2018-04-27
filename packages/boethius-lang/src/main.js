@@ -9,6 +9,7 @@ import ScopeNode from "./ScopeNode";
 import ChordNode from "./ChordNode";
 import Keyword from './Keyword';
 import Layout from './Layout';
+import Voice from './Voice';
 import BUILTINS from './builtins';
 import { NOTE, REST, CHORD, CHORDSYMBOL } from './constants';
 
@@ -30,6 +31,7 @@ function compile (program, opts={}) {
     parser.yy.ScopeNode = ScopeNode;
     parser.yy.ChordNode = ChordNode;
     parser.yy.Keyword = Keyword;
+    parser.yy.Voice = Voice;
     parser.yy.parsePitch = pitch.parsePitch;
 
     const parsed = parser.parse(program);

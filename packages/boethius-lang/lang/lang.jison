@@ -180,18 +180,7 @@ ratio:
 voice:
     LBRKT IDENTIFIER list RBRKT
         {
-            var list = $3.reduce((acc, item) => {
-                var json = item.serialize();
-                return acc.concat(json);
-            }, []);
-            if (!yy.voices[$2]) {
-                // create array for voice items
-                yy.voices[$2] = list;
-            } else {
-                yy.voices[$2] = yy.voices[$2].concat(list);
-            }
-
-            $$ = $3;
+            $$ = new yy.Voice({name: $2}, $3);
         }
     ;
 
@@ -314,7 +303,7 @@ statement:
     | scope
         {$$ = $1.execute()}
     | voice
-        {$$ = $1}
+        {$$ = $1.execute(yy)}
     ;
 
 statements:
