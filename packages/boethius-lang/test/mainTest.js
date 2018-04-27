@@ -304,7 +304,6 @@ describe("boethius compilation", () => {
                 const {layout} = compile(`
                     (name=myline (line :voice1))
                 `);
-
                 expect(layout.lines[0].name).to.equal('myline');
             });
         });

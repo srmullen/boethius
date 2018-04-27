@@ -11,8 +11,12 @@ LineNode.prototype.set = function (newprops) {
     return this;
 };
 
-LineNode.prototype.serialize = function () {
-    return Object.assign({}, this.props, {type: LINE});
+LineNode.prototype.serialize = function (scope) {
+    return Object.assign({}, scope, this.props, {type: LINE});
+}
+
+LineNode.prototype.execute = function (yy, scope) {
+    yy.layout.lines.push(this.serialize(scope));
 }
 
 export default LineNode;

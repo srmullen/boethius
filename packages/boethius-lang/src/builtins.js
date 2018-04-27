@@ -2,6 +2,8 @@ import Keyword from './Keyword';
 import PageNode from './PageNode';
 import SystemNode from './SystemNode';
 import LineNode from './LineNode';
+import ChordSymbol from './ChordSymbol';
+import TimeSignature from './TimeSignature';
 import {CHORDSYMBOL, CLEF, KEY} from './constants';
 
 const BUILTINS = {
@@ -9,8 +11,9 @@ const BUILTINS = {
         const value = args[0].toString();
         const measure = args[1].value;
         const beat = args[2] ? args[2].value : 0;
-        const chordSymbol = {type: CHORDSYMBOL, props: {value, measure, beat}};
-        yy.chordSymbols.push(chordSymbol);
+        // const chordSymbol = {type: CHORDSYMBOL, props: {value, measure, beat}};
+        const chordSymbol = new ChordSymbol({value, measure, beat});
+
         return chordSymbol;
     },
     timesig: function (yy, args) {
@@ -18,13 +21,15 @@ const BUILTINS = {
         const denominator = args[1].value;
         const measure = args[2] ? args[2].value : 0;
         const beat = args[3] ? args[3].value : 0;
-        const timeSignature = {
+        const props = {
             value: [numerator, denominator],
             measure,
             beat
         };
 
-        yy.layout.timeSignatures.push(timeSignature);
+        const timeSignature = new TimeSignature(props);
+
+        // yy.layout.timeSignatures.push(timeSignature);
 
         return timeSignature;
     },
@@ -45,16 +50,12 @@ const BUILTINS = {
             systems: args[0].value
         });
 
-        yy.layout.pages.push(page);
-
         return page;
     },
     system: function (yy, args) {
         const [measures, ...lineSpacings] = args
         const lineSpacing = lineSpacings.length ? lineSpacings.map(num => num.value) : [0];
         const system = new SystemNode({measures: measures.value, lineSpacing});
-
-        yy.layout.systems.push(system);
 
         return system;
     },
@@ -71,8 +72,6 @@ const BUILTINS = {
         }, {keys: [], clefs: [], voices: []})
 
         const line = new LineNode(props);
-
-        yy.layout.lines.push(line);
 
         return line;
     },

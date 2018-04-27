@@ -53,7 +53,7 @@ r                                                   return 'REST'
 \"(.*?)\"                                           yytext = yytext.substr(1,yyleng-2); return 'STRING'
 true|false                                          return 'BOOL'
 [0-9]+                                              return 'INTEGER'
-(csym|layout|timesig|page|system|line|clef|key)\s   return 'BUILTIN'
+// (csym|layout|timesig|page|system|line|clef|key)\s   return 'BUILTIN'
 [a-gA-G][b|#]{0,2}(?![a-zA-Z])([0-9]+)?             return 'PITCHCLASS'
 \~[a-zA-Z][a-zA-Z0-9\-]*                            return 'VAR'
 [a-zA-Z][a-zA-Z0-9]*                                return 'IDENTIFIER'
@@ -148,12 +148,12 @@ chord:
         }
     ;
 
-builtin:
-    LPAREN BUILTIN list RPAREN
-        {
-            $$ = yy.BUILTINS[$2.trim()](yy, $3);
-        }
-    ;
+// builtin:
+//     LPAREN BUILTIN list RPAREN
+//         {
+//             $$ = yy.BUILTINS[$2.trim()](yy, $3);
+//         }
+//     ;
 
 item:
     number
@@ -168,8 +168,8 @@ item:
         {$$ = $1}
     | chord
         {$$ = $1}
-    | builtin
-        {$$ = $1}
+    // | builtin
+    //     {$$ = $1}
     ;
 
 ratio:
@@ -236,9 +236,13 @@ properties:
 scope:
     LPAREN IDENTIFIER list RPAREN
         {
-            var props = {};
-            props[$2] = true;
-            $$ = new yy.ScopeNode(props, $3);
+            if (yy.BUILTINS[$2]) {
+                $$ = yy.BUILTINS[$2](yy, $3);
+            } else {
+                var props = {};
+                props[$2] = true;
+                $$ = new yy.ScopeNode(props, $3);
+            }
         }
     | LPAREN assignment list RPAREN
         {
@@ -265,6 +269,7 @@ list:
         {$$ = $1.concat($2)}
     | VAR
         {
+            // Variable expansion in lists.
             var element = yy.vars[$1];
             if (!element) throw new Error(errors.unitializedVar($1, this));
             $$ = [].concat(element.reduce(function (acc, el) {
@@ -273,6 +278,7 @@ list:
         }
     | list VAR
         {
+            // Variable expansion in lists.
             var element = yy.vars[$2];
             if (!element) throw new Error(errors.unitializedVar($2, this));
             $$ = $1.concat(element.reduce(function (acc, el) {
@@ -301,7 +307,7 @@ statement:
     | item
         {$$ = $1}
     | scope
-        {$$ = $1.execute()}
+        {$$ = $1.execute(yy)}
     | voice
         {$$ = $1.execute(yy)}
     ;

@@ -11,8 +11,12 @@ SystemNode.prototype.set = function (newprops) {
     return this;
 }
 
-SystemNode.prototype.serialize = function () {
-    return Object.assign({}, this.props, {type: SYSTEM});
+SystemNode.prototype.serialize = function (scope) {
+    return Object.assign({}, scope, this.props, {type: SYSTEM});
+}
+
+SystemNode.prototype.execute = function (yy, scope) {
+    yy.layout.systems.push(this.serialize(scope));
 }
 
 export default SystemNode;

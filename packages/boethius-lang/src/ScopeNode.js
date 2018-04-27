@@ -19,9 +19,9 @@ ScopeNode.prototype.serialize = function (scope={}) {
     }, []);
 }
 
-ScopeNode.prototype.execute = function () {
+ScopeNode.prototype.execute = function (yy, scope) {
     this.children.map(child => {
-        return child.set(this.props);
+        return child.execute(yy, this.props);
     });
     return this;
 }

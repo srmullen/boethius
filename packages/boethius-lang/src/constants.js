@@ -2,6 +2,7 @@ export const NOTE = 'note';
 export const REST = 'rest';
 export const CHORD = 'chord';
 export const CHORDSYMBOL = 'chordSymbol';
+export const TIMESIG = 'timesig';
 
 export const SCORE = 'score';
 export const PAGE = 'page';

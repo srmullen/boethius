@@ -14,16 +14,18 @@ Layout.prototype.set = function (props) {
 }
 
 Layout.prototype.serialize = function () {
-    const lines = this.lines.map(line => line.serialize());
-    const systems = this.systems.map(system => system.serialize());
-    const pages = this.pages.length ? this.pages.map(page => page.serialize()) : [{systems: systems.length, staffSpacing: []}];
+    const pages = this.pages.length ? this.pages : [{systems: this.systems.length, staffSpacing: []}];
     return Object.assign({}, this.props, {
         type: SCORE,
-        lines,
-        systems,
+        lines: this.lines,
+        systems: this.systems,
         pages,
         timeSignatures: this.timeSignatures
     });
+}
+
+Layout.prototype.execute = function (yy) {
+    return this;
 }
 
 export default Layout;
