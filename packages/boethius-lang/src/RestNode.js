@@ -16,12 +16,4 @@ RestNode.prototype.serialize = function (scope) {
     return Object.assign({}, {type: REST, props});
 }
 
-RestNode.prototype.toJSON = function () {
-    return Object.assign({}, this, {type: REST});
-};
-
-RestNode.prototype.expand = function () {
-    return this;
-};
-
 export default RestNode;

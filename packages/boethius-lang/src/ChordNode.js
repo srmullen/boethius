@@ -19,12 +19,4 @@ ChordNode.prototype.serialize = function (scope) {
     return Object.assign({}, {type: CHORD, props, children});
 }
 
-ChordNode.prototype.toJSON = function () {
-    return Object.assign({}, this, {type: CHORD});
-};
-
-ChordNode.prototype.expand = function () {
-    return this;
-};
-
 export default ChordNode;

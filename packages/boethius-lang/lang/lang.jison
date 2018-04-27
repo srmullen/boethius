@@ -247,35 +247,18 @@ properties:
 scope:
     LPAREN IDENTIFIER list RPAREN
         {
-            // $$ = $3.map(function (item) {
-            //     var props = {};
-            //     props[$2] = true;
-            //     return set(item, props);
-            // });
             var props = {};
             props[$2] = true;
             $$ = new yy.ScopeNode(props, $3);
         }
     | LPAREN assignment list RPAREN
         {
-            // $$ = $3.map(function (item) {
-            //     // var assignProps = {};
-            //     // assignProps[$2.key] = $2.value;
-            //     // var props = Object.assign({}, assignProps, item.props);
-            //     return item.set(props);
-            // });
             var props = {};
             props[$2.key] = $2.value;
             $$ = new yy.ScopeNode(props, $3);
         }
     | LPAREN properties list RPAREN
         {
-            // $$ = $3.map(function (item) {
-            //     // items properties overwrite the proplist's properties
-            //     var props = Object.assign({}, $2, item.props);
-            //     // resulting props are placed on the item.
-            //     return item.set(props);
-            // });
             var props = Object.assign({}, $2);
             $$ = new yy.ScopeNode(props, $3);
         }
@@ -329,7 +312,7 @@ statement:
     | item
         {$$ = $1}
     | scope
-        {$$ = $1}
+        {$$ = $1.execute()}
     | voice
         {$$ = $1}
     ;

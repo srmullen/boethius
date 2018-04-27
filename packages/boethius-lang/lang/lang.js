@@ -85,15 +85,6 @@ var $0 = $$.length - 1;
 switch (yystate) {
 case 1:
 
-            // var voices = {};
-            // for (var key in yy.voices) {
-            //     if (yy.voices.hasOwnProperty(key)) {
-            //         var voice = yy.voices[key];
-            //         voices[key] = voice.map(function (item) {
-            //             return item.toJSON();
-            //         });
-            //     }
-            // }
             return {voices: yy.voices, chordSymbols: yy.chordSymbols, layout: yy.layout};
         
 break;
@@ -146,7 +137,6 @@ this.$ = new yy.ChordNode({}, $$[$0-1]);
 break;
 case 18:
 
-            /*this.$ = {type: CHORD, children: $$[$0-2], props: {value: $$[$0].value, dots: $$[$0].dots}};*/
             this.$ = new yy.ChordNode({value: $$[$0].value, dots: $$[$0].dots}, $$[$0-2]);
         
 break;
@@ -155,7 +145,7 @@ case 19:
             this.$ = yy.BUILTINS[$$[$0-2].trim()](yy, $$[$0-1]);
         
 break;
-case 20: case 21: case 22: case 23: case 24: case 25: case 26: case 52: case 53: case 54: case 55: case 56:
+case 20: case 21: case 22: case 23: case 24: case 25: case 26: case 52: case 53: case 54: case 56:
 this.$ = $$[$0]
 break;
 case 27:
@@ -219,11 +209,6 @@ this.$ = $$[$0-1]
 break;
 case 41:
 
-            // this.$ = $$[$0-1].map(function (item) {
-            //     var props = {};
-            //     props[$$[$0-2]] = true;
-            //     return set(item, props);
-            // });
             var props = {};
             props[$$[$0-2]] = true;
             this.$ = new yy.ScopeNode(props, $$[$0-1]);
@@ -231,12 +216,6 @@ case 41:
 break;
 case 42:
 
-            // this.$ = $$[$0-1].map(function (item) {
-            //     // var assignProps = {};
-            //     // assignProps[$$[$0-2].key] = $$[$0-2].value;
-            //     // var props = Object.assign({}, assignProps, item.props);
-            //     return item.set(props);
-            // });
             var props = {};
             props[$$[$0-2].key] = $$[$0-2].value;
             this.$ = new yy.ScopeNode(props, $$[$0-1]);
@@ -244,12 +223,6 @@ case 42:
 break;
 case 43:
 
-            // this.$ = $$[$0-1].map(function (item) {
-            //     // items properties overwrite the proplist's properties
-            //     var props = Object.assign({}, $$[$0-2], item.props);
-            //     // resulting props are placed on the item.
-            //     return item.set(props);
-            // });
             var props = Object.assign({}, $$[$0-2]);
             this.$ = new yy.ScopeNode(props, $$[$0-1]);
         
@@ -283,6 +256,9 @@ case 51:
             yy.vars[$$[$0-2]] = [$$[$0]];
             this.$ = $$[$0];
         
+break;
+case 55:
+this.$ = $$[$0].execute()
 break;
 }
 },

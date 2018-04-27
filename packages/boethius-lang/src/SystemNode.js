@@ -11,7 +11,7 @@ SystemNode.prototype.set = function (newprops) {
     return this;
 }
 
-SystemNode.prototype.toJSON = function () {
+SystemNode.prototype.serialize = function () {
     return Object.assign({}, this.props, {type: SYSTEM});
 }
 

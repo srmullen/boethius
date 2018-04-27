@@ -11,7 +11,7 @@ PageNode.prototype.set = function (newprops) {
     return this;
 }
 
-PageNode.prototype.toJSON = function () {
+PageNode.prototype.serialize = function () {
     return Object.assign({}, this.props, {type: PAGE});
 }
 

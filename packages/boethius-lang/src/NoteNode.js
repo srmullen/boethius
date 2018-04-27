@@ -16,8 +16,4 @@ NoteNode.prototype.serialize = function (scope={}) {
     return Object.assign({}, {type: NOTE, props});
 }
 
-NoteNode.prototype.toJSON = function () {
-    return Object.assign({}, this, {type: NOTE});
-};
-
 export default NoteNode;

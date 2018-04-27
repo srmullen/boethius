@@ -19,4 +19,11 @@ ScopeNode.prototype.serialize = function (scope={}) {
     }, []);
 }
 
+ScopeNode.prototype.execute = function () {
+    this.children.map(child => {
+        return child.set(this.props);
+    });
+    return this;
+}
+
 export default ScopeNode;

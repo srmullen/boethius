@@ -37,7 +37,7 @@ const BUILTINS = {
         for (let i = 0; i < args.length; i += 2) {
             props[args[i].toString()] = args[i + 1];
         }
-        
+
         return yy.layout.set(props);
     },
     page: function (yy, args) {
@@ -70,7 +70,7 @@ const BUILTINS = {
             return acc;
         }, {keys: [], clefs: [], voices: []})
 
-        const line = new LineNode(props, yy.layout);
+        const line = new LineNode(props);
 
         yy.layout.lines.push(line);
 
