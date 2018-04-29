@@ -1,4 +1,5 @@
-function Voice (props = {}, children = []) {
+// @flow
+function Voice (props: {name: string}, children: Array<mixed>) {
     this.props = props;
     this.children = children;
 }

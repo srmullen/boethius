@@ -1,6 +1,7 @@
+// @flow
 import { SCORE } from './constants';
 
-function Layout (props={}) {
+function Layout (props: {} = {}) {
     this.props = props;
     this.timeSignatures = [];
     this.lines = [];

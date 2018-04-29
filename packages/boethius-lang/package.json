@@ -8,19 +8,23 @@
   },
   "scripts": {
     "dev": "watchify examples/index.js -t [babelify] -o examples/index-compiled.js -v -d",
+    "flow": "flow",
     "compile": "jison lang/lang.jison -o lang/lang.js",
-    "bin": "webpack",
-    "test": "npm run compile && mocha --compilers js:babel-register"
+    "bin": "npm run flow && webpack",
+    "test": "npm run flow && npm run compile && mocha --compilers js:babel-register"
   },
   "author": "Sean Mullen <srmullen13@gmail.com> (http://seanmullen.me/)",
   "license": "ISC",
   "devDependencies": {
     "babel-core": "^6.9.0",
+    "babel-loader": "^7.1.4",
     "babel-plugin-transform-object-rest-spread": "^6.8.0",
     "babel-preset-es2015": "^6.9.0",
+    "babel-preset-flow": "^6.23.0",
     "babel-register": "^6.8.0",
     "babelify": "^7.3.0",
     "chai": "^3.5.0",
+    "flow-bin": "^0.71.0",
     "jison": "^0.4.17",
     "mocha": "^2.4.5",
     "watchify": "^3.7.0",

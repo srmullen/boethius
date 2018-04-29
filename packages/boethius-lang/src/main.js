@@ -1,3 +1,4 @@
+// @flow
 import {parser} from "../lang/lang";
 import {calculateAndSetTimes} from "./time";
 import {easyOctave} from './processing';
@@ -13,7 +14,7 @@ import Voice from './Voice';
 import BUILTINS from './builtins';
 import { NOTE, REST, CHORD, CHORDSYMBOL } from './constants';
 
-function compile (program, opts={}) {
+function compile (program: string, opts: {}) {
     const defaults = {
         // easyOctave option allows octave to automatically be assigned to notes
         // based on proximity of previous notes.

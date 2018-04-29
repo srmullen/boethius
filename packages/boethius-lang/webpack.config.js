@@ -16,5 +16,14 @@ module.exports = {
             raw: true
         })
     ],
+    module: {
+        rules: [
+            {
+                test: /\.js$/,
+                use: ["babel-loader"],
+                exclude: [/node_modules/, path.join(__dirname, 'lang')]
+            }
+        ]
+    },
     target: 'node'
 }
