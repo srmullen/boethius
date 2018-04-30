@@ -1,22 +1,26 @@
+// @flow
 import { PAGE } from './constants';
+import type { YY } from './types';
 
-function PageNode (props) {
-    this.props = props;
-}
+class PageNode {
+    props: {};
 
-PageNode.prototype.type = PAGE;
+    constructor (props: {}) {
+        this.props = props;
+    }
 
-PageNode.prototype.set = function (newprops) {
-    this.props = Object.assign({}, this.props, newprops);
-    return this;
-}
+    set (newprops: {}) {
+        this.props = Object.assign({}, this.props, newprops);
+        return this;
+    }
 
-PageNode.prototype.serialize = function (scope) {
-    return Object.assign({}, scope, this.props, {type: PAGE});
-}
+    serialize (scope: {}) {
+        return Object.assign({}, scope, this.props, {type: PAGE});
+    }
 
-PageNode.prototype.execute = function (yy, scope) {
-    yy.layout.pages.push(this.serialize(scope));
+    execute (yy: YY, scope: {}) {
+        yy.layout.pages.push(this.serialize(scope));
+    }
 }
 
 export default PageNode;

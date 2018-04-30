@@ -1,11 +1,18 @@
-function NumberNode (value) {
-    this.value = Number(value);
-    this.props = {};
-}
+// @flow
 
-NumberNode.prototype.set = function (newprops) {
-    this.props = Object.assign({}, this.props, this);
-    return this;
+class NumberNode {
+    props: {};
+
+    value: number;
+
+    constructor (value: number | string) {
+        this.value = Number(value);
+    }
+
+    set (newprops: {}) {
+        this.props = Object.assign({}, this.props, this);
+        return this;
+    }
 }
 
 export default NumberNode;

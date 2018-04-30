@@ -1,22 +1,27 @@
+// @flow
 import { SYSTEM } from './constants';
+import type { YY } from './types';
 
-function SystemNode (props = {}) {
-    this.props = props;
-}
+class SystemNode {
+    props: {};
+    type: string = SYSTEM;
 
-SystemNode.prototype.type = SYSTEM;
+    constructor (props: {}) {
+        this.props = props;
+    }
 
-SystemNode.prototype.set = function (newprops) {
-    this.props = Object.assign({}, this.props, newprops);
-    return this;
-}
+    set (newprops: {}) {
+        this.props = Object.assign({}, this.props, newprops);
+        return this;
+    }
 
-SystemNode.prototype.serialize = function (scope) {
-    return Object.assign({}, scope, this.props, {type: SYSTEM});
-}
+    serialize (scope: {}) {
+        return Object.assign({}, scope, this.props, {type: SYSTEM});
+    }
 
-SystemNode.prototype.execute = function (yy, scope) {
-    yy.layout.systems.push(this.serialize(scope));
+    execute (yy: YY, scope: {}) {
+        yy.layout.systems.push(this.serialize(scope));
+    }
 }
 
 export default SystemNode;

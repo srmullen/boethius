@@ -1,15 +1,24 @@
+// @flow
 import { CHORDSYMBOL } from './constants';
+import type { YY } from './types';
+import { Executable } from './interfaces/Executable';
+import { Serializable } from './interfaces/Serializable';
 
-function ChordSymbol (props = {}) {
-    this.props = props;
-}
+class ChordSymbol implements Executable, Serializable {
+    props: {};
 
-ChordSymbol.prototype.serialize = function () {
-    return Object.assign({}, {type: CHORDSYMBOL, props: this.props});
-}
+    constructor (props: {}) {
+        this.props = props;
+    }
 
-ChordSymbol.prototype.execute = function (yy) {
-    yy.chordSymbols.push(this.serialize());
+    serialize () {
+        return Object.assign({}, {type: CHORDSYMBOL, props: this.props});
+    }
+
+    execute (yy: YY) {
+        yy.chordSymbols.push(this.serialize());
+        return this;
+    }
 }
 
 export default ChordSymbol;

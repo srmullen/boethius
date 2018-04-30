@@ -1,19 +1,22 @@
+// @flow
 import { REST } from './constants';
 
-function RestNode (props) {
-    this.props = props;
-}
+class RestNode {
+    props: {};
 
-RestNode.prototype.type = REST;
+    constructor (props: {}) {
+        this.props = props;
+    }
 
-RestNode.prototype.set = function (newprops) {
-    var props = Object.assign({}, this.props, newprops);
-    return new RestNode(props);
-};
+    set (newprops: {}) {
+        var props = Object.assign({}, this.props, newprops);
+        return new RestNode(props);
+    }
 
-RestNode.prototype.serialize = function (scope) {
-    const props = Object.assign({}, scope, this.props);
-    return Object.assign({}, {type: REST, props});
+    serialize (scope: {}) {
+        const props = Object.assign({}, scope, this.props);
+        return Object.assign({}, {type: REST, props});
+    }
 }
 
 export default RestNode;

@@ -1,29 +1,38 @@
-function ScopeNode (props={}, children=[]) {
-    this.props = props;
-    this.children = children;
-}
+// @flow
+import type { YY } from './types';
+import { Executable } from './interfaces/Executable';
+import { Serializable } from './interfaces/Serializable';
 
-ScopeNode.prototype.set = function (newprops) {
-    const props = Object.assign({}, this.props, newprops);
-    return new ScopeNode(props, this.children);
-};
+type ChildType = Executable & Serializable;
 
-/*
- * @param scope - The outer scope.
- */
-ScopeNode.prototype.serialize = function (scope={}) {
-    const props = Object.assign({}, scope, this.props);
-    return this.children.reduce((acc, item) => {
-        const json = item.serialize(props);
-        return acc.concat(json);
-    }, []);
-}
+class ScopeNode {
+    props: {};
+    children: Array<ChildType>
 
-ScopeNode.prototype.execute = function (yy, scope) {
-    this.children.map(child => {
-        return child.execute(yy, this.props);
-    });
-    return this;
+    constructor (props: {}, children: Array<ChildType>) {
+        this.props = props;
+        this.children = children;
+    }
+
+    set (newprops: {}) {
+        const props = Object.assign({}, this.props, newprops);
+        return new ScopeNode(props, this.children);
+    }
+
+    serialize (scope: {} = {}) {
+        const props = Object.assign({}, scope, this.props);
+        return this.children.reduce((acc, item) => {
+            const json = item.serialize(props);
+            return acc.concat(json);
+        }, []);
+    }
+
+    execute (yy: YY, scope: {}) {
+        this.children.map(child => {
+            return child.execute(yy, this.props);
+        });
+        return this;
+    }
 }
 
 export default ScopeNode;

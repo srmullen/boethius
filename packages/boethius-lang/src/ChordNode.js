@@ -1,22 +1,31 @@
+// @flow
 import { CHORD } from './constants';
+import NoteNode from './NoteNode';
+import { Serializable } from './interfaces/Serializable';
 
-function ChordNode (props, children) {
-    this.props = props;
-    this.children = children;
-}
+class ChordNode implements Serializable {
+    props: {};
 
-ChordNode.prototype.type = CHORD;
+    children: Array<NoteNode>;
 
-ChordNode.prototype.set = function (newprops) {
-    const props = Object.assign({}, this.props, newprops);
-    const children = this.children.map(function (child) {return child.set(newprops)});
-    return new ChordNode(props, children);
-};
+    type: string = CHORD;
 
-ChordNode.prototype.serialize = function (scope) {
-    const props = Object.assign({}, scope, this.props);
-    const children = this.children.map(child => child.serialize(scope));
-    return Object.assign({}, {type: CHORD, props, children});
+    constructor (props: {}, children: Array<NoteNode>) {
+        this.props = props;
+        this.children = children;
+    }
+
+    set (newprops: {}) {
+        const props = Object.assign({}, this.props, newprops);
+        const children = this.children.map(function (child) {return child.set(newprops)});
+        return new ChordNode(props, children);
+    };
+
+    serialize (scope: {}) {
+        const props = Object.assign({}, scope, this.props);
+        const children: Array<mixed> = this.children.map(child => child.serialize(scope));
+        return Object.assign({}, {type: CHORD, props, children});
+    }
 }
 
 export default ChordNode;

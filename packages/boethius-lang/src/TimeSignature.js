@@ -1,15 +1,24 @@
+// @flow
 import { TIMESIG } from './constants';
+import type { YY } from './types';
+import { Executable } from './interfaces/Executable';
+import { Serializable } from './interfaces/Serializable';
 
-function TimeSignature (props = {}) {
-    this.props = props;
-}
+class TimeSignature implements Executable, Serializable {
+    props: {};
 
-TimeSignature.prototype.serialize = function () {
-    return Object.assign({}, this.props, {type: TIMESIG});
-}
+    constructor (props: {}) {
+        this.props = props;
+    }
 
-TimeSignature.prototype.execute = function (yy) {
-    yy.layout.timeSignatures.push(this.serialize());
+    serialize () {
+        return Object.assign({}, this.props, {type: TIMESIG});
+    }
+
+    execute (yy: YY, scope: {}) {
+        yy.layout.timeSignatures.push(this.serialize());
+        return this;
+    }
 }
 
 export default TimeSignature;

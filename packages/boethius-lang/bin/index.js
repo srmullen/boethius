@@ -61,7 +61,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 15);
+/******/ 	return __webpack_require__(__webpack_require__.s = 18);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -257,6 +257,13 @@ module.exports = {
 
 /***/ }),
 /* 2 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+/***/ }),
+/* 3 */
 /***/ (function(module, exports) {
 
 module.exports = function(module) {
@@ -284,12 +291,12 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 3 */
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var knowledge = __webpack_require__(1);
-var vector = __webpack_require__(12);
-var toCoord = __webpack_require__(39);
+var vector = __webpack_require__(14);
+var toCoord = __webpack_require__(42);
 
 function Interval(coord) {
   if (!(this instanceof Interval)) return new Interval(coord);
@@ -461,7 +468,7 @@ module.exports = Interval;
 
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(module) {var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -17531,26 +17538,33 @@ module.exports = Interval;
   }
 }.call(this));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2)(module)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)(module)))
 
 /***/ }),
-/* 5 */
+/* 6 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+/***/ }),
+/* 7 */
 /***/ (function(module, exports) {
 
 module.exports = require("fs");
 
 /***/ }),
-/* 6 */
+/* 8 */
 /***/ (function(module, exports) {
 
 module.exports = require("path");
 
 /***/ }),
-/* 7 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* MIT license */
-var cssKeywords = __webpack_require__(20);
+var cssKeywords = __webpack_require__(23);
 
 // NOTE: conversions should only return primitive values (i.e. arrays, or
 //       values that give correct `typeof` results).
@@ -18413,7 +18427,7 @@ convert.rgb.gray = function (rgb) {
 
 
 /***/ }),
-/* 8 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -19199,15 +19213,15 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/**
 
 
 /***/ }),
-/* 9 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var scientific = __webpack_require__(36);
-var helmholtz = __webpack_require__(37);
-var pitchFq = __webpack_require__(38);
+var scientific = __webpack_require__(39);
+var helmholtz = __webpack_require__(40);
+var pitchFq = __webpack_require__(41);
 var knowledge = __webpack_require__(1);
-var vector = __webpack_require__(12);
-var Interval = __webpack_require__(3);
+var vector = __webpack_require__(14);
+var Interval = __webpack_require__(4);
 
 function pad(str, ch, len) {
   for (; len > 0; len--) {
@@ -19431,7 +19445,7 @@ module.exports = Note;
 
 
 /***/ }),
-/* 10 */
+/* 12 */
 /***/ (function(module, exports) {
 
 // First coord is octaves, second is fifths. Distances are relative to c
@@ -19456,7 +19470,7 @@ module.exports.sharp = [-4, 7];
 
 
 /***/ }),
-/* 11 */
+/* 13 */
 /***/ (function(module, exports) {
 
 var accidentalValues = {
@@ -19478,7 +19492,7 @@ module.exports.interval = function accidentalInterval(acc) {
 
 
 /***/ }),
-/* 12 */
+/* 14 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -19504,7 +19518,7 @@ module.exports = {
 
 
 /***/ }),
-/* 13 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -19517,7 +19531,7 @@ exports.raise = exports.lower = exports.high = exports.low = exports.from = expo
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
-var _lodash = __webpack_require__(4);
+var _lodash = __webpack_require__(5);
 
 var _ = _interopRequireWildcard(_lodash);
 
@@ -19649,7 +19663,7 @@ exports.lower = lower;
 exports.raise = raise;
 
 /***/ }),
-/* 14 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -19658,39 +19672,99 @@ exports.raise = raise;
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.default = Keyword;
-function Keyword(keyword) {
-    this.value = keyword;
-}
 
-Keyword.prototype.toString = function () {
-    return this.value;
-};
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _constants = __webpack_require__(0);
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var NoteNode = function () {
+    function NoteNode(props) {
+        _classCallCheck(this, NoteNode);
+
+        this.type = _constants.NOTE;
+
+        this.props = props;
+    }
+
+    _createClass(NoteNode, [{
+        key: 'set',
+        value: function set(newprops) {
+            var props = Object.assign({}, this.props, newprops);
+            return new NoteNode(props);
+        }
+    }, {
+        key: 'serialize',
+        value: function serialize(scope) {
+            var props = Object.assign({}, scope, this.props);
+            return Object.assign({}, { type: _constants.NOTE, props: props });
+        }
+    }]);
+
+    return NoteNode;
+}();
+
+exports.default = NoteNode;
 
 /***/ }),
-/* 15 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var _fs = __webpack_require__(5);
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Keyword = function () {
+    function Keyword(value) {
+        _classCallCheck(this, Keyword);
+
+        this.value = value;
+    }
+
+    _createClass(Keyword, [{
+        key: "toString",
+        value: function toString() {
+            return this.value;
+        }
+    }]);
+
+    return Keyword;
+}();
+
+exports.default = Keyword;
+
+/***/ }),
+/* 18 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _fs = __webpack_require__(7);
 
 var _fs2 = _interopRequireDefault(_fs);
 
-var _path = __webpack_require__(6);
+var _path = __webpack_require__(8);
 
 var _path2 = _interopRequireDefault(_path);
 
-var _chalk = __webpack_require__(16);
+var _chalk = __webpack_require__(19);
 
 var _chalk2 = _interopRequireDefault(_chalk);
 
-var _commander = __webpack_require__(26);
+var _commander = __webpack_require__(29);
 
 var _commander2 = _interopRequireDefault(_commander);
 
-var _main = __webpack_require__(29);
+var _main = __webpack_require__(32);
 
 var _main2 = _interopRequireDefault(_main);
 
@@ -19737,16 +19811,16 @@ if (_commander2.default.file) {
 }
 
 /***/ }),
-/* 16 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-const escapeStringRegexp = __webpack_require__(17);
-const ansiStyles = __webpack_require__(18);
-const supportsColor = __webpack_require__(22);
+const escapeStringRegexp = __webpack_require__(20);
+const ansiStyles = __webpack_require__(21);
+const supportsColor = __webpack_require__(25);
 
-const template = __webpack_require__(25);
+const template = __webpack_require__(28);
 
 const isSimpleWindowsTerm = process.platform === 'win32' && !(process.env.TERM || '').toLowerCase().startsWith('xterm');
 
@@ -19972,7 +20046,7 @@ module.exports.default = module.exports; // For TypeScript
 
 
 /***/ }),
-/* 17 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -19990,12 +20064,12 @@ module.exports = function (str) {
 
 
 /***/ }),
-/* 18 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 /* WEBPACK VAR INJECTION */(function(module) {
-const colorConvert = __webpack_require__(19);
+const colorConvert = __webpack_require__(22);
 
 const wrapAnsi16 = (fn, offset) => function () {
 	const code = fn.apply(colorConvert, arguments);
@@ -20147,14 +20221,14 @@ Object.defineProperty(module, 'exports', {
 	get: assembleStyles
 });
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2)(module)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)(module)))
 
 /***/ }),
-/* 19 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var conversions = __webpack_require__(7);
-var route = __webpack_require__(21);
+var conversions = __webpack_require__(9);
+var route = __webpack_require__(24);
 
 var convert = {};
 
@@ -20234,7 +20308,7 @@ module.exports = convert;
 
 
 /***/ }),
-/* 20 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -20393,10 +20467,10 @@ module.exports = {
 
 
 /***/ }),
-/* 21 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var conversions = __webpack_require__(7);
+var conversions = __webpack_require__(9);
 
 /*
 	this function routes a model to all other models.
@@ -20496,13 +20570,13 @@ module.exports = function (fromModel) {
 
 
 /***/ }),
-/* 22 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-const os = __webpack_require__(23);
-const hasFlag = __webpack_require__(24);
+const os = __webpack_require__(26);
+const hasFlag = __webpack_require__(27);
 
 const env = process.env;
 
@@ -20618,13 +20692,13 @@ module.exports = process && support(supportLevel);
 
 
 /***/ }),
-/* 23 */
+/* 26 */
 /***/ (function(module, exports) {
 
 module.exports = require("os");
 
 /***/ }),
-/* 24 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -20641,7 +20715,7 @@ module.exports = function (flag, argv) {
 
 
 /***/ }),
-/* 25 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -20776,19 +20850,19 @@ module.exports = (chalk, tmp) => {
 
 
 /***/ }),
-/* 26 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /**
  * Module dependencies.
  */
 
-var EventEmitter = __webpack_require__(27).EventEmitter;
-var spawn = __webpack_require__(28).spawn;
-var path = __webpack_require__(6);
+var EventEmitter = __webpack_require__(30).EventEmitter;
+var spawn = __webpack_require__(31).spawn;
+var path = __webpack_require__(8);
 var dirname = path.dirname;
 var basename = path.basename;
-var fs = __webpack_require__(5);
+var fs = __webpack_require__(7);
 
 /**
  * Expose the root command.
@@ -21940,19 +22014,19 @@ function exists(file) {
 
 
 /***/ }),
-/* 27 */
+/* 30 */
 /***/ (function(module, exports) {
 
 module.exports = require("events");
 
 /***/ }),
-/* 28 */
+/* 31 */
 /***/ (function(module, exports) {
 
 module.exports = require("child_process");
 
 /***/ }),
-/* 29 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -21963,47 +22037,47 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.TYPES = undefined;
 
-var _lang = __webpack_require__(30);
+var _lang = __webpack_require__(33);
 
-var _time = __webpack_require__(31);
+var _time = __webpack_require__(34);
 
-var _processing = __webpack_require__(32);
+var _processing = __webpack_require__(35);
 
-var _palestrina = __webpack_require__(44);
+var _palestrina = __webpack_require__(47);
 
-var _NumberNode = __webpack_require__(49);
+var _NumberNode = __webpack_require__(52);
 
 var _NumberNode2 = _interopRequireDefault(_NumberNode);
 
-var _NoteNode = __webpack_require__(50);
+var _NoteNode = __webpack_require__(16);
 
 var _NoteNode2 = _interopRequireDefault(_NoteNode);
 
-var _RestNode = __webpack_require__(51);
+var _RestNode = __webpack_require__(53);
 
 var _RestNode2 = _interopRequireDefault(_RestNode);
 
-var _ScopeNode = __webpack_require__(52);
+var _ScopeNode = __webpack_require__(54);
 
 var _ScopeNode2 = _interopRequireDefault(_ScopeNode);
 
-var _ChordNode = __webpack_require__(53);
+var _ChordNode = __webpack_require__(55);
 
 var _ChordNode2 = _interopRequireDefault(_ChordNode);
 
-var _Keyword = __webpack_require__(14);
+var _Keyword = __webpack_require__(17);
 
 var _Keyword2 = _interopRequireDefault(_Keyword);
 
-var _Layout = __webpack_require__(54);
+var _Layout = __webpack_require__(56);
 
 var _Layout2 = _interopRequireDefault(_Layout);
 
-var _Voice = __webpack_require__(55);
+var _Voice = __webpack_require__(57);
 
 var _Voice2 = _interopRequireDefault(_Voice);
 
-var _builtins = __webpack_require__(56);
+var _builtins = __webpack_require__(58);
 
 var _builtins2 = _interopRequireDefault(_builtins);
 
@@ -22055,7 +22129,7 @@ var TYPES = exports.TYPES = { NOTE: _constants.NOTE, REST: _constants.REST, CHOR
 exports.default = compile;
 
 /***/ }),
-/* 30 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(module) {/* parser generated by jison 0.4.17 */
@@ -22893,17 +22967,17 @@ exports.main = function commonjsMain(args) {
         console.log('Usage: '+args[0]+' FILE');
         process.exit(1);
     }
-    var source = __webpack_require__(5).readFileSync(__webpack_require__(6).normalize(args[1]), "utf8");
+    var source = __webpack_require__(7).readFileSync(__webpack_require__(8).normalize(args[1]), "utf8");
     return exports.parser.parse(source);
 };
 if (typeof module !== 'undefined' && __webpack_require__.c[__webpack_require__.s] === module) {
   exports.main(process.argv.slice(1));
 }
 }
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2)(module)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)(module)))
 
 /***/ }),
-/* 31 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -22914,7 +22988,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.calculateAndSetTimes = calculateAndSetTimes;
 
-var _fraction = __webpack_require__(8);
+var _fraction = __webpack_require__(10);
 
 var _fraction2 = _interopRequireDefault(_fraction);
 
@@ -22987,7 +23061,7 @@ function calculateAndSetTimes(items) {
 }
 
 /***/ }),
-/* 32 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -23000,15 +23074,15 @@ exports.easyOctave = easyOctave;
 
 var _constants = __webpack_require__(0);
 
-var _lodash = __webpack_require__(33);
+var _lodash = __webpack_require__(36);
 
 var _lodash2 = _interopRequireDefault(_lodash);
 
-var _lodash3 = __webpack_require__(34);
+var _lodash3 = __webpack_require__(37);
 
 var _lodash4 = _interopRequireDefault(_lodash3);
 
-var _teoria = __webpack_require__(35);
+var _teoria = __webpack_require__(38);
 
 var _teoria2 = _interopRequireDefault(_teoria);
 
@@ -23031,47 +23105,40 @@ var octaveDirection = (0, _lodash2.default)(function (p1, octave, p2) {
     return p1 + octave + p2;
 });
 
-function updateNoteOctave(note) {
-    var newOctave = octaveDirection(pitchClass, octave, note.props.pitchClass);
-    note.props.octave = newOctave;
-    octave = newOctave;
-}
-
 function easyOctave(voice) {
     var pitchClass = void 0;
     var octave = 4;
+    var updateNote = function updateNote(note) {
+        if (!note.props.octave) {
+            var newOctave = octaveDirection(pitchClass, octave, note.props.pitchClass);
+            note.props.octave = newOctave;
+            octave = newOctave;
+        } else {
+            octave = note.props.octave;
+        }
+        pitchClass = note.props.pitchClass;
+    };
+    var updateChord = function updateChord(chord) {
+        for (var j = 0; j < chord.children.length; j++) {
+            if (chord.children[j].type === _constants.NOTE) {
+                var note = chord.children[j];
+                updateNote(note);
+            }
+        }
+    };
     for (var i = 0; i < voice.length; i++) {
         if (voice[i].type === _constants.NOTE) {
             var note = voice[i];
-            if (!note.props.octave) {
-                var newOctave = octaveDirection(pitchClass, octave, note.props.pitchClass);
-                note.props.octave = newOctave;
-                octave = newOctave;
-            } else {
-                octave = note.props.octave;
-            }
-            pitchClass = note.props.pitchClass;
+            updateNote(note);
         } else if (voice[i].type === _constants.CHORD) {
             var chord = voice[i];
-            for (var j = 0; j < chord.children.length; j++) {
-                if (chord.children[j].type === _constants.NOTE) {
-                    var _note = chord.children[j];
-                    if (!_note.props.octave) {
-                        var _newOctave = octaveDirection(pitchClass, octave, _note.props.pitchClass);
-                        _note.props.octave = _newOctave;
-                        octave = _newOctave;
-                    } else {
-                        octave = _note.props.octave;
-                    }
-                    pitchClass = _note.props.pitchClass;
-                }
-            }
+            updateChord(chord);
         }
     }
 }
 
 /***/ }),
-/* 33 */
+/* 36 */
 /***/ (function(module, exports) {
 
 /**
@@ -23753,7 +23820,7 @@ module.exports = memoize;
 
 
 /***/ }),
-/* 34 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(module) {/**
@@ -26021,16 +26088,16 @@ function minBy(array, iteratee) {
 
 module.exports = minBy;
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2)(module)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)(module)))
 
 /***/ }),
-/* 35 */
+/* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var Note = __webpack_require__(9);
-var Interval = __webpack_require__(3);
-var Chord = __webpack_require__(40);
-var Scale = __webpack_require__(42);
+var Note = __webpack_require__(11);
+var Interval = __webpack_require__(4);
+var Chord = __webpack_require__(43);
+var Scale = __webpack_require__(45);
 
 var teoria;
 
@@ -26105,16 +26172,16 @@ teoria = {
 };
 
 
-__webpack_require__(43)(teoria);
+__webpack_require__(46)(teoria);
 exports = module.exports = teoria;
 
 
 /***/ }),
-/* 36 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var coords = __webpack_require__(10);
-var accval = __webpack_require__(11);
+var coords = __webpack_require__(12);
+var accval = __webpack_require__(13);
 
 module.exports = function scientific(name) {
   var format = /^([a-h])(x|#|bb|b?)(-?\d*)/i;
@@ -26138,11 +26205,11 @@ module.exports = function scientific(name) {
 
 
 /***/ }),
-/* 37 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var coords = __webpack_require__(10);
-var accval = __webpack_require__(11);
+var coords = __webpack_require__(12);
+var accval = __webpack_require__(13);
 
 module.exports = function helmholtz(name) {
   var name = name.replace(/\u2032/g, "'").replace(/\u0375/g, ',');
@@ -26185,7 +26252,7 @@ module.exports = function helmholtz(name) {
 
 
 /***/ }),
-/* 38 */
+/* 41 */
 /***/ (function(module, exports) {
 
 module.exports = function(coord, stdPitch) {
@@ -26202,7 +26269,7 @@ module.exports = function(coord, stdPitch) {
 
 
 /***/ }),
-/* 39 */
+/* 42 */
 /***/ (function(module, exports) {
 
 var pattern = /^(AA|A|P|M|m|d|dd)(-?\d+)$/;
@@ -26256,13 +26323,13 @@ module.exports.coords = baseIntervals.slice(0);
 
 
 /***/ }),
-/* 40 */
+/* 43 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var daccord = __webpack_require__(41);
+var daccord = __webpack_require__(44);
 var knowledge = __webpack_require__(1);
-var Note = __webpack_require__(9);
-var Interval = __webpack_require__(3);
+var Note = __webpack_require__(11);
+var Interval = __webpack_require__(4);
 
 function Chord(root, name) {
   if (!(this instanceof Chord)) return new Chord(root, name);
@@ -26487,7 +26554,7 @@ module.exports = Chord;
 
 
 /***/ }),
-/* 41 */
+/* 44 */
 /***/ (function(module, exports) {
 
 var SYMBOLS = {
@@ -26681,11 +26748,11 @@ module.exports = function(symbol) {
 
 
 /***/ }),
-/* 42 */
+/* 45 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var knowledge = __webpack_require__(1);
-var Interval = __webpack_require__(3);
+var Interval = __webpack_require__(4);
 
 var scales = {
   aeolian: ['P1', 'M2', 'm3', 'P4', 'P5', 'm6', 'm7'],
@@ -26812,7 +26879,7 @@ module.exports = Scale;
 
 
 /***/ }),
-/* 43 */
+/* 46 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var knowledge = __webpack_require__(1);
@@ -26836,7 +26903,7 @@ module.exports = function(teoria) {
 
 
 /***/ }),
-/* 44 */
+/* 47 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -26847,23 +26914,23 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.pitch = exports.live = exports.chord = exports.melody = exports.scale = undefined;
 
-var _scale = __webpack_require__(13);
+var _scale = __webpack_require__(15);
 
 var scale = _interopRequireWildcard(_scale);
 
-var _melody = __webpack_require__(45);
+var _melody = __webpack_require__(48);
 
 var melody = _interopRequireWildcard(_melody);
 
-var _chord = __webpack_require__(46);
+var _chord = __webpack_require__(49);
 
 var chord = _interopRequireWildcard(_chord);
 
-var _pitch = __webpack_require__(47);
+var _pitch = __webpack_require__(50);
 
 var pitch = _interopRequireWildcard(_pitch);
 
-var _live = __webpack_require__(48);
+var _live = __webpack_require__(51);
 
 var live = _interopRequireWildcard(_live);
 
@@ -26876,7 +26943,7 @@ exports.live = live;
 exports.pitch = pitch;
 
 /***/ }),
-/* 45 */
+/* 48 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -26887,11 +26954,11 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.accelerando = exports.tempo = exports.rhythm = exports.duration = exports.bpm = exports.after = exports.mapthen = exports.then = exports.times = exports.but = exports.wherever = exports.where = exports.all = exports.is = exports.having = exports.accompany = exports.phrase = undefined;
 
-var _lodash = __webpack_require__(4);
+var _lodash = __webpack_require__(5);
 
 var _ = _interopRequireWildcard(_lodash);
 
-var _fraction = __webpack_require__(8);
+var _fraction = __webpack_require__(10);
 
 var _fraction2 = _interopRequireDefault(_fraction);
 
@@ -27122,7 +27189,7 @@ exports.tempo = tempo;
 exports.accelerando = accelerando;
 
 /***/ }),
-/* 46 */
+/* 49 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -27133,11 +27200,11 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.inversion = exports.root = exports.thirteenth = exports.eleventh = exports.ninth = exports.seventh = exports.triad = undefined;
 
-var _lodash = __webpack_require__(4);
+var _lodash = __webpack_require__(5);
 
 var _ = _interopRequireWildcard(_lodash);
 
-var _scale = __webpack_require__(13);
+var _scale = __webpack_require__(15);
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
@@ -27181,7 +27248,7 @@ exports.root = root;
 exports.inversion = inversion;
 
 /***/ }),
-/* 47 */
+/* 50 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -27199,7 +27266,7 @@ exports.noteToMidi = noteToMidi;
 exports.midiToHz = midiToHz;
 exports.noteToHz = noteToHz;
 
-var _lodash = __webpack_require__(4);
+var _lodash = __webpack_require__(5);
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
@@ -27265,7 +27332,7 @@ function noteToHz(note) {
 }
 
 /***/ }),
-/* 48 */
+/* 51 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -27301,92 +27368,6 @@ exports.playNote = playNote;
 exports.play = play;
 
 /***/ }),
-/* 49 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-function NumberNode(value) {
-    this.value = Number(value);
-    this.props = {};
-}
-
-NumberNode.prototype.set = function (newprops) {
-    this.props = Object.assign({}, this.props, this);
-    return this;
-};
-
-exports.default = NumberNode;
-
-/***/ }),
-/* 50 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _constants = __webpack_require__(0);
-
-function NoteNode(props) {
-    this.props = props;
-}
-
-NoteNode.prototype.type = _constants.NOTE;
-
-NoteNode.prototype.set = function (newprops) {
-    var props = Object.assign({}, this.props, newprops);
-    return new NoteNode(props);
-};
-
-NoteNode.prototype.serialize = function () {
-    var scope = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-
-    var props = Object.assign({}, scope, this.props);
-    return Object.assign({}, { type: _constants.NOTE, props: props });
-};
-
-exports.default = NoteNode;
-
-/***/ }),
-/* 51 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _constants = __webpack_require__(0);
-
-function RestNode(props) {
-    this.props = props;
-}
-
-RestNode.prototype.type = _constants.REST;
-
-RestNode.prototype.set = function (newprops) {
-    var props = Object.assign({}, this.props, newprops);
-    return new RestNode(props);
-};
-
-RestNode.prototype.serialize = function (scope) {
-    var props = Object.assign({}, scope, this.props);
-    return Object.assign({}, { type: _constants.REST, props: props });
-};
-
-exports.default = RestNode;
-
-/***/ }),
 /* 52 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -27396,42 +27377,30 @@ exports.default = RestNode;
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-function ScopeNode() {
-    var props = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-    var children = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
 
-    this.props = props;
-    this.children = children;
-}
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-ScopeNode.prototype.set = function (newprops) {
-    var props = Object.assign({}, this.props, newprops);
-    return new ScopeNode(props, this.children);
-};
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-/*
- * @param scope - The outer scope.
- */
-ScopeNode.prototype.serialize = function () {
-    var scope = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+var NumberNode = function () {
+    function NumberNode(value) {
+        _classCallCheck(this, NumberNode);
 
-    var props = Object.assign({}, scope, this.props);
-    return this.children.reduce(function (acc, item) {
-        var json = item.serialize(props);
-        return acc.concat(json);
-    }, []);
-};
+        this.value = Number(value);
+    }
 
-ScopeNode.prototype.execute = function (yy, scope) {
-    var _this = this;
+    _createClass(NumberNode, [{
+        key: "set",
+        value: function set(newprops) {
+            this.props = Object.assign({}, this.props, this);
+            return this;
+        }
+    }]);
 
-    this.children.map(function (child) {
-        return child.execute(yy, _this.props);
-    });
-    return this;
-};
+    return NumberNode;
+}();
 
-exports.default = ScopeNode;
+exports.default = NumberNode;
 
 /***/ }),
 /* 53 */
@@ -27444,32 +27413,37 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
 var _constants = __webpack_require__(0);
 
-function ChordNode(props, children) {
-    this.props = props;
-    this.children = children;
-}
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-ChordNode.prototype.type = _constants.CHORD;
+var RestNode = function () {
+    function RestNode(props) {
+        _classCallCheck(this, RestNode);
 
-ChordNode.prototype.set = function (newprops) {
-    var props = Object.assign({}, this.props, newprops);
-    var children = this.children.map(function (child) {
-        return child.set(newprops);
-    });
-    return new ChordNode(props, children);
-};
+        this.props = props;
+    }
 
-ChordNode.prototype.serialize = function (scope) {
-    var props = Object.assign({}, scope, this.props);
-    var children = this.children.map(function (child) {
-        return child.serialize(scope);
-    });
-    return Object.assign({}, { type: _constants.CHORD, props: props, children: children });
-};
+    _createClass(RestNode, [{
+        key: 'set',
+        value: function set(newprops) {
+            var props = Object.assign({}, this.props, newprops);
+            return new RestNode(props);
+        }
+    }, {
+        key: 'serialize',
+        value: function serialize(scope) {
+            var props = Object.assign({}, scope, this.props);
+            return Object.assign({}, { type: _constants.REST, props: props });
+        }
+    }]);
 
-exports.default = ChordNode;
+    return RestNode;
+}();
+
+exports.default = RestNode;
 
 /***/ }),
 /* 54 */
@@ -27482,40 +27456,55 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
-var _constants = __webpack_require__(0);
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-function Layout() {
-    var props = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+var _Executable = __webpack_require__(6);
 
-    this.props = props;
-    this.timeSignatures = [];
-    this.lines = [];
-    this.systems = [];
-    this.pages = [];
-}
+var _Serializable = __webpack_require__(2);
 
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-Layout.prototype.set = function (props) {
-    this.props = Object.assign({}, this.props, props);
-    return this;
-};
+var ScopeNode = function () {
+    function ScopeNode(props, children) {
+        _classCallCheck(this, ScopeNode);
 
-Layout.prototype.serialize = function () {
-    var pages = this.pages.length ? this.pages : [{ systems: this.systems.length, staffSpacing: [] }];
-    return Object.assign({}, this.props, {
-        type: _constants.SCORE,
-        lines: this.lines,
-        systems: this.systems,
-        pages: pages,
-        timeSignatures: this.timeSignatures
-    });
-};
+        this.props = props;
+        this.children = children;
+    }
 
-Layout.prototype.execute = function (yy) {
-    return this;
-};
+    _createClass(ScopeNode, [{
+        key: 'set',
+        value: function set(newprops) {
+            var props = Object.assign({}, this.props, newprops);
+            return new ScopeNode(props, this.children);
+        }
+    }, {
+        key: 'serialize',
+        value: function serialize() {
+            var scope = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-exports.default = Layout;
+            var props = Object.assign({}, scope, this.props);
+            return this.children.reduce(function (acc, item) {
+                var json = item.serialize(props);
+                return acc.concat(json);
+            }, []);
+        }
+    }, {
+        key: 'execute',
+        value: function execute(yy, scope) {
+            var _this = this;
+
+            this.children.map(function (child) {
+                return child.execute(yy, _this.props);
+            });
+            return this;
+        }
+    }]);
+
+    return ScopeNode;
+}();
+
+exports.default = ScopeNode;
 
 /***/ }),
 /* 55 */
@@ -27527,25 +27516,55 @@ exports.default = Layout;
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-function Voice(props, children) {
-    this.props = props;
-    this.children = children;
-}
 
-Voice.prototype.execute = function (yy) {
-    var list = this.children.reduce(function (acc, item) {
-        var json = item.serialize();
-        return acc.concat(json);
-    }, []);
-    if (!yy.voices[this.props.name]) {
-        // create array for voice items
-        yy.voices[this.props.name] = list;
-    } else {
-        yy.voices[this.props.name] = yy.voices[this.props.name].concat(list);
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _constants = __webpack_require__(0);
+
+var _NoteNode = __webpack_require__(16);
+
+var _NoteNode2 = _interopRequireDefault(_NoteNode);
+
+var _Serializable = __webpack_require__(2);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var ChordNode = function () {
+    function ChordNode(props, children) {
+        _classCallCheck(this, ChordNode);
+
+        this.type = _constants.CHORD;
+
+        this.props = props;
+        this.children = children;
     }
-};
 
-exports.default = Voice;
+    _createClass(ChordNode, [{
+        key: 'set',
+        value: function set(newprops) {
+            var props = Object.assign({}, this.props, newprops);
+            var children = this.children.map(function (child) {
+                return child.set(newprops);
+            });
+            return new ChordNode(props, children);
+        }
+    }, {
+        key: 'serialize',
+        value: function serialize(scope) {
+            var props = Object.assign({}, scope, this.props);
+            var children = this.children.map(function (child) {
+                return child.serialize(scope);
+            });
+            return Object.assign({}, { type: _constants.CHORD, props: props, children: children });
+        }
+    }]);
+
+    return ChordNode;
+}();
+
+exports.default = ChordNode;
 
 /***/ }),
 /* 56 */
@@ -27558,27 +27577,136 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
-var _Keyword = __webpack_require__(14);
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _constants = __webpack_require__(0);
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Layout = function () {
+    function Layout() {
+        var props = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+        _classCallCheck(this, Layout);
+
+        this.props = props;
+        this.timeSignatures = [];
+        this.lines = [];
+        this.systems = [];
+        this.pages = [];
+    }
+
+    _createClass(Layout, [{
+        key: 'set',
+        value: function set(props) {
+            this.props = Object.assign({}, this.props, props);
+            return this;
+        }
+    }, {
+        key: 'serialize',
+        value: function serialize() {
+            var pages = this.pages.length ? this.pages : [{ systems: this.systems.length, staffSpacing: [] }];
+            return Object.assign({}, this.props, {
+                type: _constants.SCORE,
+                lines: this.lines,
+                systems: this.systems,
+                pages: pages,
+                timeSignatures: this.timeSignatures
+            });
+        }
+    }, {
+        key: 'execute',
+        value: function execute() {
+            return this;
+        }
+    }]);
+
+    return Layout;
+}();
+
+exports.default = Layout;
+
+/***/ }),
+/* 57 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _Executable = __webpack_require__(6);
+
+var _Serializable = __webpack_require__(2);
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Voice = function () {
+    function Voice(props, children) {
+        _classCallCheck(this, Voice);
+
+        this.props = props;
+        this.children = children;
+    }
+
+    _createClass(Voice, [{
+        key: 'execute',
+        value: function execute(yy, scope) {
+            var list = this.children.reduce(function (acc, item) {
+                var json = item.serialize();
+                return acc.concat(json);
+            }, []);
+            if (!yy.voices[this.props.name]) {
+                // create array for voice items
+                yy.voices[this.props.name] = list;
+            } else {
+                yy.voices[this.props.name] = yy.voices[this.props.name].concat(list);
+            }
+            return this;
+        }
+    }]);
+
+    return Voice;
+}();
+
+exports.default = Voice;
+
+/***/ }),
+/* 58 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _Keyword = __webpack_require__(17);
 
 var _Keyword2 = _interopRequireDefault(_Keyword);
 
-var _PageNode = __webpack_require__(57);
+var _PageNode = __webpack_require__(59);
 
 var _PageNode2 = _interopRequireDefault(_PageNode);
 
-var _SystemNode = __webpack_require__(58);
+var _SystemNode = __webpack_require__(60);
 
 var _SystemNode2 = _interopRequireDefault(_SystemNode);
 
-var _LineNode = __webpack_require__(59);
+var _LineNode = __webpack_require__(61);
 
 var _LineNode2 = _interopRequireDefault(_LineNode);
 
-var _ChordSymbol = __webpack_require__(60);
+var _ChordSymbol = __webpack_require__(62);
 
 var _ChordSymbol2 = _interopRequireDefault(_ChordSymbol);
 
-var _TimeSignature = __webpack_require__(61);
+var _TimeSignature = __webpack_require__(63);
 
 var _TimeSignature2 = _interopRequireDefault(_TimeSignature);
 
@@ -27680,76 +27808,6 @@ var BUILTINS = {
 exports.default = BUILTINS;
 
 /***/ }),
-/* 57 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _constants = __webpack_require__(0);
-
-function PageNode(props) {
-    this.props = props;
-}
-
-PageNode.prototype.type = _constants.PAGE;
-
-PageNode.prototype.set = function (newprops) {
-    this.props = Object.assign({}, this.props, newprops);
-    return this;
-};
-
-PageNode.prototype.serialize = function (scope) {
-    return Object.assign({}, scope, this.props, { type: _constants.PAGE });
-};
-
-PageNode.prototype.execute = function (yy, scope) {
-    yy.layout.pages.push(this.serialize(scope));
-};
-
-exports.default = PageNode;
-
-/***/ }),
-/* 58 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _constants = __webpack_require__(0);
-
-function SystemNode() {
-    var props = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-
-    this.props = props;
-}
-
-SystemNode.prototype.type = _constants.SYSTEM;
-
-SystemNode.prototype.set = function (newprops) {
-    this.props = Object.assign({}, this.props, newprops);
-    return this;
-};
-
-SystemNode.prototype.serialize = function (scope) {
-    return Object.assign({}, scope, this.props, { type: _constants.SYSTEM });
-};
-
-SystemNode.prototype.execute = function (yy, scope) {
-    yy.layout.systems.push(this.serialize(scope));
-};
-
-exports.default = SystemNode;
-
-/***/ }),
 /* 59 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -27760,28 +27818,41 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
 var _constants = __webpack_require__(0);
 
-function LineNode(props) {
-    this.props = props;
-}
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-LineNode.prototype.type = _constants.LINE;
+var PageNode = function () {
+    function PageNode(props) {
+        _classCallCheck(this, PageNode);
 
-LineNode.prototype.set = function (newprops) {
-    this.props = Object.assign({}, this.props, newprops);
-    return this;
-};
+        this.props = props;
+    }
 
-LineNode.prototype.serialize = function (scope) {
-    return Object.assign({}, scope, this.props, { type: _constants.LINE });
-};
+    _createClass(PageNode, [{
+        key: 'set',
+        value: function set(newprops) {
+            this.props = Object.assign({}, this.props, newprops);
+            return this;
+        }
+    }, {
+        key: 'serialize',
+        value: function serialize(scope) {
+            return Object.assign({}, scope, this.props, { type: _constants.PAGE });
+        }
+    }, {
+        key: 'execute',
+        value: function execute(yy, scope) {
+            yy.layout.pages.push(this.serialize(scope));
+        }
+    }]);
 
-LineNode.prototype.execute = function (yy, scope) {
-    yy.layout.lines.push(this.serialize(scope));
-};
+    return PageNode;
+}();
 
-exports.default = LineNode;
+exports.default = PageNode;
 
 /***/ }),
 /* 60 */
@@ -27794,23 +27865,43 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
 var _constants = __webpack_require__(0);
 
-function ChordSymbol() {
-    var props = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-    this.props = props;
-}
+var SystemNode = function () {
+    function SystemNode(props) {
+        _classCallCheck(this, SystemNode);
 
-ChordSymbol.prototype.serialize = function () {
-    return Object.assign({}, { type: _constants.CHORDSYMBOL, props: this.props });
-};
+        this.type = _constants.SYSTEM;
 
-ChordSymbol.prototype.execute = function (yy) {
-    yy.chordSymbols.push(this.serialize());
-};
+        this.props = props;
+    }
 
-exports.default = ChordSymbol;
+    _createClass(SystemNode, [{
+        key: 'set',
+        value: function set(newprops) {
+            this.props = Object.assign({}, this.props, newprops);
+            return this;
+        }
+    }, {
+        key: 'serialize',
+        value: function serialize(scope) {
+            return Object.assign({}, scope, this.props, { type: _constants.SYSTEM });
+        }
+    }, {
+        key: 'execute',
+        value: function execute(yy, scope) {
+            yy.layout.systems.push(this.serialize(scope));
+        }
+    }]);
+
+    return SystemNode;
+}();
+
+exports.default = SystemNode;
 
 /***/ }),
 /* 61 */
@@ -27823,21 +27914,133 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
 var _constants = __webpack_require__(0);
 
-function TimeSignature() {
-    var props = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-    this.props = props;
-}
+var LineNode = function () {
+    function LineNode(props) {
+        _classCallCheck(this, LineNode);
 
-TimeSignature.prototype.serialize = function () {
-    return Object.assign({}, this.props, { type: _constants.TIMESIG });
-};
+        this.type = _constants.LINE;
 
-TimeSignature.prototype.execute = function (yy) {
-    yy.layout.timeSignatures.push(this.serialize());
-};
+        this.props = props;
+    }
+
+    _createClass(LineNode, [{
+        key: 'set',
+        value: function set(newprops) {
+            this.props = Object.assign({}, this.props, newprops);
+            return this;
+        }
+    }, {
+        key: 'serialize',
+        value: function serialize(scope) {
+            return Object.assign({}, scope, this.props, { type: _constants.LINE });
+        }
+    }, {
+        key: 'execute',
+        value: function execute(yy, scope) {
+            yy.layout.lines.push(this.serialize(scope));
+        }
+    }]);
+
+    return LineNode;
+}();
+
+exports.default = LineNode;
+
+/***/ }),
+/* 62 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _constants = __webpack_require__(0);
+
+var _Executable = __webpack_require__(6);
+
+var _Serializable = __webpack_require__(2);
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var ChordSymbol = function () {
+    function ChordSymbol(props) {
+        _classCallCheck(this, ChordSymbol);
+
+        this.props = props;
+    }
+
+    _createClass(ChordSymbol, [{
+        key: 'serialize',
+        value: function serialize() {
+            return Object.assign({}, { type: _constants.CHORDSYMBOL, props: this.props });
+        }
+    }, {
+        key: 'execute',
+        value: function execute(yy) {
+            yy.chordSymbols.push(this.serialize());
+            return this;
+        }
+    }]);
+
+    return ChordSymbol;
+}();
+
+exports.default = ChordSymbol;
+
+/***/ }),
+/* 63 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _constants = __webpack_require__(0);
+
+var _Executable = __webpack_require__(6);
+
+var _Serializable = __webpack_require__(2);
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var TimeSignature = function () {
+    function TimeSignature(props) {
+        _classCallCheck(this, TimeSignature);
+
+        this.props = props;
+    }
+
+    _createClass(TimeSignature, [{
+        key: 'serialize',
+        value: function serialize() {
+            return Object.assign({}, this.props, { type: _constants.TIMESIG });
+        }
+    }, {
+        key: 'execute',
+        value: function execute(yy, scope) {
+            yy.layout.timeSignatures.push(this.serialize());
+            return this;
+        }
+    }]);
+
+    return TimeSignature;
+}();
 
 exports.default = TimeSignature;
 

@@ -1,32 +1,42 @@
 // @flow
+import type { Line, System, Page } from './types';
 import { SCORE } from './constants';
 
-function Layout (props: {} = {}) {
-    this.props = props;
-    this.timeSignatures = [];
-    this.lines = [];
-    this.systems = [];
-    this.pages = [];
-}
+class Layout {
 
-Layout.prototype.set = function (props) {
-    this.props = Object.assign({}, this.props, props);
-    return this;
-}
+    props: {}
+    timeSignatures: Array<mixed>
+    lines: Array<Line>
+    systems: Array<System>
+    pages: Array<Page>
 
-Layout.prototype.serialize = function () {
-    const pages = this.pages.length ? this.pages : [{systems: this.systems.length, staffSpacing: []}];
-    return Object.assign({}, this.props, {
-        type: SCORE,
-        lines: this.lines,
-        systems: this.systems,
-        pages,
-        timeSignatures: this.timeSignatures
-    });
-}
+    constructor (props: {} = {}) {
+        this.props = props;
+        this.timeSignatures = [];
+        this.lines = [];
+        this.systems = [];
+        this.pages = [];
+    }
 
-Layout.prototype.execute = function (yy) {
-    return this;
+    set (props: {}) {
+        this.props = Object.assign({}, this.props, props);
+        return this;
+    }
+
+    serialize () {
+        const pages = this.pages.length ? this.pages : [{systems: this.systems.length, staffSpacing: []}];
+        return Object.assign({}, this.props, {
+            type: SCORE,
+            lines: this.lines,
+            systems: this.systems,
+            pages,
+            timeSignatures: this.timeSignatures
+        });
+    }
+
+    execute () {
+        return this;
+    }
 }
 
 export default Layout;

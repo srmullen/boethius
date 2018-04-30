@@ -1,22 +1,29 @@
+// @flow
 import { LINE } from './constants';
+import type { YY } from './types';
 
-function LineNode (props) {
-    this.props = props;
-}
+class LineNode {
 
-LineNode.prototype.type = LINE;
+    props: {};
 
-LineNode.prototype.set = function (newprops) {
-    this.props = Object.assign({}, this.props, newprops);
-    return this;
-};
+    type: string = LINE;
 
-LineNode.prototype.serialize = function (scope) {
-    return Object.assign({}, scope, this.props, {type: LINE});
-}
+    constructor (props: {}) {
+        this.props = props;
+    }
 
-LineNode.prototype.execute = function (yy, scope) {
-    yy.layout.lines.push(this.serialize(scope));
+    set (newprops: {}) {
+        this.props = Object.assign({}, this.props, newprops);
+        return this;
+    }
+
+    serialize (scope: {}) {
+        return Object.assign({}, scope, this.props, {type: LINE});
+    }
+
+    execute (yy: YY, scope: {}) {
+        yy.layout.lines.push(this.serialize(scope));
+    }
 }
 
 export default LineNode;

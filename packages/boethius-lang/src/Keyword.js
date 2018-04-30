@@ -1,7 +1,16 @@
-export default function Keyword (keyword) {
-    this.value = keyword;
+// @flow
+
+class Keyword {
+
+    value: string;
+
+    constructor (value: string) {
+        this.value = value;
+    }
+
+    toString () {
+        return this.value;
+    }
 }
 
-Keyword.prototype.toString = function () {
-    return this.value;
-};
+export default Keyword;
