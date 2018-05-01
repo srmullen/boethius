@@ -1,6 +1,8 @@
 // @flow
+import { Serializable } from './interfaces/Serializable';
+import { Stringable } from './interfaces/Stringable';
 
-class Keyword {
+class Keyword implements Serializable, Stringable {
 
     value: string;
 
@@ -9,6 +11,10 @@ class Keyword {
     }
 
     toString () {
+        return this.value
+    }
+
+    serialize () {
         return this.value;
     }
 }

@@ -5,7 +5,7 @@ import { Serializable } from './interfaces/Serializable';
 
 class Voice implements Executable {
     props: {name: string};
-    children: Array<Serializable>
+    children: Array<Serializable>;
 
     constructor (props: {name: string}, children: Array<Serializable>) {
         this.props = props;

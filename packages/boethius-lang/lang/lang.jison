@@ -53,7 +53,6 @@ r                                                   return 'REST'
 \"(.*?)\"                                           yytext = yytext.substr(1,yyleng-2); return 'STRING'
 true|false                                          return 'BOOL'
 [0-9]+                                              return 'INTEGER'
-// (csym|layout|timesig|page|system|line|clef|key)\s   return 'BUILTIN'
 [a-gA-G][b|#]{0,2}(?![a-zA-Z])([0-9]+)?             return 'PITCHCLASS'
 \~[a-zA-Z][a-zA-Z0-9\-]*                            return 'VAR'
 [a-zA-Z][a-zA-Z0-9]*                                return 'IDENTIFIER'
@@ -148,13 +147,6 @@ chord:
         }
     ;
 
-// builtin:
-//     LPAREN BUILTIN list RPAREN
-//         {
-//             $$ = yy.BUILTINS[$2.trim()](yy, $3);
-//         }
-//     ;
-
 item:
     number
         {$$ = $1}
@@ -168,8 +160,6 @@ item:
         {$$ = $1}
     | chord
         {$$ = $1}
-    // | builtin
-    //     {$$ = $1}
     ;
 
 ratio:

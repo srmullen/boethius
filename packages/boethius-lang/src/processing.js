@@ -1,4 +1,3 @@
-
 import type { Sequencable, Chord, Note } from './types';
 import {NOTE, CHORD} from './constants';
 import memoize from 'lodash.memoize';
@@ -26,10 +25,10 @@ const octaveDirection = memoize((p1, octave, p2) => {
 
 
 
-export function easyOctave (voice: Array<Sequencable>) {
+export function easyOctave (voice) {
     let pitchClass;
     let octave = 4;
-    const updateNote = (note: Note) => {
+    const updateNote = (note) => {
         if (!note.props.octave) {
             const newOctave = octaveDirection(pitchClass, octave, note.props.pitchClass);
             note.props.octave = newOctave;
@@ -39,7 +38,7 @@ export function easyOctave (voice: Array<Sequencable>) {
         }
         pitchClass = note.props.pitchClass
     }
-    const updateChord = (chord: Chord) => {
+    const updateChord = (chord) => {
         for (let j = 0; j < chord.children.length; j++) {
             if (chord.children[j].type === NOTE) {
                 const note = chord.children[j];

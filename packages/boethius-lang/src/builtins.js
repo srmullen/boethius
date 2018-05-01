@@ -1,22 +1,27 @@
+// @flow
 import Keyword from './Keyword';
 import PageNode from './PageNode';
 import SystemNode from './SystemNode';
 import LineNode from './LineNode';
 import ChordSymbol from './ChordSymbol';
 import TimeSignature from './TimeSignature';
-import {CHORDSYMBOL, CLEF, KEY} from './constants';
+import Clef from './Clef';
+import Key from './Key';
+import NumberNode from './NumberNode';
+import type { YY } from './types';
+import { Stringable } from './interfaces/Stringable';
+import { Serializable } from './interfaces/Serializable';
 
 const BUILTINS = {
-    csym: function (yy, args) {
-        const value = args[0].toString();
+    csym: function (yy: YY, args: {}) {
+        const value = args[0].serialize();
         const measure = args[1].value;
         const beat = args[2] ? args[2].value : 0;
-        // const chordSymbol = {type: CHORDSYMBOL, props: {value, measure, beat}};
         const chordSymbol = new ChordSymbol({value, measure, beat});
 
         return chordSymbol;
     },
-    timesig: function (yy, args) {
+    timesig: function (yy: YY, args: {}) {
         const numerator = args[0].value;
         const denominator = args[1].value;
         const measure = args[2] ? args[2].value : 0;
@@ -29,11 +34,9 @@ const BUILTINS = {
 
         const timeSignature = new TimeSignature(props);
 
-        // yy.layout.timeSignatures.push(timeSignature);
-
         return timeSignature;
     },
-    layout: function (yy, args) {
+    layout: function (yy: YY, args: Array<Stringable>) {
         // args to layout must be even length
         if (args.length % 2 !== 0) {
             throw new Error('layout must have even number of arguments.');
@@ -45,28 +48,28 @@ const BUILTINS = {
 
         return yy.layout.set(props);
     },
-    page: function (yy, args) {
+    page: function (yy: YY, args: {}) {
         const page = new PageNode({
             systems: args[0].value
         });
 
         return page;
     },
-    system: function (yy, args) {
-        const [measures, ...lineSpacings] = args
+    system: function (yy: YY, args: Array<NumberNode>) {
+        const [measures, ...lineSpacings] = args;
         const lineSpacing = lineSpacings.length ? lineSpacings.map(num => num.value) : [0];
         const system = new SystemNode({measures: measures.value, lineSpacing});
 
         return system;
     },
-    line: function (yy, args) {
+    line: function (yy: YY, args: Array<Serializable>) {
         const props = args.reduce(function (acc, arg) {
             if (arg instanceof Keyword) {
-                acc.voices.push(arg.toString());
-            } else if (arg.type === CLEF) {
-                acc.clefs.push(arg);
-            } else if (arg.type === KEY) {
-                acc.keys.push(arg);
+                acc.voices.push(arg.serialize());
+            } else if (arg instanceof Clef) {
+                acc.clefs.push(arg.serialize());
+            } else if (arg instanceof Key) {
+                acc.keys.push(arg.serialize());
             }
             return acc;
         }, {keys: [], clefs: [], voices: []})
@@ -75,18 +78,18 @@ const BUILTINS = {
 
         return line;
     },
-    clef: function (yy, args) {
-        const value = args[0].toString();
+    clef: function (yy: YY, args: Array<Serializable>) {
+        const value = args[0].serialize();
         const measure = args[1] ? args[1].value : 0;
         const beat = args[2] ? args[2].value : 0;
-        return {type: CLEF, value, measure, beat};
+        return new Clef({value, measure, beat});
     },
-    key: function (yy, args) {
-        const root = args[0].toString();
-        const mode = args[1].toString();
+    key: function (yy: YY, args: Array<Serializable>) {
+        const root = args[0].serialize();
+        const mode = args[1].serialize();
         const measure = args[2] ? args[2].value : 0;
         const beat = args[3] ? args[3].value : 0;
-        return {type: KEY, root, mode, measure, beat};
+        return new Key({root, mode, measure, beat});
     }
 };
 
