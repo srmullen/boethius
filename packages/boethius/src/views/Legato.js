@@ -102,13 +102,13 @@ Legato.prototype.renderV2 = function () {
             if (!acc.low) {
                 low = item.noteHead.bounds.center;
             } else {
-                low = item.noteHead.bounds.center.y < acc.low.y ? item.noteHead.bounds.center : acc.low;
+                low = item.noteHead.bounds.center.y <= acc.low.y ? item.noteHead.bounds.center : acc.low;
             }
 
             if (!acc.high) {
                 high = item.group.bounds.bottomCenter;
             } else {
-                high = item.group.bounds.bottom > acc.high.y ? item.group.bounds.bottomCenter : acc.high;
+                high = item.group.bounds.bottom >= acc.high.y ? item.group.bounds.bottomCenter : acc.high;
             }
             return {high, low};
         }, {low: null, high: null});

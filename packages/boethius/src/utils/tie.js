@@ -80,10 +80,10 @@ export function tieV2 (points, handles) {
 	for (let i = 0; i < path.segments.length - 1; i++) {
 		let handleIn, handleOut;
 		const handle = handles[i];
-		const offset = path.getOffsetOf(path.segments[i].point);
+		const offset = path.getOffsetOf(path.segments[i].point) - 10;
 		// Get the tangent slightly behind the segment point so the tangent is
 		// from the smooth curve rather than the sharp cutoff to the next point.
-		const tangent = path.getTangentAt(offset-10).multiply(10);
+		const tangent = path.getTangentAt(offset > 0 ? offset : 0).multiply(10);
 
 		if (i !== 0) {
 			path.segments[i].handleOut = tangent;
