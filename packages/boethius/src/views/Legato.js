@@ -3,7 +3,8 @@ import {filter, first, last} from "lodash";
 
 import constants from "../constants";
 import {partitionBy} from "../utils/common";
-import {tie, getTiePoint, getTieHandle} from '../utils/tie';
+import {tie, tieV2, getTiePoint, getTieHandle, getHandles} from '../utils/tie';
+import {getNoteHeadOffset} from '../utils/placement';
 
 const TYPE = constants.type.legato;
 
@@ -24,11 +25,60 @@ Legato.of = (context, children) => {
     return new Legato(context, children);
 };
 
-Legato.prototype.render = function () {
+// Legato render version 3 chooses the tie direction based on the minimum difference
+// between the top and bottom tie points.
+Legato.prototype.renderV3 = function () {
     const group = new paper.Group({name: TYPE});
 
     const firstItem = first(this.children);
     const lastItem = last(this.children);
+
+    const {top, bottom} = this.children.reduce((acc, item) => {
+        const stemDirection = item.getStemDirection();
+        if (stemDirection === 'up') {
+            acc.top.push(item.noteHead.bounds.topCenter);
+        } else {
+            acc.top.push(item.noteHead.bounds.center);
+        }
+        acc.bottom.push(item.group.bounds.bottomCenter);
+
+        return acc;
+    }, {top: [], bottom: []});
+
+    group.addChildren(top.map(point => {
+        return new paper.Path.Circle({
+            center: point,
+            radius: 5,
+            fillColor: 'red'
+        });
+    }));
+
+    group.addChildren(bottom.map(point => {
+        return new paper.Path.Circle({
+            center: point,
+            radius: 5,
+            fillColor: 'blue'
+        });
+    }));
+
+	const firstStem = firstItem.getStemDirection();
+    const lastStem = lastItem.getStemDirection();
+	const begin = getTiePoint(firstItem, null, firstStem);
+	const handle = getTieHandle(firstStem);
+	const end = getTiePoint(lastItem, handle);
+    group.addChild(tie(begin, end, handle));
+
+    return group;
+}
+
+// Legato version two tries to determine the handle based on the childrens min or
+// max height. Direction of the tie is still based on the stem direction of the first item.
+Legato.prototype.renderV2 = function () {
+    const group = new paper.Group({name: TYPE});
+
+    const firstItem = first(this.children);
+    const lastItem = last(this.children);
+
     if (this.children.length === 1) {
         if (this.isEnd) {
             const stem = lastItem.getStemDirection();
@@ -44,7 +94,49 @@ Legato.prototype.render = function () {
             group.addChild(tie(begin, end, handle));
 
         }
-    } else if (this.systemBreak) {
+    } else if (this.children.length === 2) {
+        group.addChildren(twoNoteTie(firstItem, lastItem, this.systemBreak));
+    } else {
+        const {low, high} = this.children.reduce((acc, item) => {
+            let low, high;
+            if (!acc.low) {
+                low = item.noteHead.bounds.center;
+            } else {
+                low = item.noteHead.bounds.center.y < acc.low.y ? item.noteHead.bounds.center : acc.low;
+            }
+
+            if (!acc.high) {
+                high = item.group.bounds.bottomCenter;
+            } else {
+                high = item.group.bounds.bottom > acc.high.y ? item.group.bounds.bottomCenter : acc.high;
+            }
+            return {high, low};
+        }, {low: null, high: null});
+
+    	const firstStem = firstItem.getStemDirection();
+        const lastStem = lastItem.getStemDirection();
+    	const begin = getTiePoint(firstItem, null, firstStem);
+    	const handle = getTieHandle(firstStem);
+    	const end = getTiePoint(lastItem, handle);
+        if (firstStem === 'up') {
+            // const handle = new paper.Point([high.x - firstItem.group.bounds.center.x, high.y]);
+            const points = [begin, high, end];
+            const handles = getHandles(points, 'down');
+            group.addChild(tieV2(points, handles));
+        } else {
+            // const handle = new paper.Point([low.x - firstItem.group.bounds.center.x, low.y]);
+            const points = [begin, low, end];
+            const handles = getHandles(points, 'up');
+            group.addChild(tieV2(points, handles));
+        }
+    }
+
+    return group;
+};
+
+// Original tie algorithm.
+function twoNoteTie (firstItem, lastItem, systemBreak) {
+    if (systemBreak) {
         // TODO: Currently assumes only two notes in tie. Need to handle many notes.
         const firstStem = firstItem.getStemDirection();
         const s1Begin = getTiePoint(firstItem, null, firstStem);
@@ -57,17 +149,18 @@ Legato.prototype.render = function () {
         const s2Begin = s2End.subtract(20, 0);
         const s2Handle = getTieHandle(lastStem);
         const tie2 = tie(s2Begin, s2End, s2Handle);
-
-        group.addChildren([tie1, tie2]);
+        return [tie1, tie2];
     } else {
-    	const stem = firstItem.getStemDirection();
-    	const begin = getTiePoint(firstItem, null, stem);
-    	const handle = getTieHandle(stem);
-    	const end = getTiePoint(lastItem, handle);
-        group.addChild(tie(begin, end, handle));
+        const firstStem = firstItem.getStemDirection();
+        const lastStem = lastItem.getStemDirection();
+        const begin = getTiePoint(firstItem, null, firstStem);
+        const handle = getTieHandle(firstStem);
+        const end = getTiePoint(lastItem, handle);
+        return [tie(begin, end, handle)];
     }
-    return group;
-};
+}
+
+Legato.prototype.render = Legato.prototype.renderV2;
 
 Legato.groupLegato = function (items) {
     return filter(partitionBy(items, item => item.legato), ([item]) => !!item.legato);

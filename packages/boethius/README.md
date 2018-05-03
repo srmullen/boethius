@@ -18,13 +18,13 @@ Should view render methods return a paper group, or should they return themselve
 
 TODOS:
     # High priority
-    - Slurs / Ties, rendering improvements
-    - end slur and start new slur on same note.
+    - Slurs / Ties, rendering improvements / inflection points.
     - Voices crossing lines.
     - placement.commonShortestDuration implementation.
     - Repeats
     - Da Capo / Dal Segno
     - Anacrusis
+    - Minimum stem heights.
 
     # Lower priority
     - SMuFL

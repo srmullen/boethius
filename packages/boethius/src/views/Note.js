@@ -132,6 +132,7 @@ Note.prototype.drawStem = function (to, stemDirection) {
 		frm = this.noteHead.bounds.rightCenter.add(0, Scored.config.note.head.yOffset);
 	} else {
 		this.stemDirection = "down";
+		// this.noteHead.rotate(180);
 		frm = this.noteHead.bounds.leftCenter.add(0, Scored.config.note.head.yOffset);
 	}
 
