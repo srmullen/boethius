@@ -243,6 +243,34 @@ Note.prototype.calculateStemPoint = function (fulcrum, vector, direction) {
 };
 
 /*
+ * Return the point at the top of the note. If the stem direction is up the point
+ * will be the height of the stem.
+ */
+Note.prototype.getTop = function () {
+	const stemDirection = this.getStemDirection();
+	if (stemDirection === 'up') {
+		// return this.noteHead.bounds.topCenter;
+		return this.group.children.stem.segments[1].point;
+	} else {
+		return this.noteHead.bounds.center;
+	}
+}
+
+/*
+ * Return the point at the bottom of the note. If the stem direction is down
+ * then returns the stem point.
+ */
+Note.prototype.getBottom = function () {
+	const stemDirection = this.getStemDirection();
+	if (stemDirection === 'down') {
+		// return this.group.children.stem.segments[1].point;
+		return this.group.bounds.bottomCenter;
+	} else {
+		return this.group.bounds.bottomCenter;
+	}
+}
+
+/*
  * @return true if the this note is equivalent to the given note.
  */
 Note.prototype.equals = function (note) {

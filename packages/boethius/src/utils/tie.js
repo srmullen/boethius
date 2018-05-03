@@ -95,3 +95,15 @@ export function tieV2 (points, handles) {
 
 	return path;
 }
+
+export function tieV3 (points) {
+	const path = new paper.Path({
+		strokeColor: "black",
+		strokeWidth: 2
+	});
+
+	path.add(points[0]);
+	path.arcTo(points[1], points[2]);
+
+	return path;
+}
