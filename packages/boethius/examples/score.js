@@ -303,6 +303,18 @@ const examples = {
             n({value: 16, pitch: 'f5', legato: 4}),
             n({value: 16, pitch: 'a5', legato: 4}),
             n({value: 4, pitch: 'a4', legato: 4}),
+            // Stem-down flat
+            n({value: 16, pitch: 'c5', legato: 5}),
+            n({value: 16, pitch: 'c5', legato: 5}),
+            n({value: 16, pitch: 'c5', legato: 5}),
+            n({value: 16, pitch: 'c5', legato: 5}),
+            n({value: 4, pitch: 'c5', legato: 5}),
+            // Stem-up flat.
+            n({value: 16, pitch: 'a4', legato: 6}),
+            n({value: 16, pitch: 'a4', legato: 6}),
+            n({value: 16, pitch: 'a4', legato: 6}),
+            n({value: 16, pitch: 'a4', legato: 6}),
+            n({value: 4, pitch: 'a4', legato: 6}),
         ]);
 
         var fourfour = scored.timeSig({value: "4/4", measure: 0});

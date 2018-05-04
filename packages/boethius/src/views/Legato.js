@@ -1,5 +1,5 @@
 import paper from "paper";
-import {filter, first, last} from "lodash";
+import {filter, first, last, tail, dropRight} from "lodash";
 
 import constants from "../constants";
 import {partitionBy} from "../utils/common";
@@ -27,7 +27,7 @@ Legato.of = (context, children) => {
 
 // Legato render version 3 chooses the tie direction based on the minimum difference
 // between the top and bottom tie points.
-Legato.prototype.renderV3 = function () {
+Legato.prototype.render = function () {
     const group = new paper.Group({name: TYPE});
 
     const firstItem = first(this.children);
@@ -67,21 +67,33 @@ Legato.prototype.renderV3 = function () {
             // use bottom points
             const begin = first(bottom);
             const end = last(bottom);
-            const arcThru = bottom.reduce((max, point) => {
+            // Only look at middle points because can't arc through first or last point.
+            const middle = dropRight(tail(bottom));
+            let arcThru = middle.reduce((max, point) => {
                 if (!max) return point;
 
                 return point.y >= max.y ? point : max;
             }, null);
+            if (Math.abs(arcThru.y - Math.min(begin.y, end.y)) < 10) {
+                // Make sure the arc isn't too flat.
+                arcThru = arcThru.add([0, 5]);
+            }
             group.addChild(tieV3([begin, arcThru, end]));
         } else {
             // use top points
             const begin = first(top);
             const end = last(top);
-            const arcThru = top.reduce((min, point) => {
+            const middle = dropRight(tail(top));
+            let arcThru = middle.reduce((min, point) => {
                 if (!min) return point;
 
                 return point.y <= min.y ? point : min;
             }, null);
+
+            if (Math.abs(arcThru.y - Math.min(begin.y, end.y)) < 10) {
+                // Make sure the arc isn't too flat.
+                arcThru = arcThru.subtract([0, 5]);
+            }
             group.addChild(tieV3([begin, arcThru, end]));
         }
 
@@ -116,8 +128,6 @@ function twoNoteTie (firstItem, lastItem, systemBreak) {
         return [tie(begin, end, handle)];
     }
 }
-
-Legato.prototype.render = Legato.prototype.renderV3;
 
 Legato.groupLegato = function (items) {
     return filter(partitionBy(items, item => item.legato), ([item]) => !!item.legato);
