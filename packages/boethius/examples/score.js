@@ -237,7 +237,7 @@ const examples = {
         var soprano = scored.voice({name: "treble"}, [
             // legato across systems
             n({value: 2, pitch: 'a4'}), n({value: 2, pitch: 'a4', legato: 1}), n({value: 1, pitch: 'ab4', legato: 1}), n({value: 1, pitch: 'c5', legato: 2}),
-            n({value: 2, pitch: 'a4', legato: 2}), n({value: 2, pitch: 'a4', legato: 1}), n({value: 1, pitch: 'ab4', legato: 1}), n({value: 1, pitch: 'c5', legato: 2}),
+            n({value: 2, pitch: 'a4', legato: 2}), n({value: 2, pitch: 'c5', legato: 1}), n({value: 1, pitch: 'ab4', legato: 1}), n({value: 1, pitch: 'c5', legato: 2}),
             n({value: 2, pitch: 'a4', legato: 2}), n({value: 2, pitch: 'c5', legato: 1}), n({value: 1, pitch: 'ab4', legato: 1}), n({value: 1, pitch: 'c5', legato: 2}),
             n({value: 2, pitch: 'a4', legato: 2}), n({value: 2, pitch: 'c5', legato: 1}), n({value: 1, pitch: 'ab4', legato: 1}), n({value: 1, pitch: 'c5'})
         ]);

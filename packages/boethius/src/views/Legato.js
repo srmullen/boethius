@@ -38,14 +38,14 @@ Legato.prototype.render = function () {
             const stem = lastItem.getStemDirection();
             const end = getTiePoint(lastItem, null, stem);
             const begin = end.subtract(20, 0);
-            const handle = getTieHandle(stem);
-            group.addChild(tie(begin, end, handle));
+            const arcThru = getArcThru(begin, end, stem);
+            group.addChild(tieV3([begin, arcThru, end]));
         } else {
             const stem = firstItem.getStemDirection();
             const begin = getTiePoint(firstItem, null, stem);
             const end = begin.add(20, 0);
-            const handle = getTieHandle(stem);
-            group.addChild(tie(begin, end, handle));
+            const arcThru = getArcThru(begin, end, stem);
+            group.addChild(tieV3([begin, arcThru, end]));
 
         }
     } else if (this.children.length === 2) {
@@ -101,21 +101,20 @@ Legato.prototype.render = function () {
     return group;
 }
 
-// Original tie algorithm.
 function twoNoteTie (firstItem, lastItem, systemBreak) {
     if (systemBreak) {
         // TODO: Currently assumes only two notes in tie. Need to handle many notes.
         const firstStem = firstItem.getStemDirection();
         const s1Begin = getTiePoint(firstItem, null, firstStem);
         const s1End = s1Begin.add(20, 0);
-        const s1Handle = getTieHandle(firstStem);
-        const tie1 = tie(s1Begin, s1End, s1Handle);
+        const arcThru1 = getArcThru(s1Begin, s1End, firstStem);
+        const tie1 = tieV3([s1Begin, arcThru1, s1End]);
 
         const lastStem = lastItem.getStemDirection();
         const s2End = getTiePoint(lastItem, null, lastStem);
         const s2Begin = s2End.subtract(20, 0);
-        const s2Handle = getTieHandle(lastStem);
-        const tie2 = tie(s2Begin, s2End, s2Handle);
+        const arcThru2 = getArcThru(s2Begin, s2End, lastStem);
+        const tie2 = tieV3([s2Begin, arcThru2, s2End]);
         return [tie1, tie2];
     } else {
         const firstStem = firstItem.getStemDirection();
@@ -123,7 +122,20 @@ function twoNoteTie (firstItem, lastItem, systemBreak) {
         const begin = getTiePoint(firstItem, null, firstStem);
         const handle = getTieHandle(firstStem);
         const end = getTiePoint(lastItem, handle);
-        return [tie(begin, end, handle)];
+        const arcThru = getArcThru(begin, end, firstStem);
+        return [tieV3([begin, arcThru, end])];
+    }
+}
+
+function getArcThru (begin, end, stemDirection) {
+    if (stemDirection === 'up') {
+        const vec = end.subtract(begin);
+        const center = begin.add(vec.divide(2));
+        return center.add([0, 8]);
+    } else {
+         const vec = end.subtract(begin);
+         const center = begin.add(vec.divide(2));
+         return center.subtract([0, 8]);
     }
 }
 
