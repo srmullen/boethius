@@ -193,11 +193,13 @@ const examples = {
         // create voices
         var soprano = scored.voice({name: "treble"}, [
             // slur across systems
-            n({value: 2, pitch: 'a4', slur: 1}), n({value: 2, pitch: 'a4', slur: 1}),
-            r({value: 4}), n({value: 4, pitch: 'c5', slur: 2}), n({value: 4, pitch: 'c5', slur: 2}), n({value: 4, pitch: 'c5', slur: 2}),
+            n({value: 4, pitch: 'a4', slur: 1}), n({value: 4, pitch: 'a4', slur: 1}),
+            n({value: 4, pitch: 'a4', slur: 2}), n({value: 4, pitch: 'c5', slur: 2}),
+            r({value: 4}), n({value: 4, pitch: 'c5', slur: 3}), n({value: 4, pitch: 'c5', slur: 3}), n({value: 4, pitch: 'c5', slur: 3}),
         ]);
         var bass = scored.voice({name: "bass"}, [
-            n({value: 2, pitch: 'e3', slur: 1}), n({value: 4, pitch: 'e3', slur: 1}), r({value: 4}),
+            n({value: 4, pitch: 'e3', slur: 1}), n({value: 4, pitch: 'e3', slur: 1}),
+            n({value: 4, pitch: 'e3', slur: 2}), n({value: 4, pitch: 'c3', slur: 2}),
             n({value: 4, pitch: 'c3'}), n({value: 4, pitch: 'c3'}), n({value: 4, pitch: 'c3'}), r()
         ]);
 

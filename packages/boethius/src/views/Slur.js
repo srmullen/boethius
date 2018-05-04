@@ -4,7 +4,7 @@ import {filter} from 'lodash';
 import constants from '../constants';
 import {isChord} from "../types";
 import {partitionBy} from "../utils/common";
-import {tie, tieV3, getTiePoint, getTieHandle, getArcThru} from "../utils/tie";
+import {tie, getTiePoint, getArcThru} from "../utils/tie";
 
 const TYPE = constants.type.slur;
 
@@ -28,11 +28,10 @@ Slur.prototype.render = function () {
         const fromItem = this.children[i];
         const toItem = this.children[i+1];
         const stem = fromItem.getStemDirection();
-    	const begin = getTiePoint(fromItem, null, stem);
-    	const handle = getTieHandle(stem);
-    	const end = getTiePoint(toItem, handle);
+    	const begin = getTiePoint(fromItem, stem);
+    	const end = getTiePoint(toItem, stem);
         const arcThru = getArcThru(begin, end, stem);
-        group.addChild(tieV3([begin, arcThru, end]));
+        group.addChild(tie([begin, arcThru, end]));
     }
 
     return group;

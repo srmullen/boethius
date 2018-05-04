@@ -7,48 +7,12 @@ import {isChord} from "../types";
  * @param incoming - the incoming tie handle
  * @param stemDirection - String.
  */
-export function getTiePoint (item, incoming, stemDirection) {
+export function getTiePoint (item, stemDirection) {
 	stemDirection = stemDirection || item.getStemDirection();
 
 	const noteHead = isChord(item) ? item.getBaseNote(stemDirection).noteHead : item.noteHead;
 
-	if (!incoming) {
-		return stemDirection === "down" ? noteHead.bounds.center : noteHead.bounds.bottomCenter;
-	} else if (incoming.y < 0) {
-		return noteHead.bounds.center;
-	} else {
-		return noteHead.bounds.bottomCenter;
-	}
-}
-
-export function getTieHandle (stemDirection) {
-	const yVec = stemDirection === "up" ? 10 : -10;
-	return new paper.Point([0, yVec]);
-}
-
-export function tie (begin, end, handle) {
-
-	const path = new paper.Path({
-		segments: [begin, end],
-		strokeColor: "black",
-		strokeWidth: 2
-	});
-
-	path.segments[0].handleOut = handle;
-	path.segments[1].handleIn = handle;
-
-	return path;
-}
-
-/*
- * @param points {Point[]} - Points to create in and out handles for.
- * @param direction {String} - The vertical direction the tie is arching.
- * @return [Point, Point] - handleOut for the first path segment and handleIn for the last path segement.
- */
-export function getHandles (points, direction) {
-	const handleOut = getHandle(points[0], points[1], direction);
-	const handleIn = getHandle(points[points.length-1], points[points.length-2], direction);
-	return [handleOut, handleIn];
+	return stemDirection === "down" ? noteHead.bounds.center : noteHead.bounds.bottomCenter;
 }
 
 function getHandle (p1, p2, direction) {
@@ -69,7 +33,7 @@ export function getArcThru (begin, end, stemDirection) {
     }
 }
 
-export function tieV3 (points) {
+export function tie (points) {
 	const path = new paper.Path({
 		fillColor: "black",
 		strokeWidth: 1

@@ -3,7 +3,7 @@ import {filter, first, last, tail, dropRight} from "lodash";
 
 import constants from "../constants";
 import {partitionBy} from "../utils/common";
-import {tie, tieV3, getTiePoint, getTieHandle, getHandles, getArcThru} from '../utils/tie';
+import {tie, getTiePoint, getArcThru} from '../utils/tie';
 import {getNoteHeadOffset} from '../utils/placement';
 
 const TYPE = constants.type.legato;
@@ -36,16 +36,16 @@ Legato.prototype.render = function () {
     if (this.children.length === 1) {
         if (this.isEnd) {
             const stem = lastItem.getStemDirection();
-            const end = getTiePoint(lastItem, null, stem);
+            const end = getTiePoint(lastItem, stem);
             const begin = end.subtract(20, 0);
             const arcThru = getArcThru(begin, end, stem);
-            group.addChild(tieV3([begin, arcThru, end]));
+            group.addChild(tie([begin, arcThru, end]));
         } else {
             const stem = firstItem.getStemDirection();
-            const begin = getTiePoint(firstItem, null, stem);
+            const begin = getTiePoint(firstItem, stem);
             const end = begin.add(20, 0);
             const arcThru = getArcThru(begin, end, stem);
-            group.addChild(tieV3([begin, arcThru, end]));
+            group.addChild(tie([begin, arcThru, end]));
 
         }
     } else if (this.children.length === 2) {
@@ -78,7 +78,7 @@ Legato.prototype.render = function () {
                 // Make sure the arc isn't too flat.
                 arcThru = arcThru.add([0, 8]);
             }
-            group.addChild(tieV3([begin, arcThru, end]));
+            group.addChild(tie([begin, arcThru, end]));
         } else {
             // use top points
             const begin = first(top);
@@ -94,7 +94,7 @@ Legato.prototype.render = function () {
                 // Make sure the arc isn't too flat.
                 arcThru = arcThru.subtract([0, 8]);
             }
-            group.addChild(tieV3([begin, arcThru, end]));
+            group.addChild(tie([begin, arcThru, end]));
         }
     }
 
@@ -105,25 +105,24 @@ function twoNoteTie (firstItem, lastItem, systemBreak) {
     if (systemBreak) {
         // TODO: Currently assumes only two notes in tie. Need to handle many notes.
         const firstStem = firstItem.getStemDirection();
-        const s1Begin = getTiePoint(firstItem, null, firstStem);
+        const s1Begin = getTiePoint(firstItem, firstStem);
         const s1End = s1Begin.add(20, 0);
         const arcThru1 = getArcThru(s1Begin, s1End, firstStem);
-        const tie1 = tieV3([s1Begin, arcThru1, s1End]);
+        const tie1 = tie([s1Begin, arcThru1, s1End]);
 
         const lastStem = lastItem.getStemDirection();
-        const s2End = getTiePoint(lastItem, null, lastStem);
+        const s2End = getTiePoint(lastItem, lastStem);
         const s2Begin = s2End.subtract(20, 0);
         const arcThru2 = getArcThru(s2Begin, s2End, lastStem);
-        const tie2 = tieV3([s2Begin, arcThru2, s2End]);
+        const tie2 = tie([s2Begin, arcThru2, s2End]);
         return [tie1, tie2];
     } else {
         const firstStem = firstItem.getStemDirection();
         const lastStem = lastItem.getStemDirection();
-        const begin = getTiePoint(firstItem, null, firstStem);
-        const handle = getTieHandle(firstStem);
-        const end = getTiePoint(lastItem, handle);
+        const begin = getTiePoint(firstItem, firstStem);
+        const end = getTiePoint(lastItem, firstStem);
         const arcThru = getArcThru(begin, end, firstStem);
-        return [tieV3([begin, arcThru, end])];
+        return [tie([begin, arcThru, end])];
     }
 }
 
