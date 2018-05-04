@@ -76,7 +76,7 @@ Legato.prototype.render = function () {
             }, null);
             if (Math.abs(arcThru.y - Math.min(begin.y, end.y)) < 10) {
                 // Make sure the arc isn't too flat.
-                arcThru = arcThru.add([0, 5]);
+                arcThru = arcThru.add([0, 8]);
             }
             group.addChild(tieV3([begin, arcThru, end]));
         } else {
@@ -92,12 +92,10 @@ Legato.prototype.render = function () {
 
             if (Math.abs(arcThru.y - Math.min(begin.y, end.y)) < 10) {
                 // Make sure the arc isn't too flat.
-                arcThru = arcThru.subtract([0, 5]);
+                arcThru = arcThru.subtract([0, 8]);
             }
             group.addChild(tieV3([begin, arcThru, end]));
         }
-
-        // TODO: Make sure there is a minimum and maximum arc.
     }
 
     return group;
