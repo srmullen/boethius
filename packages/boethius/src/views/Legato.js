@@ -3,7 +3,7 @@ import {filter, first, last, tail, dropRight} from "lodash";
 
 import constants from "../constants";
 import {partitionBy} from "../utils/common";
-import {tie, tieV2, tieV3, getTiePoint, getTieHandle, getHandles} from '../utils/tie';
+import {tie, tieV3, getTiePoint, getTieHandle, getHandles, getArcThru} from '../utils/tie';
 import {getNoteHeadOffset} from '../utils/placement';
 
 const TYPE = constants.type.legato;
@@ -124,18 +124,6 @@ function twoNoteTie (firstItem, lastItem, systemBreak) {
         const end = getTiePoint(lastItem, handle);
         const arcThru = getArcThru(begin, end, firstStem);
         return [tieV3([begin, arcThru, end])];
-    }
-}
-
-function getArcThru (begin, end, stemDirection) {
-    if (stemDirection === 'up') {
-        const vec = end.subtract(begin);
-        const center = begin.add(vec.divide(2));
-        return center.add([0, 8]);
-    } else {
-         const vec = end.subtract(begin);
-         const center = begin.add(vec.divide(2));
-         return center.subtract([0, 8]);
     }
 }
 

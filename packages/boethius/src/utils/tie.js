@@ -57,43 +57,16 @@ function getHandle (p1, p2, direction) {
 	return perp.multiply(20);
 }
 
-/*
- * @param points {Point[]} - Points on the tie's path.
- * @param handles {Point[]} - Handles for each segment on the path. Length must
- * 	must be one less than length of points.
- * @returm {paper.Path}
- */
-export function tieV2 (points, handles) {
-	const path = new paper.Path({
-		segments: points,
-		strokeColor: "black",
-		strokeWidth: 2
-	});
-
-	// path.fullySelected = true;
-
-	// arc the first segment
-	first(path.segments).handleOut = handles[0];
-	// arc the last segment
-	last(path.segments).handleIn = handles[1];
-
-	for (let i = 0; i < path.segments.length - 1; i++) {
-		let handleIn, handleOut;
-		const handle = handles[i];
-		const offset = path.getOffsetOf(path.segments[i].point) - 10;
-		// Get the tangent slightly behind the segment point so the tangent is
-		// from the smooth curve rather than the sharp cutoff to the next point.
-		const tangent = path.getTangentAt(offset > 0 ? offset : 0).multiply(10);
-
-		if (i !== 0) {
-			path.segments[i].handleOut = tangent;
-		}
-		if (i !== path.segments.length -1) {
-			path.segments[i+1].handleIn = tangent;
-		}
-	}
-
-	return path;
+export function getArcThru (begin, end, stemDirection) {
+    if (stemDirection === 'up') {
+        const vec = end.subtract(begin);
+        const center = begin.add(vec.divide(2));
+        return center.add([0, 8]);
+    } else {
+         const vec = end.subtract(begin);
+         const center = begin.add(vec.divide(2));
+         return center.subtract([0, 8]);
+    }
 }
 
 export function tieV3 (points) {
