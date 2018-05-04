@@ -1,5 +1,5 @@
 import paper from 'paper';
-import {first, last} from 'lodash';
+import {first, last, dropRight, tail} from 'lodash';
 import {isChord} from "../types";
 
 /*
@@ -21,16 +21,46 @@ function getHandle (p1, p2, direction) {
 	return perp.multiply(20);
 }
 
-export function getArcThru (begin, end, stemDirection) {
-    if (stemDirection === 'up') {
-        const vec = end.subtract(begin);
-        const center = begin.add(vec.divide(2));
-        return center.add([0, 8]);
-    } else {
-         const vec = end.subtract(begin);
-         const center = begin.add(vec.divide(2));
-         return center.subtract([0, 8]);
-    }
+export function getArcThru (points, stemDirection) {
+	const begin = first(points);
+	const end = last(points);
+	if (points.length === 2) {
+	    if (stemDirection === 'up') {
+	        const vec = end.subtract(begin);
+	        const center = begin.add(vec.divide(2));
+	        return center.add([0, 8]);
+	    } else {
+	         const vec = end.subtract(begin);
+	         const center = begin.add(vec.divide(2));
+	         return center.subtract([0, 8]);
+	    }
+	} else {
+		const middle = dropRight(tail(points));
+		if (stemDirection === 'up') {
+            let arcThru = middle.reduce((max, point) => {
+                if (!max) return point;
+
+                return point.y >= max.y ? point : max;
+            }, null);
+            if (Math.abs(arcThru.y - Math.min(begin.y, end.y)) < 10) {
+                // Make sure the arc isn't too flat.
+                arcThru = arcThru.add([0, 8]);
+            }
+			return arcThru;
+		} else {
+            let arcThru = middle.reduce((min, point) => {
+                if (!min) return point;
+
+                return point.y <= min.y ? point : min;
+            }, null);
+
+            if (Math.abs(arcThru.y - Math.min(begin.y, end.y)) < 10) {
+                // Make sure the arc isn't too flat.
+                arcThru = arcThru.subtract([0, 8]);
+            }
+			return arcThru;
+		}
+	}
 }
 
 export function tie (points) {

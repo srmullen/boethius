@@ -30,7 +30,7 @@ Slur.prototype.render = function () {
         const stem = fromItem.getStemDirection();
     	const begin = getTiePoint(fromItem, stem);
     	const end = getTiePoint(toItem, stem);
-        const arcThru = getArcThru(begin, end, stem);
+        const arcThru = getArcThru([begin, end], stem);
         group.addChild(tie([begin, arcThru, end]));
     }
 

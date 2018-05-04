@@ -244,18 +244,26 @@ const examples = {
             n({value: 2, pitch: 'a4', legato: 2}), n({value: 2, pitch: 'c5', legato: 1}), n({value: 1, pitch: 'ab4', legato: 1}), n({value: 1, pitch: 'c5'})
         ]);
         var bass = scored.voice({name: "bass"}, [
-            n({value: 1, pitch: 'e3'}), n({value: 1, pitch: 'e3'}), n({value: 1, pitch: 'e3'}),
-            n({value: 1, pitch: 'e3'}), n({value: 1, pitch: 'e3'}), n({value: 1, pitch: 'e3'}),
+            n({value: 1, pitch: 'e3'}), n({value: 1, pitch: 'e3'}),
+            // Test system break with muliple notes.
+            n({value: 2, pitch: 'e3', legato: 1}), n({value: 2, pitch: 'e3', legato: 1}),
+            n({value: 1, pitch: 'e3', legato: 1}),
+            // Test system break not ending on the first note of the next system
+            n({value: 1, pitch: 'e3'}),
+            n({value: 2, pitch: 'e3', legato: 2}), n({value: 2, pitch: 'e3', legato: 2}),
+            n({value: 2, pitch: 'e3', legato: 2}), n({value: 2, pitch: 'e3', legato: 2}),
             n({value: 1, pitch: 'e3'}), n({value: 1, pitch: 'f3'}), n({value: 1, pitch: 'g3'}),
             n({value: 1, pitch: 'e3'}), n({value: 1, pitch: 'f3'}), n({value: 1, pitch: 'g3'})
         ]);
+
+        // TODO: test (legato=8 b/8. c/16) (legato=8 d/8 d2/8)
 
         var fourfour = scored.timeSig({value: "4/4", measure: 0});
 
         // create staves
         var system1 = scored.system({measures: 3, page: 0});
         var system2 = scored.system({measures: 3, page: 0});
-        var system3 = scored.system({measures: 3, page: 1});
+        var system3 = scored.system({measures: 3, page: 0});
         var system4 = scored.system({measures: 3, page: 1});
 
         var page0 = scored.page();

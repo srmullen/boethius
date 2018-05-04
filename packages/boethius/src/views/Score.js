@@ -90,7 +90,15 @@ Score.render = function (score, {measures, voices=[], chordSymbols=[], repeats=[
             return Legato.groupLegato(voice, startTimes).map(legato => {
                 const legatoStartTime = _.first(legato).time;
                 const legatoEndTime = _.last(legato).time;
-                const systemBreak = _.includes(startTimes.map(time => time.time), legatoEndTime);
+                // const systemBreak = _.includes(startTimes.map(time => time.time), legatoEndTime);
+                let systemBreak;
+                for (let i = 0; i < startTimes.length; i++) {
+                    const systemStartTime = startTimes[i].time;
+                    if (legatoStartTime < systemStartTime && legatoEndTime >= systemStartTime) {
+                        systemBreak = systemStartTime;
+                        break;
+                    }
+                }
                 const isEnd = !!systemBreak && legato.length === 1;
                 return Legato.of({systemBreak, isEnd}, legato);
         })});
