@@ -249,8 +249,13 @@ Note.prototype.calculateStemPoint = function (fulcrum, vector, direction) {
 Note.prototype.getTop = function () {
 	const stemDirection = this.getStemDirection();
 	if (stemDirection === 'up') {
-		// return this.noteHead.bounds.topCenter;
-		return this.group.children.stem.segments[1].point;
+		const stem = this.group.children.stem;
+		// Notes won't necessarily have a stem. Could be whole note or belong to a chord.
+		if (stem) {
+			return stem.segments[1].point;
+		} else {
+			return this.noteHead.bounds.center;
+		}
 	} else {
 		return this.noteHead.bounds.center;
 	}

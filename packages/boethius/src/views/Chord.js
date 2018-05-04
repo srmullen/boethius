@@ -18,7 +18,7 @@ const DOWN = "down";
 /*
  * @param children - Array of notes. Can take several representations. String, Object, or Note.
  */
-function Chord ({value=4, dots=0, tuplet, time, root, name, inversion, staccato, tenuto, portato, slur, stemDirection}, children=[]) {
+function Chord ({value=4, dots=0, tuplet, time, root, name, inversion, staccato, legato, tenuto, portato, slur, stemDirection}, children=[]) {
 	this.value = value;
 	this.dots = dots;
 	this.tuplet = tuplet;
@@ -29,6 +29,7 @@ function Chord ({value=4, dots=0, tuplet, time, root, name, inversion, staccato,
 
 	// articulations
 	this.staccato = staccato;
+	this.legato = legato;
 	this.tenuto = tenuto;
 	this.portato = portato;
 	this.slur = slur;
@@ -319,6 +320,29 @@ Chord.prototype.getBaseNote = function (direction) {
 Chord.prototype.calculateStemPoint = function (fulcrum, vector, direction) {
 	const baseNote = this.getBaseNote(direction);
 	return baseNote.calculateStemPoint(fulcrum, vector, direction);
+};
+
+Chord.prototype.getTop = function () {
+	const stemDirection = this.getStemDirection();
+	if (stemDirection === UP) {
+		return this.group.children.stem.segments[1].point;
+	} else {
+		const baseNote = this.getBaseNote(stemDirection);
+		return baseNote.getTop();
+	}
+};
+
+Chord.prototype.getBottom = function () {
+	const stemDirection = this.getStemDirection();
+	if (stemDirection === UP) {
+		// return this.group.children.stem.segments[1].point;
+		const baseNote = this.getBaseNote(stemDirection);
+		return baseNote.getBottom();
+	} else {
+		// const baseNote = this.getBaseNote(stemDirection);
+		// return baseNote.getTop();
+		return this.group.bounds.bottomCenter;
+	}
 };
 
 Chord.prototype.equals = function (chord) {
