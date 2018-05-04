@@ -1,4 +1,5 @@
 // @flow
+import uuid from 'uuid/v1';
 import Keyword from './Keyword';
 import PageNode from './PageNode';
 import SystemNode from './SystemNode';
@@ -8,6 +9,7 @@ import TimeSignature from './TimeSignature';
 import Clef from './Clef';
 import Key from './Key';
 import NumberNode from './NumberNode';
+import ScopeNode from './ScopeNode';
 import type { YY } from './types';
 import { Stringable } from './interfaces/Stringable';
 import { Serializable } from './interfaces/Serializable';
@@ -90,6 +92,9 @@ const BUILTINS = {
         const measure = args[2] ? args[2].value : 0;
         const beat = args[3] ? args[3].value : 0;
         return new Key({root, mode, measure, beat});
+    },
+    legato: function (yy: YY, args: Array<Serializable>) {
+        return new ScopeNode({legato: uuid()}, args);
     }
 };
 

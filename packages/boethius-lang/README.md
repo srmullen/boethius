@@ -13,6 +13,7 @@ TODO
 - Transposition
 - octave guessing based on previous note proximity rather than default.
 - Type checking with Flow
+- Immutable data structures?
 
 Docs
 ----

@@ -347,3 +347,13 @@ describe('assignment', () => {
         expect(compile('myvar = {value=16 legato=true}')).to.be.ok;
     });
 });
+
+describe('builtins', () => {
+    describe('legato', () => {
+        it('should fail', () => {
+            const {voices} = compile(`[mel (legato a4 b5)]`);
+            expect(voices.mel[0].props.legato).to.be.a('string');
+            expect(voices.mel[0].props.legato).to.equal(voices.mel[1].props.legato);
+        });
+    });
+});
