@@ -196,11 +196,15 @@ const examples = {
             n({value: 4, pitch: 'a4', slur: 1}), n({value: 4, pitch: 'a4', slur: 1}),
             n({value: 4, pitch: 'a4', slur: 2}), n({value: 4, pitch: 'c5', slur: 2}),
             r({value: 4}), n({value: 4, pitch: 'c5', slur: 3}), n({value: 4, pitch: 'c5', slur: 3}), n({value: 4, pitch: 'c5', slur: 3}),
+            // Test system break
+            r({value: 2, dots: 1}), n({value: 4, slur: 4}), n({value: 4, slur: 4}), n({value: 4, slur: 4})
         ]);
         var bass = scored.voice({name: "bass"}, [
             n({value: 4, pitch: 'e3', slur: 1}), n({value: 4, pitch: 'e3', slur: 1}),
             n({value: 4, pitch: 'e3', slur: 2}), n({value: 4, pitch: 'c3', slur: 2}),
-            n({value: 4, pitch: 'c3'}), n({value: 4, pitch: 'c3'}), n({value: 4, pitch: 'c3'}), r()
+            n({value: 4, pitch: 'c3'}), n({value: 4, pitch: 'c3'}), n({value: 4, pitch: 'c3'}), r(),
+            // test system break.
+            r({value: 2}), n({value: 4, pitch: 'e3', slur: 4}), n({value: 4, pitch: 'e3', slur: 4}), n({value: 16, pitch: 'e3', slur: 4})
         ]);
 
         var fourfour = scored.timeSig({value: "4/4", measure: 0});
@@ -222,7 +226,7 @@ const examples = {
         return scored.render(score, {voices: [soprano, bass], pages: [0]});
     },
 
-    testLegato: function (scored) {
+    testLegatoSystemBreaks: function (scored) {
         var n = scored.note;
         var r = scored.rest;
         var c = scored.chord;
