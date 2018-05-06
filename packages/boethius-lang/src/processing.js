@@ -1,3 +1,4 @@
+// @flow
 import type { Sequencable, Chord, Note } from './types';
 import {NOTE, CHORD} from './constants';
 import memoize from 'lodash.memoize';
@@ -9,7 +10,7 @@ import teoria from 'teoria';
  * Given a pitch {p1}, that pitches octave {octave} and a pitch without an octave {p2}
  * returns the octave for pitch p2 which is closest to p1.
  */
-const octaveDirection = memoize((p1, octave, p2) => {
+const octaveDirection = memoize((p1: string, octave: number, p2: string): string | number => {
     if (!p1) {
         return octave;
     }
@@ -19,13 +20,13 @@ const octaveDirection = memoize((p1, octave, p2) => {
         return Math.abs(teoria.interval(n1, teoria.note(p2 + oct)).semitones());
     });
 
-}, (p1, octave, p2) => {
+}, (p1: string, octave: number, p2: string): string => {
     return p1 + octave + p2;
 });
 
 
 
-export function easyOctave (voice) {
+export function easyOctave (voice: Array<Sequencable>) {
     let pitchClass;
     let octave = 4;
     const updateNote = (note) => {
