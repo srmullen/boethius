@@ -35,26 +35,37 @@ export function getArcThru (points, stemDirection) {
 	         return center.subtract([0, 8]);
 	    }
 	} else {
-		const middle = dropRight(tail(points));
+		// const middle = dropRight(tail(points));
 		if (stemDirection === 'up') {
-            let arcThru = middle.reduce((max, point) => {
+            let arcThru = points.reduce((max, point) => {
                 if (!max) return point;
 
                 return point.y >= max.y ? point : max;
             }, null);
-            if (Math.abs(arcThru.y - Math.min(begin.y, end.y)) < 10) {
+			if (arcThru === begin || arcThru === end) {
+				// If the highest point is either the first or last point of the
+				// tie, then find the middle of the tie and put some arc in it.
+				const vec = end.subtract(begin);
+				const middle = begin.add(vec.divide(2));
+				arcThru = middle.add([0, 8]);
+			} else if (Math.abs(arcThru.y - Math.min(begin.y, end.y)) < 10) {
                 // Make sure the arc isn't too flat.
                 arcThru = arcThru.add([0, 8]);
             }
 			return arcThru;
 		} else {
-            let arcThru = middle.reduce((min, point) => {
+            let arcThru = points.reduce((min, point) => {
                 if (!min) return point;
 
                 return point.y <= min.y ? point : min;
             }, null);
-
-            if (Math.abs(arcThru.y - Math.min(begin.y, end.y)) < 10) {
+			if (arcThru === begin || arcThru === end) {
+				// If the highest point is either the first or last point of the
+				// tie, then find the middle of the tie and put some arc in it.
+				const vec = end.subtract(begin);
+				const middle = begin.add(vec.divide(2));
+				arcThru = middle.subtract([0, 8]);
+			} else if (Math.abs(arcThru.y - Math.min(begin.y, end.y)) < 10) {
                 // Make sure the arc isn't too flat.
                 arcThru = arcThru.subtract([0, 8]);
             }
