@@ -11,9 +11,9 @@ TODO
 - Math
 - Scales
 - Transposition
-- octave guessing based on previous note proximity rather than default.
-- Type checking with Flow
 - Immutable data structures?
+- Inline comments.
+- Clef change in voice.
 
 Ideas
 -----

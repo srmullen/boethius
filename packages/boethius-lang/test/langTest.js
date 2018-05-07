@@ -233,7 +233,7 @@ describe("parser", () => {
         });
     });
 
-    describe("comments", () => {
+    describe("single line comments", () => {
         it("should ignore text after ;", () => {
             expect(compile("; i'm a comment")).to.eql({
                 voices: {}, chordSymbols: [], layout: new Layout().serialize()
@@ -252,6 +252,54 @@ describe("parser", () => {
             const [note1, note2] = mel;
             expect(note1.props).to.eql({pitchClass: "c", octave: 4, time: 0});
             expect(note2.props).to.eql({pitchClass: "e", octave: 4, time: 0.25});
+        });
+    });
+
+    describe('multiline comments', () => {
+        it('should ignore code inbetween /* and */', () => {
+            const compiled = compile(`
+                [mel c4 /* d4 */ e4]
+            `);
+            expect(compiled).to.be.ok;
+            const [note1, note2] = compiled.voices.mel;
+            expect(note1.props).to.eql({pitchClass: "c", octave: 4, time: 0});
+            expect(note2.props).to.eql({pitchClass: "e", octave: 4, time: 0.25});
+        });
+
+        it('should ignore code across multiple lines', () => {
+            const compiled = compile(`
+                [mel c4 /*
+                    d4
+                    This is a great piece of music!
+                    */ e4]
+            `);
+            expect(compiled).to.be.ok;
+            const [note1, note2] = compiled.voices.mel;
+            expect(note1.props).to.eql({pitchClass: "c", octave: 4, time: 0});
+            expect(note2.props).to.eql({pitchClass: "e", octave: 4, time: 0.25});
+        });
+
+        it('should evaluate code between the first and second comment', () => {
+            const compiled = compile(`
+                [mel c4 /*
+                    d4 **/
+                    e4
+                    /***
+                    * This is a great piece of music!
+                    */]
+            `);
+            expect(compiled).to.be.ok;
+            const [note1, note2] = compiled.voices.mel;
+            expect(note1.props).to.eql({pitchClass: "c", octave: 4, time: 0});
+            expect(note2.props).to.eql({pitchClass: "e", octave: 4, time: 0.25});
+        });
+
+        it('should not be comment inside of a string', () => {
+            const compiled = compile(`
+                [mel (myprop="this /* is no comment */" a4)]
+            `);
+            expect(compiled).to.be.ok;
+            expect(compiled.voices.mel[0].props.myprop).to.equal("this /* is no comment */");
         });
     });
 

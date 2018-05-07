@@ -37,6 +37,8 @@
 \s+                                                 /* skip whitespace */
 \;.*                                                /* ignore comments */
 \|                                                  /* ignore barlines */
+// \/\*(.|[\r\n])*\*\/                                       /* ignore multi-line comment */
+\/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+\/         /* ignore multi-line comment */
 \(                                                  return 'LPAREN'
 \)                                                  return 'RPAREN'
 \[                                                  return 'LBRKT'
