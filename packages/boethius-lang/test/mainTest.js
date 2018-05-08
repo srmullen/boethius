@@ -197,6 +197,24 @@ describe("boethius compilation", () => {
             expect(voices.mel2[3].props.time).to.equal(0.6875);
             expect(voices.mel2[4].props.time).to.equal(0.75);
         });
+
+        it('should work when voice is split', () => {
+            const {voices} = compile(`
+                [mel a4/2 bb5/8 c6/16 c6/16 d2/4]
+                [mel a4/2 bb5/8 c6/16 c6/16 d2/4]
+            `);
+
+            expect(voices.mel[0].props.time).to.equal(0);
+            expect(voices.mel[1].props.time).to.equal(0.5);
+            expect(voices.mel[2].props.time).to.equal(0.625);
+            expect(voices.mel[3].props.time).to.equal(0.6875);
+            expect(voices.mel[4].props.time).to.equal(0.75);
+            expect(voices.mel[5].props.time).to.equal(1);
+            expect(voices.mel[6].props.time).to.equal(1.5);
+            expect(voices.mel[7].props.time).to.equal(1.625);
+            expect(voices.mel[8].props.time).to.equal(1.6875);
+            expect(voices.mel[9].props.time).to.equal(1.75);
+        });
     });
 
     describe('layout', () => {

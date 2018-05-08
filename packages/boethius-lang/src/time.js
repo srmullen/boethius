@@ -24,10 +24,10 @@ function isRepeat (item) {
  * @param item - Scored item. Given an item, return the rational duration of the item;
  * @return Number
  */
-function calculateDuration (item) {
+export function calculateDuration (item) {
 
 	// The item doesn't have a duration unless it's one of the following types.
-	if (!(isNote(item) || isChord(item) || isRest(item) ||isRepeat(item))) return 0;
+	if (!(isNote(item) || isChord(item) || isRest(item) ||isRepeat(item))) return F(0);
 
 	const s = item.props.tuplet ? item.props.tuplet.split("/") : null;
 	const tuplet = s ? new F(s[0], s[1]) : null;
@@ -55,9 +55,10 @@ export function calculateAndSetTimes (items, offset=0) {
         const previousItem = acc[acc.length-1];
 
         if (previousItem) {
-            item.props.time = F(previousItem.props.time).add(calculateDuration(previousItem)).add(offset).valueOf();
+            // item.props.time = F(previousItem.props.time).add(calculateDuration(previousItem)).add(offset).valueOf();
+			item.props.time = F(previousItem.props.time).add(calculateDuration(previousItem)).valueOf();
         } else {
-            item.props.time = 0;
+            item.props.time = offset;
         }
 
         return acc.concat([item]);

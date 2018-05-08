@@ -12,8 +12,8 @@ TODO
 - Scales
 - Transposition
 - Immutable data structures?
-- Inline comments.
 - Clef change in voice.
+- Force display of accidentals. Probably requires boethius changes as well.
 
 Ideas
 -----

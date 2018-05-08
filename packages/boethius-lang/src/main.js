@@ -1,6 +1,5 @@
 // @flow
 import {parser} from "../lang/lang";
-import {calculateAndSetTimes} from "./time";
 import {easyOctave} from './processing';
 import {scale, pitch} from "./palestrina/src/palestrina";
 import NumberNode from './NumberNode';
@@ -39,7 +38,6 @@ function compile (program: string, opts: {}) {
 
     for (let voice in parser.yy.voices) {
         if (parser.yy.voices.hasOwnProperty(voice)) {
-            calculateAndSetTimes(parser.yy.voices[voice]);
             if (options.easyOctave) {
                 easyOctave(parser.yy.voices[voice]);
             }
