@@ -61,7 +61,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 21);
+/******/ 	return __webpack_require__(__webpack_require__.s = 22);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -100,6 +100,8 @@ var KEY = exports.KEY = 'key';
 
 "use strict";
 
+
+var _Node = __webpack_require__(9);
 
 /***/ }),
 /* 3 */
@@ -271,211 +273,6 @@ module.exports = {
 
 /***/ }),
 /* 4 */
-/***/ (function(module, exports) {
-
-module.exports = function(module) {
-	if(!module.webpackPolyfill) {
-		module.deprecate = function() {};
-		module.paths = [];
-		// module.parent = undefined by default
-		if(!module.children) module.children = [];
-		Object.defineProperty(module, "loaded", {
-			enumerable: true,
-			get: function() {
-				return module.l;
-			}
-		});
-		Object.defineProperty(module, "id", {
-			enumerable: true,
-			get: function() {
-				return module.i;
-			}
-		});
-		module.webpackPolyfill = 1;
-	}
-	return module;
-};
-
-
-/***/ }),
-/* 5 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var knowledge = __webpack_require__(3);
-var vector = __webpack_require__(14);
-var toCoord = __webpack_require__(45);
-
-function Interval(coord) {
-  if (!(this instanceof Interval)) return new Interval(coord);
-  this.coord = coord;
-}
-
-Interval.prototype = {
-  name: function() {
-    return knowledge.intervalsIndex[this.number() - 1];
-  },
-
-  semitones: function() {
-    return vector.sum(vector.mul(this.coord, [12, 7]));
-  },
-
-  number: function() {
-    return Math.abs(this.value());
-  },
-
-  value: function() {
-    var toMultiply = Math.floor((this.coord[1] - 2) / 7) + 1;
-    var product = vector.mul(knowledge.sharp, toMultiply);
-    var without = vector.sub(this.coord, product);
-    var i = knowledge.intervalFromFifth[without[1] + 5];
-    var diff = without[0] - knowledge.intervals[i][0];
-    var val = knowledge.stepNumber[i] + diff * 7;
-
-    return (val > 0) ? val : val - 2;
-  },
-
-  type: function() {
-    return knowledge.intervals[this.base()][0] <= 1 ? 'perfect' : 'minor';
-  },
-
-  base: function() {
-    var product = vector.mul(knowledge.sharp, this.qualityValue());
-    var fifth = vector.sub(this.coord, product)[1];
-    fifth = this.value() > 0 ? fifth + 5 : -(fifth - 5) % 7;
-    fifth = fifth < 0 ? knowledge.intervalFromFifth.length + fifth : fifth;
-
-    var name = knowledge.intervalFromFifth[fifth];
-    if (name === 'unison' && this.number() >= 8)
-      name = 'octave';
-
-    return name;
-  },
-
-  direction: function(dir) {
-    if (dir) {
-      var is = this.value() >= 1 ? 'up' : 'down';
-      if (is !== dir)
-        this.coord = vector.mul(this.coord, -1);
-
-      return this;
-    }
-    else
-      return this.value() >= 1 ? 'up' : 'down';
-  },
-
-  simple: function(ignore) {
-    // Get the (upwards) base interval (with quality)
-    var simple = knowledge.intervals[this.base()];
-    var toAdd = vector.mul(knowledge.sharp, this.qualityValue());
-    simple = vector.add(simple, toAdd);
-
-    // Turn it around if necessary
-    if (!ignore)
-      simple = this.direction() === 'down' ? vector.mul(simple, -1) : simple;
-
-    return new Interval(simple);
-  },
-
-  isCompound: function() {
-    return this.number() > 8;
-  },
-
-  octaves: function() {
-    var toSubtract, without, octaves;
-
-    if (this.direction() === 'up') {
-      toSubtract = vector.mul(knowledge.sharp, this.qualityValue());
-      without = vector.sub(this.coord, toSubtract);
-      octaves = without[0] - knowledge.intervals[this.base()][0];
-    } else {
-      toSubtract = vector.mul(knowledge.sharp, -this.qualityValue());
-      without = vector.sub(this.coord, toSubtract);
-      octaves = -(without[0] + knowledge.intervals[this.base()][0]);
-    }
-
-    return octaves;
-  },
-
-  invert: function() {
-    var i = this.base();
-    var qual = this.qualityValue();
-    var acc = this.type() === 'minor' ? -(qual - 1) : -qual;
-    var idx = 9 - knowledge.stepNumber[i] - 1;
-    var coord = knowledge.intervals[knowledge.intervalsIndex[idx]];
-    coord = vector.add(coord, vector.mul(knowledge.sharp, acc));
-
-    return new Interval(coord);
-  },
-
-  quality: function(lng) {
-    var quality = knowledge.alterations[this.type()][this.qualityValue() + 2];
-
-    return lng ? knowledge.qualityLong[quality] : quality;
-  },
-
-  qualityValue: function() {
-    if (this.direction() === 'down')
-      return Math.floor((-this.coord[1] - 2) / 7) + 1;
-    else
-      return Math.floor((this.coord[1] - 2) / 7) + 1;
-  },
-
-  equal: function(interval) {
-      return this.coord[0] === interval.coord[0] &&
-          this.coord[1] === interval.coord[1];
-  },
-
-  greater: function(interval) {
-    var semi = this.semitones();
-    var isemi = interval.semitones();
-
-    // If equal in absolute size, measure which interval is bigger
-    // For example P4 is bigger than A3
-    return (semi === isemi) ?
-      (this.number() > interval.number()) : (semi > isemi);
-  },
-
-  smaller: function(interval) {
-    return !this.equal(interval) && !this.greater(interval);
-  },
-
-  add: function(interval) {
-    return new Interval(vector.add(this.coord, interval.coord));
-  },
-
-  toString: function(ignore) {
-    // If given true, return the positive value
-    var number = ignore ? this.number() : this.value();
-
-    return this.quality() + number;
-  }
-};
-
-Interval.toCoord = function(simple) {
-  var coord = toCoord(simple);
-  if (!coord)
-    throw new Error('Invalid simple format interval');
-
-  return new Interval(coord);
-};
-
-Interval.from = function(from, to) {
-  return from.interval(to);
-};
-
-Interval.between = function(from, to) {
-  return new Interval(vector.sub(to.coord, from.coord));
-};
-
-Interval.invert = function(sInterval) {
-  return Interval.toCoord(sInterval).invert().toString();
-};
-
-module.exports = Interval;
-
-
-/***/ }),
-/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(module) {var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -17545,7 +17342,212 @@ module.exports = Interval;
   }
 }.call(this));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)(module)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)(module)))
+
+/***/ }),
+/* 5 */
+/***/ (function(module, exports) {
+
+module.exports = function(module) {
+	if(!module.webpackPolyfill) {
+		module.deprecate = function() {};
+		module.paths = [];
+		// module.parent = undefined by default
+		if(!module.children) module.children = [];
+		Object.defineProperty(module, "loaded", {
+			enumerable: true,
+			get: function() {
+				return module.l;
+			}
+		});
+		Object.defineProperty(module, "id", {
+			enumerable: true,
+			get: function() {
+				return module.i;
+			}
+		});
+		module.webpackPolyfill = 1;
+	}
+	return module;
+};
+
+
+/***/ }),
+/* 6 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var knowledge = __webpack_require__(3);
+var vector = __webpack_require__(14);
+var toCoord = __webpack_require__(45);
+
+function Interval(coord) {
+  if (!(this instanceof Interval)) return new Interval(coord);
+  this.coord = coord;
+}
+
+Interval.prototype = {
+  name: function() {
+    return knowledge.intervalsIndex[this.number() - 1];
+  },
+
+  semitones: function() {
+    return vector.sum(vector.mul(this.coord, [12, 7]));
+  },
+
+  number: function() {
+    return Math.abs(this.value());
+  },
+
+  value: function() {
+    var toMultiply = Math.floor((this.coord[1] - 2) / 7) + 1;
+    var product = vector.mul(knowledge.sharp, toMultiply);
+    var without = vector.sub(this.coord, product);
+    var i = knowledge.intervalFromFifth[without[1] + 5];
+    var diff = without[0] - knowledge.intervals[i][0];
+    var val = knowledge.stepNumber[i] + diff * 7;
+
+    return (val > 0) ? val : val - 2;
+  },
+
+  type: function() {
+    return knowledge.intervals[this.base()][0] <= 1 ? 'perfect' : 'minor';
+  },
+
+  base: function() {
+    var product = vector.mul(knowledge.sharp, this.qualityValue());
+    var fifth = vector.sub(this.coord, product)[1];
+    fifth = this.value() > 0 ? fifth + 5 : -(fifth - 5) % 7;
+    fifth = fifth < 0 ? knowledge.intervalFromFifth.length + fifth : fifth;
+
+    var name = knowledge.intervalFromFifth[fifth];
+    if (name === 'unison' && this.number() >= 8)
+      name = 'octave';
+
+    return name;
+  },
+
+  direction: function(dir) {
+    if (dir) {
+      var is = this.value() >= 1 ? 'up' : 'down';
+      if (is !== dir)
+        this.coord = vector.mul(this.coord, -1);
+
+      return this;
+    }
+    else
+      return this.value() >= 1 ? 'up' : 'down';
+  },
+
+  simple: function(ignore) {
+    // Get the (upwards) base interval (with quality)
+    var simple = knowledge.intervals[this.base()];
+    var toAdd = vector.mul(knowledge.sharp, this.qualityValue());
+    simple = vector.add(simple, toAdd);
+
+    // Turn it around if necessary
+    if (!ignore)
+      simple = this.direction() === 'down' ? vector.mul(simple, -1) : simple;
+
+    return new Interval(simple);
+  },
+
+  isCompound: function() {
+    return this.number() > 8;
+  },
+
+  octaves: function() {
+    var toSubtract, without, octaves;
+
+    if (this.direction() === 'up') {
+      toSubtract = vector.mul(knowledge.sharp, this.qualityValue());
+      without = vector.sub(this.coord, toSubtract);
+      octaves = without[0] - knowledge.intervals[this.base()][0];
+    } else {
+      toSubtract = vector.mul(knowledge.sharp, -this.qualityValue());
+      without = vector.sub(this.coord, toSubtract);
+      octaves = -(without[0] + knowledge.intervals[this.base()][0]);
+    }
+
+    return octaves;
+  },
+
+  invert: function() {
+    var i = this.base();
+    var qual = this.qualityValue();
+    var acc = this.type() === 'minor' ? -(qual - 1) : -qual;
+    var idx = 9 - knowledge.stepNumber[i] - 1;
+    var coord = knowledge.intervals[knowledge.intervalsIndex[idx]];
+    coord = vector.add(coord, vector.mul(knowledge.sharp, acc));
+
+    return new Interval(coord);
+  },
+
+  quality: function(lng) {
+    var quality = knowledge.alterations[this.type()][this.qualityValue() + 2];
+
+    return lng ? knowledge.qualityLong[quality] : quality;
+  },
+
+  qualityValue: function() {
+    if (this.direction() === 'down')
+      return Math.floor((-this.coord[1] - 2) / 7) + 1;
+    else
+      return Math.floor((this.coord[1] - 2) / 7) + 1;
+  },
+
+  equal: function(interval) {
+      return this.coord[0] === interval.coord[0] &&
+          this.coord[1] === interval.coord[1];
+  },
+
+  greater: function(interval) {
+    var semi = this.semitones();
+    var isemi = interval.semitones();
+
+    // If equal in absolute size, measure which interval is bigger
+    // For example P4 is bigger than A3
+    return (semi === isemi) ?
+      (this.number() > interval.number()) : (semi > isemi);
+  },
+
+  smaller: function(interval) {
+    return !this.equal(interval) && !this.greater(interval);
+  },
+
+  add: function(interval) {
+    return new Interval(vector.add(this.coord, interval.coord));
+  },
+
+  toString: function(ignore) {
+    // If given true, return the positive value
+    var number = ignore ? this.number() : this.value();
+
+    return this.quality() + number;
+  }
+};
+
+Interval.toCoord = function(simple) {
+  var coord = toCoord(simple);
+  if (!coord)
+    throw new Error('Invalid simple format interval');
+
+  return new Interval(coord);
+};
+
+Interval.from = function(from, to) {
+  return from.interval(to);
+};
+
+Interval.between = function(from, to) {
+  return new Interval(vector.sub(to.coord, from.coord));
+};
+
+Interval.invert = function(sInterval) {
+  return Interval.toCoord(sInterval).invert().toString();
+};
+
+module.exports = Interval;
+
 
 /***/ }),
 /* 7 */
@@ -17563,8 +17565,15 @@ module.exports = require("path");
 /* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
+"use strict";
+
+
+/***/ }),
+/* 10 */
+/***/ (function(module, exports, __webpack_require__) {
+
 /* MIT license */
-var cssKeywords = __webpack_require__(26);
+var cssKeywords = __webpack_require__(27);
 
 // NOTE: conversions should only return primitive values (i.e. arrays, or
 //       values that give correct `typeof` results).
@@ -18427,7 +18436,457 @@ convert.rgb.gray = function (rgb) {
 
 
 /***/ }),
-/* 10 */
+/* 11 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var scientific = __webpack_require__(42);
+var helmholtz = __webpack_require__(43);
+var pitchFq = __webpack_require__(44);
+var knowledge = __webpack_require__(3);
+var vector = __webpack_require__(14);
+var Interval = __webpack_require__(6);
+
+function pad(str, ch, len) {
+  for (; len > 0; len--) {
+    str += ch;
+  }
+
+  return str;
+}
+
+
+function Note(coord, duration) {
+  if (!(this instanceof Note)) return new Note(coord, duration);
+  duration = duration || {};
+
+  this.duration = { value: duration.value || 4, dots: duration.dots || 0 };
+  this.coord = coord;
+}
+
+Note.prototype = {
+  octave: function() {
+    return this.coord[0] + knowledge.A4[0] - knowledge.notes[this.name()][0] +
+      this.accidentalValue() * 4;
+  },
+
+  name: function() {
+    var value = this.accidentalValue();
+    var idx = this.coord[1] + knowledge.A4[1] - value * 7 + 1;
+    return knowledge.fifths[idx];
+  },
+
+  accidentalValue: function() {
+    return Math.round((this.coord[1] + knowledge.A4[1] - 2) / 7);
+  },
+
+  accidental: function() {
+    return knowledge.accidentals[this.accidentalValue() + 2];
+  },
+
+  /**
+   * Returns the key number of the note
+   */
+  key: function(white) {
+    if (white)
+      return this.coord[0] * 7 + this.coord[1] * 4 + 29;
+    else
+      return this.coord[0] * 12 + this.coord[1] * 7 + 49;
+  },
+
+  /**
+  * Returns a number ranging from 0-127 representing a MIDI note value
+  */
+  midi: function() {
+    return this.key() + 20;
+  },
+
+  /**
+   * Calculates and returns the frequency of the note.
+   * Optional concert pitch (def. 440)
+   */
+  fq: function(concertPitch) {
+    return pitchFq(this.coord, concertPitch);
+  },
+
+  /**
+   * Returns the pitch class index (chroma) of the note
+   */
+  chroma: function() {
+    var value = (vector.sum(vector.mul(this.coord, [12, 7])) - 3) % 12;
+
+    return (value < 0) ? value + 12 : value;
+  },
+
+  interval: function(interval) {
+    if (typeof interval === 'string') interval = Interval.toCoord(interval);
+
+    if (interval instanceof Interval)
+      return new Note(vector.add(this.coord, interval.coord), this.duration);
+    else if (interval instanceof Note)
+      return new Interval(vector.sub(interval.coord, this.coord));
+  },
+
+  transpose: function(interval) {
+    this.coord = vector.add(this.coord, interval.coord);
+    return this;
+  },
+
+  /**
+   * Returns the Helmholtz notation form of the note (fx C,, d' F# g#'')
+   */
+  helmholtz: function() {
+    var octave = this.octave();
+    var name = this.name();
+    name = octave < 3 ? name.toUpperCase() : name.toLowerCase();
+    var padchar = octave < 3 ? ',' : '\'';
+    var padcount = octave < 2 ? 2 - octave : octave - 3;
+
+    return pad(name + this.accidental(), padchar, padcount);
+  },
+
+  /**
+   * Returns the scientific notation form of the note (fx E4, Bb3, C#7 etc.)
+   */
+  scientific: function() {
+    return this.name().toUpperCase() + this.accidental() + this.octave();
+  },
+
+  /**
+   * Returns notes that are enharmonic with this note.
+   */
+  enharmonics: function(oneaccidental) {
+    var key = this.key(), limit = oneaccidental ? 2 : 3;
+
+    return ['m3', 'm2', 'm-2', 'm-3']
+      .map(this.interval.bind(this))
+      .filter(function(note) {
+      var acc = note.accidentalValue();
+      var diff = key - (note.key() - acc);
+
+      if (diff < limit && diff > -limit) {
+        var product = vector.mul(knowledge.sharp, diff - acc);
+        note.coord = vector.add(note.coord, product);
+        return true;
+      }
+    });
+  },
+
+  solfege: function(scale, showOctaves) {
+    var interval = scale.tonic.interval(this), solfege, stroke, count;
+    if (interval.direction() === 'down')
+      interval = interval.invert();
+
+    if (showOctaves) {
+      count = (this.key(true) - scale.tonic.key(true)) / 7;
+      count = (count >= 0) ? Math.floor(count) : -(Math.ceil(-count));
+      stroke = (count >= 0) ? '\'' : ',';
+    }
+
+    solfege = knowledge.intervalSolfege[interval.simple(true).toString()];
+    return (showOctaves) ? pad(solfege, stroke, Math.abs(count)) : solfege;
+  },
+
+  scaleDegree: function(scale) {
+    var inter = scale.tonic.interval(this);
+
+    // If the direction is down, or we're dealing with an octave - invert it
+    if (inter.direction() === 'down' ||
+       (inter.coord[1] === 0 && inter.coord[0] !== 0)) {
+      inter = inter.invert();
+    }
+
+    inter = inter.simple(true).coord;
+
+    return scale.scale.reduce(function(index, current, i) {
+      var coord = Interval.toCoord(current).coord;
+      return coord[0] === inter[0] && coord[1] === inter[1] ? i + 1 : index;
+    }, 0);
+  },
+
+  /**
+   * Returns the name of the duration value,
+   * such as 'whole', 'quarter', 'sixteenth' etc.
+   */
+  durationName: function() {
+    return knowledge.durations[this.duration.value];
+  },
+
+  /**
+   * Returns the duration of the note (including dots)
+   * in seconds. The first argument is the tempo in beats
+   * per minute, the second is the beat unit (i.e. the
+   * lower numeral in a time signature).
+   */
+  durationInSeconds: function(bpm, beatUnit) {
+    var secs = (60 / bpm) / (this.duration.value / 4) / (beatUnit / 4);
+    return secs * 2 - secs / Math.pow(2, this.duration.dots);
+  },
+
+  /**
+   * Returns the name of the note, with an optional display of octave number
+   */
+  toString: function(dont) {
+    return this.name() + this.accidental() + (dont ? '' : this.octave());
+  }
+};
+
+Note.fromString = function(name, dur) {
+  var coord = scientific(name);
+  if (!coord) coord = helmholtz(name);
+  return new Note(coord, dur);
+};
+
+Note.fromKey = function(key) {
+  var octave = Math.floor((key - 4) / 12);
+  var distance = key - (octave * 12) - 4;
+  var name = knowledge.fifths[(2 * Math.round(distance / 2) + 1) % 7];
+  var subDiff = vector.sub(knowledge.notes[name], knowledge.A4);
+  var note = vector.add(subDiff, [octave + 1, 0]);
+  var diff = (key - 49) - vector.sum(vector.mul(note, [12, 7]));
+
+  var arg = diff ? vector.add(note, vector.mul(knowledge.sharp, diff)) : note;
+  return new Note(arg);
+};
+
+Note.fromFrequency = function(fq, concertPitch) {
+  var key, cents, originalFq;
+  concertPitch = concertPitch || 440;
+
+  key = 49 + 12 * ((Math.log(fq) - Math.log(concertPitch)) / Math.log(2));
+  key = Math.round(key);
+  originalFq = concertPitch * Math.pow(2, (key - 49) / 12);
+  cents = 1200 * (Math.log(fq / originalFq) / Math.log(2));
+
+  return { note: Note.fromKey(key), cents: cents };
+};
+
+Note.fromMIDI = function(note) {
+  return Note.fromKey(note - 20);
+};
+
+module.exports = Note;
+
+
+/***/ }),
+/* 12 */
+/***/ (function(module, exports) {
+
+// First coord is octaves, second is fifths. Distances are relative to c
+var notes = {
+  c: [0, 0],
+  d: [-1, 2],
+  e: [-2, 4],
+  f: [1, -1],
+  g: [0, 1],
+  a: [-1, 3],
+  b: [-2, 5],
+  h: [-2, 5]
+};
+
+module.exports = function(name) {
+  return name in notes ? [notes[name][0], notes[name][1]] : null;
+};
+
+module.exports.notes = notes;
+module.exports.A4 = [3, 3]; // Relative to C0 (scientic notation, ~16.35Hz)
+module.exports.sharp = [-4, 7];
+
+
+/***/ }),
+/* 13 */
+/***/ (function(module, exports) {
+
+var accidentalValues = {
+  'bb': -2,
+  'b': -1,
+  '': 0,
+  '#': 1,
+  'x': 2
+};
+
+module.exports = function accidentalNumber(acc) {
+  return accidentalValues[acc];
+}
+
+module.exports.interval = function accidentalInterval(acc) {
+  var val = accidentalValues[acc];
+  return [-4 * val, 7 * val];
+}
+
+
+/***/ }),
+/* 14 */
+/***/ (function(module, exports) {
+
+module.exports = {
+  add: function(note, interval) {
+    return [note[0] + interval[0], note[1] + interval[1]];
+  },
+
+  sub: function(note, interval) {
+    return [note[0] - interval[0], note[1] - interval[1]];
+  },
+
+  mul: function(note, interval) {
+    if (typeof interval === 'number')
+      return [note[0] * interval, note[1] * interval];
+    else
+      return [note[0] * interval[0], note[1] * interval[1]];
+  },
+
+  sum: function(coord) {
+    return coord[0] + coord[1];
+  }
+};
+
+
+/***/ }),
+/* 15 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.raise = exports.lower = exports.high = exports.low = exports.from = exports.B = exports.A = exports.G = exports.F = exports.E = exports.D = exports.C = exports.locrian = exports.aeolian = exports.mixolydian = exports.lydian = exports.phrygian = exports.dorian = exports.ionian = exports.sharp = exports.flat = exports.mode = exports.minor = exports.major = undefined;
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+var _lodash = __webpack_require__(4);
+
+var _ = _interopRequireWildcard(_lodash);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+// because Array.prototype.reverse mutates the array
+function reverse(array) {
+    return _.reduceRight(array, function (acc, n) {
+        acc.push(n);
+        return acc;
+    }, []);
+}
+
+function sumFrom(series, n) {
+    if (Math.floor(n) !== n) {
+        var _lower = sumFrom(series, Math.floor(n)),
+            upper = sumFrom(series, Math.ceil(n)),
+            fraction = n - Math.floor(n);
+        return _lower + fraction * (upper - _lower);
+    } else if (n < 0) {
+        var _ret = function () {
+            var rseries = _.map(reverse(series), function (n) {
+                return 0 - n;
+            });
+            return {
+                v: _.sum(_.map(_.range(Math.abs(n)), function (i) {
+                    return rseries[i % rseries.length];
+                }))
+            };
+        }();
+
+        if ((typeof _ret === "undefined" ? "undefined" : _typeof(_ret)) === "object") return _ret.v;
+    } else if (n >= 0) {
+        return _.sum(_.map(_.range(n), function (i) {
+            return series[i % series.length];
+        }));
+    }
+}
+
+function create(scale) {
+    return _.partial(sumFrom, scale);
+}
+
+function mode(scale, n) {
+    var scaleLenth = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 7;
+
+    return _.flowRight(function (x) {
+        return x - scale(n);
+    }, scale, from(n));
+}
+
+var major = create([2, 2, 1, 2, 2, 2, 1]),
+    minor = create([2, 1, 2, 2, 1, 2, 2]),
+    ionian = mode(major, 0),
+    dorian = mode(major, 1),
+    phrygian = mode(major, 2),
+    lydian = mode(major, 3),
+    mixolydian = mode(major, 4),
+    aeolian = mode(major, 5),
+    locrian = mode(major, 6);
+
+function from(base) {
+    return function (root) {
+        return root + base;
+    };
+}
+
+/*
+ * Lower midi one octave.
+ */
+function low(midi) {
+    return from(-12)(midi);
+}
+
+/*
+ * Raise midi one octave.
+ */
+function high(midi) {
+    return from(12)(midi);
+}
+
+/*
+ * Lower degree one octave (assuming heptatonic scale).
+ */
+function lower(degree) {
+    return from(-7)(degree);
+}
+
+/*
+ * Raise degree one octave (assuming heptatonic scale).
+ */
+function raise(degree) {
+    return from(7)(degree);
+}
+
+var C = from(60),
+    D = from(62),
+    E = from(64),
+    F = from(65),
+    G = from(67),
+    A = from(69),
+    B = from(71),
+    sharp = from(1),
+    flat = from(-1);
+
+exports.major = major;
+exports.minor = minor;
+exports.mode = mode;
+exports.flat = flat;
+exports.sharp = sharp;
+exports.ionian = ionian;
+exports.dorian = dorian;
+exports.phrygian = phrygian;
+exports.lydian = lydian;
+exports.mixolydian = mixolydian;
+exports.aeolian = aeolian;
+exports.locrian = locrian;
+exports.C = C;
+exports.D = D;
+exports.E = E;
+exports.F = F;
+exports.G = G;
+exports.A = A;
+exports.B = B;
+exports.from = from;
+exports.low = low;
+exports.high = high;
+exports.lower = lower;
+exports.raise = raise;
+
+/***/ }),
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -19213,457 +19672,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/**
 
 
 /***/ }),
-/* 11 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var scientific = __webpack_require__(42);
-var helmholtz = __webpack_require__(43);
-var pitchFq = __webpack_require__(44);
-var knowledge = __webpack_require__(3);
-var vector = __webpack_require__(14);
-var Interval = __webpack_require__(5);
-
-function pad(str, ch, len) {
-  for (; len > 0; len--) {
-    str += ch;
-  }
-
-  return str;
-}
-
-
-function Note(coord, duration) {
-  if (!(this instanceof Note)) return new Note(coord, duration);
-  duration = duration || {};
-
-  this.duration = { value: duration.value || 4, dots: duration.dots || 0 };
-  this.coord = coord;
-}
-
-Note.prototype = {
-  octave: function() {
-    return this.coord[0] + knowledge.A4[0] - knowledge.notes[this.name()][0] +
-      this.accidentalValue() * 4;
-  },
-
-  name: function() {
-    var value = this.accidentalValue();
-    var idx = this.coord[1] + knowledge.A4[1] - value * 7 + 1;
-    return knowledge.fifths[idx];
-  },
-
-  accidentalValue: function() {
-    return Math.round((this.coord[1] + knowledge.A4[1] - 2) / 7);
-  },
-
-  accidental: function() {
-    return knowledge.accidentals[this.accidentalValue() + 2];
-  },
-
-  /**
-   * Returns the key number of the note
-   */
-  key: function(white) {
-    if (white)
-      return this.coord[0] * 7 + this.coord[1] * 4 + 29;
-    else
-      return this.coord[0] * 12 + this.coord[1] * 7 + 49;
-  },
-
-  /**
-  * Returns a number ranging from 0-127 representing a MIDI note value
-  */
-  midi: function() {
-    return this.key() + 20;
-  },
-
-  /**
-   * Calculates and returns the frequency of the note.
-   * Optional concert pitch (def. 440)
-   */
-  fq: function(concertPitch) {
-    return pitchFq(this.coord, concertPitch);
-  },
-
-  /**
-   * Returns the pitch class index (chroma) of the note
-   */
-  chroma: function() {
-    var value = (vector.sum(vector.mul(this.coord, [12, 7])) - 3) % 12;
-
-    return (value < 0) ? value + 12 : value;
-  },
-
-  interval: function(interval) {
-    if (typeof interval === 'string') interval = Interval.toCoord(interval);
-
-    if (interval instanceof Interval)
-      return new Note(vector.add(this.coord, interval.coord), this.duration);
-    else if (interval instanceof Note)
-      return new Interval(vector.sub(interval.coord, this.coord));
-  },
-
-  transpose: function(interval) {
-    this.coord = vector.add(this.coord, interval.coord);
-    return this;
-  },
-
-  /**
-   * Returns the Helmholtz notation form of the note (fx C,, d' F# g#'')
-   */
-  helmholtz: function() {
-    var octave = this.octave();
-    var name = this.name();
-    name = octave < 3 ? name.toUpperCase() : name.toLowerCase();
-    var padchar = octave < 3 ? ',' : '\'';
-    var padcount = octave < 2 ? 2 - octave : octave - 3;
-
-    return pad(name + this.accidental(), padchar, padcount);
-  },
-
-  /**
-   * Returns the scientific notation form of the note (fx E4, Bb3, C#7 etc.)
-   */
-  scientific: function() {
-    return this.name().toUpperCase() + this.accidental() + this.octave();
-  },
-
-  /**
-   * Returns notes that are enharmonic with this note.
-   */
-  enharmonics: function(oneaccidental) {
-    var key = this.key(), limit = oneaccidental ? 2 : 3;
-
-    return ['m3', 'm2', 'm-2', 'm-3']
-      .map(this.interval.bind(this))
-      .filter(function(note) {
-      var acc = note.accidentalValue();
-      var diff = key - (note.key() - acc);
-
-      if (diff < limit && diff > -limit) {
-        var product = vector.mul(knowledge.sharp, diff - acc);
-        note.coord = vector.add(note.coord, product);
-        return true;
-      }
-    });
-  },
-
-  solfege: function(scale, showOctaves) {
-    var interval = scale.tonic.interval(this), solfege, stroke, count;
-    if (interval.direction() === 'down')
-      interval = interval.invert();
-
-    if (showOctaves) {
-      count = (this.key(true) - scale.tonic.key(true)) / 7;
-      count = (count >= 0) ? Math.floor(count) : -(Math.ceil(-count));
-      stroke = (count >= 0) ? '\'' : ',';
-    }
-
-    solfege = knowledge.intervalSolfege[interval.simple(true).toString()];
-    return (showOctaves) ? pad(solfege, stroke, Math.abs(count)) : solfege;
-  },
-
-  scaleDegree: function(scale) {
-    var inter = scale.tonic.interval(this);
-
-    // If the direction is down, or we're dealing with an octave - invert it
-    if (inter.direction() === 'down' ||
-       (inter.coord[1] === 0 && inter.coord[0] !== 0)) {
-      inter = inter.invert();
-    }
-
-    inter = inter.simple(true).coord;
-
-    return scale.scale.reduce(function(index, current, i) {
-      var coord = Interval.toCoord(current).coord;
-      return coord[0] === inter[0] && coord[1] === inter[1] ? i + 1 : index;
-    }, 0);
-  },
-
-  /**
-   * Returns the name of the duration value,
-   * such as 'whole', 'quarter', 'sixteenth' etc.
-   */
-  durationName: function() {
-    return knowledge.durations[this.duration.value];
-  },
-
-  /**
-   * Returns the duration of the note (including dots)
-   * in seconds. The first argument is the tempo in beats
-   * per minute, the second is the beat unit (i.e. the
-   * lower numeral in a time signature).
-   */
-  durationInSeconds: function(bpm, beatUnit) {
-    var secs = (60 / bpm) / (this.duration.value / 4) / (beatUnit / 4);
-    return secs * 2 - secs / Math.pow(2, this.duration.dots);
-  },
-
-  /**
-   * Returns the name of the note, with an optional display of octave number
-   */
-  toString: function(dont) {
-    return this.name() + this.accidental() + (dont ? '' : this.octave());
-  }
-};
-
-Note.fromString = function(name, dur) {
-  var coord = scientific(name);
-  if (!coord) coord = helmholtz(name);
-  return new Note(coord, dur);
-};
-
-Note.fromKey = function(key) {
-  var octave = Math.floor((key - 4) / 12);
-  var distance = key - (octave * 12) - 4;
-  var name = knowledge.fifths[(2 * Math.round(distance / 2) + 1) % 7];
-  var subDiff = vector.sub(knowledge.notes[name], knowledge.A4);
-  var note = vector.add(subDiff, [octave + 1, 0]);
-  var diff = (key - 49) - vector.sum(vector.mul(note, [12, 7]));
-
-  var arg = diff ? vector.add(note, vector.mul(knowledge.sharp, diff)) : note;
-  return new Note(arg);
-};
-
-Note.fromFrequency = function(fq, concertPitch) {
-  var key, cents, originalFq;
-  concertPitch = concertPitch || 440;
-
-  key = 49 + 12 * ((Math.log(fq) - Math.log(concertPitch)) / Math.log(2));
-  key = Math.round(key);
-  originalFq = concertPitch * Math.pow(2, (key - 49) / 12);
-  cents = 1200 * (Math.log(fq / originalFq) / Math.log(2));
-
-  return { note: Note.fromKey(key), cents: cents };
-};
-
-Note.fromMIDI = function(note) {
-  return Note.fromKey(note - 20);
-};
-
-module.exports = Note;
-
-
-/***/ }),
-/* 12 */
-/***/ (function(module, exports) {
-
-// First coord is octaves, second is fifths. Distances are relative to c
-var notes = {
-  c: [0, 0],
-  d: [-1, 2],
-  e: [-2, 4],
-  f: [1, -1],
-  g: [0, 1],
-  a: [-1, 3],
-  b: [-2, 5],
-  h: [-2, 5]
-};
-
-module.exports = function(name) {
-  return name in notes ? [notes[name][0], notes[name][1]] : null;
-};
-
-module.exports.notes = notes;
-module.exports.A4 = [3, 3]; // Relative to C0 (scientic notation, ~16.35Hz)
-module.exports.sharp = [-4, 7];
-
-
-/***/ }),
-/* 13 */
-/***/ (function(module, exports) {
-
-var accidentalValues = {
-  'bb': -2,
-  'b': -1,
-  '': 0,
-  '#': 1,
-  'x': 2
-};
-
-module.exports = function accidentalNumber(acc) {
-  return accidentalValues[acc];
-}
-
-module.exports.interval = function accidentalInterval(acc) {
-  var val = accidentalValues[acc];
-  return [-4 * val, 7 * val];
-}
-
-
-/***/ }),
-/* 14 */
-/***/ (function(module, exports) {
-
-module.exports = {
-  add: function(note, interval) {
-    return [note[0] + interval[0], note[1] + interval[1]];
-  },
-
-  sub: function(note, interval) {
-    return [note[0] - interval[0], note[1] - interval[1]];
-  },
-
-  mul: function(note, interval) {
-    if (typeof interval === 'number')
-      return [note[0] * interval, note[1] * interval];
-    else
-      return [note[0] * interval[0], note[1] * interval[1]];
-  },
-
-  sum: function(coord) {
-    return coord[0] + coord[1];
-  }
-};
-
-
-/***/ }),
-/* 15 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-exports.raise = exports.lower = exports.high = exports.low = exports.from = exports.B = exports.A = exports.G = exports.F = exports.E = exports.D = exports.C = exports.locrian = exports.aeolian = exports.mixolydian = exports.lydian = exports.phrygian = exports.dorian = exports.ionian = exports.sharp = exports.flat = exports.mode = exports.minor = exports.major = undefined;
-
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
-var _lodash = __webpack_require__(6);
-
-var _ = _interopRequireWildcard(_lodash);
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
-// because Array.prototype.reverse mutates the array
-function reverse(array) {
-    return _.reduceRight(array, function (acc, n) {
-        acc.push(n);
-        return acc;
-    }, []);
-}
-
-function sumFrom(series, n) {
-    if (Math.floor(n) !== n) {
-        var _lower = sumFrom(series, Math.floor(n)),
-            upper = sumFrom(series, Math.ceil(n)),
-            fraction = n - Math.floor(n);
-        return _lower + fraction * (upper - _lower);
-    } else if (n < 0) {
-        var _ret = function () {
-            var rseries = _.map(reverse(series), function (n) {
-                return 0 - n;
-            });
-            return {
-                v: _.sum(_.map(_.range(Math.abs(n)), function (i) {
-                    return rseries[i % rseries.length];
-                }))
-            };
-        }();
-
-        if ((typeof _ret === "undefined" ? "undefined" : _typeof(_ret)) === "object") return _ret.v;
-    } else if (n >= 0) {
-        return _.sum(_.map(_.range(n), function (i) {
-            return series[i % series.length];
-        }));
-    }
-}
-
-function create(scale) {
-    return _.partial(sumFrom, scale);
-}
-
-function mode(scale, n) {
-    var scaleLenth = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 7;
-
-    return _.flowRight(function (x) {
-        return x - scale(n);
-    }, scale, from(n));
-}
-
-var major = create([2, 2, 1, 2, 2, 2, 1]),
-    minor = create([2, 1, 2, 2, 1, 2, 2]),
-    ionian = mode(major, 0),
-    dorian = mode(major, 1),
-    phrygian = mode(major, 2),
-    lydian = mode(major, 3),
-    mixolydian = mode(major, 4),
-    aeolian = mode(major, 5),
-    locrian = mode(major, 6);
-
-function from(base) {
-    return function (root) {
-        return root + base;
-    };
-}
-
-/*
- * Lower midi one octave.
- */
-function low(midi) {
-    return from(-12)(midi);
-}
-
-/*
- * Raise midi one octave.
- */
-function high(midi) {
-    return from(12)(midi);
-}
-
-/*
- * Lower degree one octave (assuming heptatonic scale).
- */
-function lower(degree) {
-    return from(-7)(degree);
-}
-
-/*
- * Raise degree one octave (assuming heptatonic scale).
- */
-function raise(degree) {
-    return from(7)(degree);
-}
-
-var C = from(60),
-    D = from(62),
-    E = from(64),
-    F = from(65),
-    G = from(67),
-    A = from(69),
-    B = from(71),
-    sharp = from(1),
-    flat = from(-1);
-
-exports.major = major;
-exports.minor = minor;
-exports.mode = mode;
-exports.flat = flat;
-exports.sharp = sharp;
-exports.ionian = ionian;
-exports.dorian = dorian;
-exports.phrygian = phrygian;
-exports.lydian = lydian;
-exports.mixolydian = mixolydian;
-exports.aeolian = aeolian;
-exports.locrian = locrian;
-exports.C = C;
-exports.D = D;
-exports.E = E;
-exports.F = F;
-exports.G = G;
-exports.A = A;
-exports.B = B;
-exports.from = from;
-exports.low = low;
-exports.high = high;
-exports.lower = lower;
-exports.raise = raise;
-
-/***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -19698,7 +19707,7 @@ var NumberNode = function () {
 exports.default = NumberNode;
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -19743,7 +19752,7 @@ var NoteNode = function () {
 exports.default = NoteNode;
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -19804,7 +19813,7 @@ var ScopeNode = function () {
 exports.default = ScopeNode;
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -19818,7 +19827,7 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 var _Serializable = __webpack_require__(1);
 
-var _Stringable = __webpack_require__(20);
+var _Stringable = __webpack_require__(21);
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -19847,14 +19856,14 @@ var Keyword = function () {
 exports.default = Keyword;
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -19868,15 +19877,15 @@ var _path = __webpack_require__(8);
 
 var _path2 = _interopRequireDefault(_path);
 
-var _chalk = __webpack_require__(22);
+var _chalk = __webpack_require__(23);
 
 var _chalk2 = _interopRequireDefault(_chalk);
 
-var _commander = __webpack_require__(32);
+var _commander = __webpack_require__(33);
 
 var _commander2 = _interopRequireDefault(_commander);
 
-var _main = __webpack_require__(35);
+var _main = __webpack_require__(36);
 
 var _main2 = _interopRequireDefault(_main);
 
@@ -19923,16 +19932,16 @@ if (_commander2.default.file) {
 }
 
 /***/ }),
-/* 22 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-const escapeStringRegexp = __webpack_require__(23);
-const ansiStyles = __webpack_require__(24);
-const supportsColor = __webpack_require__(28);
+const escapeStringRegexp = __webpack_require__(24);
+const ansiStyles = __webpack_require__(25);
+const supportsColor = __webpack_require__(29);
 
-const template = __webpack_require__(31);
+const template = __webpack_require__(32);
 
 const isSimpleWindowsTerm = process.platform === 'win32' && !(process.env.TERM || '').toLowerCase().startsWith('xterm');
 
@@ -20158,7 +20167,7 @@ module.exports.default = module.exports; // For TypeScript
 
 
 /***/ }),
-/* 23 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -20176,12 +20185,12 @@ module.exports = function (str) {
 
 
 /***/ }),
-/* 24 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 /* WEBPACK VAR INJECTION */(function(module) {
-const colorConvert = __webpack_require__(25);
+const colorConvert = __webpack_require__(26);
 
 const wrapAnsi16 = (fn, offset) => function () {
 	const code = fn.apply(colorConvert, arguments);
@@ -20333,14 +20342,14 @@ Object.defineProperty(module, 'exports', {
 	get: assembleStyles
 });
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)(module)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)(module)))
 
 /***/ }),
-/* 25 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var conversions = __webpack_require__(9);
-var route = __webpack_require__(27);
+var conversions = __webpack_require__(10);
+var route = __webpack_require__(28);
 
 var convert = {};
 
@@ -20420,7 +20429,7 @@ module.exports = convert;
 
 
 /***/ }),
-/* 26 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -20579,10 +20588,10 @@ module.exports = {
 
 
 /***/ }),
-/* 27 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var conversions = __webpack_require__(9);
+var conversions = __webpack_require__(10);
 
 /*
 	this function routes a model to all other models.
@@ -20682,13 +20691,13 @@ module.exports = function (fromModel) {
 
 
 /***/ }),
-/* 28 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-const os = __webpack_require__(29);
-const hasFlag = __webpack_require__(30);
+const os = __webpack_require__(30);
+const hasFlag = __webpack_require__(31);
 
 const env = process.env;
 
@@ -20804,13 +20813,13 @@ module.exports = process && support(supportLevel);
 
 
 /***/ }),
-/* 29 */
+/* 30 */
 /***/ (function(module, exports) {
 
 module.exports = require("os");
 
 /***/ }),
-/* 30 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -20827,7 +20836,7 @@ module.exports = function (flag, argv) {
 
 
 /***/ }),
-/* 31 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -20962,15 +20971,15 @@ module.exports = (chalk, tmp) => {
 
 
 /***/ }),
-/* 32 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /**
  * Module dependencies.
  */
 
-var EventEmitter = __webpack_require__(33).EventEmitter;
-var spawn = __webpack_require__(34).spawn;
+var EventEmitter = __webpack_require__(34).EventEmitter;
+var spawn = __webpack_require__(35).spawn;
 var path = __webpack_require__(8);
 var dirname = path.dirname;
 var basename = path.basename;
@@ -22126,19 +22135,19 @@ function exists(file) {
 
 
 /***/ }),
-/* 33 */
+/* 34 */
 /***/ (function(module, exports) {
 
 module.exports = require("events");
 
 /***/ }),
-/* 34 */
+/* 35 */
 /***/ (function(module, exports) {
 
 module.exports = require("child_process");
 
 /***/ }),
-/* 35 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -22149,19 +22158,17 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.TYPES = undefined;
 
-var _lang = __webpack_require__(36);
-
-var _time = __webpack_require__(37);
+var _lang = __webpack_require__(37);
 
 var _processing = __webpack_require__(38);
 
 var _palestrina = __webpack_require__(50);
 
-var _NumberNode = __webpack_require__(16);
+var _NumberNode = __webpack_require__(17);
 
 var _NumberNode2 = _interopRequireDefault(_NumberNode);
 
-var _NoteNode = __webpack_require__(17);
+var _NoteNode = __webpack_require__(18);
 
 var _NoteNode2 = _interopRequireDefault(_NoteNode);
 
@@ -22169,7 +22176,7 @@ var _RestNode = __webpack_require__(55);
 
 var _RestNode2 = _interopRequireDefault(_RestNode);
 
-var _ScopeNode = __webpack_require__(18);
+var _ScopeNode = __webpack_require__(19);
 
 var _ScopeNode2 = _interopRequireDefault(_ScopeNode);
 
@@ -22177,7 +22184,7 @@ var _ChordNode = __webpack_require__(56);
 
 var _ChordNode2 = _interopRequireDefault(_ChordNode);
 
-var _Keyword = __webpack_require__(19);
+var _Keyword = __webpack_require__(20);
 
 var _Keyword2 = _interopRequireDefault(_Keyword);
 
@@ -22189,7 +22196,7 @@ var _Voice = __webpack_require__(58);
 
 var _Voice2 = _interopRequireDefault(_Voice);
 
-var _builtins = __webpack_require__(59);
+var _builtins = __webpack_require__(60);
 
 var _builtins2 = _interopRequireDefault(_builtins);
 
@@ -22222,7 +22229,6 @@ function compile(program, opts) {
 
     for (var voice in _lang.parser.yy.voices) {
         if (_lang.parser.yy.voices.hasOwnProperty(voice)) {
-            (0, _time.calculateAndSetTimes)(_lang.parser.yy.voices[voice]);
             if (options.easyOctave) {
                 (0, _processing.easyOctave)(_lang.parser.yy.voices[voice]);
             }
@@ -22235,13 +22241,12 @@ function compile(program, opts) {
         layout: _lang.parser.yy.layout.serialize()
     };
 }
-
 var TYPES = exports.TYPES = { NOTE: _constants.NOTE, REST: _constants.REST, CHORD: _constants.CHORD, CHORDSYMBOL: _constants.CHORDSYMBOL };
 
 exports.default = compile;
 
 /***/ }),
-/* 36 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(module) {/* parser generated by jison 0.4.17 */
@@ -23088,91 +23093,7 @@ if (typeof module !== 'undefined' && __webpack_require__.c[__webpack_require__.s
   exports.main(process.argv.slice(1));
 }
 }
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)(module)))
-
-/***/ }),
-/* 37 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.calculateAndSetTimes = calculateAndSetTimes;
-
-var _fraction = __webpack_require__(10);
-
-var _fraction2 = _interopRequireDefault(_fraction);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function isNote(item) {
-  return item.type === "note";
-}
-
-function isChord(item) {
-  return item.type === "chord";
-}
-
-function isRest(item) {
-  return item.type === "rest";
-}
-
-function isTimeSignature(item) {
-  return item.type === "timeSig";
-}
-
-function isRepeat(item) {
-  return item.type === "repeat";
-}
-
-/*
- * @param item - Scored item. Given an item, return the rational duration of the item;
- * @return Number
- */
-function calculateDuration(item) {
-
-  // The item doesn't have a duration unless it's one of the following types.
-  if (!(isNote(item) || isChord(item) || isRest(item) || isRepeat(item))) return 0;
-
-  var s = item.props.tuplet ? item.props.tuplet.split("/") : null;
-  var tuplet = s ? new _fraction2.default(s[0], s[1]) : null;
-  var dots = item.props.dots || 0;
-
-  var dur = new _fraction2.default(1, item.props.value || 4);
-
-  for (var i = 0; i < dots; i++) {
-    dur = dur.mul(1.5);
-  }
-
-  if (tuplet && dur) {
-    dur = dur.mul(s[1]).div(s[0]);
-  }
-
-  return dur;
-}
-
-/*
- * @param items - Item[]
- * @param offset - Optional amount of time that will be added to the items times.
- */
-function calculateAndSetTimes(items) {
-  var offset = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
-
-  return items.reduce(function (acc, item) {
-    var previousItem = acc[acc.length - 1];
-
-    if (previousItem) {
-      item.props.time = (0, _fraction2.default)(previousItem.props.time).add(calculateDuration(previousItem)).add(offset).valueOf();
-    } else {
-      item.props.time = 0;
-    }
-
-    return acc.concat([item]);
-  }, []);
-}
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)(module)))
 
 /***/ }),
 /* 38 */
@@ -26201,14 +26122,14 @@ function minBy(array, iteratee) {
 
 module.exports = minBy;
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)(module)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)(module)))
 
 /***/ }),
 /* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var Note = __webpack_require__(11);
-var Interval = __webpack_require__(5);
+var Interval = __webpack_require__(6);
 var Chord = __webpack_require__(46);
 var Scale = __webpack_require__(48);
 
@@ -26442,7 +26363,7 @@ module.exports.coords = baseIntervals.slice(0);
 var daccord = __webpack_require__(47);
 var knowledge = __webpack_require__(3);
 var Note = __webpack_require__(11);
-var Interval = __webpack_require__(5);
+var Interval = __webpack_require__(6);
 
 function Chord(root, name) {
   if (!(this instanceof Chord)) return new Chord(root, name);
@@ -26865,7 +26786,7 @@ module.exports = function(symbol) {
 /***/ (function(module, exports, __webpack_require__) {
 
 var knowledge = __webpack_require__(3);
-var Interval = __webpack_require__(5);
+var Interval = __webpack_require__(6);
 
 var scales = {
   aeolian: ['P1', 'M2', 'm3', 'P4', 'P5', 'm6', 'm7'],
@@ -27067,11 +26988,11 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.accelerando = exports.tempo = exports.rhythm = exports.duration = exports.bpm = exports.after = exports.mapthen = exports.then = exports.times = exports.but = exports.wherever = exports.where = exports.all = exports.is = exports.having = exports.accompany = exports.phrase = undefined;
 
-var _lodash = __webpack_require__(6);
+var _lodash = __webpack_require__(4);
 
 var _ = _interopRequireWildcard(_lodash);
 
-var _fraction = __webpack_require__(10);
+var _fraction = __webpack_require__(16);
 
 var _fraction2 = _interopRequireDefault(_fraction);
 
@@ -27313,7 +27234,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.inversion = exports.root = exports.thirteenth = exports.eleventh = exports.ninth = exports.seventh = exports.triad = undefined;
 
-var _lodash = __webpack_require__(6);
+var _lodash = __webpack_require__(4);
 
 var _ = _interopRequireWildcard(_lodash);
 
@@ -27379,7 +27300,7 @@ exports.noteToMidi = noteToMidi;
 exports.midiToHz = midiToHz;
 exports.noteToHz = noteToHz;
 
-var _lodash = __webpack_require__(6);
+var _lodash = __webpack_require__(4);
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
@@ -27538,7 +27459,7 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 var _constants = __webpack_require__(0);
 
-var _NoteNode = __webpack_require__(17);
+var _NoteNode = __webpack_require__(18);
 
 var _NoteNode2 = _interopRequireDefault(_NoteNode);
 
@@ -27656,9 +27577,15 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+var _lodash = __webpack_require__(4);
+
 var _Executable = __webpack_require__(2);
 
 var _Serializable = __webpack_require__(1);
+
+var _Node = __webpack_require__(9);
+
+var _time = __webpack_require__(59);
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -27679,9 +27606,12 @@ var Voice = function () {
             }, []);
             if (!yy.voices[this.props.name]) {
                 // create array for voice items
-                yy.voices[this.props.name] = list;
+                yy.voices[this.props.name] = (0, _time.calculateAndSetTimes)(list);
             } else {
-                yy.voices[this.props.name] = yy.voices[this.props.name].concat(list);
+                var previousItem = (0, _lodash.last)(yy.voices[this.props.name]);
+                var offset = (0, _time.calculateDuration)(previousItem).add(previousItem.props.time);
+                var listWithTimes = (0, _time.calculateAndSetTimes)(list, offset.valueOf());
+                yy.voices[this.props.name] = yy.voices[this.props.name].concat(listWithTimes);
             }
             return this;
         }
@@ -27700,56 +27630,146 @@ exports.default = Voice;
 
 
 Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.calculateDuration = calculateDuration;
+exports.calculateAndSetTimes = calculateAndSetTimes;
+
+var _fraction = __webpack_require__(16);
+
+var _fraction2 = _interopRequireDefault(_fraction);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function isNote(item) {
+  return item.type === "note";
+}
+
+function isChord(item) {
+  return item.type === "chord";
+}
+
+function isRest(item) {
+  return item.type === "rest";
+}
+
+function isTimeSignature(item) {
+  return item.type === "timeSig";
+}
+
+function isRepeat(item) {
+  return item.type === "repeat";
+}
+
+/*
+ * @param item - Scored item. Given an item, return the rational duration of the item;
+ * @return Number
+ */
+function calculateDuration(item) {
+
+  // The item doesn't have a duration unless it's one of the following types.
+  if (!(isNote(item) || isChord(item) || isRest(item) || isRepeat(item))) return (0, _fraction2.default)(0);
+
+  var s = item.props.tuplet ? item.props.tuplet.split("/") : null;
+  var tuplet = s ? new _fraction2.default(s[0], s[1]) : null;
+  var dots = item.props.dots || 0;
+
+  var dur = new _fraction2.default(1, item.props.value || 4);
+
+  for (var i = 0; i < dots; i++) {
+    dur = dur.mul(1.5);
+  }
+
+  if (tuplet && dur) {
+    dur = dur.mul(s[1]).div(s[0]);
+  }
+
+  return dur;
+}
+
+/*
+ * @param items - Item[]
+ * @param offset - Optional amount of time that will be added to the items times.
+ */
+function calculateAndSetTimes(items) {
+  var offset = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+
+  return items.reduce(function (acc, item) {
+    var previousItem = acc[acc.length - 1];
+
+    if (previousItem) {
+      // item.props.time = F(previousItem.props.time).add(calculateDuration(previousItem)).add(offset).valueOf();
+      item.props.time = (0, _fraction2.default)(previousItem.props.time).add(calculateDuration(previousItem)).valueOf();
+    } else {
+      item.props.time = offset;
+    }
+
+    return acc.concat([item]);
+  }, []);
+}
+
+/***/ }),
+/* 60 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
-var _v = __webpack_require__(60);
+var _v = __webpack_require__(61);
 
 var _v2 = _interopRequireDefault(_v);
 
-var _Keyword = __webpack_require__(19);
+var _Keyword = __webpack_require__(20);
 
 var _Keyword2 = _interopRequireDefault(_Keyword);
 
-var _PageNode = __webpack_require__(64);
+var _PageNode = __webpack_require__(65);
 
 var _PageNode2 = _interopRequireDefault(_PageNode);
 
-var _SystemNode = __webpack_require__(65);
+var _SystemNode = __webpack_require__(66);
 
 var _SystemNode2 = _interopRequireDefault(_SystemNode);
 
-var _LineNode = __webpack_require__(66);
+var _LineNode = __webpack_require__(67);
 
 var _LineNode2 = _interopRequireDefault(_LineNode);
 
-var _ChordSymbol = __webpack_require__(67);
+var _ChordSymbol = __webpack_require__(68);
 
 var _ChordSymbol2 = _interopRequireDefault(_ChordSymbol);
 
-var _TimeSignature = __webpack_require__(68);
+var _TimeSignature = __webpack_require__(69);
 
 var _TimeSignature2 = _interopRequireDefault(_TimeSignature);
 
-var _Clef = __webpack_require__(69);
+var _Clef = __webpack_require__(70);
 
 var _Clef2 = _interopRequireDefault(_Clef);
 
-var _Key = __webpack_require__(70);
+var _Key = __webpack_require__(71);
 
 var _Key2 = _interopRequireDefault(_Key);
 
-var _NumberNode = __webpack_require__(16);
+var _NumberNode = __webpack_require__(17);
 
 var _NumberNode2 = _interopRequireDefault(_NumberNode);
 
-var _ScopeNode = __webpack_require__(18);
+var _ScopeNode = __webpack_require__(19);
 
 var _ScopeNode2 = _interopRequireDefault(_ScopeNode);
 
-var _Stringable = __webpack_require__(20);
+var _Stringable = __webpack_require__(21);
 
 var _Serializable = __webpack_require__(1);
+
+var _Executable = __webpack_require__(2);
+
+var _Node = __webpack_require__(9);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -27841,17 +27861,33 @@ var BUILTINS = {
     },
     legato: function legato(yy, args) {
         return new _ScopeNode2.default({ legato: (0, _v2.default)() }, args);
+    },
+    repeat: function repeat(yy, args) {
+        var _args2 = _toArray(args),
+            repeats = _args2[0],
+            items = _args2.slice(1);
+
+        var repeated = [];
+        for (var i = 0; i < repeats.value; i++) {
+            repeated = repeated.concat(items.map(clone));
+        }
+        return new _ScopeNode2.default({}, repeated);
     }
 };
+
+function clone(item) {
+    var Constructor = item.constructor;
+    return new Constructor(item.props, item.children);
+}
 
 exports.default = BUILTINS;
 
 /***/ }),
-/* 60 */
+/* 61 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var rng = __webpack_require__(61);
-var bytesToUuid = __webpack_require__(63);
+var rng = __webpack_require__(62);
+var bytesToUuid = __webpack_require__(64);
 
 // **`v1()` - Generate time-based UUID**
 //
@@ -27962,13 +27998,13 @@ module.exports = v1;
 
 
 /***/ }),
-/* 61 */
+/* 62 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // Unique ID creation requires a high quality random # generator.  In node.js
 // this is pretty straight-forward - we use the crypto API.
 
-var crypto = __webpack_require__(62);
+var crypto = __webpack_require__(63);
 
 module.exports = function nodeRNG() {
   return crypto.randomBytes(16);
@@ -27976,13 +28012,13 @@ module.exports = function nodeRNG() {
 
 
 /***/ }),
-/* 62 */
+/* 63 */
 /***/ (function(module, exports) {
 
 module.exports = require("crypto");
 
 /***/ }),
-/* 63 */
+/* 64 */
 /***/ (function(module, exports) {
 
 /**
@@ -28011,7 +28047,7 @@ module.exports = bytesToUuid;
 
 
 /***/ }),
-/* 64 */
+/* 65 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -28058,7 +28094,7 @@ var PageNode = function () {
 exports.default = PageNode;
 
 /***/ }),
-/* 65 */
+/* 66 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -28107,7 +28143,7 @@ var SystemNode = function () {
 exports.default = SystemNode;
 
 /***/ }),
-/* 66 */
+/* 67 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -28156,7 +28192,7 @@ var LineNode = function () {
 exports.default = LineNode;
 
 /***/ }),
-/* 67 */
+/* 68 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -28202,7 +28238,7 @@ var ChordSymbol = function () {
 exports.default = ChordSymbol;
 
 /***/ }),
-/* 68 */
+/* 69 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -28248,7 +28284,7 @@ var TimeSignature = function () {
 exports.default = TimeSignature;
 
 /***/ }),
-/* 69 */
+/* 70 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -28290,7 +28326,7 @@ var Clef = function () {
 exports.default = Clef;
 
 /***/ }),
-/* 70 */
+/* 71 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";

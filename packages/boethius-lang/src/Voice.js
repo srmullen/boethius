@@ -3,9 +3,10 @@ import { last } from 'lodash';
 import type { YY } from './types';
 import { Executable } from './interfaces/Executable';
 import { Serializable } from './interfaces/Serializable';
+import { Node } from './interfaces/Node';
 import { calculateAndSetTimes, calculateDuration } from './time';
 
-class Voice implements Executable {
+class Voice implements Node, Executable {
     props: {name: string};
     children: Array<Serializable>;
 

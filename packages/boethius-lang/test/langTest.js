@@ -404,4 +404,19 @@ describe('builtins', () => {
             expect(voices.mel[0].props.legato).to.equal(voices.mel[1].props.legato);
         });
     });
+
+    describe('repeat', () => {
+        it('should handle layout items', () => {
+            const {layout} = compile(`(repeat 4 (system 1))`);
+            expect(layout.systems.length).to.equal(4);
+        });
+
+        it('should handle voice items', () => {
+            const {voices} = compile(`
+                [mel (repeat 3 a4)]
+            `);
+            expect(voices.mel.length).to.equal(3);
+            expect(voices.mel[0].props.pitchClass).to.equal('a');
+        });
+    });
 });

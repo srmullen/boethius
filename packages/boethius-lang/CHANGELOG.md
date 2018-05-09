@@ -2,8 +2,9 @@ v0.7.0
 ------
 - Curly bracket enclosed properties lists.
 - Identifiers at the beginning of scope can now be either builtin or scope property.
-- legato builtin.
+- `legato` builtin.
 - Block comments
+- `repeat` builtin.
 
 v0.6.0
 ------
