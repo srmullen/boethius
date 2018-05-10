@@ -58,7 +58,7 @@ Legato.prototype.render = function () {
     return group;
 }
 
-Legato.groupLegato = function (items) {
+Legato.groupItems = function (items) {
     return filter(partitionBy(items, item => item.legato), ([item]) => !!item.legato);
 };
 

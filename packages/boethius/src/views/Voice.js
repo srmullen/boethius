@@ -66,6 +66,7 @@ function nextBeaming (items, groupingTime) {
  * @param items - <Note, Chord>[][]
  * @return - array of note groupings.
  */
+ // FIXME: This is similar to groupLegato and groupSlur. Make into consisten API.
 Voice.findBeaming = function findBeaming (timeSig, items) {
     if (!items.length) {
         return [];
@@ -95,6 +96,7 @@ Voice.findBeaming = function findBeaming (timeSig, items) {
  * @param items - array if items.
  * @return - array of arrays of tuplets.
  */
+ // FIXME: This is similar to groupLegato and groupSlur. Make into consisten API.
 Voice.groupTuplets = function groupTuplets (items) {
     if (!items.length) {
         return [];
@@ -126,30 +128,6 @@ Voice.groupTuplets = function groupTuplets (items) {
     }
 
     return groupings;
-};
-
-/*
- * @param centerLineValue - String representing note value.
- * @param notes <Note, Chord>[]
- * @param stemDirections - optional String specifying the direction of all note stems.
- */
-Voice.stemAndBeam = function stemAndBeam (centerLineValue, items, stemDirections) {
-	if (items.length === 1) {
-		items[0].renderStem(centerLineValue, stemDirections[0]);
-	} else {
-		return beam(items, {line: centerLineValue, stemDirections});
-	}
-};
-
-/*
- * @param Item[][] - beamings
- * @param centerLineValue - String
- * @return String[] - stem direction of every note.
- */
-Voice.getAllStemDirections = function getAllStemDirections (beamings, centerLineValue) {
-    return _.reduce(beamings, (acc, beaming) => {
-        return acc.concat(getAverageStemDirection(beaming, centerLineValue));
-    }, []);
 };
 
 Voice.renderArticulations = function (items) {

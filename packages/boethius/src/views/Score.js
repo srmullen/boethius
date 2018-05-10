@@ -3,6 +3,7 @@ import _ from "lodash";
 
 import System from "./System";
 import TimeContext from "./TimeContext";
+import Beaming from './Beaming';
 import Legato from "./Legato";
 import Slur from './Slur';
 import Text from "./Text";
@@ -44,7 +45,7 @@ function Score ({pageWidth=595, pageHeight=842, length, title}, children=[]) {
 Score.prototype.type = TYPE;
 
 Score.render = function (score, {measures, voices=[], chordSymbols=[], repeats=[], pages=[0]}) {
-    // Create the Score Group. No actual rendering is done here.
+    // Create the Score Group.
     const scoreGroup = score.render();
 
     // Optimize here. Measures shouldn't need to be recreated every time the score is re-rendered.
@@ -57,10 +58,13 @@ Score.render = function (score, {measures, voices=[], chordSymbols=[], repeats=[
         });
     }
 
+    // Get the systems that need to be rendered. The rest are ignored. This
+    // is based on the page.
     const systemsToRender = _.reduce(score.systems, (acc, system, index) => {
         return _.includes(pages, system.page) ? concat(acc, {system, index}) : acc;
     }, []);
 
+    // When no systems are on the page nothing further is done.
     if (systemsToRender.length) {
         // get the start measure for each System.
         const startMeasures = reductions((acc, system) => acc + system.measures, score.systems, 0);
@@ -69,7 +73,8 @@ Score.render = function (score, {measures, voices=[], chordSymbols=[], repeats=[
         // [startTime inclusive, endTime exclusive]
         const timeFrame = [startTimes[_.first(systemsToRender).index], startTimes[_.last(systemsToRender).index + 1]];
 
-        // get voice time frames for rendering decorations.
+        // voiceTimeFrames is an array of only the items that are being rendered
+        // for each voice.
         const voiceTimeFrames = voices.map(voice => {
             if (isVoiceUsed(voice, score.lines)) {
                 return voice.getTimeFrame(timeFrame[0].time, timeFrame[1].time);
@@ -78,9 +83,15 @@ Score.render = function (score, {measures, voices=[], chordSymbols=[], repeats=[
             }
         });
 
+        // const beamings = voiceTimeFrames.map(voice => {
+        //     return Beaming.groupItems(voice, {measures}).map(beaming => {
+        //         return Beaming.of({}, beaming);
+        //     });
+        // });
+
         // Create Slurs
         const slurs = voiceTimeFrames.map(voice => {
-            return Slur.groupSlurs(voice).map(slur => {
+            return Slur.groupItems(voice).map(slur => {
                 const slurStartTime = _.first(slur).time;
                 const slurEndTime = _.last(slur).time;
                 // const systemBreak = _.includes(startTimes.map(time => time.time), legatoEndTime);
@@ -99,7 +110,7 @@ Score.render = function (score, {measures, voices=[], chordSymbols=[], repeats=[
 
         // legatos are grouped by voice.
         const legatos = voiceTimeFrames.map(voice => {
-            return Legato.groupLegato(voice).map(legato => {
+            return Legato.groupItems(voice).map(legato => {
                 const legatoStartTime = _.first(legato).time;
                 const legatoEndTime = _.last(legato).time;
                 // const systemBreak = _.includes(startTimes.map(time => time.time), legatoEndTime);
@@ -149,8 +160,14 @@ Score.render = function (score, {measures, voices=[], chordSymbols=[], repeats=[
             }
         }, systemsToRender);
 
+        /////////////////////
+        // Rendering Phase //
+        /////////////////////
+
+        // systemOffset is used to help calculate the vertical placement of systems.
         let systemOffset = 0;
 
+        // Render the page title if required.
         if (score.title && _.includes(pages, 0)) {
             const titleGroup = score.title.render();
             const xTranslate = (score.length || score.pageWidth)/2;
@@ -159,6 +176,10 @@ Score.render = function (score, {measures, voices=[], chordSymbols=[], repeats=[
             scoreGroup.addChild(titleGroup);
         }
 
+        // Render the Systems
+        // This also includes rendering the music (ie. notes/rests etc.) onto the
+        // system. It should be possible to hook into rendering the system and Rendering
+        // the music seperately.
         const systemGroups = _.map(systemsToRender, ({system, index}, i) => {
             const endMeasure = startMeasures[index] + system.measures;
             const systemMeasures = _.slice(measures, startMeasures[index], endMeasure);
@@ -179,6 +200,9 @@ Score.render = function (score, {measures, voices=[], chordSymbols=[], repeats=[
 
             return systemGroup;
         });
+
+        // render beamings
+        // const beamGroups = _.flatten(beamings).map(beaming => beaming.render());
 
         // render slurs
         const slurGroups = _.flatten(slurs).map(slur => slur.render());

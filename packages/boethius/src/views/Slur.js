@@ -43,7 +43,7 @@ Slur.prototype.render = function () {
     return group;
 }
 
-Slur.groupSlurs = (items) => {
+Slur.groupItems = (items) => {
     return filter(partitionBy(items, item => item.slur), ([item]) => !!item.slur);
 }
 

@@ -65,16 +65,26 @@ function sumSteps (notes, centerLineValue) {
 	return _.sum(notes.map(note => getSteps(centerLineValue, note.pitch)));
 }
 
+function getStemDirection (item, centerLineValue) {
+	let steps = 0;
+	if (isNote(item)) {
+		steps = getSteps(centerLineValue, item.pitch);
+	} else if (isChord(item)) {
+		steps = sumSteps(item.children, centerLineValue);
+	}
+	return steps < 0 ? "up" : "down";
+}
+
 /*
  * @param items <Note, Chord>[]
- * @param centerLineValue - String representing center line note value
+ * @param centerLineValue - String[] representing center line note value
  */
-function getAverageStemDirection (items, centerLineValue) {
-	let averageDirection = _.sum(items.map(item => {
+function getAverageStemDirection (items, centerLineValues) {
+	let averageDirection = _.sum(items.map((item, i) => {
 		if (isNote(item)) {
-			return getSteps(centerLineValue, item.pitch);
+			return getSteps(centerLineValues[i], item.pitch);
 		} else if (isChord(item)) {
-			return sumSteps(item.children, centerLineValue);
+			return sumSteps(item.children, centerLineValues[i]);
 		} else {
 			return 0;
 		}
@@ -114,6 +124,7 @@ export {
 	getStemLength,
 	defaultStemPoint,
 	getSteps,
+	getStemDirection,
 	getAverageStemDirection,
 	parsePitch,
 	hasPitch

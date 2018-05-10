@@ -18,7 +18,8 @@ const constants = {
 		dynamic: "dynamic",
 		page: "page",
 		repeat: "repeat",
-		text: "text"
+		text: "text",
+		beaming: "beaming"
 	},
 	font: {
 		clefs: {

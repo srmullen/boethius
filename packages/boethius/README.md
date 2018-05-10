@@ -25,6 +25,8 @@ TODOS:
     - Anacrusis
     - Minimum stem heights.
     - Tie inflection points.
+    - Clef change markings at end of system.
+    - Fermata
 
     # Lower priority
     - SMuFL
