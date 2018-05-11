@@ -4,6 +4,7 @@ import _ from "lodash";
 import System from "./System";
 import TimeContext from "./TimeContext";
 import Beaming from './Beaming';
+import Tuplet from './Tuplet';
 import Legato from "./Legato";
 import Slur from './Slur';
 import Text from "./Text";
@@ -75,19 +76,25 @@ Score.render = function (score, {measures, voices=[], chordSymbols=[], repeats=[
 
         // voiceTimeFrames is an array of only the items that are being rendered
         // for each voice.
-        const voiceTimeFrames = voices.map(voice => {
+        const voiceTimeFrames = _.compact(voices.map(voice => {
             if (isVoiceUsed(voice, score.lines)) {
                 return voice.getTimeFrame(timeFrame[0].time, timeFrame[1].time);
             } else {
                 return null;
             }
+        }));
+
+        const beamings = voiceTimeFrames.map(voice => {
+            return Beaming.groupItems(voice, {measures}).map(beaming => {
+                return Beaming.of({}, beaming);
+            });
         });
 
-        // const beamings = voiceTimeFrames.map(voice => {
-        //     return Beaming.groupItems(voice, {measures}).map(beaming => {
-        //         return Beaming.of({}, beaming);
-        //     });
-        // });
+        const tuplets = voiceTimeFrames.map(voice => {
+            return Tuplet.groupItems(voice, {measures}).map(tuplet => {
+                return Tuplet.of({}, tuplet);
+            });
+        });
 
         // Create Slurs
         const slurs = voiceTimeFrames.map(voice => {
@@ -203,6 +210,12 @@ Score.render = function (score, {measures, voices=[], chordSymbols=[], repeats=[
 
         // render beamings
         // const beamGroups = _.flatten(beamings).map(beaming => beaming.render());
+
+        // render tuplets
+        // const tupletGroups = _.flatten(tuplets).map(tuplet => {
+        //     // needs line center
+        //     tuplet.render();
+        // });
 
         // render slurs
         const slurGroups = _.flatten(slurs).map(slur => slur.render());

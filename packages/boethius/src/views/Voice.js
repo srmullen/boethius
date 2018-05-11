@@ -90,55 +90,10 @@ Voice.findBeaming = function findBeaming (timeSig, items) {
     return _.reject(beamings, _.isEmpty);
 };
 
-/*
- * items must have time properties.
- * @param timeSig - time signature in the current contet.
- * @param items - array if items.
- * @return - array of arrays of tuplets.
- */
- // FIXME: This is similar to groupLegato and groupSlur. Make into consisten API.
-Voice.groupTuplets = function groupTuplets (items) {
-    if (!items.length) {
-        return [];
-    }
-
-    // filter out items that don't have a tuplet after partitioning them.
-
-    const groupings = [];
-    let previousTuplet = null;
-    for (let i = 0; i < items.length; i++) {
-        let item = items[i];
-        if (!item.tuplet) { // skip this item
-            previousTuplet = null;
-        } else if (item.tuplet !== previousTuplet || !_.last(groupings)) { // create a new tuplet grouping
-            groupings.push([item]);
-            previousTuplet = item.tuplet;
-        } else { // add the item to the previous grouping.
-            let grouping = _.last(groupings);
-            let longestDuration = _.minBy(grouping, item => item.value).value;
-            let currentTupletDuration = sumDurations(grouping);
-            let maxTupletDuration = calculateTupletDuration(previousTuplet, longestDuration);
-            if (currentTupletDuration < maxTupletDuration) { // floating point error
-                grouping.push(item); // add the item to the last tuplet grouping.
-            } else {
-                groupings.push([item]); // create a new tuplet grouping.
-            }
-            // no need to update previousTuplet since it is the same
-        }
-    }
-
-    return groupings;
-};
-
 Voice.renderArticulations = function (items) {
     _.each(items, (item) => {
         if (item.drawArticulations) item.drawArticulations();
     });
-};
-
-Voice.renderTuplets = function (items, centerLine) {
-    const tuplets = Voice.groupTuplets(items);
-    return tuplets.map(tuplet => drawTuplets(tuplet, centerLine, this.stemDirection));
 };
 
 function gt (n1, n2) {

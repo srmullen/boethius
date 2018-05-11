@@ -2,9 +2,9 @@ import _ from 'lodash';
 import constants from '../constants';
 import {isPitched} from "../types";
 import {beam} from '../engraver';
-import {concat, partitionBy, reductions} from "../utils/common";
-import {calculateDuration, parseSignature, calculateTupletDuration, sumDurations} from "../utils/timeUtils";
-import {getAverageStemDirection, getStemDirection} from "../utils/note";
+import {reductions} from "../utils/common";
+import {parseSignature} from "../utils/timeUtils";
+import {getAverageStemDirection} from "../utils/note";
 
 function Beaming (props, children = []) {
     this.children = children;

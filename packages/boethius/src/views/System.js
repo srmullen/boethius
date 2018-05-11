@@ -13,6 +13,7 @@ import Voice from "./Voice";
 import {getCenterLineValue} from "./Clef";
 import Line from "./Line";
 import Beaming from './Beaming';
+import Tuplet from './Tuplet';
 
 const TYPE = constants.type.system;
 
@@ -34,130 +35,10 @@ function System ({page=0, measures=4, lineHeights=[], indentation=0, length}, ch
 	this.indentation = indentation;
 }
 
-/*
- * @param system - System
- * @param timeContexts - array of time contexts
- */
-System.renderTimeContextsV1 = function ({system, lines, measures, voices, timeContexts, length}) {
-	// create the system group that all items will be added to.
-	const systemGroup = system.render();
-
-	const lineHeights = system.getLineHeights(lines);
-
-	// Create the timeContexts groups so their widths can be determined.
-	const timeContextGroups = _.map(timeContexts, timeContext => timeContext.render(lineHeights));
-
-	const shortestDuration = Scored.config.shortestDuration; // need function to calculate this.
-
-	const timeLengths = calculateTimeLengths(timeContexts, shortestDuration);
-
-	const measureLengths = addDefaultMeasureLengths(system.measures, calculateMeasureLengths(timeLengths));
-
-	// get the minimum length of the line
-	const minLineLength = _.sum(measureLengths);
-
-	let lineGroups, noteScale, cursorFn;
-
-	if (!length) {
-		lineGroups = system.renderLines(lines, minLineLength);
-
-		const measureGroups = system.renderMeasures(measures, measureLengths, lineGroups);
-
-		systemGroup.addChildren(measureGroups);
-
-		cursorFn = (possibleNextPositions, cursor) => {
-			return _.min(possibleNextPositions) + cursor;
-		};
-
-	} else {
-		lineGroups = system.renderLines(lines, length);
-
-		const totalMarkingLength = _.sumBy(timeLengths, ({length}) => length[0]);
-
-		const measureScale = length / minLineLength;
-
-		// noteScale = (length - totalMarkingLength) / (minLineLength - totalMarkingLength);
-
-		const measureGroups = system.renderMeasures(measures, _.map(measureLengths, measureLength => measureLength * measureScale), lineGroups);
-
-		systemGroup.addChildren(measureGroups);
-
-		cursorFn = (possibleNextPositions, cursor) => {
-			return placement.scaleCursor(measureScale, cursor, _.min(possibleNextPositions) + cursor);
-		};
-	}
-
-	// add the items to the system group
-	systemGroup.addChildren(timeContextGroups);
-
-	systemGroup.addChildren(lineGroups);
-
-	systemGroup.addChild(drawSystemBar(lineGroups));
-
-	/////////////////////
-	// Placement Phase //
-	/////////////////////
-	const lineCenters = _.map(lineGroups, b);
-	const cursors = placeTimes(timeContexts, measures, measureLengths, cursorFn);
-
-	// Render stems, beams, tuplets, articulations, and ledger lines.
-	////////////////////////
-	// Render Decorations // FIXME: Should be handled at the Score level?
-	////////////////////////
-	if (timeContexts) {
-		const startTime = _.first(timeContexts).time;
-		const endTime = _.last(timeContexts).time;
-		map((line, lineGroup, lineCenter) => {
-			const lineItems = getLineItems(line, voices, startTime.time, endTime.time);
-
-			// Render stems and tuplets.
-			_.each(lineItems, (lineVoice, i) => {
-				const itemsByMeasure = _.groupBy(lineVoice, child => getMeasureNumber(measures, child.time));
-				_.each(measures, (measure) => {
-					const items = itemsByMeasure[measure.value] || [];
-
-					// Nothing to do if there are no items in the measure.
-					if (!items.length) return;
-
-					// stems and beams need to know both line and voice
-					const contextTime = getTime(measures, items[0]);
-					const beat = 0
-					const context = line.contextAt({measure: measure.value, beat: beat});
-					const centerLineValue = getCenterLineValue(context.clef);
-					const beamings = Voice.findBeaming(context.timeSig, items);
-					const stemDirection = getStemDirection(lineItems, i);
-					const stemDirections = stemDirection
-						? _.fill(new Array(items.length), stemDirection)
-						: Voice.getAllStemDirections(beamings, centerLineValue);
-					const beams = _.compact(mapDeep(_.partial(Voice.stemAndBeam, centerLineValue), beamings, stemDirections));
-					lineGroup.addChildren(beams);
-
-					// tuplet groups need to know voice and line
-					const tupletGroups = Voice.renderTuplets(items, lineCenter);
-					lineGroup.addChildren(tupletGroups);
-				});
-			});
-
-			// render decorations that only require knowledge of the line.
-			_.each(lineItems, voiceItems => {
-				renderLedgerLines(voiceItems, lineCenter);
-				Voice.renderArticulations(voiceItems); // items must have stem direction already
-			});
-
-		}, lines, lineGroups, lineCenters);
-	}
-
-	const measureNumber = renderMeasureNumber(measures[0].value);
-	measureNumber.translate(0, -20);
-	systemGroup.addChild(measureNumber);
-
-	return systemGroup;
-};
-
 // measures only contains the MeasureViews that are being rendered on this system.
 // Perhaps it should get all the measures and start and end times. That way Rendering
 // on a system doesn't have to begin and end at measure boundaries.
-System.renderTimeContextsV2 = function ({system, lines, measures, voices, timeContexts, length}) {
+System.renderTimeContexts = function ({system, lines, measures, voices, timeContexts, length}) {
 	// create the system group that all items will be added to.
 	const systemGroup = system.render();
 
@@ -232,6 +113,7 @@ System.renderTimeContextsV2 = function ({system, lines, measures, voices, timeCo
 			// Render stems and tuplets.
 			_.each(lineItems, (lineVoice, i) => {
 				const itemsByMeasure = _.groupBy(lineVoice, child => getMeasureNumber(measures, child.time));
+
 				// Create the stem groupings.
 				const beamings = _.map(measures, (measure) => {
 					const items = itemsByMeasure[measure.value] || [];
@@ -241,21 +123,21 @@ System.renderTimeContextsV2 = function ({system, lines, measures, voices, timeCo
 
 					// stems and beams need to know both line and voice
 					const context = line.contextAt({measure: measure.value});
-					const beamings = Voice.findBeaming(context.timeSig, items);
-					return beamings;
-
-					// const centerLineValue = getCenterLineValue(context.clef);
-					// const stemDirection = getStemDirection(lineItems, i);
-					// const stemDirections = stemDirection
-					// 	? _.fill(new Array(items.length), stemDirection)
-					// 	: Voice.getAllStemDirections(beamings, centerLineValue);
-					// const beams = _.compact(mapDeep(_.partial(Voice.stemAndBeam, centerLineValue), beamings, stemDirections));
-					// lineGroup.addChildren(beams);
-					//
-					// // tuplet groups need to know voice and line
-					// const tupletGroups = Voice.renderTuplets(items, lineCenter);
-					// lineGroup.addChildren(tupletGroups);
+					// FIXME: Use Beaming.groupItems instead.
+					return Voice.findBeaming(context.timeSig, items);
 				});
+
+				const tuplets = _.map(measures, measure => {
+					const items = itemsByMeasure[measure.value] || [];
+
+					if (!items.length) return;
+
+					// Group tuplets FIXME: shouldn't be here.
+					return Tuplet.groupItems(items).map(tuplet => {
+						return Tuplet.of({}, tuplet);
+					});
+				});
+
 				// Render Beamings
 				// Voice.findBeaming returns the beamings grouped by measure, so it
 				// needs to be flattened one level.
@@ -263,18 +145,21 @@ System.renderTimeContextsV2 = function ({system, lines, measures, voices, timeCo
 					const centerLineValues = _.map(beaming, item => {
 						const contextTime = getTime(measures, item);
 						const context = line.contextAt(contextTime);
-						const centerLineValue = getCenterLineValue(context.clef);
-						return centerLineValue;
+						return getCenterLineValue(context.clef);
 					});
 
 					const stemDirection = getStemDirection(lineItems, i);
 					const stemDirections = stemDirection
 						? _.fill(new Array(beaming.length), stemDirection)
 						: Beaming.getAllStemDirections(beaming, centerLineValues);
-					// const stemDirections = Beaming.getAllStemDirections(beaming, centerLineValues);
 
 					const beam = Beaming.stemAndBeam(beaming, centerLineValues, stemDirections);
 					lineGroup.addChild(beam);
+				});
+
+				_.each(_.compact(_.flatten(tuplets)), tuplet => {
+					const group = tuplet.render(lineCenter);
+					lineGroup.addChild(group);
 				});
 			});
 
@@ -293,8 +178,6 @@ System.renderTimeContextsV2 = function ({system, lines, measures, voices, timeCo
 
 	return systemGroup;
 };
-
-System.renderTimeContexts = System.renderTimeContextsV2;
 
 /*
  * @param timeContexts - array of lineContexts.

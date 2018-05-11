@@ -19,7 +19,8 @@ const constants = {
 		page: "page",
 		repeat: "repeat",
 		text: "text",
-		beaming: "beaming"
+		beaming: "beaming",
+		tuplet: "tuplet"
 	},
 	font: {
 		clefs: {

@@ -1036,10 +1036,16 @@ const examples = {
 
         // create voices
         var soprano = scored.voice({name: "treble"}, [
+            // stems up
             n({value: 4, tuplet: "3/2"}), n({value: 4, tuplet: "3/2"}), n({value: 4, tuplet: "3/2"}),
             n({value: 8, tuplet: "3/2"}), n({value: 8, tuplet: "3/2"}), n({value: 8, tuplet: "3/2"}),
             n({value: 16, tuplet: "3/2"}), n({value: 16, tuplet: "3/2"}), n({value: 16, tuplet: "3/2"}),
-            n({value: 16, tuplet: "3/2"}), n({value: 16, tuplet: "3/2"}), n({value: 16, tuplet: "3/2"})
+            n({value: 16, tuplet: "3/2"}), n({value: 16, tuplet: "3/2"}), n({value: 16, tuplet: "3/2"}),
+            // stems down
+            n({value: 4, pitch: 'c5', tuplet: "3/2"}), n({value: 4, pitch: 'c5', tuplet: "3/2"}), n({value: 4, pitch: 'c5', tuplet: "3/2"}),
+            n({value: 8, pitch: 'c5', tuplet: "3/2"}), n({value: 8, pitch: 'c5', tuplet: "3/2"}), n({value: 8, pitch: 'c5', tuplet: "3/2"}),
+            n({value: 16, pitch: 'c5', tuplet: "3/2"}), n({value: 16, pitch: 'c5', tuplet: "3/2"}), n({value: 16, pitch: 'c5', tuplet: "3/2"}),
+            n({value: 16, pitch: 'c5', tuplet: "3/2"}), n({value: 16, pitch: 'c5', tuplet: "3/2"}), n({value: 16, pitch: 'c5', tuplet: "3/2"})
         ]);
         var bass = scored.voice({name: "bass"}, [
             r({value: 4, tuplet: "3/2"}), r({value: 4, tuplet: "3/2"}), r({value: 4, tuplet: "3/2"}),

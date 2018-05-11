@@ -39,12 +39,13 @@ describe("Note", () => {
                 e5 = scored.note({pitch: "e5", value: 16}),
                 f5 = scored.note({pitch: "f5", value: 16});
 
-            expect(getAverageStemDirection([e4, f4, g4, a4], centerLine)).to.eql(["up", "up", "up", "up"]);
-            expect(getAverageStemDirection([g4, a4, b4, c5], centerLine)).to.eql(["up", "up", "up", "up"]);
-            expect(getAverageStemDirection([a4, b4, c5, d5], centerLine)).to.eql(["down", "down", "down", "down"]);
-            expect(getAverageStemDirection([d5, c5, b4, a4], centerLine)).to.eql(["down", "down", "down", "down"]);
-            expect(getAverageStemDirection([e4, e5], centerLine)).to.eql(["up", "up"]);
-            expect(getAverageStemDirection([e4, f5], centerLine)).to.eql(["down", "down"]);
+            const centerLines = _.fill(new Array(4), centerLine);
+            expect(getAverageStemDirection([e4, f4, g4, a4], centerLines)).to.eql(["up", "up", "up", "up"]);
+            expect(getAverageStemDirection([g4, a4, b4, c5], centerLines)).to.eql(["up", "up", "up", "up"]);
+            expect(getAverageStemDirection([a4, b4, c5, d5], centerLines)).to.eql(["down", "down", "down", "down"]);
+            expect(getAverageStemDirection([d5, c5, b4, a4], centerLines)).to.eql(["down", "down", "down", "down"]);
+            expect(getAverageStemDirection([e4, e5], centerLines)).to.eql(["up", "up"]);
+            expect(getAverageStemDirection([e4, f5], centerLines)).to.eql(["down", "down"]);
         });
 
         it("should handle chords and notes", () => {
@@ -63,12 +64,13 @@ describe("Note", () => {
                 amin = scored.chord({value: 16}, ["a4", "c5", "e5"]),
                 bdim = scored.chord({value: 16}, ["b4", "d5", "f5"]);
 
-            expect(getAverageStemDirection([e4, fmaj, g4, a4], centerLine)).to.eql(["up", "up", "up", "up"]);
-            expect(getAverageStemDirection([gmaj, a4, b4, c5], centerLine)).to.eql(["down", "down", "down", "down"]);
-            expect(getAverageStemDirection([gmaj, a4, g4, e4], centerLine)).to.eql(["up", "up", "up", "up"]);
-            expect(getAverageStemDirection([amin, bdim], centerLine)).to.eql(["down", "down"]);
-            expect(getAverageStemDirection([fmaj, gmaj], centerLine)).to.eql(["up", "up"]);
-            expect(getAverageStemDirection([fmaj, bdim], centerLine)).to.eql(["down", "down"]);
+            const centerLines = _.fill(new Array(4), centerLine);
+            expect(getAverageStemDirection([e4, fmaj, g4, a4], centerLines)).to.eql(["up", "up", "up", "up"]);
+            expect(getAverageStemDirection([gmaj, a4, b4, c5], centerLines)).to.eql(["down", "down", "down", "down"]);
+            expect(getAverageStemDirection([gmaj, a4, g4, e4], centerLines)).to.eql(["up", "up", "up", "up"]);
+            expect(getAverageStemDirection([amin, bdim], centerLines)).to.eql(["down", "down"]);
+            expect(getAverageStemDirection([fmaj, gmaj], centerLines)).to.eql(["up", "up"]);
+            expect(getAverageStemDirection([fmaj, bdim], centerLines)).to.eql(["down", "down"]);
         });
     });
 
