@@ -43,21 +43,21 @@ Voice.prototype.type = constants.type.voice;
  * @param groupingTime - the time the grouping should end at.
  * @return [beaming, remainingItems]
  */
-function nextBeaming (items, groupingTime) {
-    const item = _.first(items);
-    if (!isPitched(item)) {
-        return [null, _.tail(items)];
-    } else if (item.value <= 4) { // and item doesn't get beamed if it is a quarter note or greater.
-        return [[_.first(items)], _.tail(items)];
-    } else {
-        const splitIndex = _.findIndex(items, item => ((item.time >= groupingTime || item.value <= 4) || !isPitched(item)));
-        if (splitIndex === -1) {
-            return [items, []];
-        } else {
-            return [_.take(items, splitIndex), _.drop(items, splitIndex)];
-        }
-    }
-}
+// function nextBeaming (items, groupingTime) {
+//     const item = _.first(items);
+//     if (!isPitched(item)) {
+//         return [null, _.tail(items)];
+//     } else if (item.value <= 4) { // and item doesn't get beamed if it is a quarter note or greater.
+//         return [[_.first(items)], _.tail(items)];
+//     } else {
+//         const splitIndex = _.findIndex(items, item => ((item.time >= groupingTime || item.value <= 4) || !isPitched(item)));
+//         if (splitIndex === -1) {
+//             return [items, []];
+//         } else {
+//             return [_.take(items, splitIndex), _.drop(items, splitIndex)];
+//         }
+//     }
+// }
 
 /*
  * Notes must have time properties for this function to work.
@@ -67,28 +67,28 @@ function nextBeaming (items, groupingTime) {
  * @return - array of note groupings.
  */
  // FIXME: This is similar to groupLegato and groupSlur. Make into consisten API.
-Voice.findBeaming = function findBeaming (timeSig, items) {
-    if (!items.length) {
-        return [];
-    }
-
-    const [, denominator] = parseSignature(timeSig);
-    const groupingDurations = timeSig.beatStructure.map(beats => beats * (1/denominator));
-    const baseTime = items[0].time; // the time from which the groupings are reckoned.
-    const groupingTimes = _.tail(reductions((acc, el) => acc + el, groupingDurations, baseTime));
-
-    const beamings = [];
-    let groupingTimeIndex = 0;
-    let [beaming, remainingItems] = nextBeaming(items, groupingTimes[groupingTimeIndex]);
-    beamings.push(beaming);
-    while (remainingItems.length) {
-        if (remainingItems[0].time >= groupingTimes[groupingTimeIndex]) groupingTimeIndex++;
-        [beaming, remainingItems] = nextBeaming(remainingItems, groupingTimes[groupingTimeIndex]);
-        if (beaming) beamings.push(beaming);
-    }
-
-    return _.reject(beamings, _.isEmpty);
-};
+// Voice.findBeaming = function findBeaming (timeSig, items) {
+//     if (!items.length) {
+//         return [];
+//     }
+//
+//     const [, denominator] = parseSignature(timeSig);
+//     const groupingDurations = timeSig.beatStructure.map(beats => beats * (1/denominator));
+//     const baseTime = items[0].time; // the time from which the groupings are reckoned.
+//     const groupingTimes = _.tail(reductions((acc, el) => acc + el, groupingDurations, baseTime));
+//
+//     const beamings = [];
+//     let groupingTimeIndex = 0;
+//     let [beaming, remainingItems] = nextBeaming(items, groupingTimes[groupingTimeIndex]);
+//     beamings.push(beaming);
+//     while (remainingItems.length) {
+//         if (remainingItems[0].time >= groupingTimes[groupingTimeIndex]) groupingTimeIndex++;
+//         [beaming, remainingItems] = nextBeaming(remainingItems, groupingTimes[groupingTimeIndex]);
+//         if (beaming) beamings.push(beaming);
+//     }
+//
+//     return _.reject(beamings, _.isEmpty);
+// };
 
 Voice.renderArticulations = function (items) {
     _.each(items, (item) => {

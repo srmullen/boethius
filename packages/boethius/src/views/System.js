@@ -110,57 +110,41 @@ System.renderTimeContexts = function ({system, lines, measures, voices, timeCont
 		map((line, lineGroup, lineCenter) => {
 			const lineItems = getLineItems(line, voices, startTime.time, endTime.time);
 
-			// Render stems and tuplets.
-			_.each(lineItems, (lineVoice, i) => {
-				const itemsByMeasure = _.groupBy(lineVoice, child => getMeasureNumber(measures, child.time));
-
-				// Create the stem groupings.
-				const beamings = _.map(measures, (measure) => {
-					const items = itemsByMeasure[measure.value] || [];
-
-					// Nothing to do if there are no items in the measure.
-					if (!items.length) return;
-
-					// stems and beams need to know both line and voice
-					const context = line.contextAt({measure: measure.value});
-					// FIXME: Use Beaming.groupItems instead.
-					return Voice.findBeaming(context.timeSig, items);
-				});
-
-				const tuplets = _.map(measures, measure => {
-					const items = itemsByMeasure[measure.value] || [];
-
-					if (!items.length) return;
-
-					// Group tuplets FIXME: shouldn't be here.
-					return Tuplet.groupItems(items).map(tuplet => {
-						return Tuplet.of({}, tuplet);
-					});
-				});
-
-				// Render Beamings
-				// Voice.findBeaming returns the beamings grouped by measure, so it
-				// needs to be flattened one level.
-				_.each(_.compact(_.flatten(beamings)), (beaming) => {
-					const centerLineValues = _.map(beaming, item => {
-						const contextTime = getTime(measures, item);
-						const context = line.contextAt(contextTime);
-						return getCenterLineValue(context.clef);
-					});
-
+			const beamings = lineItems.map((voice, i) => {
+				return Beaming.groupItems(voice, {measures}).map(beaming => {
 					const stemDirection = getStemDirection(lineItems, i);
-					const stemDirections = stemDirection
-						? _.fill(new Array(beaming.length), stemDirection)
-						: Beaming.getAllStemDirections(beaming, centerLineValues);
+					return Beaming.of({stemDirection}, beaming);
+				});
+			});
 
-					const beam = Beaming.stemAndBeam(beaming, centerLineValues, stemDirections);
-					lineGroup.addChild(beam);
+			const tuplets = lineItems.map(voice => {
+	            return Tuplet.groupItems(voice, {measures}).map(tuplet => {
+	                return Tuplet.of({}, tuplet);
+	            });
+	        });
+
+			// Render Beamings
+			// Voice.findBeaming returns the beamings grouped by measure, so it
+			// needs to be flattened one level.
+			_.each(_.compact(_.flatten(beamings)), (beaming) => {
+				const centerLineValues = _.map(beaming.children, item => {
+					const contextTime = getTime(measures, item);
+					const context = line.contextAt(contextTime);
+					return getCenterLineValue(context.clef);
 				});
 
-				_.each(_.compact(_.flatten(tuplets)), tuplet => {
-					const group = tuplet.render(lineCenter);
-					lineGroup.addChild(group);
-				});
+				// const stemDirection = getStemDirection(lineItems, i);
+				const stemDirections = beaming.stemDirection
+					? _.fill(new Array(beaming.children.length), beaming.stemDirection)
+					: Beaming.getAllStemDirections(beaming.children, centerLineValues);
+
+				const beam = Beaming.stemAndBeam(beaming.children, centerLineValues, stemDirections);
+				lineGroup.addChild(beam);
+			});
+
+			_.each(_.compact(_.flatten(tuplets)), tuplet => {
+				const group = tuplet.render(lineCenter);
+				lineGroup.addChild(group);
 			});
 
 			// render decorations that only require knowledge of the line.

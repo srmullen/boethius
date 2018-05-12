@@ -84,17 +84,17 @@ Score.render = function (score, {measures, voices=[], chordSymbols=[], repeats=[
             }
         }));
 
-        const beamings = voiceTimeFrames.map(voice => {
-            return Beaming.groupItems(voice, {measures}).map(beaming => {
-                return Beaming.of({}, beaming);
-            });
-        });
+        // const beamings = voiceTimeFrames.map(voice => {
+        //     return Beaming.groupItems(voice, {measures}).map(beaming => {
+        //         return Beaming.of({}, beaming);
+        //     });
+        // });
 
-        const tuplets = voiceTimeFrames.map(voice => {
-            return Tuplet.groupItems(voice, {measures}).map(tuplet => {
-                return Tuplet.of({}, tuplet);
-            });
-        });
+        // const tuplets = voiceTimeFrames.map(voice => {
+        //     return Tuplet.groupItems(voice, {measures}).map(tuplet => {
+        //         return Tuplet.of({}, tuplet);
+        //     });
+        // });
 
         // Create Slurs
         const slurs = voiceTimeFrames.map(voice => {

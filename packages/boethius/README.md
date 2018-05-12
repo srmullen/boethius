@@ -27,6 +27,7 @@ TODOS:
     - Tie inflection points.
     - Clef change markings at end of system.
     - Fermata
+    - Fingerings
 
     # Lower priority
     - SMuFL

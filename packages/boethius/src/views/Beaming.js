@@ -3,10 +3,11 @@ import constants from '../constants';
 import {isPitched} from "../types";
 import {beam} from '../engraver';
 import {reductions} from "../utils/common";
-import {parseSignature} from "../utils/timeUtils";
+import {parseSignature, getMeasureNumber} from "../utils/timeUtils";
 import {getAverageStemDirection} from "../utils/note";
 
-function Beaming (props, children = []) {
+function Beaming ({stemDirection}, children = []) {
+    this.stemDirection = stemDirection;
     this.children = children;
 }
 
@@ -24,23 +25,33 @@ Beaming.groupItems = function (items, {measures}={}) {
     if (!items.length) {
         return [];
     }
-    const timeSig = measures[0].timeSig;
-    const [, denominator] = parseSignature(timeSig);
-    const groupingDurations = timeSig.beatStructure.map(beats => beats * (1/denominator));
-    const baseTime = items[0].time; // the time from which the groupings are reckoned.
-    const groupingTimes = _.tail(reductions((acc, el) => acc + el, groupingDurations, baseTime));
+	const itemsByMeasure = _.groupBy(items, child => getMeasureNumber(measures, child.time));
 
-    const beamings = [];
-    let groupingTimeIndex = 0;
-    let [beaming, remainingItems] = nextBeaming(items, groupingTimes[groupingTimeIndex]);
-    beamings.push(beaming);
-    while (remainingItems.length) {
-        if (remainingItems[0].time >= groupingTimes[groupingTimeIndex]) groupingTimeIndex++;
-        [beaming, remainingItems] = nextBeaming(remainingItems, groupingTimes[groupingTimeIndex]);
-        if (beaming) beamings.push(beaming);
-    }
+    // NOTE: Currently only beaming items within a measure. Should make it possible to
+    // beam across measures.
+    return measures.reduce((acc, measure) => {
+        const measureItems = itemsByMeasure[measure.value] || [];
 
-    return _.reject(beamings, _.isEmpty);
+        if (!measureItems.length) return acc;
+
+        const timeSig = measure.timeSig;
+        const [, denominator] = parseSignature(timeSig);
+        const groupingDurations = timeSig.beatStructure.map(beats => beats * (1/denominator));
+        const baseTime = measureItems[0].time; // the time from which the groupings are reckoned.
+        const groupingTimes = _.tail(reductions((acc, el) => acc + el, groupingDurations, baseTime));
+
+        const beamings = [];
+        let groupingTimeIndex = 0;
+        let [beaming, remainingItems] = nextBeaming(measureItems, groupingTimes[groupingTimeIndex]);
+        beamings.push(beaming);
+        while (remainingItems.length) {
+            if (remainingItems[0].time >= groupingTimes[groupingTimeIndex]) groupingTimeIndex++;
+            [beaming, remainingItems] = nextBeaming(remainingItems, groupingTimes[groupingTimeIndex]);
+            if (beaming) beamings.push(beaming);
+        }
+
+        return acc.concat(_.reject(beamings, _.isEmpty));
+    }, []);
 }
 
 Beaming.getAllStemDirections = function (items, centerLineValues) {
