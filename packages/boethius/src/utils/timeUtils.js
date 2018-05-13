@@ -53,12 +53,12 @@ function getTime (measures, item) {
 		measure = getMeasureNumber(measures, item.time);
 	}
 
-	if (measure >= measures.length) {
-		const lastMeasure = _.last(measures);
+	const lastMeasure = _.last(measures);
+	if (measure > lastMeasure.value) {
 		time = getMeasureDuration(lastMeasure) + lastMeasure.startsAt;
 	}
 
-	const measureView = measures[measure];
+	const measureView = measures.find(view => view.value === measure);
 
 	// time signatures are always at the beginning of a measure.
 	if (isTimeSignature(item)) {
@@ -84,6 +84,7 @@ function getTime (measures, item) {
 
 	return {time, measure, beat};
 }
+
 
 /*
  * @param timesig - string or arrary representation of timeSig value.

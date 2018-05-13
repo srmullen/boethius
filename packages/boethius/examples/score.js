@@ -55,7 +55,7 @@ const examples = {
         var voice = scored.voice({name: "v"}, [
             scored.note({pitch: "a4", value: 1}),
             scored.note({pitch: "a4", value: 1}),
-            scored.note({pitch: "a4", value: 4})
+            scored.note({pitch: "bb4", value: 4})
         ]);
 
         var page0 = scored.page();

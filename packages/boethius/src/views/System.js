@@ -138,7 +138,8 @@ System.renderTimeContexts = function ({system, lines, measures, voices, timeCont
 					? _.fill(new Array(beaming.children.length), beaming.stemDirection)
 					: Beaming.getAllStemDirections(beaming.children, centerLineValues);
 
-				const beam = Beaming.stemAndBeam(beaming.children, centerLineValues, stemDirections);
+				// const beam = Beaming.stemAndBeam(beaming.children, centerLineValues, stemDirections);
+				const beam = beaming.render(centerLineValues, stemDirections);
 				lineGroup.addChild(beam);
 			});
 

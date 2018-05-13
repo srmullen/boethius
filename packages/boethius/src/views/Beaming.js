@@ -58,11 +58,11 @@ Beaming.getAllStemDirections = function (items, centerLineValues) {
     return getAverageStemDirection(items, centerLineValues);
 }
 
-Beaming.stemAndBeam = function (items, centerLineValues, stemDirections) {
-    if (items.length === 1) {
-		items[0].renderStem(centerLineValues[0], stemDirections[0]);
+Beaming.prototype.render = function (centerLineValues, stemDirections) {
+    if (this.children.length === 1) {
+		this.children[0].renderStem(centerLineValues[0], stemDirections[0]);
 	} else {
-		return beam(items, {line: centerLineValues[0], stemDirections});
+		return beam(this.children, {line: centerLineValues[0], stemDirections});
 	}
 }
 
