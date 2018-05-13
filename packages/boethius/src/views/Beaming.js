@@ -13,10 +13,6 @@ function Beaming ({stemDirection}, children = []) {
 
 Beaming.prototype.type = constants.type.beaming;
 
-Beaming.prototype.render = function () {
-    console.log('rendering beaming');
-}
-
 Beaming.of = (context, children) => {
     return new Beaming(context, children);
 }

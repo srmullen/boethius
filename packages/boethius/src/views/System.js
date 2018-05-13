@@ -126,7 +126,7 @@ System.renderTimeContexts = function ({system, lines, measures, voices, timeCont
 			// Render Beamings
 			// Voice.findBeaming returns the beamings grouped by measure, so it
 			// needs to be flattened one level.
-			_.each(_.compact(_.flatten(beamings)), (beaming) => {
+			_.each(_.flatten(beamings), (beaming) => {
 				const centerLineValues = _.map(beaming.children, item => {
 					const contextTime = getTime(measures, item);
 					const context = line.contextAt(contextTime);
@@ -143,7 +143,7 @@ System.renderTimeContexts = function ({system, lines, measures, voices, timeCont
 				lineGroup.addChild(beam);
 			});
 
-			_.each(_.compact(_.flatten(tuplets)), tuplet => {
+			_.each(_.flatten(tuplets), tuplet => {
 				const group = tuplet.render(lineCenter);
 				lineGroup.addChild(group);
 			});
