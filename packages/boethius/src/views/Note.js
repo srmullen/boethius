@@ -19,7 +19,11 @@ const TYPE = constants.type.note;
  * Only items on the context will be saved back to the music json.
  * All other properties on the view will need to be calculated at runtime.
  */
-function Note ({pitch, pitchClass="a", octave=4, value=4, dots=0, slur, tuplet, time, legato, staccato, tenuto, portato, voice}) {
+function Note (props) {
+	const {
+		pitch, pitchClass="a", octave=4, value=4, dots=0, slur, tuplet, time,
+		legato, staccato, tenuto, portato, voice, forceAccidental
+	} = props;
 
 	this.pitch = pitch || (pitchClass + octave);
 	this.pitchClass = pitchClass;
@@ -33,6 +37,7 @@ function Note ({pitch, pitchClass="a", octave=4, value=4, dots=0, slur, tuplet, 
 	this.voice = voice;
 	this.slur = slur;
 	this.legato = legato;
+	this.forceAccidental = forceAccidental;
 
 	// articulations
 	this.staccato = staccato;
@@ -51,7 +56,14 @@ Note.render = function (note, context={}) {
 
 Note.renderAccidental = function (note, accidentals, key) {
 	let parsedPitch = noteUtils.parsePitch(note.pitch);
-	let accidental = key ? getAccidental(parsedPitch, accidentals, key) : parsedPitch.accidental;
+	let accidental;
+	if (note.forceAccidental) {
+		accidental = parsedPitch.accidental || 'n';
+	} else {
+		accidental = key ? getAccidental(parsedPitch, accidentals, key) : parsedPitch.accidental;
+	}
+
+	// let accidental = key ? getAccidental(parsedPitch, accidentals, key) : parsedPitch.accidental;
 	if (!_.isUndefined(accidental)) {
 		let position = placement.calculateDefaultAccidentalPosition(note);
 		let accidentalGroup = note.drawAccidental(accidental);
