@@ -1,14 +1,14 @@
 // @flow
 import { LINE } from './constants';
-import type { YY } from './types';
+import type { YY, Clef, LineProps } from './types';
 
 class LineNode {
 
-    props: {};
+    props: LineProps;
 
     type: string = LINE;
 
-    constructor (props: {}) {
+    constructor (props: LineProps) {
         this.props = props;
     }
 

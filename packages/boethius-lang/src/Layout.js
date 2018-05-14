@@ -1,12 +1,12 @@
 // @flow
-import type { Line, System, Page } from './types';
+import type { LineProps, System, Page } from './types';
 import { SCORE } from './constants';
 
 class Layout {
 
     props: {}
     timeSignatures: Array<mixed>
-    lines: Array<Line>
+    lines: Array<LineProps>
     systems: Array<System>
     pages: Array<Page>
 

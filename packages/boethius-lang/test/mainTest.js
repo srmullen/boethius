@@ -482,4 +482,48 @@ describe("boethius compilation", () => {
             expect(voices.chords[0].children[2].props.octave).to.equal(5);
         });
     });
+
+    describe('Voice markings', () => {
+        it('should add clefs in the voice to the layout', () => {
+            const compiled = compile(`
+                (line :mel)
+                [mel (clef :bass) a3 (clef :alto)]
+            `);
+            expect(compiled.layout.lines[0].clefs[0].value).to.equal('bass');
+            expect(compiled.layout.lines[0].clefs[1].value).to.equal('alto');
+        });
+
+        it('should set time on the clefs', () => {
+            const compiled = compile(`
+                (line :mel)
+                [mel (clef :bass) a3 (clef :alto)]
+            `);
+            expect(compiled.layout.lines[0].clefs[0].time).to.equal(0);
+            expect(compiled.layout.lines[0].clefs[1].time).to.equal(0.25);
+        });
+
+        it('should set clef on the line the voice belongs to', () => {
+            const compiled = compile(`
+                (name=line1 (line :mel1))
+                (name=line2 (line :mel2))
+                [mel1 (clef :bass) a3]
+                [mel2 (clef :tenor) c#4]
+            `);
+            const line1 = compiled.layout.lines.find(line => line.name === 'line1')
+            const line2 = compiled.layout.lines.find(line => line.name === 'line2')
+            expect(line1.clefs.length).to.equal(1);
+            expect(line2.clefs.length).to.equal(1);
+            expect(line1.clefs[0].value).to.equal('bass');
+            expect(line2.clefs[0].value).to.equal('tenor');
+        });
+
+        it('should work for clefs inside scope nodes', () => {
+            const compiled = compile(`
+                (line :mel (clef :treble))
+                [mel (staccato f5/4 (clef :bass) a3)]
+            `);
+            expect(compiled.layout.lines[0].clefs[0].value).to.equal('treble');
+            expect(compiled.layout.lines[0].clefs[1].value).to.equal('bass');
+        });
+    });
 });

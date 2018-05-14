@@ -13,7 +13,7 @@ TODO
 - Transposition
 - Immutable data structures?
 - Clef change in voice.
-- Force display of accidentals. Probably requires boethius changes as well.
+- Mode to apply accidentals from key if not specified on notes.
 
 Ideas
 -----
