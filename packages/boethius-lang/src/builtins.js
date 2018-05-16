@@ -90,8 +90,8 @@ const BUILTINS = {
 
     clef (yy: YY, args: Array<Serializable>) {
         const value = args[0].serialize();
-        const measure = args[1] ? args[1].value : 0;
-        const beat = args[2] ? args[2].value : 0;
+        const measure = args[1] ? args[1].value : undefined;
+        const beat = args[2] ? args[2].value : undefined;
         return new Clef({value, measure, beat});
     },
 

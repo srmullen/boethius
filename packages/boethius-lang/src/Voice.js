@@ -2,6 +2,7 @@
 import F from 'fraction.js';
 import { last } from 'lodash';
 import type { YY, LineProps } from './types';
+import Layout from './Layout';
 import { CLEF } from './constants';
 import { Executable } from './interfaces/Executable';
 import { Serializable } from './interfaces/Serializable';
@@ -21,27 +22,34 @@ class Voice implements Node, Executable {
     execute (yy: YY, scope: {}) {
         const list = this.children.reduce((acc, item) => {
             const json = item.serialize();
-            if (json.type === CLEF) {
-                // find the line the current voice belongs to.
-                const line: ?LineProps = yy.layout.lines.find(line => {
-                    return line.voices.some(name => name === this.props.name);
-                });
-                if (line) {
-                    line.clefs.push(json);
-                }
-            }
             return acc.concat(json);
         }, []);
         if (!yy.voices[this.props.name]) {
             // create array for voice items
-            yy.voices[this.props.name] = calculateAndSetTimes(list);
+            const [voice, layoutItems] = calculateAndSetTimes(list);
+            this.addItemToLayout(yy.layout, layoutItems);
+            yy.voices[this.props.name] = voice;
         } else {
             const previousItem = last(yy.voices[this.props.name]);
             const offset = calculateDuration(previousItem).add(previousItem.props.time);
-            const listWithTimes = calculateAndSetTimes(list, offset.valueOf());
-            yy.voices[this.props.name] = yy.voices[this.props.name].concat(listWithTimes);
+            const [voice, layout] = calculateAndSetTimes(list, offset.valueOf());
+            yy.voices[this.props.name] = yy.voices[this.props.name].concat(voice);
         }
         return this;
+    }
+
+    addItemToLayout (layout: Layout, items: Array<any>) {
+        items.forEach(item => {
+            if (item.type === CLEF) {
+                // find the line the current voice belongs to.
+                const line: ?LineProps = layout.lines.find(line => {
+                    return line.voices.some(name => name === this.props.name);
+                });
+                if (line) {
+                    line.clefs.push(item);
+                }
+            }
+        });
     }
 }
 
@@ -50,8 +58,12 @@ class Voice implements Node, Executable {
  * in a voice list (clefs, keys, etc.).
  */
 function calculateAndSetTimes (items, offset=0) {
-    return items.reduce((acc, item) => {
-        const previousItem = acc[acc.length-1];
+    const voiceItems = [];
+    const layoutItems = [];
+
+    for (let i = 0; i < items.length; i++) {
+        const previousItem = items[i-1];
+        const item = items[i];
 
         if (previousItem) {
 			setTime(item, F(getTime(previousItem)).add(calculateDuration(previousItem)).valueOf());
@@ -60,11 +72,12 @@ function calculateAndSetTimes (items, offset=0) {
         }
 
         if (isMusic(item)) {
-            return acc.concat([item]);
+            voiceItems.push(item);
         } else {
-            return acc;
+            layoutItems.push(item);
         }
-    }, []);
+    }
+    return [voiceItems, layoutItems];
 }
 
 export default Voice;

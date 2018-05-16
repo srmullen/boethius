@@ -44,10 +44,12 @@ function compile (program: string, opts: {}) {
         }
     }
 
+    const layout = parser.yy.layout.serialize();
+    
     return {
         voices: parser.yy.voices,
         chordSymbols: parser.yy.chordSymbols,
-        layout: parser.yy.layout.serialize()
+        layout
     };
 }
 
