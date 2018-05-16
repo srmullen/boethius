@@ -1,7 +1,7 @@
 import constants from "../constants";
 import {mapDeep} from "../utils/common";
 import {drawLine} from "../engraver";
-import {getMeasureNumber} from "../utils/timeUtils";
+import {getMeasureNumber, getTime, getTimeFromSignatures} from "../utils/timeUtils";
 import {isPitched} from "../types";
 import _ from "lodash";
 
@@ -16,10 +16,20 @@ function Line ({voices={}}, children=[]) {
 
 	this.children = children;
 
+	this.timeSignatures = types[constants.type.timeSig];
+
 	// collect all marking arrays into one and sort them by time
-	this.markings = _.sortBy(_.reduce(_.omit(types, constants.type.measure), (arr, v) => {
-		return arr.concat(v);
-	}, []), "measure", (marking) => marking.beat ? marking.beat : 0); // if no beat on the marking then default to 0
+	this.markings = _.sortBy(
+		_.reduce(
+			_.omit(types, constants.type.measure),
+			(arr, v) => {
+				return arr.concat(v);
+			}, []
+		),
+		(marking) => getTimeFromSignatures(this.timeSignatures, marking).time
+		// "measure",
+		// (marking) => marking.beat ? marking.beat : 0
+	); // if no beat on the marking then default to 0
 
 	this.voices = voices;
 }
@@ -61,7 +71,7 @@ Line.prototype.contextAt = function (time) {
 			return false;
 		}
 	});
-	// const getMarking = _.curry((time, marking) => marking.time <= time.time);
+
 	const getMarkingAtTime = (markings, type, time) => {
 		// Reverse mutates the array. Filtering first give a new array so no need to worry about mutating markings.
 		let markingsOfType = _.filter(markings, (marking) => marking.type === type).reverse();

@@ -70,9 +70,7 @@ function getTime (measures, item) {
 		// const baseTime = getTimeNumber(measure, measureView.timeSig);
 		const baseTime = measureView.startsAt;
 		if (_.isNumber(item.beat)) {
-			const [,beatType] = parseSignature(measureView.timeSig);
-			const beatTime = (1/beatType) * item.beat;
-			time = baseTime + beatTime;
+			time = baseTime + getBeatTime(measureView.timeSig, item.beat);
 		} else {
 			time = baseTime;
 		}
@@ -85,6 +83,86 @@ function getTime (measures, item) {
 	return {time, measure, beat};
 }
 
+/*
+ * @param measures TimeSignature[]
+ * @param item - Any object with a time or measure property.
+ * @return time object - object with time, measure, and beat.
+ */
+function getTimeFromSignatures (timeSigs, item) {
+	let beat = item.beat;
+	let measure = item.measure;
+	let time = item.time;
+
+	if (!_.isNumber(item.time) && !_.isNumber(item.measure)) {
+		throw new Error('Item must have time or measure property');
+	}
+
+	if (!_.isNumber(item.measure)) {
+		measure = 0;
+		const timeSignature = getTimeSignatureAtMeasure(timeSigs, measure);
+		let measureTime = getTimeSigDuration(timeSignature);
+		while (measureTime <= item.time) {
+			measure++;
+			const timeSignature = getTimeSignatureAtMeasure(timeSigs, measure);
+			measureTime += getTimeSigDuration(timeSignature);
+		}
+
+		beat = getBeat(item.time, timeSignature, getTimeAtMeasure(timeSigs, measure));
+	}
+
+	if (!_.isNumber(item.time)) {
+		const timeSig = getTimeSignatureAtMeasure(timeSigs, item.measure);
+		const measureTime = getTimeAtMeasure(timeSigs, item.measure);
+		const beatTime = getBeatTime(timeSig, item.beat);
+		time = measureTime + beatTime;
+	}
+
+	return {time, measure, beat};
+}
+
+/*
+ * Get the TimeSignature at the given measure.
+ * @param timeSigs TimeSignature[] - Array of TimeSignatures.
+ * @param measure Number - The measure number to get the timeSignature for.
+ * @return TimeSignature
+ */
+function getTimeSignatureAtMeasure(timeSigs, measure) {
+	if (!timeSigs.length) {
+		throw new Error('No TimeSignatures given.');
+	} else if (timeSigs.length === 1) {
+		return timeSigs[0];
+	} else {
+		for (let i = 0; i < timeSigs.length; i++) {
+			const timeSig = timeSigs[i];
+			if (timeSig.measure === measure) {
+				return timeSig;
+			} else if (timeSig.measure > measure) {
+				return timeSigs[i-1];
+			}
+		}
+		return _.last(timeSigs);
+	}
+}
+
+/*
+ * Get the time at which the given measure starts.
+ * @param timeSigs TimeSignaure[]
+ * @param measure Number
+ * @return Number
+ */
+function getTimeAtMeasure (timeSigs, measure) {
+	let time = 0;
+	for (let i = 0; i < measure; i++) {
+		const timeSig = getTimeSignatureAtMeasure(timeSigs, i);
+		time += getTimeSigDuration(timeSig);
+	}
+	return time;
+}
+
+function getBeatTime (timeSig, beat=0) {
+	const [,beatType] = parseSignature(timeSig);
+	return (1/beatType) * beat;
+}
 
 /*
  * @param timesig - string or arrary representation of timeSig value.
@@ -309,6 +387,7 @@ export function absoluteToRelativeDuration (abs) {
 
 export {
 	getTime,
+	getTimeFromSignatures,
 	getMeasure,
 	getMeasureByTime,
 	getBeat,

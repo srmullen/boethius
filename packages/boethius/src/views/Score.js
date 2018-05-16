@@ -45,12 +45,13 @@ function Score ({pageWidth=595, pageHeight=842, length, title}, children=[]) {
 
 Score.prototype.type = TYPE;
 
-Score.render = function (score, {measures, voices=[], chordSymbols=[], repeats=[], pages=[0]}) {
+Score.render = function (score, {voices=[], chordSymbols=[], repeats=[], pages=[0]}) {
     // Create the Score Group.
     const scoreGroup = score.render();
 
     // Optimize here. Measures shouldn't need to be recreated every time the score is re-rendered.
-    measures = measures || scoreToMeasures(score, repeats);
+    // measures = measures || scoreToMeasures(score, repeats);
+    const measures = scoreToMeasures(score, repeats);
 
     {
         const times = measures.map(measure => measure.startsAt);
@@ -266,7 +267,8 @@ function createTimeContexts (lines, voices, measures, chordSymbols) {
     // get the time contexts
 	const lineItems = getStaffItems(lines, voices);
     // FIXME: returned contexts are incorrect when clef starts on beat other than 0.
-	const lineTimes = map((line, items) => getTimeContexts(line, measures, items), lines, lineItems);
+    // const lineTimes = map((line, items) => getTimeContexts(line, measures, items), lines, lineItems);
+	const lineTimes = map((line, items) => getTimeContexts(line, items), lines, lineItems);
 
     // calculate the accidentals for each line.
 	_.each(lineTimes, (times) => {

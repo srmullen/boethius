@@ -9,7 +9,7 @@ import Chord from "../views/Chord";
 import ChordSymbol from "../views/ChordSymbol";
 import System from "../views/System";
 import Line from "../views/Line";
-import Measure from "../views/Measure";
+import Measure, { createMeasures } from "../views/Measure";
 import Clef from "../views/Clef";
 import Key from "../views/Key";
 import TimeSignature from "../views/TimeSignature";
@@ -44,11 +44,11 @@ export function parseLayout (layout) {
         return new TimeSignature({value: convertTimeSig(timeSig.value), measure: timeSig.measure});
     });
 
-    const lines = layout.lines.map(makeLine.bind(null, timeSigs));
-
     const pages = makePages(layout.pages);
 
     const systems = makeSystems(layout.pages, layout.systems);
+
+    const lines = layout.lines.map(makeLine.bind(null, timeSigs));
 
     return new Score({title: layout.title}, [...timeSigs, ...pages, ...systems, ...lines]);
 }

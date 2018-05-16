@@ -133,12 +133,10 @@ System.renderTimeContexts = function ({system, lines, measures, voices, timeCont
 					return getCenterLineValue(context.clef);
 				});
 
-				// const stemDirection = getStemDirection(lineItems, i);
 				const stemDirections = beaming.stemDirection
 					? _.fill(new Array(beaming.children.length), beaming.stemDirection)
 					: Beaming.getAllStemDirections(beaming.children, centerLineValues);
 
-				// const beam = Beaming.stemAndBeam(beaming.children, centerLineValues, stemDirections);
 				const beam = beaming.render(centerLineValues, stemDirections);
 				lineGroup.addChild(beam);
 			});

@@ -1,6 +1,6 @@
 import paper from "paper";
 import _ from "lodash";
-import {getTime} from "./timeUtils";
+import {getTime, getTimeFromSignatures} from "./timeUtils";
 import {isNote} from "../types";
 import * as placement from "./placement";
 import {concat} from "./common";
@@ -57,13 +57,28 @@ function getLineItems (line, voices, start, end) {
  * @param voices - Item[]
  * @return [...{time, items, context}] Array ordered by time
  */
-function getTimeContexts (line, measures, items) {
+// function getTimeContexts (line, measures, items) {
+// 	const allItems = line.markings.concat(items);
+//
+// 	const times = _.map(_.groupBy(allItems, (item) => {
+// 		return getTime(measures, item).time;
+// 	}), (v) => {
+// 		const time = getTime(measures, v[0]);
+// 		return {time, items: v, context: line.contextAt(time)};
+// 	});
+//
+// 	const sortedTimes = _.sortBy(times, ({time}) => time.time);
+//
+// 	return sortedTimes;
+// }
+
+function getTimeContexts (line, items) {
 	const allItems = line.markings.concat(items);
 
 	const times = _.map(_.groupBy(allItems, (item) => {
-		return getTime(measures, item).time;
+		return getTimeFromSignatures(line.timeSignatures, item).time;
 	}), (v) => {
-		const time = getTime(measures, v[0]);
+		const time = getTimeFromSignatures(line.timeSignatures, v[0]);
 		return {time, items: v, context: line.contextAt(time)};
 	});
 

@@ -19,7 +19,11 @@ describe("Line", () => {
         });
 
         it("should contain markings passed in as children", () => {
-            let line = new Line({}, [scored.clef(), scored.timeSig(), scored.key()]);
+            let line = new Line({}, [
+                scored.clef({measure: 0}),
+                scored.timeSig({measure: 0}),
+                scored.key({measure: 0})
+            ]);
             expect(line.markings.length).to.equal(3);
         });
 

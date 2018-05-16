@@ -2,7 +2,8 @@ import {expect} from "chai";
 import _ from "lodash";
 
 import {
-    getBeat, getTime, getMeasureNumber, getMeasureByTime, calculateDuration, calculateTupletDuration, equals,
+    getBeat, getTime, getTimeFromSignatures, getMeasureNumber, getMeasureByTime,
+    calculateDuration, calculateTupletDuration, equals,
     gt, lt, gte, lte, absoluteToRelativeDuration
 } from "../src/utils/timeUtils";
 import {createMeasures} from "../src/views/Measure";
@@ -56,6 +57,18 @@ describe("timeUtils", () => {
             expect(bassTime).to.eql({time: 2, measure: 2, beat: 0});
         });
 
+        it("should return a time object for items containing a measure and beat property", () => {
+            let trebleClef = scored.clef({value: "treble", measure: 0, beat: 1}),
+                bassClef = scored.clef({value: "bass", measure: 2, beat: 3}),
+                fourfour = scored.timeSig({value: "4/4", measure: 0}),
+                measures = createMeasures(4, [fourfour]);
+
+            const trebleTime = getTime(measures, trebleClef);
+            expect(trebleTime).to.eql({time: 0.25, measure: 0, beat: 1});
+            const bassTime = getTime(measures, bassClef);
+            expect(bassTime).to.eql({time: 2.75, measure: 2, beat: 3});
+        });
+
         it("should return a time object for items containing just a time property", () => {
             let note1 = scored.note({value: 4, time: 0}),
                 rest1 = scored.rest({value: 8, time: 0.25}),
@@ -89,6 +102,60 @@ describe("timeUtils", () => {
             const note = scored.note({value: 2, time: 8});
 
             expect(getTime(measures, clef)).not.to.eql(getTime(measures, note));
+        });
+    });
+
+    describe('getTimeFromSignatures', () => {
+        it('should return object with a measure property', () => {
+            const timeSigs = [scored.timeSig({value: '4/4', measure: 0})];
+            expect(getTimeFromSignatures(timeSigs, scored.note({time: 0})).measure).to.equal(0);
+            expect(getTimeFromSignatures(timeSigs, scored.note({time: 0.25})).measure).to.equal(0);
+            expect(getTimeFromSignatures(timeSigs, scored.note({time: 1})).measure).to.equal(1);
+            expect(getTimeFromSignatures(timeSigs, scored.note({time: 1.25})).measure).to.equal(1);
+        });
+
+        it('should return an object with the correct measure property when there are multiple timeSigs', () => {
+            const timeSigs = [scored.timeSig({value: '4/4', measure: 0}), scored.timeSig({value: '3/4', measure: 1})];
+            expect(getTimeFromSignatures(timeSigs, scored.note({time: 0})).measure).to.equal(0);
+            expect(getTimeFromSignatures(timeSigs, scored.note({time: 0.25})).measure).to.equal(0);
+            expect(getTimeFromSignatures(timeSigs, scored.note({time: 1})).measure).to.equal(1);
+            expect(getTimeFromSignatures(timeSigs, scored.note({time: 1.25})).measure).to.equal(1);
+            expect(getTimeFromSignatures(timeSigs, scored.note({time: 1.75})).measure).to.equal(2);
+            expect(getTimeFromSignatures(timeSigs, scored.note({time: 2})).measure).to.equal(2);
+        });
+
+        it('should return an object with a beat property', () => {
+            const timeSigs = [scored.timeSig({value: '4/4', measure: 0})];
+            expect(getTimeFromSignatures(timeSigs, scored.note({time: 0})).beat).to.equal(0);
+            expect(getTimeFromSignatures(timeSigs, scored.note({time: 0.25})).beat).to.equal(1);
+            expect(getTimeFromSignatures(timeSigs, scored.note({time: 0.5})).beat).to.equal(2);
+            expect(getTimeFromSignatures(timeSigs, scored.note({time: 0.75})).beat).to.equal(3);
+        });
+
+        it('should return an object with the correct measure property when there are multiple timeSigs', () => {
+            const timeSigs = [scored.timeSig({value: '4/4', measure: 0}), scored.timeSig({value: '3/4', measure: 1})];
+            expect(getTimeFromSignatures(timeSigs, scored.note({time: 0})).beat).to.equal(0);
+            expect(getTimeFromSignatures(timeSigs, scored.note({time: 0.25})).beat).to.equal(1);
+            expect(getTimeFromSignatures(timeSigs, scored.note({time: 1})).beat).to.equal(0);
+            expect(getTimeFromSignatures(timeSigs, scored.note({time: 1.25})).beat).to.equal(1);
+            expect(getTimeFromSignatures(timeSigs, scored.note({time: 1.75})).beat).to.equal(0);
+            expect(getTimeFromSignatures(timeSigs, scored.note({time: 2.25})).beat).to.equal(2);
+        });
+
+        it('should return object with a time property when given a measure', () => {
+            const timeSigs = [scored.timeSig({value: '3/4', measure: 0})];
+            expect(getTimeFromSignatures(timeSigs, scored.clef({measure: 0})).time).to.equal(0);
+            expect(getTimeFromSignatures(timeSigs, scored.clef({measure: 1})).time).to.equal(0.75);
+            expect(getTimeFromSignatures(timeSigs, scored.clef({measure: 2})).time).to.equal(1.5);
+            expect(getTimeFromSignatures(timeSigs, scored.clef({measure: 5})).time).to.equal(3.75);
+        });
+
+        it('should return object with a time property when given a measure and beat', () => {
+            const timeSigs = [scored.timeSig({value: '3/4', measure: 0})];
+            expect(getTimeFromSignatures(timeSigs, scored.clef({measure: 0, beat: 1})).time).to.equal(0.25);
+            expect(getTimeFromSignatures(timeSigs, scored.clef({measure: 1, beat: 2})).time).to.equal(1.25);
+            expect(getTimeFromSignatures(timeSigs, scored.clef({measure: 2, beat: 0})).time).to.equal(1.5);
+            expect(getTimeFromSignatures(timeSigs, scored.clef({measure: 5, beat: 3})).time).to.equal(4.5);
         });
     });
 

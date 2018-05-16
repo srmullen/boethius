@@ -140,10 +140,11 @@ const TYPE = constants.type.key,
 		"ab": [flatSteps[7], FLAT]
 	};
 
-function Key ({value="C", measure, beat}) {
+function Key ({value="C", measure, beat, time}) {
 	this.value = value;
 	this.measure = measure;
 	this.beat = beat;
+	this.time = time;
 }
 
 Key.prototype.type = TYPE;
