@@ -3,7 +3,8 @@ import Layout from './Layout';
 import { NOTE, CHORD, REST } from './constants';
 
 export type Clef = {value: string};
-export type LineProps = {clefs: Array<Clef>, voices: Array<string>};
+export type Key = {value: string};
+export type LineProps = {clefs: Array<Clef>, keys: Array<Key>, voices: Array<string>};
 export type System = {};
 export type Page = {};
 

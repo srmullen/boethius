@@ -8,7 +8,7 @@ import { Executable } from './interfaces/Executable';
 import { Serializable } from './interfaces/Serializable';
 import { Node } from './interfaces/Node';
 import { getTime, setTime, calculateDuration } from './time';
-import { isClef, isMusic } from './utils';
+import { isClef, isKeySignature, isMusic } from './utils';
 
 class Voice implements Node, Executable {
     props: {name: string};
@@ -40,13 +40,21 @@ class Voice implements Node, Executable {
 
     addItemToLayout (layout: Layout, items: Array<any>) {
         items.forEach(item => {
-            if (item.type === CLEF) {
+            if (isClef(item)) {
                 // find the line the current voice belongs to.
                 const line: ?LineProps = layout.lines.find(line => {
                     return line.voices.some(name => name === this.props.name);
                 });
                 if (line) {
                     line.clefs.push(item);
+                }
+            } else if (isKeySignature(item)) {
+                // find the line the current voice belongs to.
+                const line: ?LineProps = layout.lines.find(line => {
+                    return line.voices.some(name => name === this.props.name);
+                });
+                if (line) {
+                    line.keys.push(item);
                 }
             }
         });

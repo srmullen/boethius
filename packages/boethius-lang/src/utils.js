@@ -1,4 +1,4 @@
-import { NOTE, REST, CHORD, TIMESIG, CLEF, REPEAT } from './constants';
+import { NOTE, REST, CHORD, TIMESIG, CLEF, REPEAT, KEY } from './constants';
 
 export function isNote (item) {
 	return item.type === NOTE;
@@ -22,6 +22,10 @@ export function isRepeat (item) {
 
 export function isClef (item) {
 	return item.type === CLEF;
+}
+
+export function isKeySignature (item) {
+	return item.type === KEY;
 }
 
 export function isMusic (item) {

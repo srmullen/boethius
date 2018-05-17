@@ -1,6 +1,8 @@
 import F from "fraction.js";
 // import { NOTE, REST, CHORD, TIMESIG, CLEF, REPEAT } from './constants';
-import { isNote, isRest, isChord, isTimeSignature, isRepeat, isClef } from './utils';
+import {
+	isNote, isRest, isChord, isTimeSignature, isRepeat, isClef, isKeySignature
+} from './utils';
 
 /*
  * @param item - Scored item. Given an item, return the rational duration of the item;
@@ -50,7 +52,7 @@ export function calculateAndSetTimes (items, offset=0) {
  * Sets the time in the correct position on an item.
  */
 export function setTime (item, time) {
-	if (isClef(item)) {
+	if (isClef(item) || isKeySignature(item)) {
 		item.time = time;
 	} else {
 		item.props.time = time;
@@ -58,7 +60,7 @@ export function setTime (item, time) {
 }
 
 export function getTime (item) {
-	if (isClef(item)) {
+	if (isClef(item) || isKeySignature(item)) {
 		return item.time;
 	} else {
 		return item.props.time;

@@ -98,8 +98,8 @@ const BUILTINS = {
     key (yy: YY, args: Array<Serializable>) {
         const root = args[0].serialize();
         const mode = args[1].serialize();
-        const measure = args[2] ? args[2].value : 0;
-        const beat = args[3] ? args[3].value : 0;
+        const measure = args[2] ? args[2].value : undefined;
+        const beat = args[3] ? args[3].value : undefined;
         return new Key({root, mode, measure, beat});
     },
 
