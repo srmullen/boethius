@@ -61,15 +61,10 @@ Line.prototype.render = function (length) {
  * Returns the clef, time signature and accidentals at the given time.
  */
 Line.prototype.contextAt = function (time) {
-	// FIXME: Marking should have time property and not just measure and beat properties.
 	const getMarking = _.curry((time, marking) => {
-		if (marking.measure < time.measure) {
-			return true;
-		} else if (marking.measure === time.measure) {
-			return (marking.beat || 0) <= (time.beat || 0);
-		} else {
-			return false;
-		}
+		const markingTime = getTimeFromSignatures(this.timeSignatures, marking);
+		const populatedTime = getTimeFromSignatures(this.timeSignatures, time);
+		return markingTime.time <= populatedTime.time;
 	});
 
 	const getMarkingAtTime = (markings, type, time) => {

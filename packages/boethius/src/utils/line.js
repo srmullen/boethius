@@ -53,25 +53,9 @@ function getLineItems (line, voices, start, end) {
 
 /*
  * @param line - Line
- * @param measures - Measure[]
  * @param voices - Item[]
  * @return [...{time, items, context}] Array ordered by time
  */
-// function getTimeContexts (line, measures, items) {
-// 	const allItems = line.markings.concat(items);
-//
-// 	const times = _.map(_.groupBy(allItems, (item) => {
-// 		return getTime(measures, item).time;
-// 	}), (v) => {
-// 		const time = getTime(measures, v[0]);
-// 		return {time, items: v, context: line.contextAt(time)};
-// 	});
-//
-// 	const sortedTimes = _.sortBy(times, ({time}) => time.time);
-//
-// 	return sortedTimes;
-// }
-
 function getTimeContexts (line, items) {
 	const allItems = line.markings.concat(items);
 
