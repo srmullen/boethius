@@ -56,7 +56,7 @@ true|false                                          return 'BOOL'
 [0-9]+                                              return 'INTEGER'
 [a-gA-G][b|#]{0,2}(?![a-zA-Z])([0-9]+)?             return 'PITCHCLASS'
 \~[a-zA-Z][a-zA-Z0-9\-]*                            return 'VAR'
-[a-zA-Z][a-zA-Z0-9]*                                return 'IDENTIFIER'
+[a-zA-Z][a-zA-Z0-9\-\!]*                            return 'IDENTIFIER'
 <<EOF>>                                             return 'EOF'
 .                                                   return 'INVALID'
 
@@ -103,7 +103,7 @@ duration:
 
 pitch:
     PITCHCLASS
-        {$$ = yy.parsePitch($1);}
+        {$$ = yy.parsePitch($1, yy.currentKey);}
     ;
 
 keyword:

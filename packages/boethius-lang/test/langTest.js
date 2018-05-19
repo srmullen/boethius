@@ -419,4 +419,68 @@ describe('builtins', () => {
             expect(voices.mel[0].props.pitchClass).to.equal('a');
         });
     });
+
+    describe('in-key!', () => {
+        it('should compile', () => {
+            expect(compile(`(in-key! (key :C :minor))`)).to.be.ok;
+        });
+
+        it('should apply accidentals from the given key to the notes', () => {
+            const {voices} = compile(`
+                (in-key! (key :C :minor))
+                [scale (value=8 c d e f g a b)]
+            `);
+            expect(voices.scale.length).to.equal(7);
+            expect(voices.scale.map(note => note.props.pitchClass))
+                .to.eql(['c', 'd', 'eb', 'f', 'g', 'ab', 'bb']);
+        });
+
+        it('should not make any change if the note already has an accidental', () => {
+            const {voices} = compile(`
+                (in-key! (key :D :major))
+                [scale fb f]
+            `);
+            expect(voices.scale.map(note => note.props.pitchClass))
+                .to.eql(['fb', 'f#']);
+        });
+
+        it('should be able to change keys', () => {
+            const {voices} = compile(`
+                (in-key! (key :D :major))
+                ~ns1 = (value=8 fb f)
+                (in-key! (key :C :minor))
+                ~ns2 = (value=8 e c)
+                [scale ~ns1 ~ns2]
+            `);
+            expect(voices.scale.map(note => note.props.pitchClass))
+                .to.eql(['fb', 'f#', 'eb', 'c']);
+        });
+
+        it('should accept :none keyword to remove current key', () => {
+            const {voices} = compile(`
+                (in-key! (key :D :major))
+                ~ns1 = (value=8 fb f)
+                (in-key! :none)
+                ~ns2 = (value=8 e c)
+                [scale ~ns1 ~ns2]
+            `);
+            expect(voices.scale.map(note => note.props.pitchClass))
+                .to.eql(['fb', 'f#', 'e', 'c']);
+        });
+
+        it('should add key to layout if in voice', () => {
+            const {voices, layout} = compile(`
+                (line :mel)
+                ~ns1 = (value=8 (in-key! (key :D :major)) fb f (in-key! (key :F# :minor)))
+                [mel ~ns1]
+            `);
+            expect(voices.mel.map(note => note.props.pitchClass))
+                .to.eql(['fb', 'f#']);
+
+            expect(layout.lines[0].keys[0].root).to.equal('D');
+            expect(layout.lines[0].keys[0].mode).to.equal('major');
+            expect(layout.lines[0].keys[1].root).to.equal('F#');
+            expect(layout.lines[0].keys[1].mode).to.equal('minor');
+        });
+    });
 });

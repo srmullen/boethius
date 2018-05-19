@@ -32,7 +32,14 @@ function compile (program: string, opts: {}) {
     parser.yy.ChordNode = ChordNode;
     parser.yy.Keyword = Keyword;
     parser.yy.Voice = Voice;
-    parser.yy.parsePitch = pitch.parsePitch;
+    parser.yy.parsePitch = (pitchStr, key) => {
+        const pitchObj = pitch.parsePitch(pitchStr);
+        // pitchClass does not have an accidental set if length is one.
+        if (key && pitchObj.pitchClass.length === 1 && !key.hasPitch(pitchObj.pitchClass)) {
+            pitchObj.pitchClass = key.getEnharmonic(pitchObj.pitchClass);
+        }
+        return pitchObj;
+    };
 
     const parsed = parser.parse(program);
 
@@ -45,7 +52,7 @@ function compile (program: string, opts: {}) {
     }
 
     const layout = parser.yy.layout.serialize();
-    
+
     return {
         voices: parser.yy.voices,
         chordSymbols: parser.yy.chordSymbols,

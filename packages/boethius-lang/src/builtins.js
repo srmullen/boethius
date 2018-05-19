@@ -114,6 +114,24 @@ const BUILTINS = {
             repeated = repeated.concat(items.map(clone));
         }
         return new ScopeNode({}, repeated);
+    },
+
+    /*
+     * in-key! causes any notes coming after it to have accidentals applied
+     * to automatically. Returns a Key, so if called mid-voice will also
+     * add key to the layout.
+     */
+    'in-key!': function (yy: YY, args: [Key | string]) {
+        const key = args[0];
+        if (key instanceof Key) {
+            yy.currentKey = key;
+            return new ScopeNode({}, [key]);
+        } else if (key instanceof Keyword && key.toString() === 'none') {
+            yy.currentKey = null;
+            return new ScopeNode({}, []);
+        } else {
+            throw new Error(`Unexpected arguments to in-key! : ${args[0].toString()}`);
+        }
     }
 };
 
