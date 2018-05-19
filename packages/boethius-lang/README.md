@@ -12,7 +12,6 @@ TODO
 - Scales
 - Transposition
 - Immutable data structures?
-- Mode to apply accidentals from key if not specified on notes.
 
 Ideas
 -----

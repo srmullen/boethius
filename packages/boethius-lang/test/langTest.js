@@ -42,6 +42,12 @@ describe("parser", () => {
             });
         });
 
+        it('should allow n to be natural accidental', () => {
+            const {voices} = compile("[mel cn an3]");
+            expect(voices.mel[0].props.pitchClass).to.eql('c');
+            expect(voices.mel[1].props.pitchClass).to.eql('a');
+        });
+
         it("should take capitalized notes", () => {
             const {voices} = compile("[mel A1 B2 C3 D4 E5 F6 G7]");
             const [a, b, c, d, e, f, g] = voices.mel;
@@ -466,6 +472,16 @@ describe('builtins', () => {
             `);
             expect(voices.scale.map(note => note.props.pitchClass))
                 .to.eql(['fb', 'f#', 'e', 'c']);
+        });
+
+        it('should not apply the key to notes that have a natural accidental', () => {
+            const {voices} = compile(`
+                (in-key! (key :D :major))
+                ~ns1 = (value=8 fb f fn)
+                [scale ~ns1]
+            `);
+            expect(voices.scale.map(note => note.props.pitchClass))
+                .to.eql(['fb', 'f#', 'f']);
         });
 
         it('should add key to layout if in voice', () => {

@@ -38,6 +38,12 @@ function compile (program: string, opts: {}) {
         if (key && pitchObj.pitchClass.length === 1 && !key.hasPitch(pitchObj.pitchClass)) {
             pitchObj.pitchClass = key.getEnharmonic(pitchObj.pitchClass);
         }
+
+        // Remove the natural accidental if it exists.
+        if (pitchObj.pitchClass[1] === 'n') {
+            pitchObj.pitchClass = pitchObj.pitchClass[0];
+        }
+
         return pitchObj;
     };
 
