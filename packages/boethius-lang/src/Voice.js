@@ -34,6 +34,7 @@ class Voice implements Node, Executable {
             const offset = calculateDuration(previousItem).add(previousItem.props.time);
             const [voice, layout] = calculateAndSetTimes(list, offset.valueOf());
             yy.voices[this.props.name] = yy.voices[this.props.name].concat(voice);
+            this.addItemToLayout(yy.layout, layout);
         }
         return this;
     }

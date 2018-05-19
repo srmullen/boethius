@@ -5,6 +5,7 @@ v0.7.0
 - `legato` builtin.
 - Block comments
 - `repeat` builtin.
+- Inline clef and key changes.
 
 v0.6.0
 ------

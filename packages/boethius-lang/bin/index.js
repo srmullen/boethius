@@ -61,7 +61,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 22);
+/******/ 	return __webpack_require__(__webpack_require__.s = 24);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -77,6 +77,7 @@ Object.defineProperty(exports, "__esModule", {
 var NOTE = exports.NOTE = 'note';
 var REST = exports.REST = 'rest';
 var CHORD = exports.CHORD = 'chord';
+var REPEAT = exports.REPEAT = 'repeat';
 var CHORDSYMBOL = exports.CHORDSYMBOL = 'chordSymbol';
 var TIMESIG = exports.TIMESIG = 'timesig';
 
@@ -101,7 +102,7 @@ var KEY = exports.KEY = 'key';
 "use strict";
 
 
-var _Node = __webpack_require__(9);
+var _Node = __webpack_require__(10);
 
 /***/ }),
 /* 3 */
@@ -17377,8 +17378,8 @@ module.exports = function(module) {
 /***/ (function(module, exports, __webpack_require__) {
 
 var knowledge = __webpack_require__(3);
-var vector = __webpack_require__(14);
-var toCoord = __webpack_require__(45);
+var vector = __webpack_require__(15);
+var toCoord = __webpack_require__(47);
 
 function Interval(coord) {
   if (!(this instanceof Interval)) return new Interval(coord);
@@ -17565,15 +17566,801 @@ module.exports = require("path");
 /* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
-"use strict";
+var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/**
+ * @license Fraction.js v3.3.1 09/09/2015
+ * http://www.xarg.org/2014/03/precise-calculations-in-javascript/
+ *
+ * Copyright (c) 2015, Robert Eisele (robert@xarg.org)
+ * Dual licensed under the MIT or GPL Version 2 licenses.
+ **/
+
+
+/**
+ *
+ * This class offers the possibility to calculate fractions.
+ * You can pass a fraction in different formats. Either as array, as double, as string or as an integer.
+ *
+ * Array/Object form
+ * [ 0 => <nominator>, 1 => <denominator> ]
+ * [ n => <nominator>, d => <denominator> ]
+ *
+ * Integer form
+ * - Single integer value
+ *
+ * Double form
+ * - Single double value
+ *
+ * String form
+ * 123.456 - a simple double
+ * 123/456 - a string fraction
+ * 123.'456' - a double with repeating decimal places
+ * 123.(456) - synonym
+ * 123.45'6' - a double with repeating last place
+ * 123.45(6) - synonym
+ *
+ * Example:
+ *
+ * var f = new Fraction("9.4'31'");
+ * f.mul([-4, 3]).div(4.9);
+ *
+ */
+
+(function(root) {
+
+  "use strict";
+
+  // Maximum search depth for cyclic rational numbers. 2000 should be more than enough. 
+  // Example: 1/7 = 0.(142857) has 6 repeating decimal places.
+  // If MAX_CYCLE_LEN gets reduced, long cycles will not be detected and toString() only gets the first 10 digits
+  var MAX_CYCLE_LEN = 2000;
+
+  // Parsed data to avoid calling "new" all the time
+  var P = {
+    "s": 1,
+    "n": 0,
+    "d": 1
+  };
+
+  function assign(n, s) {
+
+    if (isNaN(n = parseInt(n, 10))) {
+      throwInvalidParam();
+    }
+    return n * s;
+  }
+
+  function throwInvalidParam() {
+    throw "Invalid Param";
+  }
+
+  var parse = function(p1, p2) {
+
+    var n = 0, d = 1, s = 1;
+    var v = 0, w = 0, x = 0, y = 1, z = 1;
+
+    var A = 0, B = 1;
+    var C = 1, D = 1;
+
+    var N = 10000000;
+    var M;
+
+    if (p1 === undefined || p1 === null) {
+      /* void */
+    } else if (p2 !== undefined) {
+      n = p1;
+      d = p2;
+      s = n * d;
+    } else
+      switch (typeof p1) {
+
+        case "object":
+        {
+          if ("d" in p1 && "n" in p1) {
+            n = p1["n"];
+            d = p1["d"];
+            if ("s" in p1)
+              n*= p1["s"];
+          } else if (0 in p1) {
+            n = p1[0];
+            if (1 in p1)
+              d = p1[1];
+          } else {
+            throwInvalidParam();
+          }
+          s = n * d;
+          break;
+        }
+        case "number":
+        {
+          if (p1 < 0) {
+            s = p1;
+            p1 = -p1;
+          }
+
+          if (p1 % 1 === 0) {
+            n = p1;
+          } else if (p1 > 0) { // check for != 0, scale would become NaN (log(0)), which converges really slow
+
+            if (p1 >= 1) {
+              z = Math.pow(10, Math.floor(1 + Math.log(p1) / Math.LN10));
+              p1/= z;
+            }
+
+            // Using Farey Sequences
+            // http://www.johndcook.com/blog/2010/10/20/best-rational-approximation/
+
+            while (B <= N && D <= N) {
+              M = (A + C) / (B + D);
+
+              if (p1 === M) {
+                if (B + D <= N) {
+                  n = A + C;
+                  d = B + D;
+                } else if (D > B) {
+                  n = C;
+                  d = D;
+                } else {
+                  n = A;
+                  d = B;
+                }
+                break;
+
+              } else {
+
+                if (p1 > M) {
+                  A+= C;
+                  B+= D;
+                } else {
+                  C+= A;
+                  D+= B;
+                }
+
+                if (B > N) {
+                  n = C;
+                  d = D;
+                } else {
+                  n = A;
+                  d = B;
+                }
+              }
+            }
+            n*= z;
+          } else if (isNaN(p1) || isNaN(p2)) {
+            d = n = NaN;
+          }
+          break;
+        }
+        case "string":
+        {
+          B = p1.match(/\d+|./g);
+
+          if (B[A] === '-') {// Check for minus sign at the beginning
+            s = -1;
+            A++;
+          } else if (B[A] === '+') {// Check for plus sign at the beginning
+            A++;
+          }
+
+          if (B.length === A + 1) { // Check if it's just a simple number "1234"
+            w = assign(B[A++], s);
+          } else if (B[A + 1] === '.' || B[A] === '.') { // Check if it's a decimal number
+
+            if (B[A] !== '.') { // Handle 0.5 and .5
+              v = assign(B[A++], s);
+            }
+            A++;
+
+            // Check for decimal places
+            if (A + 1 === B.length || B[A + 1] === '(' && B[A + 3] === ')' || B[A + 1] === "'" && B[A + 3] === "'") {
+              w = assign(B[A], s);
+              y = Math.pow(10, B[A].length);
+              A++;
+            }
+
+            // Check for repeating places
+            if (B[A] === '(' && B[A + 2] === ')' || B[A] === "'" && B[A + 2] === "'") {
+              x = assign(B[A + 1], s);
+              z = Math.pow(10, B[A + 1].length) - 1;
+              A+= 3;
+            }
+
+          } else if (B[A + 1] === '/' || B[A + 1] === ':') { // Check for a simple fraction "123/456" or "123:456"
+            w = assign(B[A], s);
+            y = assign(B[A + 2], 1);
+            A+= 3;
+          } else if (B[A + 3] === '/' && B[A + 1] === ' ') { // Check for a complex fraction "123 1/2"
+            v = assign(B[A], s);
+            w = assign(B[A + 2], s);
+            y = assign(B[A + 4], 1);
+            A+= 5;
+          }
+
+          if (B.length <= A) { // Check for more tokens on the stack
+            d = y * z;
+            s = /* void */
+                    n = x + d * v + z * w;
+            break;
+          }
+
+          /* Fall through on error */
+        }
+        default:
+          throwInvalidParam();
+      }
+
+    if (d === 0) {
+      throw "DIV/0";
+    }
+
+    P["s"] = s < 0 ? -1 : 1;
+    P["n"] = Math.abs(n);
+    P["d"] = Math.abs(d);
+  };
+
+  var modpow = function(b, e, m) {
+
+    for (var r = 1; e > 0; b = (b * b) % m, e >>= 1) {
+
+      if (e & 1) {
+        r = (r * b) % m;
+      }
+    }
+    return r;
+  };
+
+  var cycleLen = function(n, d) {
+
+    for (; d % 2 === 0;
+            d/= 2) {}
+
+    for (; d % 5 === 0;
+            d/= 5) {}
+
+    if (d === 1) // Catch non-cyclic numbers
+      return 0;
+
+    // If we would like to compute really large numbers quicker, we could make use of Fermat's little theorem:
+    // 10^(d-1) % d == 1
+    // However, we don't need such large numbers and MAX_CYCLE_LEN should be the capstone, 
+    // as we want to translate the numbers to strings.
+
+    var rem = 10 % d;
+
+    for (var t = 1; rem !== 1; t++) {
+      rem = rem * 10 % d;
+
+      if (t > MAX_CYCLE_LEN)
+        return 0; // Returning 0 here means that we don't print it as a cyclic number. It's likely that the answer is `d-1`
+    }
+    return t;
+  };
+
+  var cycleStart = function(n, d, len) {
+
+    var rem1 = 1;
+    var rem2 = modpow(10, len, d);
+
+    for (var t = 0; t < 300; t++) { // s < ~log10(Number.MAX_VALUE)
+      // Solve 10^s == 10^(s+t) (mod d)
+
+      if (rem1 === rem2)
+        return t;
+
+      rem1 = rem1 * 10 % d;
+      rem2 = rem2 * 10 % d;
+    }
+    return 0;
+  };
+
+  var gcd = function(a, b) {
+
+    if (!a) return b;
+    if (!b) return a;
+
+    while (1) {
+      a%= b;
+      if (!a) return b;
+      b%= a;
+      if (!b) return a;
+    }
+  };
+
+  /**
+   * Module constructor
+   *
+   * @constructor
+   * @param {number|Fraction} a
+   * @param {number=} b
+   */
+  function Fraction(a, b) {
+
+    if (!(this instanceof Fraction)) {
+      return new Fraction(a, b);
+    }
+
+    parse(a, b);
+
+    if (Fraction['REDUCE']) {
+      a = gcd(P["d"], P["n"]); // Abuse a
+    } else {
+      a = 1;
+    }
+
+    this["s"] = P["s"];
+    this["n"] = P["n"] / a;
+    this["d"] = P["d"] / a;
+  }
+
+  /**
+   * Boolean global variable to be able to disable automatic reduction of the fraction
+   *
+   */
+  Fraction['REDUCE'] = 1;
+
+  Fraction.prototype = {
+
+    "s": 1,
+    "n": 0,
+    "d": 1,
+
+    /**
+     * Calculates the absolute value
+     *
+     * Ex: new Fraction(-4).abs() => 4
+     **/
+    "abs": function() {
+
+      return new Fraction(this["n"], this["d"]);
+    },
+
+    /**
+     * Inverts the sign of the current fraction
+     *
+     * Ex: new Fraction(-4).neg() => 4
+     **/
+    "neg": function() {
+
+      return new Fraction(-this["s"] * this["n"], this["d"]);
+    },
+
+    /**
+     * Adds two rational numbers
+     *
+     * Ex: new Fraction({n: 2, d: 3}).add("14.9") => 467 / 30
+     **/
+    "add": function(a, b) {
+
+      parse(a, b);
+      return new Fraction(
+              this["s"] * this["n"] * P["d"] + P["s"] * this["d"] * P["n"],
+              this["d"] * P["d"]
+              );
+    },
+
+    /**
+     * Subtracts two rational numbers
+     *
+     * Ex: new Fraction({n: 2, d: 3}).add("14.9") => -427 / 30
+     **/
+    "sub": function(a, b) {
+
+      parse(a, b);
+      return new Fraction(
+              this["s"] * this["n"] * P["d"] - P["s"] * this["d"] * P["n"],
+              this["d"] * P["d"]
+              );
+    },
+
+    /**
+     * Multiplies two rational numbers
+     *
+     * Ex: new Fraction("-17.(345)").mul(3) => 5776 / 111
+     **/
+    "mul": function(a, b) {
+
+      parse(a, b);
+      return new Fraction(
+              this["s"] * P["s"] * this["n"] * P["n"],
+              this["d"] * P["d"]
+              );
+    },
+
+    /**
+     * Divides two rational numbers
+     *
+     * Ex: new Fraction("-17.(345)").inverse().div(3)
+     **/
+    "div": function(a, b) {
+
+      parse(a, b);
+      return new Fraction(
+              this["s"] * P["s"] * this["n"] * P["d"],
+              this["d"] * P["n"]
+              );
+    },
+
+    /**
+     * Clones the actual object
+     *
+     * Ex: new Fraction("-17.(345)").clone()
+     **/
+    "clone": function() {
+      return new Fraction(this);
+    },
+
+    /**
+     * Calculates the modulo of two rational numbers - a more precise fmod
+     *
+     * Ex: new Fraction('4.(3)').mod([7, 8]) => (13/3) % (7/8) = (5/6)
+     **/
+    "mod": function(a, b) {
+
+      if (isNaN(this['n']) || isNaN(this['d'])) {
+        return new Fraction(NaN);
+      }
+
+      if (a === undefined) {
+        return new Fraction(this["s"] * this["n"] % this["d"], 1);
+      }
+
+      parse(a, b);
+      if (0 === P["n"] && 0 === this["d"]) {
+        Fraction(0, 0); // Throw div/0
+      }
+
+      /*
+       * First silly attempt, kinda slow
+       *
+       return that["sub"]({
+       "n": num["n"] * Math.floor((this.n / this.d) / (num.n / num.d)),
+       "d": num["d"],
+       "s": this["s"]
+       });*/
+
+      /*
+       * New attempt: a1 / b1 = a2 / b2 * q + r
+       * => b2 * a1 = a2 * b1 * q + b1 * b2 * r
+       * => (b2 * a1 % a2 * b1) / (b1 * b2)
+       */
+      return new Fraction(
+              (this["s"] * P["d"] * this["n"]) % (P["n"] * this["d"]),
+              P["d"] * this["d"]
+              );
+    },
+
+    /**
+     * Calculates the fractional gcd of two rational numbers
+     *
+     * Ex: new Fraction(5,8).gcd(3,7) => 1/56
+     */
+    "gcd": function(a, b) {
+
+      parse(a, b);
+
+      // gcd(a / b, c / d) = gcd(a, c) / lcm(b, d)
+
+      return new Fraction(gcd(P["n"], this["n"]), P["d"] * this["d"] / gcd(P["d"], this["d"]));
+    },
+
+    /**
+     * Calculates the fractional lcm of two rational numbers
+     *
+     * Ex: new Fraction(5,8).lcm(3,7) => 15
+     */
+    "lcm": function(a, b) {
+
+      parse(a, b);
+
+      // lcm(a / b, c / d) = lcm(a, c) / gcd(b, d)
+
+      if (P["n"] === 0 && this["n"] === 0) {
+        return new Fraction;
+      }
+      return new Fraction(P["n"] * this["n"] / gcd(P["n"], this["n"]), gcd(P["d"], this["d"]));
+    },
+
+    /**
+     * Calculates the ceil of a rational number
+     *
+     * Ex: new Fraction('4.(3)').ceil() => (5 / 1)
+     **/
+    "ceil": function(places) {
+
+      places = Math.pow(10, places || 0);
+
+      if (isNaN(this["n"]) || isNaN(this["d"])) {
+        return new Fraction(NaN);
+      }
+      return new Fraction(Math.ceil(places * this["s"] * this["n"] / this["d"]), places);
+    },
+
+    /**
+     * Calculates the floor of a rational number
+     *
+     * Ex: new Fraction('4.(3)').floor() => (4 / 1)
+     **/
+    "floor": function(places) {
+
+      places = Math.pow(10, places || 0);
+
+      if (isNaN(this["n"]) || isNaN(this["d"])) {
+        return new Fraction(NaN);
+      }
+      return new Fraction(Math.floor(places * this["s"] * this["n"] / this["d"]), places);
+    },
+
+    /**
+     * Rounds a rational numbers
+     *
+     * Ex: new Fraction('4.(3)').round() => (4 / 1)
+     **/
+    "round": function(places) {
+
+      places = Math.pow(10, places || 0);
+
+      if (isNaN(this["n"]) || isNaN(this["d"])) {
+        return new Fraction(NaN);
+      }
+      return new Fraction(Math.round(places * this["s"] * this["n"] / this["d"]), places);
+    },
+
+    /**
+     * Gets the inverse of the fraction, means numerator and denumerator are exchanged
+     *
+     * Ex: new Fraction([-3, 4]).inverse() => -4 / 3
+     **/
+    "inverse": function() {
+
+      return new Fraction(this["s"] * this["d"], this["n"]);
+    },
+
+    /**
+     * Calculates the fraction to some integer exponent
+     *
+     * Ex: new Fraction(-1,2).pow(-3) => -8
+     */
+    "pow": function(m) {
+
+      if (m < 0) {
+        return new Fraction(Math.pow(this['s'] * this["d"],-m), Math.pow(this["n"],-m));
+      } else {
+        return new Fraction(Math.pow(this['s'] * this["n"], m), Math.pow(this["d"], m));
+      }
+    },
+
+    /**
+     * Check if two rational numbers are the same
+     *
+     * Ex: new Fraction(19.6).equals([98, 5]);
+     **/
+    "equals": function(a, b) {
+
+      parse(a, b);
+      return this["s"] * this["n"] * P["d"] === P["s"] * P["n"] * this["d"]; // Same as compare() === 0
+    },
+
+    /**
+     * Check if two rational numbers are the same
+     *
+     * Ex: new Fraction(19.6).equals([98, 5]);
+     **/
+    "compare": function(a, b) {
+
+      parse(a, b);
+      var t = (this["s"] * this["n"] * P["d"] - P["s"] * P["n"] * this["d"]);
+      return (0 < t) - (t < 0);
+    },
+
+    /**
+     * Check if two rational numbers are divisible
+     *
+     * Ex: new Fraction(19.6).divisible(1.5);
+     */
+    "divisible": function(a, b) {
+
+      parse(a, b);
+      return !(!(P["n"] * this["d"]) || ((this["n"] * P["d"]) % (P["n"] * this["d"])));
+    },
+
+    /**
+     * Returns a decimal representation of the fraction
+     *
+     * Ex: new Fraction("100.'91823'").valueOf() => 100.91823918239183
+     **/
+    'valueOf': function() {
+
+      return this["s"] * this["n"] / this["d"];
+    },
+
+    /**
+     * Returns a string-fraction representation of a Fraction object
+     *
+     * Ex: new Fraction("1.'3'").toFraction() => "4 1/3"
+     **/
+    'toFraction': function(excludeWhole) {
+
+      var whole, str = "";
+      var n = this["n"];
+      var d = this["d"];
+      if (this["s"] < 0) {
+        str+= '-';
+      }
+
+      if (d === 1) {
+        str+= n;
+      } else {
+
+        if (excludeWhole && (whole = Math.floor(n / d)) > 0) {
+          str+= whole;
+          str+= " ";
+          n%= d;
+        }
+
+        str+= n;
+        str+= '/';
+        str+= d;
+      }
+      return str;
+    },
+
+    /**
+     * Returns a latex representation of a Fraction object
+     *
+     * Ex: new Fraction("1.'3'").toLatex() => "\frac{4}{3}"
+     **/
+    'toLatex': function(excludeWhole) {
+
+      var whole, str = "";
+      var n = this["n"];
+      var d = this["d"];
+      if (this["s"] < 0) {
+        str+= '-';
+      }
+
+      if (d === 1) {
+        str+= n;
+      } else {
+
+        if (excludeWhole && (whole = Math.floor(n / d)) > 0) {
+          str+= whole;
+          n%= d;
+        }
+
+        str+= "\\frac{";
+        str+= n;
+        str+= '}{';
+        str+= d;
+        str+= '}';
+      }
+      return str;
+    },
+
+    /**
+     * Returns an array of continued fraction elements
+     * 
+     * Ex: new Fraction("7/8").toContinued() => [0,1,7]
+     */
+    'toContinued': function() {
+
+      var t;
+      var a = this['n'];
+      var b = this['d'];
+      var res = [];
+
+      do {
+        res.push(Math.floor(a / b));
+        t = a % b;
+        a = b;
+        b = t;
+      } while (a !== 1);
+
+      return res;
+    },
+
+    /**
+     * Creates a string representation of a fraction with all digits
+     *
+     * Ex: new Fraction("100.'91823'").toString() => "100.(91823)"
+     **/
+    'toString': function() {
+
+      var g;
+      var N = this["n"];
+      var D = this["d"];
+
+      if (isNaN(N) || isNaN(D)) {
+        return "NaN";
+      }
+
+      if (!Fraction['REDUCE']) {
+        g = gcd(N, D);
+        N/= g;
+        D/= g;
+      }
+
+      var p = String(N).split(""); // Numerator chars
+      var t = 0; // Tmp var
+
+      var ret = [~this["s"] ? "" : "-", "", ""]; // Return array, [0] is zero sign, [1] before comma, [2] after
+      var zeros = ""; // Collection variable for zeros
+
+      var cycLen = cycleLen(N, D); // Cycle length
+      var cycOff = cycleStart(N, D, cycLen); // Cycle start
+
+      var j = -1;
+      var n = 1; // str index
+
+      // rough estimate to fill zeros
+      var length = 15 + cycLen + cycOff + p.length; // 15 = decimal places when no repitation
+
+      for (var i = 0; i < length; i++, t*= 10) {
+
+        if (i < p.length) {
+          t+= Number(p[i]);
+        } else {
+          n = 2;
+          j++; // Start now => after comma
+        }
+
+        if (cycLen > 0) { // If we have a repeating part
+          if (j === cycOff) {
+            ret[n]+= zeros + "(";
+            zeros = "";
+          } else if (j === cycLen + cycOff) {
+            ret[n]+= zeros + ")";
+            break;
+          }
+        }
+
+        if (t >= D) {
+          ret[n]+= zeros + ((t / D) | 0); // Flush zeros, Add current digit
+          zeros = "";
+          t = t % D;
+        } else if (n > 1) { // Add zeros to the zero buffer
+          zeros+= "0";
+        } else if (ret[n]) { // If before comma, add zero only if already something was added
+          ret[n]+= "0";
+        }
+      }
+
+      // If it's empty, it's a leading zero only
+      ret[0]+= ret[1] || "0";
+
+      // If there is something after the comma, add the comma sign
+      if (ret[2]) {
+        return ret[0] + "." + ret[2];
+      }
+      return ret[0];
+    }
+  };
+
+  if (true) {
+    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = (function() {
+      return Fraction;
+    }).apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__),
+				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+  } else if (typeof exports === "object") {
+    module["exports"] = Fraction;
+  } else {
+    root['Fraction'] = Fraction;
+  }
+
+})(this);
 
 
 /***/ }),
 /* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
+"use strict";
+
+
+/***/ }),
+/* 11 */
+/***/ (function(module, exports, __webpack_require__) {
+
 /* MIT license */
-var cssKeywords = __webpack_require__(27);
+var cssKeywords = __webpack_require__(29);
 
 // NOTE: conversions should only return primitive values (i.e. arrays, or
 //       values that give correct `typeof` results).
@@ -18436,14 +19223,14 @@ convert.rgb.gray = function (rgb) {
 
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var scientific = __webpack_require__(42);
-var helmholtz = __webpack_require__(43);
-var pitchFq = __webpack_require__(44);
+var scientific = __webpack_require__(44);
+var helmholtz = __webpack_require__(45);
+var pitchFq = __webpack_require__(46);
 var knowledge = __webpack_require__(3);
-var vector = __webpack_require__(14);
+var vector = __webpack_require__(15);
 var Interval = __webpack_require__(6);
 
 function pad(str, ch, len) {
@@ -18668,7 +19455,7 @@ module.exports = Note;
 
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports) {
 
 // First coord is octaves, second is fifths. Distances are relative to c
@@ -18693,7 +19480,7 @@ module.exports.sharp = [-4, 7];
 
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports) {
 
 var accidentalValues = {
@@ -18715,7 +19502,7 @@ module.exports.interval = function accidentalInterval(acc) {
 
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -18741,7 +19528,7 @@ module.exports = {
 
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -18884,792 +19671,6 @@ exports.low = low;
 exports.high = high;
 exports.lower = lower;
 exports.raise = raise;
-
-/***/ }),
-/* 16 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/**
- * @license Fraction.js v3.3.1 09/09/2015
- * http://www.xarg.org/2014/03/precise-calculations-in-javascript/
- *
- * Copyright (c) 2015, Robert Eisele (robert@xarg.org)
- * Dual licensed under the MIT or GPL Version 2 licenses.
- **/
-
-
-/**
- *
- * This class offers the possibility to calculate fractions.
- * You can pass a fraction in different formats. Either as array, as double, as string or as an integer.
- *
- * Array/Object form
- * [ 0 => <nominator>, 1 => <denominator> ]
- * [ n => <nominator>, d => <denominator> ]
- *
- * Integer form
- * - Single integer value
- *
- * Double form
- * - Single double value
- *
- * String form
- * 123.456 - a simple double
- * 123/456 - a string fraction
- * 123.'456' - a double with repeating decimal places
- * 123.(456) - synonym
- * 123.45'6' - a double with repeating last place
- * 123.45(6) - synonym
- *
- * Example:
- *
- * var f = new Fraction("9.4'31'");
- * f.mul([-4, 3]).div(4.9);
- *
- */
-
-(function(root) {
-
-  "use strict";
-
-  // Maximum search depth for cyclic rational numbers. 2000 should be more than enough. 
-  // Example: 1/7 = 0.(142857) has 6 repeating decimal places.
-  // If MAX_CYCLE_LEN gets reduced, long cycles will not be detected and toString() only gets the first 10 digits
-  var MAX_CYCLE_LEN = 2000;
-
-  // Parsed data to avoid calling "new" all the time
-  var P = {
-    "s": 1,
-    "n": 0,
-    "d": 1
-  };
-
-  function assign(n, s) {
-
-    if (isNaN(n = parseInt(n, 10))) {
-      throwInvalidParam();
-    }
-    return n * s;
-  }
-
-  function throwInvalidParam() {
-    throw "Invalid Param";
-  }
-
-  var parse = function(p1, p2) {
-
-    var n = 0, d = 1, s = 1;
-    var v = 0, w = 0, x = 0, y = 1, z = 1;
-
-    var A = 0, B = 1;
-    var C = 1, D = 1;
-
-    var N = 10000000;
-    var M;
-
-    if (p1 === undefined || p1 === null) {
-      /* void */
-    } else if (p2 !== undefined) {
-      n = p1;
-      d = p2;
-      s = n * d;
-    } else
-      switch (typeof p1) {
-
-        case "object":
-        {
-          if ("d" in p1 && "n" in p1) {
-            n = p1["n"];
-            d = p1["d"];
-            if ("s" in p1)
-              n*= p1["s"];
-          } else if (0 in p1) {
-            n = p1[0];
-            if (1 in p1)
-              d = p1[1];
-          } else {
-            throwInvalidParam();
-          }
-          s = n * d;
-          break;
-        }
-        case "number":
-        {
-          if (p1 < 0) {
-            s = p1;
-            p1 = -p1;
-          }
-
-          if (p1 % 1 === 0) {
-            n = p1;
-          } else if (p1 > 0) { // check for != 0, scale would become NaN (log(0)), which converges really slow
-
-            if (p1 >= 1) {
-              z = Math.pow(10, Math.floor(1 + Math.log(p1) / Math.LN10));
-              p1/= z;
-            }
-
-            // Using Farey Sequences
-            // http://www.johndcook.com/blog/2010/10/20/best-rational-approximation/
-
-            while (B <= N && D <= N) {
-              M = (A + C) / (B + D);
-
-              if (p1 === M) {
-                if (B + D <= N) {
-                  n = A + C;
-                  d = B + D;
-                } else if (D > B) {
-                  n = C;
-                  d = D;
-                } else {
-                  n = A;
-                  d = B;
-                }
-                break;
-
-              } else {
-
-                if (p1 > M) {
-                  A+= C;
-                  B+= D;
-                } else {
-                  C+= A;
-                  D+= B;
-                }
-
-                if (B > N) {
-                  n = C;
-                  d = D;
-                } else {
-                  n = A;
-                  d = B;
-                }
-              }
-            }
-            n*= z;
-          } else if (isNaN(p1) || isNaN(p2)) {
-            d = n = NaN;
-          }
-          break;
-        }
-        case "string":
-        {
-          B = p1.match(/\d+|./g);
-
-          if (B[A] === '-') {// Check for minus sign at the beginning
-            s = -1;
-            A++;
-          } else if (B[A] === '+') {// Check for plus sign at the beginning
-            A++;
-          }
-
-          if (B.length === A + 1) { // Check if it's just a simple number "1234"
-            w = assign(B[A++], s);
-          } else if (B[A + 1] === '.' || B[A] === '.') { // Check if it's a decimal number
-
-            if (B[A] !== '.') { // Handle 0.5 and .5
-              v = assign(B[A++], s);
-            }
-            A++;
-
-            // Check for decimal places
-            if (A + 1 === B.length || B[A + 1] === '(' && B[A + 3] === ')' || B[A + 1] === "'" && B[A + 3] === "'") {
-              w = assign(B[A], s);
-              y = Math.pow(10, B[A].length);
-              A++;
-            }
-
-            // Check for repeating places
-            if (B[A] === '(' && B[A + 2] === ')' || B[A] === "'" && B[A + 2] === "'") {
-              x = assign(B[A + 1], s);
-              z = Math.pow(10, B[A + 1].length) - 1;
-              A+= 3;
-            }
-
-          } else if (B[A + 1] === '/' || B[A + 1] === ':') { // Check for a simple fraction "123/456" or "123:456"
-            w = assign(B[A], s);
-            y = assign(B[A + 2], 1);
-            A+= 3;
-          } else if (B[A + 3] === '/' && B[A + 1] === ' ') { // Check for a complex fraction "123 1/2"
-            v = assign(B[A], s);
-            w = assign(B[A + 2], s);
-            y = assign(B[A + 4], 1);
-            A+= 5;
-          }
-
-          if (B.length <= A) { // Check for more tokens on the stack
-            d = y * z;
-            s = /* void */
-                    n = x + d * v + z * w;
-            break;
-          }
-
-          /* Fall through on error */
-        }
-        default:
-          throwInvalidParam();
-      }
-
-    if (d === 0) {
-      throw "DIV/0";
-    }
-
-    P["s"] = s < 0 ? -1 : 1;
-    P["n"] = Math.abs(n);
-    P["d"] = Math.abs(d);
-  };
-
-  var modpow = function(b, e, m) {
-
-    for (var r = 1; e > 0; b = (b * b) % m, e >>= 1) {
-
-      if (e & 1) {
-        r = (r * b) % m;
-      }
-    }
-    return r;
-  };
-
-  var cycleLen = function(n, d) {
-
-    for (; d % 2 === 0;
-            d/= 2) {}
-
-    for (; d % 5 === 0;
-            d/= 5) {}
-
-    if (d === 1) // Catch non-cyclic numbers
-      return 0;
-
-    // If we would like to compute really large numbers quicker, we could make use of Fermat's little theorem:
-    // 10^(d-1) % d == 1
-    // However, we don't need such large numbers and MAX_CYCLE_LEN should be the capstone, 
-    // as we want to translate the numbers to strings.
-
-    var rem = 10 % d;
-
-    for (var t = 1; rem !== 1; t++) {
-      rem = rem * 10 % d;
-
-      if (t > MAX_CYCLE_LEN)
-        return 0; // Returning 0 here means that we don't print it as a cyclic number. It's likely that the answer is `d-1`
-    }
-    return t;
-  };
-
-  var cycleStart = function(n, d, len) {
-
-    var rem1 = 1;
-    var rem2 = modpow(10, len, d);
-
-    for (var t = 0; t < 300; t++) { // s < ~log10(Number.MAX_VALUE)
-      // Solve 10^s == 10^(s+t) (mod d)
-
-      if (rem1 === rem2)
-        return t;
-
-      rem1 = rem1 * 10 % d;
-      rem2 = rem2 * 10 % d;
-    }
-    return 0;
-  };
-
-  var gcd = function(a, b) {
-
-    if (!a) return b;
-    if (!b) return a;
-
-    while (1) {
-      a%= b;
-      if (!a) return b;
-      b%= a;
-      if (!b) return a;
-    }
-  };
-
-  /**
-   * Module constructor
-   *
-   * @constructor
-   * @param {number|Fraction} a
-   * @param {number=} b
-   */
-  function Fraction(a, b) {
-
-    if (!(this instanceof Fraction)) {
-      return new Fraction(a, b);
-    }
-
-    parse(a, b);
-
-    if (Fraction['REDUCE']) {
-      a = gcd(P["d"], P["n"]); // Abuse a
-    } else {
-      a = 1;
-    }
-
-    this["s"] = P["s"];
-    this["n"] = P["n"] / a;
-    this["d"] = P["d"] / a;
-  }
-
-  /**
-   * Boolean global variable to be able to disable automatic reduction of the fraction
-   *
-   */
-  Fraction['REDUCE'] = 1;
-
-  Fraction.prototype = {
-
-    "s": 1,
-    "n": 0,
-    "d": 1,
-
-    /**
-     * Calculates the absolute value
-     *
-     * Ex: new Fraction(-4).abs() => 4
-     **/
-    "abs": function() {
-
-      return new Fraction(this["n"], this["d"]);
-    },
-
-    /**
-     * Inverts the sign of the current fraction
-     *
-     * Ex: new Fraction(-4).neg() => 4
-     **/
-    "neg": function() {
-
-      return new Fraction(-this["s"] * this["n"], this["d"]);
-    },
-
-    /**
-     * Adds two rational numbers
-     *
-     * Ex: new Fraction({n: 2, d: 3}).add("14.9") => 467 / 30
-     **/
-    "add": function(a, b) {
-
-      parse(a, b);
-      return new Fraction(
-              this["s"] * this["n"] * P["d"] + P["s"] * this["d"] * P["n"],
-              this["d"] * P["d"]
-              );
-    },
-
-    /**
-     * Subtracts two rational numbers
-     *
-     * Ex: new Fraction({n: 2, d: 3}).add("14.9") => -427 / 30
-     **/
-    "sub": function(a, b) {
-
-      parse(a, b);
-      return new Fraction(
-              this["s"] * this["n"] * P["d"] - P["s"] * this["d"] * P["n"],
-              this["d"] * P["d"]
-              );
-    },
-
-    /**
-     * Multiplies two rational numbers
-     *
-     * Ex: new Fraction("-17.(345)").mul(3) => 5776 / 111
-     **/
-    "mul": function(a, b) {
-
-      parse(a, b);
-      return new Fraction(
-              this["s"] * P["s"] * this["n"] * P["n"],
-              this["d"] * P["d"]
-              );
-    },
-
-    /**
-     * Divides two rational numbers
-     *
-     * Ex: new Fraction("-17.(345)").inverse().div(3)
-     **/
-    "div": function(a, b) {
-
-      parse(a, b);
-      return new Fraction(
-              this["s"] * P["s"] * this["n"] * P["d"],
-              this["d"] * P["n"]
-              );
-    },
-
-    /**
-     * Clones the actual object
-     *
-     * Ex: new Fraction("-17.(345)").clone()
-     **/
-    "clone": function() {
-      return new Fraction(this);
-    },
-
-    /**
-     * Calculates the modulo of two rational numbers - a more precise fmod
-     *
-     * Ex: new Fraction('4.(3)').mod([7, 8]) => (13/3) % (7/8) = (5/6)
-     **/
-    "mod": function(a, b) {
-
-      if (isNaN(this['n']) || isNaN(this['d'])) {
-        return new Fraction(NaN);
-      }
-
-      if (a === undefined) {
-        return new Fraction(this["s"] * this["n"] % this["d"], 1);
-      }
-
-      parse(a, b);
-      if (0 === P["n"] && 0 === this["d"]) {
-        Fraction(0, 0); // Throw div/0
-      }
-
-      /*
-       * First silly attempt, kinda slow
-       *
-       return that["sub"]({
-       "n": num["n"] * Math.floor((this.n / this.d) / (num.n / num.d)),
-       "d": num["d"],
-       "s": this["s"]
-       });*/
-
-      /*
-       * New attempt: a1 / b1 = a2 / b2 * q + r
-       * => b2 * a1 = a2 * b1 * q + b1 * b2 * r
-       * => (b2 * a1 % a2 * b1) / (b1 * b2)
-       */
-      return new Fraction(
-              (this["s"] * P["d"] * this["n"]) % (P["n"] * this["d"]),
-              P["d"] * this["d"]
-              );
-    },
-
-    /**
-     * Calculates the fractional gcd of two rational numbers
-     *
-     * Ex: new Fraction(5,8).gcd(3,7) => 1/56
-     */
-    "gcd": function(a, b) {
-
-      parse(a, b);
-
-      // gcd(a / b, c / d) = gcd(a, c) / lcm(b, d)
-
-      return new Fraction(gcd(P["n"], this["n"]), P["d"] * this["d"] / gcd(P["d"], this["d"]));
-    },
-
-    /**
-     * Calculates the fractional lcm of two rational numbers
-     *
-     * Ex: new Fraction(5,8).lcm(3,7) => 15
-     */
-    "lcm": function(a, b) {
-
-      parse(a, b);
-
-      // lcm(a / b, c / d) = lcm(a, c) / gcd(b, d)
-
-      if (P["n"] === 0 && this["n"] === 0) {
-        return new Fraction;
-      }
-      return new Fraction(P["n"] * this["n"] / gcd(P["n"], this["n"]), gcd(P["d"], this["d"]));
-    },
-
-    /**
-     * Calculates the ceil of a rational number
-     *
-     * Ex: new Fraction('4.(3)').ceil() => (5 / 1)
-     **/
-    "ceil": function(places) {
-
-      places = Math.pow(10, places || 0);
-
-      if (isNaN(this["n"]) || isNaN(this["d"])) {
-        return new Fraction(NaN);
-      }
-      return new Fraction(Math.ceil(places * this["s"] * this["n"] / this["d"]), places);
-    },
-
-    /**
-     * Calculates the floor of a rational number
-     *
-     * Ex: new Fraction('4.(3)').floor() => (4 / 1)
-     **/
-    "floor": function(places) {
-
-      places = Math.pow(10, places || 0);
-
-      if (isNaN(this["n"]) || isNaN(this["d"])) {
-        return new Fraction(NaN);
-      }
-      return new Fraction(Math.floor(places * this["s"] * this["n"] / this["d"]), places);
-    },
-
-    /**
-     * Rounds a rational numbers
-     *
-     * Ex: new Fraction('4.(3)').round() => (4 / 1)
-     **/
-    "round": function(places) {
-
-      places = Math.pow(10, places || 0);
-
-      if (isNaN(this["n"]) || isNaN(this["d"])) {
-        return new Fraction(NaN);
-      }
-      return new Fraction(Math.round(places * this["s"] * this["n"] / this["d"]), places);
-    },
-
-    /**
-     * Gets the inverse of the fraction, means numerator and denumerator are exchanged
-     *
-     * Ex: new Fraction([-3, 4]).inverse() => -4 / 3
-     **/
-    "inverse": function() {
-
-      return new Fraction(this["s"] * this["d"], this["n"]);
-    },
-
-    /**
-     * Calculates the fraction to some integer exponent
-     *
-     * Ex: new Fraction(-1,2).pow(-3) => -8
-     */
-    "pow": function(m) {
-
-      if (m < 0) {
-        return new Fraction(Math.pow(this['s'] * this["d"],-m), Math.pow(this["n"],-m));
-      } else {
-        return new Fraction(Math.pow(this['s'] * this["n"], m), Math.pow(this["d"], m));
-      }
-    },
-
-    /**
-     * Check if two rational numbers are the same
-     *
-     * Ex: new Fraction(19.6).equals([98, 5]);
-     **/
-    "equals": function(a, b) {
-
-      parse(a, b);
-      return this["s"] * this["n"] * P["d"] === P["s"] * P["n"] * this["d"]; // Same as compare() === 0
-    },
-
-    /**
-     * Check if two rational numbers are the same
-     *
-     * Ex: new Fraction(19.6).equals([98, 5]);
-     **/
-    "compare": function(a, b) {
-
-      parse(a, b);
-      var t = (this["s"] * this["n"] * P["d"] - P["s"] * P["n"] * this["d"]);
-      return (0 < t) - (t < 0);
-    },
-
-    /**
-     * Check if two rational numbers are divisible
-     *
-     * Ex: new Fraction(19.6).divisible(1.5);
-     */
-    "divisible": function(a, b) {
-
-      parse(a, b);
-      return !(!(P["n"] * this["d"]) || ((this["n"] * P["d"]) % (P["n"] * this["d"])));
-    },
-
-    /**
-     * Returns a decimal representation of the fraction
-     *
-     * Ex: new Fraction("100.'91823'").valueOf() => 100.91823918239183
-     **/
-    'valueOf': function() {
-
-      return this["s"] * this["n"] / this["d"];
-    },
-
-    /**
-     * Returns a string-fraction representation of a Fraction object
-     *
-     * Ex: new Fraction("1.'3'").toFraction() => "4 1/3"
-     **/
-    'toFraction': function(excludeWhole) {
-
-      var whole, str = "";
-      var n = this["n"];
-      var d = this["d"];
-      if (this["s"] < 0) {
-        str+= '-';
-      }
-
-      if (d === 1) {
-        str+= n;
-      } else {
-
-        if (excludeWhole && (whole = Math.floor(n / d)) > 0) {
-          str+= whole;
-          str+= " ";
-          n%= d;
-        }
-
-        str+= n;
-        str+= '/';
-        str+= d;
-      }
-      return str;
-    },
-
-    /**
-     * Returns a latex representation of a Fraction object
-     *
-     * Ex: new Fraction("1.'3'").toLatex() => "\frac{4}{3}"
-     **/
-    'toLatex': function(excludeWhole) {
-
-      var whole, str = "";
-      var n = this["n"];
-      var d = this["d"];
-      if (this["s"] < 0) {
-        str+= '-';
-      }
-
-      if (d === 1) {
-        str+= n;
-      } else {
-
-        if (excludeWhole && (whole = Math.floor(n / d)) > 0) {
-          str+= whole;
-          n%= d;
-        }
-
-        str+= "\\frac{";
-        str+= n;
-        str+= '}{';
-        str+= d;
-        str+= '}';
-      }
-      return str;
-    },
-
-    /**
-     * Returns an array of continued fraction elements
-     * 
-     * Ex: new Fraction("7/8").toContinued() => [0,1,7]
-     */
-    'toContinued': function() {
-
-      var t;
-      var a = this['n'];
-      var b = this['d'];
-      var res = [];
-
-      do {
-        res.push(Math.floor(a / b));
-        t = a % b;
-        a = b;
-        b = t;
-      } while (a !== 1);
-
-      return res;
-    },
-
-    /**
-     * Creates a string representation of a fraction with all digits
-     *
-     * Ex: new Fraction("100.'91823'").toString() => "100.(91823)"
-     **/
-    'toString': function() {
-
-      var g;
-      var N = this["n"];
-      var D = this["d"];
-
-      if (isNaN(N) || isNaN(D)) {
-        return "NaN";
-      }
-
-      if (!Fraction['REDUCE']) {
-        g = gcd(N, D);
-        N/= g;
-        D/= g;
-      }
-
-      var p = String(N).split(""); // Numerator chars
-      var t = 0; // Tmp var
-
-      var ret = [~this["s"] ? "" : "-", "", ""]; // Return array, [0] is zero sign, [1] before comma, [2] after
-      var zeros = ""; // Collection variable for zeros
-
-      var cycLen = cycleLen(N, D); // Cycle length
-      var cycOff = cycleStart(N, D, cycLen); // Cycle start
-
-      var j = -1;
-      var n = 1; // str index
-
-      // rough estimate to fill zeros
-      var length = 15 + cycLen + cycOff + p.length; // 15 = decimal places when no repitation
-
-      for (var i = 0; i < length; i++, t*= 10) {
-
-        if (i < p.length) {
-          t+= Number(p[i]);
-        } else {
-          n = 2;
-          j++; // Start now => after comma
-        }
-
-        if (cycLen > 0) { // If we have a repeating part
-          if (j === cycOff) {
-            ret[n]+= zeros + "(";
-            zeros = "";
-          } else if (j === cycLen + cycOff) {
-            ret[n]+= zeros + ")";
-            break;
-          }
-        }
-
-        if (t >= D) {
-          ret[n]+= zeros + ((t / D) | 0); // Flush zeros, Add current digit
-          zeros = "";
-          t = t % D;
-        } else if (n > 1) { // Add zeros to the zero buffer
-          zeros+= "0";
-        } else if (ret[n]) { // If before comma, add zero only if already something was added
-          ret[n]+= "0";
-        }
-      }
-
-      // If it's empty, it's a leading zero only
-      ret[0]+= ret[1] || "0";
-
-      // If there is something after the comma, add the comma sign
-      if (ret[2]) {
-        return ret[0] + "." + ret[2];
-      }
-      return ret[0];
-    }
-  };
-
-  if (true) {
-    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = (function() {
-      return Fraction;
-    }).apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__),
-				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-  } else if (typeof exports === "object") {
-    module["exports"] = Fraction;
-  } else {
-    root['Fraction'] = Fraction;
-  }
-
-})(this);
-
 
 /***/ }),
 /* 17 */
@@ -19869,6 +19870,119 @@ exports.default = Keyword;
 "use strict";
 
 
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _constants = __webpack_require__(0);
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Layout = function () {
+    function Layout() {
+        var props = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+        _classCallCheck(this, Layout);
+
+        this.props = props;
+        this.timeSignatures = [];
+        this.lines = [];
+        this.systems = [];
+        this.pages = [];
+    }
+
+    _createClass(Layout, [{
+        key: 'set',
+        value: function set(props) {
+            this.props = Object.assign({}, this.props, props);
+            return this;
+        }
+    }, {
+        key: 'serialize',
+        value: function serialize() {
+            var pages = this.pages.length ? this.pages : [{ systems: this.systems.length, staffSpacing: [] }];
+            return Object.assign({}, this.props, {
+                type: _constants.SCORE,
+                lines: this.lines,
+                systems: this.systems,
+                pages: pages,
+                timeSignatures: this.timeSignatures
+            });
+        }
+    }, {
+        key: 'execute',
+        value: function execute() {
+            return this;
+        }
+    }]);
+
+    return Layout;
+}();
+
+exports.default = Layout;
+
+/***/ }),
+/* 23 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+exports.isNote = isNote;
+exports.isChord = isChord;
+exports.isRest = isRest;
+exports.isTimeSignature = isTimeSignature;
+exports.isRepeat = isRepeat;
+exports.isClef = isClef;
+exports.isKeySignature = isKeySignature;
+exports.isMusic = isMusic;
+
+var _constants = __webpack_require__(0);
+
+function isNote(item) {
+	return item.type === _constants.NOTE;
+}
+
+function isChord(item) {
+	return item.type === _constants.CHORD;
+}
+
+function isRest(item) {
+	return item.type === _constants.REST;
+}
+
+function isTimeSignature(item) {
+	return item.type === _constants.TIMESIG;
+}
+
+function isRepeat(item) {
+	return item.type === _constants.REPEAT;
+}
+
+function isClef(item) {
+	return item.type === _constants.CLEF;
+}
+
+function isKeySignature(item) {
+	return item.type === _constants.KEY;
+}
+
+function isMusic(item) {
+	return isNote(item) || isChord(item) || isRest(item);
+}
+
+/***/ }),
+/* 24 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
 var _fs = __webpack_require__(7);
 
 var _fs2 = _interopRequireDefault(_fs);
@@ -19877,15 +19991,15 @@ var _path = __webpack_require__(8);
 
 var _path2 = _interopRequireDefault(_path);
 
-var _chalk = __webpack_require__(23);
+var _chalk = __webpack_require__(25);
 
 var _chalk2 = _interopRequireDefault(_chalk);
 
-var _commander = __webpack_require__(33);
+var _commander = __webpack_require__(35);
 
 var _commander2 = _interopRequireDefault(_commander);
 
-var _main = __webpack_require__(36);
+var _main = __webpack_require__(38);
 
 var _main2 = _interopRequireDefault(_main);
 
@@ -19932,16 +20046,16 @@ if (_commander2.default.file) {
 }
 
 /***/ }),
-/* 23 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-const escapeStringRegexp = __webpack_require__(24);
-const ansiStyles = __webpack_require__(25);
-const supportsColor = __webpack_require__(29);
+const escapeStringRegexp = __webpack_require__(26);
+const ansiStyles = __webpack_require__(27);
+const supportsColor = __webpack_require__(31);
 
-const template = __webpack_require__(32);
+const template = __webpack_require__(34);
 
 const isSimpleWindowsTerm = process.platform === 'win32' && !(process.env.TERM || '').toLowerCase().startsWith('xterm');
 
@@ -20167,7 +20281,7 @@ module.exports.default = module.exports; // For TypeScript
 
 
 /***/ }),
-/* 24 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -20185,12 +20299,12 @@ module.exports = function (str) {
 
 
 /***/ }),
-/* 25 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 /* WEBPACK VAR INJECTION */(function(module) {
-const colorConvert = __webpack_require__(26);
+const colorConvert = __webpack_require__(28);
 
 const wrapAnsi16 = (fn, offset) => function () {
 	const code = fn.apply(colorConvert, arguments);
@@ -20345,11 +20459,11 @@ Object.defineProperty(module, 'exports', {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)(module)))
 
 /***/ }),
-/* 26 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var conversions = __webpack_require__(10);
-var route = __webpack_require__(28);
+var conversions = __webpack_require__(11);
+var route = __webpack_require__(30);
 
 var convert = {};
 
@@ -20429,7 +20543,7 @@ module.exports = convert;
 
 
 /***/ }),
-/* 27 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -20588,10 +20702,10 @@ module.exports = {
 
 
 /***/ }),
-/* 28 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var conversions = __webpack_require__(10);
+var conversions = __webpack_require__(11);
 
 /*
 	this function routes a model to all other models.
@@ -20691,13 +20805,13 @@ module.exports = function (fromModel) {
 
 
 /***/ }),
-/* 29 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-const os = __webpack_require__(30);
-const hasFlag = __webpack_require__(31);
+const os = __webpack_require__(32);
+const hasFlag = __webpack_require__(33);
 
 const env = process.env;
 
@@ -20813,13 +20927,13 @@ module.exports = process && support(supportLevel);
 
 
 /***/ }),
-/* 30 */
+/* 32 */
 /***/ (function(module, exports) {
 
 module.exports = require("os");
 
 /***/ }),
-/* 31 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -20836,7 +20950,7 @@ module.exports = function (flag, argv) {
 
 
 /***/ }),
-/* 32 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -20971,15 +21085,15 @@ module.exports = (chalk, tmp) => {
 
 
 /***/ }),
-/* 33 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /**
  * Module dependencies.
  */
 
-var EventEmitter = __webpack_require__(34).EventEmitter;
-var spawn = __webpack_require__(35).spawn;
+var EventEmitter = __webpack_require__(36).EventEmitter;
+var spawn = __webpack_require__(37).spawn;
 var path = __webpack_require__(8);
 var dirname = path.dirname;
 var basename = path.basename;
@@ -22135,19 +22249,19 @@ function exists(file) {
 
 
 /***/ }),
-/* 34 */
+/* 36 */
 /***/ (function(module, exports) {
 
 module.exports = require("events");
 
 /***/ }),
-/* 35 */
+/* 37 */
 /***/ (function(module, exports) {
 
 module.exports = require("child_process");
 
 /***/ }),
-/* 36 */
+/* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -22158,11 +22272,11 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.TYPES = undefined;
 
-var _lang = __webpack_require__(37);
+var _lang = __webpack_require__(39);
 
-var _processing = __webpack_require__(38);
+var _processing = __webpack_require__(40);
 
-var _palestrina = __webpack_require__(50);
+var _palestrina = __webpack_require__(52);
 
 var _NumberNode = __webpack_require__(17);
 
@@ -22172,7 +22286,7 @@ var _NoteNode = __webpack_require__(18);
 
 var _NoteNode2 = _interopRequireDefault(_NoteNode);
 
-var _RestNode = __webpack_require__(55);
+var _RestNode = __webpack_require__(57);
 
 var _RestNode2 = _interopRequireDefault(_RestNode);
 
@@ -22180,7 +22294,7 @@ var _ScopeNode = __webpack_require__(19);
 
 var _ScopeNode2 = _interopRequireDefault(_ScopeNode);
 
-var _ChordNode = __webpack_require__(56);
+var _ChordNode = __webpack_require__(58);
 
 var _ChordNode2 = _interopRequireDefault(_ChordNode);
 
@@ -22188,15 +22302,15 @@ var _Keyword = __webpack_require__(20);
 
 var _Keyword2 = _interopRequireDefault(_Keyword);
 
-var _Layout = __webpack_require__(57);
+var _Layout = __webpack_require__(22);
 
 var _Layout2 = _interopRequireDefault(_Layout);
 
-var _Voice = __webpack_require__(58);
+var _Voice = __webpack_require__(59);
 
 var _Voice2 = _interopRequireDefault(_Voice);
 
-var _builtins = __webpack_require__(60);
+var _builtins = __webpack_require__(61);
 
 var _builtins2 = _interopRequireDefault(_builtins);
 
@@ -22235,10 +22349,12 @@ function compile(program, opts) {
         }
     }
 
+    var layout = _lang.parser.yy.layout.serialize();
+
     return {
         voices: _lang.parser.yy.voices,
         chordSymbols: _lang.parser.yy.chordSymbols,
-        layout: _lang.parser.yy.layout.serialize()
+        layout: layout
     };
 }
 var TYPES = exports.TYPES = { NOTE: _constants.NOTE, REST: _constants.REST, CHORD: _constants.CHORD, CHORDSYMBOL: _constants.CHORDSYMBOL };
@@ -22246,7 +22362,7 @@ var TYPES = exports.TYPES = { NOTE: _constants.NOTE, REST: _constants.REST, CHOR
 exports.default = compile;
 
 /***/ }),
-/* 37 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(module) {/* parser generated by jison 0.4.17 */
@@ -23096,7 +23212,7 @@ if (typeof module !== 'undefined' && __webpack_require__.c[__webpack_require__.s
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)(module)))
 
 /***/ }),
-/* 38 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -23109,15 +23225,15 @@ exports.easyOctave = easyOctave;
 
 var _constants = __webpack_require__(0);
 
-var _lodash = __webpack_require__(39);
+var _lodash = __webpack_require__(41);
 
 var _lodash2 = _interopRequireDefault(_lodash);
 
-var _lodash3 = __webpack_require__(40);
+var _lodash3 = __webpack_require__(42);
 
 var _lodash4 = _interopRequireDefault(_lodash3);
 
-var _teoria = __webpack_require__(41);
+var _teoria = __webpack_require__(43);
 
 var _teoria2 = _interopRequireDefault(_teoria);
 
@@ -23172,7 +23288,7 @@ function easyOctave(voice) {
 }
 
 /***/ }),
-/* 39 */
+/* 41 */
 /***/ (function(module, exports) {
 
 /**
@@ -23854,7 +23970,7 @@ module.exports = memoize;
 
 
 /***/ }),
-/* 40 */
+/* 42 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(module) {/**
@@ -26125,13 +26241,13 @@ module.exports = minBy;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)(module)))
 
 /***/ }),
-/* 41 */
+/* 43 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var Note = __webpack_require__(11);
+var Note = __webpack_require__(12);
 var Interval = __webpack_require__(6);
-var Chord = __webpack_require__(46);
-var Scale = __webpack_require__(48);
+var Chord = __webpack_require__(48);
+var Scale = __webpack_require__(50);
 
 var teoria;
 
@@ -26206,16 +26322,16 @@ teoria = {
 };
 
 
-__webpack_require__(49)(teoria);
+__webpack_require__(51)(teoria);
 exports = module.exports = teoria;
 
 
 /***/ }),
-/* 42 */
+/* 44 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var coords = __webpack_require__(12);
-var accval = __webpack_require__(13);
+var coords = __webpack_require__(13);
+var accval = __webpack_require__(14);
 
 module.exports = function scientific(name) {
   var format = /^([a-h])(x|#|bb|b?)(-?\d*)/i;
@@ -26239,11 +26355,11 @@ module.exports = function scientific(name) {
 
 
 /***/ }),
-/* 43 */
+/* 45 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var coords = __webpack_require__(12);
-var accval = __webpack_require__(13);
+var coords = __webpack_require__(13);
+var accval = __webpack_require__(14);
 
 module.exports = function helmholtz(name) {
   var name = name.replace(/\u2032/g, "'").replace(/\u0375/g, ',');
@@ -26286,7 +26402,7 @@ module.exports = function helmholtz(name) {
 
 
 /***/ }),
-/* 44 */
+/* 46 */
 /***/ (function(module, exports) {
 
 module.exports = function(coord, stdPitch) {
@@ -26303,7 +26419,7 @@ module.exports = function(coord, stdPitch) {
 
 
 /***/ }),
-/* 45 */
+/* 47 */
 /***/ (function(module, exports) {
 
 var pattern = /^(AA|A|P|M|m|d|dd)(-?\d+)$/;
@@ -26357,12 +26473,12 @@ module.exports.coords = baseIntervals.slice(0);
 
 
 /***/ }),
-/* 46 */
+/* 48 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var daccord = __webpack_require__(47);
+var daccord = __webpack_require__(49);
 var knowledge = __webpack_require__(3);
-var Note = __webpack_require__(11);
+var Note = __webpack_require__(12);
 var Interval = __webpack_require__(6);
 
 function Chord(root, name) {
@@ -26588,7 +26704,7 @@ module.exports = Chord;
 
 
 /***/ }),
-/* 47 */
+/* 49 */
 /***/ (function(module, exports) {
 
 var SYMBOLS = {
@@ -26782,7 +26898,7 @@ module.exports = function(symbol) {
 
 
 /***/ }),
-/* 48 */
+/* 50 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var knowledge = __webpack_require__(3);
@@ -26913,7 +27029,7 @@ module.exports = Scale;
 
 
 /***/ }),
-/* 49 */
+/* 51 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var knowledge = __webpack_require__(3);
@@ -26937,7 +27053,7 @@ module.exports = function(teoria) {
 
 
 /***/ }),
-/* 50 */
+/* 52 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -26948,23 +27064,23 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.pitch = exports.live = exports.chord = exports.melody = exports.scale = undefined;
 
-var _scale = __webpack_require__(15);
+var _scale = __webpack_require__(16);
 
 var scale = _interopRequireWildcard(_scale);
 
-var _melody = __webpack_require__(51);
+var _melody = __webpack_require__(53);
 
 var melody = _interopRequireWildcard(_melody);
 
-var _chord = __webpack_require__(52);
+var _chord = __webpack_require__(54);
 
 var chord = _interopRequireWildcard(_chord);
 
-var _pitch = __webpack_require__(53);
+var _pitch = __webpack_require__(55);
 
 var pitch = _interopRequireWildcard(_pitch);
 
-var _live = __webpack_require__(54);
+var _live = __webpack_require__(56);
 
 var live = _interopRequireWildcard(_live);
 
@@ -26977,7 +27093,7 @@ exports.live = live;
 exports.pitch = pitch;
 
 /***/ }),
-/* 51 */
+/* 53 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -26992,7 +27108,7 @@ var _lodash = __webpack_require__(4);
 
 var _ = _interopRequireWildcard(_lodash);
 
-var _fraction = __webpack_require__(16);
+var _fraction = __webpack_require__(9);
 
 var _fraction2 = _interopRequireDefault(_fraction);
 
@@ -27223,7 +27339,7 @@ exports.tempo = tempo;
 exports.accelerando = accelerando;
 
 /***/ }),
-/* 52 */
+/* 54 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -27238,7 +27354,7 @@ var _lodash = __webpack_require__(4);
 
 var _ = _interopRequireWildcard(_lodash);
 
-var _scale = __webpack_require__(15);
+var _scale = __webpack_require__(16);
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
@@ -27282,7 +27398,7 @@ exports.root = root;
 exports.inversion = inversion;
 
 /***/ }),
-/* 53 */
+/* 55 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -27366,7 +27482,7 @@ function noteToHz(note) {
 }
 
 /***/ }),
-/* 54 */
+/* 56 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -27402,7 +27518,7 @@ exports.playNote = playNote;
 exports.play = play;
 
 /***/ }),
-/* 55 */
+/* 57 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -27445,7 +27561,7 @@ var RestNode = function () {
 exports.default = RestNode;
 
 /***/ }),
-/* 56 */
+/* 58 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -27505,7 +27621,7 @@ var ChordNode = function () {
 exports.default = ChordNode;
 
 /***/ }),
-/* 57 */
+/* 59 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -27515,77 +27631,33 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _constants = __webpack_require__(0);
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var Layout = function () {
-    function Layout() {
-        var props = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-
-        _classCallCheck(this, Layout);
-
-        this.props = props;
-        this.timeSignatures = [];
-        this.lines = [];
-        this.systems = [];
-        this.pages = [];
-    }
-
-    _createClass(Layout, [{
-        key: 'set',
-        value: function set(props) {
-            this.props = Object.assign({}, this.props, props);
-            return this;
-        }
-    }, {
-        key: 'serialize',
-        value: function serialize() {
-            var pages = this.pages.length ? this.pages : [{ systems: this.systems.length, staffSpacing: [] }];
-            return Object.assign({}, this.props, {
-                type: _constants.SCORE,
-                lines: this.lines,
-                systems: this.systems,
-                pages: pages,
-                timeSignatures: this.timeSignatures
-            });
-        }
-    }, {
-        key: 'execute',
-        value: function execute() {
-            return this;
-        }
-    }]);
-
-    return Layout;
-}();
-
-exports.default = Layout;
-
-/***/ }),
-/* 58 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
+var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _fraction = __webpack_require__(9);
+
+var _fraction2 = _interopRequireDefault(_fraction);
 
 var _lodash = __webpack_require__(4);
+
+var _Layout = __webpack_require__(22);
+
+var _Layout2 = _interopRequireDefault(_Layout);
+
+var _constants = __webpack_require__(0);
 
 var _Executable = __webpack_require__(2);
 
 var _Serializable = __webpack_require__(1);
 
-var _Node = __webpack_require__(9);
+var _Node = __webpack_require__(10);
 
-var _time = __webpack_require__(59);
+var _time = __webpack_require__(60);
+
+var _utils = __webpack_require__(23);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -27606,107 +27678,93 @@ var Voice = function () {
             }, []);
             if (!yy.voices[this.props.name]) {
                 // create array for voice items
-                yy.voices[this.props.name] = (0, _time.calculateAndSetTimes)(list);
+                var _calculateAndSetTimes = calculateAndSetTimes(list),
+                    _calculateAndSetTimes2 = _slicedToArray(_calculateAndSetTimes, 2),
+                    voice = _calculateAndSetTimes2[0],
+                    layoutItems = _calculateAndSetTimes2[1];
+
+                this.addItemToLayout(yy.layout, layoutItems);
+                yy.voices[this.props.name] = voice;
             } else {
                 var previousItem = (0, _lodash.last)(yy.voices[this.props.name]);
                 var offset = (0, _time.calculateDuration)(previousItem).add(previousItem.props.time);
-                var listWithTimes = (0, _time.calculateAndSetTimes)(list, offset.valueOf());
-                yy.voices[this.props.name] = yy.voices[this.props.name].concat(listWithTimes);
+
+                var _calculateAndSetTimes3 = calculateAndSetTimes(list, offset.valueOf()),
+                    _calculateAndSetTimes4 = _slicedToArray(_calculateAndSetTimes3, 2),
+                    _voice = _calculateAndSetTimes4[0],
+                    layout = _calculateAndSetTimes4[1];
+
+                yy.voices[this.props.name] = yy.voices[this.props.name].concat(_voice);
+                this.addItemToLayout(yy.layout, layout);
             }
             return this;
+        }
+    }, {
+        key: 'addItemToLayout',
+        value: function addItemToLayout(layout, items) {
+            var _this = this;
+
+            items.forEach(function (item) {
+                if ((0, _utils.isClef)(item)) {
+                    // find the line the current voice belongs to.
+                    var line = layout.lines.find(function (line) {
+                        return line.voices.some(function (name) {
+                            return name === _this.props.name;
+                        });
+                    });
+                    if (line) {
+                        line.clefs.push(item);
+                    }
+                } else if ((0, _utils.isKeySignature)(item)) {
+                    // find the line the current voice belongs to.
+                    var _line = layout.lines.find(function (line) {
+                        return line.voices.some(function (name) {
+                            return name === _this.props.name;
+                        });
+                    });
+                    if (_line) {
+                        _line.keys.push(item);
+                    }
+                }
+            });
         }
     }]);
 
     return Voice;
 }();
 
-exports.default = Voice;
-
-/***/ }),
-/* 59 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.calculateDuration = calculateDuration;
-exports.calculateAndSetTimes = calculateAndSetTimes;
-
-var _fraction = __webpack_require__(16);
-
-var _fraction2 = _interopRequireDefault(_fraction);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function isNote(item) {
-  return item.type === "note";
-}
-
-function isChord(item) {
-  return item.type === "chord";
-}
-
-function isRest(item) {
-  return item.type === "rest";
-}
-
-function isTimeSignature(item) {
-  return item.type === "timeSig";
-}
-
-function isRepeat(item) {
-  return item.type === "repeat";
-}
-
 /*
- * @param item - Scored item. Given an item, return the rational duration of the item;
- * @return Number
+ * Sets time property on all the items. Removes the items that do not belong
+ * in a voice list (clefs, keys, etc.).
  */
-function calculateDuration(item) {
 
-  // The item doesn't have a duration unless it's one of the following types.
-  if (!(isNote(item) || isChord(item) || isRest(item) || isRepeat(item))) return (0, _fraction2.default)(0);
 
-  var s = item.props.tuplet ? item.props.tuplet.split("/") : null;
-  var tuplet = s ? new _fraction2.default(s[0], s[1]) : null;
-  var dots = item.props.dots || 0;
-
-  var dur = new _fraction2.default(1, item.props.value || 4);
-
-  for (var i = 0; i < dots; i++) {
-    dur = dur.mul(1.5);
-  }
-
-  if (tuplet && dur) {
-    dur = dur.mul(s[1]).div(s[0]);
-  }
-
-  return dur;
-}
-
-/*
- * @param items - Item[]
- * @param offset - Optional amount of time that will be added to the items times.
- */
 function calculateAndSetTimes(items) {
-  var offset = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+    var offset = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
 
-  return items.reduce(function (acc, item) {
-    var previousItem = acc[acc.length - 1];
+    var voiceItems = [];
+    var layoutItems = [];
 
-    if (previousItem) {
-      // item.props.time = F(previousItem.props.time).add(calculateDuration(previousItem)).add(offset).valueOf();
-      item.props.time = (0, _fraction2.default)(previousItem.props.time).add(calculateDuration(previousItem)).valueOf();
-    } else {
-      item.props.time = offset;
+    for (var i = 0; i < items.length; i++) {
+        var previousItem = items[i - 1];
+        var item = items[i];
+
+        if (previousItem) {
+            (0, _time.setTime)(item, (0, _fraction2.default)((0, _time.getTime)(previousItem)).add((0, _time.calculateDuration)(previousItem)).valueOf());
+        } else {
+            (0, _time.setTime)(item, offset);
+        }
+
+        if ((0, _utils.isMusic)(item)) {
+            voiceItems.push(item);
+        } else {
+            layoutItems.push(item);
+        }
     }
-
-    return acc.concat([item]);
-  }, []);
+    return [voiceItems, layoutItems];
 }
+
+exports.default = Voice;
 
 /***/ }),
 /* 60 */
@@ -27716,10 +27774,100 @@ function calculateAndSetTimes(items) {
 
 
 Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+exports.calculateDuration = calculateDuration;
+exports.calculateAndSetTimes = calculateAndSetTimes;
+exports.setTime = setTime;
+exports.getTime = getTime;
+
+var _fraction = __webpack_require__(9);
+
+var _fraction2 = _interopRequireDefault(_fraction);
+
+var _utils = __webpack_require__(23);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/*
+ * @param item - Scored item. Given an item, return the rational duration of the item;
+ * @return Number
+ */
+function calculateDuration(item) {
+
+	// The item doesn't have a duration unless it's one of the following types.
+	if (!((0, _utils.isNote)(item) || (0, _utils.isChord)(item) || (0, _utils.isRest)(item) || (0, _utils.isRepeat)(item))) return (0, _fraction2.default)(0);
+
+	var s = item.props.tuplet ? item.props.tuplet.split("/") : null;
+	var tuplet = s ? new _fraction2.default(s[0], s[1]) : null;
+	var dots = item.props.dots || 0;
+
+	var dur = new _fraction2.default(1, item.props.value || 4);
+
+	for (var i = 0; i < dots; i++) {
+		dur = dur.mul(1.5);
+	}
+
+	if (tuplet && dur) {
+		dur = dur.mul(s[1]).div(s[0]);
+	}
+
+	return dur;
+}
+
+/*
+ * @param items - Item[]
+ * @param offset - Optional amount of time that will be added to the items times.
+ */
+
+// import { NOTE, REST, CHORD, TIMESIG, CLEF, REPEAT } from './constants';
+function calculateAndSetTimes(items) {
+	var offset = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+
+	return items.reduce(function (acc, item) {
+		var previousItem = acc[acc.length - 1];
+
+		if (previousItem) {
+			setTime(item, (0, _fraction2.default)(getTime(previousItem)).add(calculateDuration(previousItem)).valueOf());
+		} else {
+			setTime(item, offset);
+		}
+
+		return acc.concat([item]);
+	}, []);
+}
+
+/*
+ * Sets the time in the correct position on an item.
+ */
+function setTime(item, time) {
+	if ((0, _utils.isClef)(item) || (0, _utils.isKeySignature)(item)) {
+		item.time = time;
+	} else {
+		item.props.time = time;
+	}
+}
+
+function getTime(item) {
+	if ((0, _utils.isClef)(item) || (0, _utils.isKeySignature)(item)) {
+		return item.time;
+	} else {
+		return item.props.time;
+	}
+}
+
+/***/ }),
+/* 61 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
-var _v = __webpack_require__(61);
+var _v = __webpack_require__(62);
 
 var _v2 = _interopRequireDefault(_v);
 
@@ -27727,31 +27875,31 @@ var _Keyword = __webpack_require__(20);
 
 var _Keyword2 = _interopRequireDefault(_Keyword);
 
-var _PageNode = __webpack_require__(65);
+var _PageNode = __webpack_require__(66);
 
 var _PageNode2 = _interopRequireDefault(_PageNode);
 
-var _SystemNode = __webpack_require__(66);
+var _SystemNode = __webpack_require__(67);
 
 var _SystemNode2 = _interopRequireDefault(_SystemNode);
 
-var _LineNode = __webpack_require__(67);
+var _LineNode = __webpack_require__(68);
 
 var _LineNode2 = _interopRequireDefault(_LineNode);
 
-var _ChordSymbol = __webpack_require__(68);
+var _ChordSymbol = __webpack_require__(69);
 
 var _ChordSymbol2 = _interopRequireDefault(_ChordSymbol);
 
-var _TimeSignature = __webpack_require__(69);
+var _TimeSignature = __webpack_require__(70);
 
 var _TimeSignature2 = _interopRequireDefault(_TimeSignature);
 
-var _Clef = __webpack_require__(70);
+var _Clef = __webpack_require__(71);
 
 var _Clef2 = _interopRequireDefault(_Clef);
 
-var _Key = __webpack_require__(71);
+var _Key = __webpack_require__(72);
 
 var _Key2 = _interopRequireDefault(_Key);
 
@@ -27769,7 +27917,7 @@ var _Serializable = __webpack_require__(1);
 
 var _Executable = __webpack_require__(2);
 
-var _Node = __webpack_require__(9);
+var _Node = __webpack_require__(10);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -27848,15 +27996,15 @@ var BUILTINS = {
     },
     clef: function clef(yy, args) {
         var value = args[0].serialize();
-        var measure = args[1] ? args[1].value : 0;
-        var beat = args[2] ? args[2].value : 0;
+        var measure = args[1] ? args[1].value : undefined;
+        var beat = args[2] ? args[2].value : undefined;
         return new _Clef2.default({ value: value, measure: measure, beat: beat });
     },
     key: function key(yy, args) {
         var root = args[0].serialize();
         var mode = args[1].serialize();
-        var measure = args[2] ? args[2].value : 0;
-        var beat = args[3] ? args[3].value : 0;
+        var measure = args[2] ? args[2].value : undefined;
+        var beat = args[3] ? args[3].value : undefined;
         return new _Key2.default({ root: root, mode: mode, measure: measure, beat: beat });
     },
     legato: function legato(yy, args) {
@@ -27883,11 +28031,11 @@ function clone(item) {
 exports.default = BUILTINS;
 
 /***/ }),
-/* 61 */
+/* 62 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var rng = __webpack_require__(62);
-var bytesToUuid = __webpack_require__(64);
+var rng = __webpack_require__(63);
+var bytesToUuid = __webpack_require__(65);
 
 // **`v1()` - Generate time-based UUID**
 //
@@ -27998,13 +28146,13 @@ module.exports = v1;
 
 
 /***/ }),
-/* 62 */
+/* 63 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // Unique ID creation requires a high quality random # generator.  In node.js
 // this is pretty straight-forward - we use the crypto API.
 
-var crypto = __webpack_require__(63);
+var crypto = __webpack_require__(64);
 
 module.exports = function nodeRNG() {
   return crypto.randomBytes(16);
@@ -28012,13 +28160,13 @@ module.exports = function nodeRNG() {
 
 
 /***/ }),
-/* 63 */
+/* 64 */
 /***/ (function(module, exports) {
 
 module.exports = require("crypto");
 
 /***/ }),
-/* 64 */
+/* 65 */
 /***/ (function(module, exports) {
 
 /**
@@ -28047,7 +28195,7 @@ module.exports = bytesToUuid;
 
 
 /***/ }),
-/* 65 */
+/* 66 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -28094,7 +28242,7 @@ var PageNode = function () {
 exports.default = PageNode;
 
 /***/ }),
-/* 66 */
+/* 67 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -28143,7 +28291,7 @@ var SystemNode = function () {
 exports.default = SystemNode;
 
 /***/ }),
-/* 67 */
+/* 68 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -28192,7 +28340,7 @@ var LineNode = function () {
 exports.default = LineNode;
 
 /***/ }),
-/* 68 */
+/* 69 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -28238,7 +28386,7 @@ var ChordSymbol = function () {
 exports.default = ChordSymbol;
 
 /***/ }),
-/* 69 */
+/* 70 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -28284,7 +28432,7 @@ var TimeSignature = function () {
 exports.default = TimeSignature;
 
 /***/ }),
-/* 70 */
+/* 71 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -28326,7 +28474,7 @@ var Clef = function () {
 exports.default = Clef;
 
 /***/ }),
-/* 71 */
+/* 72 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
