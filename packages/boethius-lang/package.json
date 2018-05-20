@@ -11,7 +11,8 @@
     "flow": "flow",
     "compile": "jison lang/lang.jison -o lang/lang.js",
     "bin": "npm run flow && webpack",
-    "test": "npm run flow && npm run compile && mocha --compilers js:babel-register"
+    "test-mocha": "npm run flow && npm run compile && mocha --compilers js:babel-register",
+    "test": "jest"
   },
   "author": "Sean Mullen <srmullen13@gmail.com> (http://seanmullen.me/)",
   "license": "ISC",
@@ -26,6 +27,7 @@
     "babelify": "^7.3.0",
     "chai": "^3.5.0",
     "flow-bin": "^0.71.0",
+    "jest": "^22.4.4",
     "jison": "^0.4.17",
     "mocha": "^2.4.5",
     "watchify": "^3.7.0",
