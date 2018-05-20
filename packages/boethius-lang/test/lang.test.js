@@ -167,7 +167,7 @@ describe("parser", () => {
         });
 
         test("should not override dots when there is a duration", () => {
-            const {voices: {mel}} = compile("[mel c4/4 (dots=1 c4/4 c4/4.. c4)]");
+            const {voices: {mel}} = compile("[mel c4 (dots=1 c4/4 c4/4.. c4)]");
             const [note1, note2, note3, note4] = mel;
             expect(note1.props.dots).not.toBeDefined();
             expect(note2.props.dots).toBe(0);
