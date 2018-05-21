@@ -51,7 +51,7 @@ function renderLedgerLines (items, centerLine) {
 }
 
 Line.prototype.render = function (length) {
-	const group = drawLine(length);
+	const group = this.group = drawLine(length);
 	group.name = TYPE;
 	group.strokeColor = "black";
 	return group;

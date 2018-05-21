@@ -105,62 +105,88 @@ System.renderTimeContexts = function ({system, lines, measures, voices, timeCont
 	// Render Decorations // FIXME: Should be handled at the Score level?
 	////////////////////////
 	if (timeContexts) {
-		const startTime = _.first(timeContexts).time;
-		const endTime = _.last(timeContexts).time;
-		map((line, lineGroup, lineCenter) => {
-			const lineItems = getLineItems(line, voices, startTime.time, endTime.time);
-
-			const beamings = lineItems.map((voice, i) => {
-				return Beaming.groupItems(voice, {measures}).map(beaming => {
-					const stemDirection = getStemDirection(lineItems, i);
-					return Beaming.of({stemDirection}, beaming);
-				});
-			});
-
-			const tuplets = lineItems.map(voice => {
-	            return Tuplet.groupItems(voice, {measures}).map(tuplet => {
-	                return Tuplet.of({}, tuplet);
-	            });
-	        });
-
-			// Render Beamings
-			// Voice.findBeaming returns the beamings grouped by measure, so it
-			// needs to be flattened one level.
-			_.each(_.flatten(beamings), (beaming) => {
-				const centerLineValues = _.map(beaming.children, item => {
-					const contextTime = getTime(measures, item);
-					const context = line.contextAt(contextTime);
-					return getCenterLineValue(context.clef);
-				});
-
-				const stemDirections = beaming.stemDirection
-					? _.fill(new Array(beaming.children.length), beaming.stemDirection)
-					: Beaming.getAllStemDirections(beaming.children, centerLineValues);
-
-				const beam = beaming.render(centerLineValues, stemDirections);
-				lineGroup.addChild(beam);
-			});
-
-			_.each(_.flatten(tuplets), tuplet => {
-				const group = tuplet.render(lineCenter);
-				lineGroup.addChild(group);
-			});
-
-			// render decorations that only require knowledge of the line.
-			_.each(lineItems, voiceItems => {
-				renderLedgerLines(voiceItems, lineCenter);
-				Voice.renderArticulations(voiceItems); // items must have stem direction already
-			});
-
-		}, lines, lineGroups, lineCenters);
+		const groupings = System.createGroups({timeContexts, lines, voices, measures});
+		System.renderDecorations({
+			timeContexts,
+			lines,
+			voices,
+			lineGroups,
+			lineCenters,
+			voices,
+			measures,
+			groupings
+		});
 	}
 
+	// FIXME: Should this be part of renderDecorations?
 	const measureNumber = renderMeasureNumber(measures[0].value);
 	measureNumber.translate(0, -20);
 	systemGroup.addChild(measureNumber);
 
 	return systemGroup;
 };
+
+System.createGroups = function ({timeContexts, lines, voices, measures}) {
+	const startTime = _.first(timeContexts).time;
+	const endTime = _.last(timeContexts).time;
+
+	return lines.reduce((acc, line) => {
+		const lineItems = getLineItems(line, voices, startTime.time, endTime.time);
+
+		acc.beamings = acc.beamings.concat(lineItems.map((voice, i) => {
+			return Beaming.groupItems(voice, {measures}).map(beaming => {
+				const stemDirection = getStemDirection(lineItems, i);
+				return Beaming.of({line, stemDirection}, beaming);
+			});
+		}));
+
+		acc.tuplets = acc.tuplets.concat(lineItems.map(voice => {
+			return Tuplet.groupItems(voice, {measures}).map(tuplet => {
+				return Tuplet.of({line}, tuplet);
+			});
+		}));
+
+		return acc;
+	}, {beamings: [], tuplets: []});
+}
+
+System.renderDecorations = function ({timeContexts, lines, lineGroups, lineCenters, voices, measures, groupings}) {
+	const startTime = _.first(timeContexts).time;
+	const endTime = _.last(timeContexts).time;
+
+	const { beamings, tuplets } = groupings;
+
+	_.each(_.flatten(beamings), (beaming) => {
+		const centerLineValues = _.map(beaming.children, item => {
+			const contextTime = getTime(measures, item);
+			const context = beaming.props.line.contextAt(contextTime);
+			return getCenterLineValue(context.clef);
+		});
+
+		const stemDirections = beaming.props.stemDirection
+			? _.fill(new Array(beaming.children.length), beaming.props.stemDirection)
+			: Beaming.getAllStemDirections(beaming.children, centerLineValues);
+
+		const beam = beaming.render(centerLineValues, stemDirections);
+		beaming.props.line.group.addChild(beam);
+	});
+
+	_.each(_.flatten(tuplets), tuplet => {
+		const lineCenter = b(tuplet.props.line.group);
+		const group = tuplet.render(lineCenter);
+		tuplet.props.line.group.addChild(group);
+	});
+
+	map((line, lineGroup, lineCenter) => {
+		const lineItems = getLineItems(line, voices, startTime.time, endTime.time);
+		// render decorations that only require knowledge of the line.
+		_.each(lineItems, voiceItems => {
+			renderLedgerLines(voiceItems, lineCenter);
+			Voice.renderArticulations(voiceItems); // items must have stem direction already
+		});
+
+	}, lines, lineGroups, lineCenters);
+}
 
 /*
  * @param timeContexts - array of lineContexts.

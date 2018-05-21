@@ -5,26 +5,28 @@ import constants from "../constants";
 import {isNote, isDynamic, isMarking} from "../types";
 
 const noteNameToDegreeObj = {
-		"c": 0,
-		"d": 1,
-		"e": 2,
-		"f": 3,
-		"g": 4,
-		"a": 5,
-		"b": 6
-	},
-	clefBases = {
-		treble: {pitch: "C", degree: 0, octave: 5, offset: 3},
-		bass:   {pitch: "F", degree: 3, octave: 3, offset: 2},
-		alto:   {pitch: "C", degree: 0, octave: 4, offset: 4},
-		tenor:  {pitch: "C", degree: 0, octave: 4, offset: 2}
-	},
-	lineNamesObj = {
-		treble: ["f", "e", "d", "c", "b", "a", "g", "f", "e"],
-		base:   ["a", "g", "f", "e", "d", "c", "b", "a", "g"],
-		alto:   ["g", "f", "e", "d", "c", "b", "a", "g", "f"],
-		tenor:  ["e", "d", "c", "b", "a", "g", "f", "e", "d"]
-	};
+	"c": 0,
+	"d": 1,
+	"e": 2,
+	"f": 3,
+	"g": 4,
+	"a": 5,
+	"b": 6
+};
+
+const clefBases = {
+	treble: {pitch: "C", degree: 0, octave: 5, offset: 3},
+	bass:   {pitch: "F", degree: 3, octave: 3, offset: 2},
+	alto:   {pitch: "C", degree: 0, octave: 4, offset: 4},
+	tenor:  {pitch: "C", degree: 0, octave: 4, offset: 2}
+};
+
+const lineNamesObj = {
+	treble: ["f", "e", "d", "c", "b", "a", "g", "f", "e"],
+	base:   ["a", "g", "f", "e", "d", "c", "b", "a", "g"],
+	alto:   ["g", "f", "e", "d", "c", "b", "a", "g", "f"],
+	tenor:  ["e", "d", "c", "b", "a", "g", "f", "e", "d"]
+};
 
 
 function noteNameToDegree (name) {

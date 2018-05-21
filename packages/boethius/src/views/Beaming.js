@@ -6,8 +6,8 @@ import {reductions} from "../utils/common";
 import {parseSignature, getMeasureNumber} from "../utils/timeUtils";
 import {getAverageStemDirection} from "../utils/note";
 
-function Beaming ({stemDirection}, children = []) {
-    this.stemDirection = stemDirection;
+function Beaming (props={}, children = []) {
+    this.props = props;
     this.children = children;
 }
 

@@ -28,6 +28,7 @@ TODOS:
     - Clef change markings at end of system.
     - Fermata
     - Fingerings
+    - Ghost notes
 
     # Lower priority
     - SMuFL

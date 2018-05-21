@@ -3,6 +3,7 @@ import {drawTuplets} from "../engraver";
 import {calculateTupletDuration, sumDurations} from "../utils/timeUtils";
 
 function Tuplet (props, children=[]) {
+    this.props = props;
     this.children = children;
 }
 
