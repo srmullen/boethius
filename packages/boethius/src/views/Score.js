@@ -85,54 +85,7 @@ Score.render = function (score, {voices=[], chordSymbols=[], repeats=[], pages=[
             }
         }));
 
-        // const beamings = voiceTimeFrames.map(voice => {
-        //     return Beaming.groupItems(voice, {measures}).map(beaming => {
-        //         return Beaming.of({}, beaming);
-        //     });
-        // });
-
-        // const tuplets = voiceTimeFrames.map(voice => {
-        //     return Tuplet.groupItems(voice, {measures}).map(tuplet => {
-        //         return Tuplet.of({}, tuplet);
-        //     });
-        // });
-
-        // Create Slurs
-        const slurs = voiceTimeFrames.map(voice => {
-            return Slur.groupItems(voice).map(slur => {
-                const slurStartTime = _.first(slur).time;
-                const slurEndTime = _.last(slur).time;
-                // const systemBreak = _.includes(startTimes.map(time => time.time), legatoEndTime);
-                let systemBreak;
-                for (let i = 0; i < startTimes.length; i++) {
-                    const systemStartTime = startTimes[i].time;
-                    if (slurStartTime < systemStartTime && slurEndTime >= systemStartTime) {
-                        systemBreak = systemStartTime;
-                        break;
-                    }
-                }
-                const isEnd = !!systemBreak && slur.length === 1;
-                return Slur.of({systemBreak, isEnd}, slur);
-            });
-        });
-
-        // legatos are grouped by voice.
-        const legatos = voiceTimeFrames.map(voice => {
-            return Legato.groupItems(voice).map(legato => {
-                const legatoStartTime = _.first(legato).time;
-                const legatoEndTime = _.last(legato).time;
-                // const systemBreak = _.includes(startTimes.map(time => time.time), legatoEndTime);
-                let systemBreak;
-                for (let i = 0; i < startTimes.length; i++) {
-                    const systemStartTime = startTimes[i].time;
-                    if (legatoStartTime < systemStartTime && legatoEndTime >= systemStartTime) {
-                        systemBreak = systemStartTime;
-                        break;
-                    }
-                }
-                const isEnd = !!systemBreak && legato.length === 1;
-                return Legato.of({systemBreak, isEnd}, legato);
-        })});
+        const groupings = Score.createGroups({voiceTimeFrames, startTimes});
 
         const systemTimeContexts = partitionBySystem(createTimeContexts(score.lines, voices, measures, chordSymbols), startMeasures);
 
@@ -209,24 +162,10 @@ Score.render = function (score, {voices=[], chordSymbols=[], repeats=[], pages=[
             return systemGroup;
         });
 
-        // render beamings
-        // const beamGroups = _.flatten(beamings).map(beaming => beaming.render());
-
-        // render tuplets
-        // const tupletGroups = _.flatten(tuplets).map(tuplet => {
-        //     // needs line center
-        //     tuplet.render();
-        // });
-
-        // render slurs
-        const slurGroups = _.flatten(slurs).map(slur => slur.render());
-        scoreGroup.addChildren(slurGroups);
-
-        // render legatos
-        const legatoGroups = _.flatten(legatos).map(legato => legato.render());
-        scoreGroup.addChildren(legatoGroups);
-
         scoreGroup.addChildren(systemGroups);
+
+        scoreGroup.addChildren(Score.renderDecorations({groupings}));
+
     }
 
     return scoreGroup;
@@ -239,6 +178,78 @@ Score.prototype.render = function () {
 
     return group;
 };
+
+Score.createGroups = function ({voiceTimeFrames, startTimes}) {
+    // const beamings = voiceTimeFrames.map(voice => {
+    //     return Beaming.groupItems(voice, {measures}).map(beaming => {
+    //         return Beaming.of({}, beaming);
+    //     });
+    // });
+
+    // const tuplets = voiceTimeFrames.map(voice => {
+    //     return Tuplet.groupItems(voice, {measures}).map(tuplet => {
+    //         return Tuplet.of({}, tuplet);
+    //     });
+    // });
+
+    // Create Slurs
+    const slurs = voiceTimeFrames.map(voice => {
+        return Slur.groupItems(voice).map(slur => {
+            const slurStartTime = _.first(slur).time;
+            const slurEndTime = _.last(slur).time;
+            // const systemBreak = _.includes(startTimes.map(time => time.time), legatoEndTime);
+            let systemBreak;
+            for (let i = 0; i < startTimes.length; i++) {
+                const systemStartTime = startTimes[i].time;
+                if (slurStartTime < systemStartTime && slurEndTime >= systemStartTime) {
+                    systemBreak = systemStartTime;
+                    break;
+                }
+            }
+            const isEnd = !!systemBreak && slur.length === 1;
+            return Slur.of({systemBreak, isEnd}, slur);
+        });
+    });
+
+    // legatos are grouped by voice.
+    const legatos = voiceTimeFrames.map(voice => {
+        return Legato.groupItems(voice).map(legato => {
+            const legatoStartTime = _.first(legato).time;
+            const legatoEndTime = _.last(legato).time;
+            // const systemBreak = _.includes(startTimes.map(time => time.time), legatoEndTime);
+            let systemBreak;
+            for (let i = 0; i < startTimes.length; i++) {
+                const systemStartTime = startTimes[i].time;
+                if (legatoStartTime < systemStartTime && legatoEndTime >= systemStartTime) {
+                    systemBreak = systemStartTime;
+                    break;
+                }
+            }
+            const isEnd = !!systemBreak && legato.length === 1;
+            return Legato.of({systemBreak, isEnd}, legato);
+    })});
+
+    return { slurs, legatos };
+}
+
+Score.renderDecorations = function ({groupings}) {
+    // render beamings
+    // const beamGroups = _.flatten(beamings).map(beaming => beaming.render());
+
+    // render tuplets
+    // const tupletGroups = _.flatten(tuplets).map(tuplet => {
+    //     // needs line center
+    //     tuplet.render();
+    // });
+
+    // render slurs
+    const slurGroups = _.flatten(groupings.slurs).map(slur => slur.render());
+
+    // render legatos
+    const legatoGroups = _.flatten(groupings.legatos).map(legato => legato.render());
+
+    return [...slurGroups, ...legatoGroups];
+}
 
 function isVoiceUsed (voice, lines) {
     return _.some(lines, line => _.some(line.voices, linesVoice => linesVoice === voice.name));
