@@ -135,9 +135,8 @@ function parseVoices (voices) {
 export function parseMusic (music) {
     const voices = music.voices || {};
     const chordSymbols = music.chordSymbols || [];
-    return {
+    return Object.assign({}, music, {
         voices: parseVoices(voices),
-        // pages: [layout.currentPage],
         chordSymbols: chordSymbols.map(parse)
-    };
+    });
 }

@@ -45,7 +45,7 @@ function Score ({pageWidth=595, pageHeight=842, length, title}, children=[]) {
 
 Score.prototype.type = TYPE;
 
-Score.render = function (score, {voices=[], chordSymbols=[], repeats=[], pages=[0]}) {
+Score.render = function (score, {voices=[], chordSymbols=[], repeats=[]}, {pages=[0]} = {}) {
     // Create the Score Group.
     const scoreGroup = score.render();
 

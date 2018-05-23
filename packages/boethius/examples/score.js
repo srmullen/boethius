@@ -135,7 +135,7 @@ const examples = {
         }, [fourfour, system1, system2, system3, system4, trebleLine, bassLine, page0, page1, page2]);
 
         // render it all as a score.
-        return scored.render(score, {voices: [soprano, bass], pages: [1]});
+        return scored.render(score, {voices: [soprano, bass]}, {pages: [1]});
     },
 
     testChords: function (scored) {
