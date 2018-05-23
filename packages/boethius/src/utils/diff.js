@@ -62,8 +62,8 @@ export function arrays (previous, next) {
  * TODO: Need to handle timeSig changes.
  */
 export function measures (current, next) {
-    const currentNum = _.sum(current.systems, system => system.measures);
-    const nextNum = _.sum(next.systems, system => system.measures);
+    const currentNum = _.sum(current.systems, system => system.props.measures);
+    const nextNum = _.sum(next.systems, system => system.props.measures);
 
     return currentNum !== nextNum;
 }

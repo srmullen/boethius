@@ -63,13 +63,13 @@ Score.render = function (score, {voices=[], chordSymbols=[], repeats=[]}, {pages
     // Get the systems that need to be rendered. The rest are ignored. This
     // is based on the page.
     const systemsToRender = _.reduce(score.systems, (acc, system, index) => {
-        return _.includes(pages, system.page) ? concat(acc, {system, index}) : acc;
+        return _.includes(pages, system.props.page) ? concat(acc, {system, index}) : acc;
     }, []);
 
     // When no systems are on the page nothing further is done.
     if (systemsToRender.length) {
         // get the start measure for each System.
-        const startMeasures = reductions((acc, system) => acc + system.measures, score.systems, 0);
+        const startMeasures = reductions((acc, system) => acc + system.props.measures, score.systems, 0);
         const startTimes = startMeasures.map((measure) => getTime(measures, {measure}));
 
         // [startTime inclusive, endTime exclusive]
@@ -142,7 +142,7 @@ Score.render = function (score, {voices=[], chordSymbols=[], repeats=[]}, {pages
         // system. It should be possible to hook into rendering the system and Rendering
         // the music seperately.
         const systemGroups = _.map(systemsToRender, ({system, index}, i) => {
-            const endMeasure = startMeasures[index] + system.measures;
+            const endMeasure = startMeasures[index] + system.props.measures;
             const systemMeasures = _.slice(measures, startMeasures[index], endMeasure);
             const timeContexts = systemTimeContexts[index];
 
@@ -150,14 +150,14 @@ Score.render = function (score, {voices=[], chordSymbols=[], repeats=[]}, {pages
                 system, voices, timeContexts, chordSymbols,
                 lines: score.lines,
                 measures: systemMeasures,
-                length: system.length || score.length
+                length: system.props.length || score.length
             });
 
-            const systemTranslation = (!_.includes(pages, system.page)) ?
-                score.pages[system.page].staffSpacing[i] || i * 250 :
-                score.pages[system.page].staffSpacing[i] || i * 250 + _.indexOf(pages, system.page) * score.pageHeight;
+            const systemTranslation = (!_.includes(pages, system.props.page)) ?
+                score.pages[system.props.page].staffSpacing[i] || i * 250 :
+                score.pages[system.props.page].staffSpacing[i] || i * 250 + _.indexOf(pages, system.props.page) * score.pageHeight;
 
-            systemGroup.translate(system.indentation, systemTranslation + systemOffset);
+            systemGroup.translate(system.props.indentation, systemTranslation + systemOffset);
 
             return systemGroup;
         });
@@ -260,7 +260,7 @@ function getStartContext (score, time) {
 }
 
 export function scoreToMeasures (score, repeats) {
-    const numMeasures = _.sumBy(score.systems, system => system.measures);
+    const numMeasures = _.sumBy(score.systems, system => system.props.measures);
     return createMeasures(numMeasures, [...score.timeSigs, ...repeats]);
 }
 

@@ -17,6 +17,13 @@ import Tuplet from './Tuplet';
 
 const TYPE = constants.type.system;
 
+const SYSTEM_DEFAULTS = {
+	page: 0,
+	measures: 4,
+	lineHeights: [],
+	indentation: 0
+};
+
 /*
  * @measures - the number of measures on the system.
  * @startMeasure - the index of the first measure on the stave.
@@ -25,14 +32,15 @@ const TYPE = constants.type.system;
  // TODO: What are the children of a system now? It's more of a view onto the lines, rather than something with children in it's own right.
  // @param children <Line, Measure, Marking>[] - A marking that is given to the system will be rendered on all lines. If it is
  // 	given to a line it will only affect that line.
-function System ({page=0, measures=4, lineHeights=[], indentation=0, length}, children=[]) {
-	this.page = page;
-	this.measures = measures;
+function System (props = {}, children = []) {
+	this.props = Object.assign({}, SYSTEM_DEFAULTS, props);
+	// this.page = page;
+	// this.measures = measures;
+	// this.lineHeights = lineHeights;
+	// this.length = length;
+	// this.indentation = indentation;
 	this.children = children;
-	this.markings = _.filter(children, isMarking);
-	this.lineHeights = lineHeights;
-	this.length = length;
-	this.indentation = indentation;
+	// this.markings = _.filter(children, isMarking);
 }
 
 // measures only contains the MeasureViews that are being rendered on this system.
@@ -51,7 +59,7 @@ System.renderTimeContexts = function ({system, lines, measures, voices, timeCont
 
 	const timeLengths = calculateTimeLengths(timeContexts, shortestDuration);
 
-	const measureLengths = addDefaultMeasureLengths(system.measures, calculateMeasureLengths(timeLengths));
+	const measureLengths = addDefaultMeasureLengths(system.props.measures, calculateMeasureLengths(timeLengths));
 
 	// get the minimum length of the line
 	const minLineLength = _.sum(measureLengths);
@@ -262,8 +270,8 @@ System.prototype.render = function () {
 System.prototype.getLineHeights = function (lines) {
 	const defaultHeight = 120;
 	return lines.reduce((heights, line, i) => {
-		return heights.concat((this.lineHeights[i+1] || defaultHeight) + _.last(heights));
-	}, [this.lineHeights[0] || 0]);
+		return heights.concat((this.props.lineHeights[i+1] || defaultHeight) + _.last(heights));
+	}, [this.props.lineHeights[0] || 0]);
 };
 
 System.prototype.renderLines = function (lines, length) {
