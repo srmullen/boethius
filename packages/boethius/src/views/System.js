@@ -1,12 +1,12 @@
 import paper from "paper";
 import _ from "lodash";
 
-import {isMarking, isPitched, isNote} from "../types";
+import {isMarking, isPitched, isNote, isClef, isKey, isTimeSignature} from "../types";
 import {drawSystemBar} from "../engraver";
 import constants from "../constants";
 import {getLineItems, b} from "../utils/line";
 import {getStaffItems, calculateMeasureLengths, addDefaultMeasureLengths, iterateByTime} from "../utils/system";
-import {map, mapDeep} from "../utils/common";
+import {map, mapDeep, clone} from "../utils/common";
 import * as placement from "../utils/placement";
 import {getMeasureNumber, getTime} from "../utils/timeUtils";
 import Voice from "./Voice";
@@ -14,6 +14,7 @@ import {getCenterLineValue} from "./Clef";
 import Line from "./Line";
 import Beaming from './Beaming';
 import Tuplet from './Tuplet';
+import TimeContext from './TimeContext';
 
 const TYPE = constants.type.system;
 
@@ -34,11 +35,6 @@ const SYSTEM_DEFAULTS = {
  // 	given to a line it will only affect that line.
 function System (props = {}, children = []) {
 	this.props = Object.assign({}, SYSTEM_DEFAULTS, props);
-	// this.page = page;
-	// this.measures = measures;
-	// this.lineHeights = lineHeights;
-	// this.length = length;
-	// this.indentation = indentation;
 	this.children = children;
 	// this.markings = _.filter(children, isMarking);
 }
@@ -51,6 +47,9 @@ System.renderTimeContexts = function ({system, lines, measures, voices, timeCont
 	const systemGroup = system.render();
 
 	const lineHeights = system.getLineHeights(lines);
+
+	// Create the context marking for the beginning of each system.
+	System.createSystemSignatures({timeContexts, measures, lines});
 
 	// Create the timeContexts groups so their widths can be determined.
 	const timeContextGroups = _.map(timeContexts, timeContext => timeContext.render(lineHeights));
@@ -133,6 +132,42 @@ System.renderTimeContexts = function ({system, lines, measures, voices, timeCont
 
 	return systemGroup;
 };
+
+/*
+ * Adds Clef, Key, and TimeSignature objects to the given timeContests so they are
+ * rendered at the beginning of the System.
+ *
+ * @param timeContexts TimeContext[] - Time contexts that are rendered on this system.
+ */
+System.createSystemSignatures = function ({timeContexts, measures, lines}) {
+	const firstTime = _.first(timeContexts);
+	const startTime = getTime(measures, {time: measures[0].startsAt});
+	const startContext = getStartContext(lines, startTime);
+	if (firstTime) {
+		const time = firstTime.time
+		if (startTime.time < time.time) {
+			// Add a new TimeContext for the startTime of the system.
+			const systemTimeContext = _.map(startContext, _.partial(createLineTimeContext, startTime));
+			systemTimeContexts[index] = [new TimeContext(systemTimeContext), ...systemContext];
+		} else {
+			_.each(firstTime.lines, (timeContext, i) => {
+				if (timeContext) { // there are items at the time.
+					// add markings to the items list if they don't exist.
+					const {context, items} = timeContext;
+					if (!_.find(timeContext.items, isClef)) items.push(clone(context.clef));
+					if (!_.find(timeContext.items, isKey)) items.push(clone(context.key));
+					if (!_.find(timeContext.items, isTimeSignature)) items.push(clone(context.timeSig));
+				} else { // create a context and marking items for the line
+					firstTime.lines[i] = createLineTimeContext(startTime, startContext[i]);
+				}
+			});
+		}
+	} else {
+		// create a timeContext with the cloned startContext markings
+		const systemTimeContext = _.map(startContext, _.partial(createLineTimeContext, startTime));
+		timeContexts.push(new TimeContext(systemTimeContext));
+	}
+}
 
 System.createGroups = function ({timeContexts, lines, voices, measures}) {
 	const startTime = _.first(timeContexts).time;
@@ -300,5 +335,19 @@ System.prototype.renderMeasures = function (measures, lengths, systemGroup) {
 
 	return measureGroups;
 };
+
+function getStartContext (lines, time) {
+    return lines.map(line => line.contextAt(time));
+}
+
+/*
+ * @param time - Time object.
+ * @param context - Return value of line.contextAt.
+ * @return TimeContext object {context, time, items}
+ */
+export function createLineTimeContext (time, context) {
+    const items = [clone(context.clef), clone(context.key), clone(context.timeSig)];
+    return {context, items, time};
+}
 
 export default System;

@@ -15,7 +15,7 @@ import {getTimeContexts} from "../utils/line";
 import {getStaffItems, iterateByTime} from "../utils/system";
 import {getAccidentalContexts} from "../utils/accidental";
 import {getTime, equals} from "../utils/timeUtils";
-import {isClef, isKey, isText, isTimeSignature} from "../types";
+import {isText} from "../types";
 
 const TYPE = constants.type.score;
 
@@ -87,39 +87,8 @@ Score.render = function (score, {voices=[], chordSymbols=[], repeats=[]}, {pages
 
         const groupings = Score.createGroups({voiceTimeFrames, startTimes});
 
-        const systemTimeContexts = partitionBySystem(createTimeContexts(score.lines, voices, measures, chordSymbols), startMeasures);
-
-        // Create the context marking for the beginning of each system.
-        map(({index}) => {
-            const systemContext = systemTimeContexts[index];
-            const firstTime = _.first(systemContext);
-            const startTime = startTimes[index]
-            const startContext = getStartContext(score, startTime);
-            if (firstTime) {
-                const time = firstTime.time
-                if (startTime.time < time.time) {
-                    // Add a new TimeContext for the startTime of the system.
-                    const systemTimeContext = _.map(startContext, _.partial(createLineTimeContext, startTime));
-                    systemTimeContexts[index] = [new TimeContext(systemTimeContext), ...systemContext];
-                } else {
-                    _.each(firstTime.lines, (timeContext, i) => {
-                        if (timeContext) { // there are items at the time.
-                            // add markings to the items list if they don't exist.
-                            const {context, items} = timeContext;
-                            if (!_.find(timeContext.items, isClef)) items.push(clone(context.clef));
-                            if (!_.find(timeContext.items, isKey)) items.push(clone(context.key));
-                            if (!_.find(timeContext.items, isTimeSignature)) items.push(clone(context.timeSig));
-                        } else { // create a context and marking items for the line
-                            firstTime.lines[i] = createLineTimeContext(startTime, startContext[i]);
-                        }
-                    });
-                }
-            } else {
-                // create a timeContext with the cloned startContext markings
-                const systemTimeContext = _.map(startContext, _.partial(createLineTimeContext, startTime));
-                systemContext.push(new TimeContext(systemTimeContext));
-            }
-        }, systemsToRender);
+        const timeContexts = createTimeContexts(score.lines, voices, measures, chordSymbols);
+        const systemTimeContexts = partitionBySystem(timeContexts, startMeasures);
 
         /////////////////////
         // Rendering Phase //
@@ -255,23 +224,9 @@ function isVoiceUsed (voice, lines) {
     return _.some(lines, line => _.some(line.voices, linesVoice => linesVoice === voice.name));
 }
 
-function getStartContext (score, time) {
-    return score.lines.map(line => line.contextAt(time));
-}
-
 export function scoreToMeasures (score, repeats) {
     const numMeasures = _.sumBy(score.systems, system => system.props.measures);
     return createMeasures(numMeasures, [...score.timeSigs, ...repeats]);
-}
-
-/*
- * @param time - Time object.
- * @param context - Return value of line.contextAt.
- * @return TimeContext object {context, time, items}
- */
-export function createLineTimeContext (time, context) {
-    const items = [clone(context.clef), clone(context.key), clone(context.timeSig)];
-    return {context, items, time};
 }
 
 function createTimeContexts (lines, voices, measures, chordSymbols) {
