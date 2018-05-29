@@ -7,7 +7,8 @@ module.exports = {
     devtool: "eval-source-map",
     entry: {
         "./site/score": "./examples/score",
-        "./site/errors": "./examples/errors"
+        "./site/errors": "./examples/errors",
+        "./site/plugins": "./examples/plugins"
     },
     output: {
         path: "/",
@@ -26,6 +27,11 @@ module.exports = {
             filename: "errors.html",
             template: "./examples/errors.html",
             chunks: ["./site/errors"]
+        }),
+        new HtmlWebpackPlugin({
+            filename: 'plugins.html',
+            template: './examples/plugins.html',
+            chunks: ['./site/plugins']
         })
     ],
     resolve: {

@@ -134,7 +134,7 @@ System.renderTimeContexts = function ({system, lines, measures, voices, timeCont
 };
 
 /*
- * Adds Clef, Key, and TimeSignature objects to the given timeContests so they are
+ * Adds Clef, Key, and TimeSignature objects to the given timeContexts so they are
  * rendered at the beginning of the System.
  *
  * @param timeContexts TimeContext[] - Time contexts that are rendered on this system.

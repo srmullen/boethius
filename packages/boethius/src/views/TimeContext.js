@@ -3,9 +3,13 @@ import _ from "lodash";
 
 import Note from "./Note";
 import Chord from "./Chord";
+import {getStaffItems, iterateByTime} from "../utils/system";
+import {positionMarkings, getTimeContexts} from "../utils/line";
+import {getAccidentalContexts} from "../utils/accidental";
+import {equals, getTimeFromSignatures} from "../utils/timeUtils";
 import {isNote, isChord, isRest, isDynamic, isPitched, isMarking, hasDuration} from "../types";
 import {calculateNoteYpos, getClefBase, alignNoteHeads, getYOffset, calculateCursor, placeAt} from "../utils/placement";
-import {positionMarkings} from "../utils/line";
+import {map} from '../utils/common';
 
 /*
  * Representation of all items across lines that are at a given time.
@@ -129,5 +133,29 @@ function renderChord (chord, context) {
 	Chord.renderAccidentals(chord, context);
 	return group;
 };
+
+TimeContext.createTimeContexts = function createTimeContexts (timeSignaures, lines, voices, chordSymbols) {
+    // get the time contexts
+	const lineItems = getStaffItems(lines, voices);
+    // FIXME: returned contexts are incorrect when clef starts on beat other than 0.
+	const lineTimes = map((line, items) => getTimeContexts(line, items), lines, lineItems);
+
+    // calculate the accidentals for each line.
+	_.each(lineTimes, (times) => {
+		const accidentals = getAccidentalContexts(times);
+		// add accidentals to times
+		_.each(times, (time, i) => time.context.accidentals = accidentals[i]);
+	});
+
+    return iterateByTime(timeContext => {
+        let [symbols, ] = _.partition(chordSymbols, (sym) => {
+            const symbolTime = getTimeFromSignatures(timeSignaures, sym);
+            const contextTime = _.find(timeContext, line => !!line).time;
+            return equals(contextTime, symbolTime);
+        });
+
+        return new TimeContext(timeContext, symbols);
+    }, lineTimes);
+}
 
 export default TimeContext;
