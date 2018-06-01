@@ -253,15 +253,20 @@ function calculateTimeLength (items, shortestDuration) {
 		key: keys,
 		timeSig: timeSigs
 	} = _.groupBy(markings, item => item.type);
-	const getMarkingWidth = (marking) => marking.group.bounds.width + noteHeadWidth;
+	const getMarkingWidth = (marking) => marking.group
+		? marking.group.bounds.width + noteHeadWidth
+		: 0;
 	const clefLength = clefs ? _.max(clefs.map(getMarkingWidth)) : 0;
 	const keyLength = keys ? _.max(keys.map(getMarkingWidth)) : 0;
 	const timeSigLength = timeSigs ? _.max(timeSigs.map(getMarkingWidth)) : 0;
 	const markingsLength = _.sum([clefLength, keyLength, timeSigLength]);
 	// dynamics should not affect measure length. remove them.
 	const voiceItemLengths = _.map(_.reject(voiceItems, isDynamic), item => { // these should use the same calculations as cursor
-		return item.group.bounds.width + (noteHeadWidth * getStaffSpace(shortestDuration, item));
+		return item.group
+			? item.group.bounds.width + (noteHeadWidth * getStaffSpace(shortestDuration, item))
+			: undefined;
 	});
+	
 	const totalVoiceItemsLength = voiceItemLengths.length ? _.min(voiceItemLengths) : 0;
 
 	return [markingsLength, totalVoiceItemsLength];

@@ -26,9 +26,11 @@ Slur.of = (context, children) => {
 Slur.prototype.render = function () {
     const group = new paper.Group({name: TYPE});
 
-    for (let i = 0; i < this.children.length - 1; i++) {
-        const fromItem = this.children[i];
-        const toItem = this.children[i+1];
+    const children = this.children.filter(child => child.group);
+
+    for (let i = 0; i < children.length - 1; i++) {
+        const fromItem = children[i];
+        const toItem = children[i+1];
         if (this.systemBreak && fromItem.time < this.systemBreak && toItem.time >= this.systemBreak) {
             group.addChildren(tieOverSystemBreak([fromItem, toItem], this.systemBreak));
         } else {

@@ -4,8 +4,8 @@ import _ from "lodash";
 import {isMarking, isPitched, isNote, isClef, isKey, isTimeSignature} from "../types";
 import {drawSystemBar} from "../engraver";
 import constants from "../constants";
-import {getLineItems, b} from "../utils/line";
-import {getStaffItems, calculateMeasureLengths, addDefaultMeasureLengths, iterateByTime} from "../utils/system";
+import {getLineItems, b, positionMarkings} from "../utils/line";
+import {getStaffItems, calculateMeasureLengths, addDefaultMeasureLengths} from "../utils/system";
 import {map, mapDeep, clone} from "../utils/common";
 import * as placement from "../utils/placement";
 import {getMeasureNumber, getTime} from "../utils/timeUtils";
@@ -48,27 +48,46 @@ System.renderTimeContexts = function ({system, lines, measures, voices, timeCont
 
 	const lineHeights = system.getLineHeights(lines);
 
+	const systemStartTime = getTime(measures, {time: measures[0].startsAt});
+
 	// Create the context marking for the beginning of each system.
-	System.createSystemSignatures({timeContexts, measures, lines});
+	const systemSignatures = System.createSystemSignatures({timeContexts, measures, lines});
+	const systemSignatureGroups = systemSignatures.map(({clef, key, timeSig}, i) => {
+		const context = lines[i].contextAt(systemStartTime);
+		clef.time = systemStartTime;
+		key.time = systemStartTime;
+		timeSig.time = systemStartTime;
+		return {
+			clef: clef.render(context),
+			key: key.render(context),
+			timeSig: timeSig.render(context)
+		};
+	});
 
 	// Create the timeContexts groups so their widths can be determined.
-	const timeContextGroups = _.map(timeContexts, timeContext => timeContext.render(lineHeights));
+	const timeContextGroups = _.map(timeContexts, (timeContext, i) => {
+		return timeContext.render({lineHeights, disableMarkingRendering: i === 0});
+	});
 
 	const shortestDuration = Scored.config.shortestDuration; // need function to calculate this.
 
+	// signatureLengths is the amount of horizontal space the system signature take up on a line.
+	const [signatureLength] = calculateSystemSignaturesLength(systemSignatures);
+
 	const timeLengths = calculateTimeLengths(timeContexts, shortestDuration);
 
+	// Add signatureLength to the first measure.
 	const measureLengths = addDefaultMeasureLengths(system.props.measures, calculateMeasureLengths(timeLengths));
 
 	// get the minimum length of the line
-	const minLineLength = _.sum(measureLengths);
+	const minLineLength = _.sum(measureLengths) + signatureLength;
 
 	let lineGroups, noteScale, cursorFn;
 
 	if (!length) {
 		lineGroups = system.renderLines(lines, minLineLength);
 
-		const measureGroups = system.renderMeasures(measures, measureLengths, lineGroups);
+		const measureGroups = system.renderMeasures(measures, measureLengths, lineGroups, signatureLength);
 
 		systemGroup.addChildren(measureGroups);
 
@@ -79,13 +98,20 @@ System.renderTimeContexts = function ({system, lines, measures, voices, timeCont
 	} else {
 		lineGroups = system.renderLines(lines, length);
 
-		const totalMarkingLength = _.sumBy(timeLengths, ({length}) => length[0]);
+		const totalMarkingLength = _.sumBy(timeLengths, ({length}) => length[0]) + signatureLength;
 
-		const measureScale = length / minLineLength;
+		const measureScale = (length - signatureLength) / (minLineLength - signatureLength);
 
 		// noteScale = (length - totalMarkingLength) / (minLineLength - totalMarkingLength);
 
-		const measureGroups = system.renderMeasures(measures, _.map(measureLengths, measureLength => measureLength * measureScale), lineGroups);
+		const scaledMeasureLengths = _.map(measureLengths, measureLength => measureLength * measureScale);
+
+		const measureGroups = system.renderMeasures(
+			measures,
+			scaledMeasureLengths,
+			lineGroups,
+			signatureLength
+		);
 
 		systemGroup.addChildren(measureGroups);
 
@@ -93,6 +119,10 @@ System.renderTimeContexts = function ({system, lines, measures, voices, timeCont
 			return placement.scaleCursor(measureScale, cursor, _.min(possibleNextPositions) + cursor);
 		};
 	}
+
+	systemSignatureGroups.forEach(({clef, key, timeSig}, i) => {
+		systemGroup.addChildren([clef, key, timeSig]);
+	});
 
 	// add the items to the system group
 	systemGroup.addChildren(timeContextGroups);
@@ -105,7 +135,8 @@ System.renderTimeContexts = function ({system, lines, measures, voices, timeCont
 	// Placement Phase //
 	/////////////////////
 	const lineCenters = _.map(lineGroups, b);
-	const cursors = placeTimes(timeContexts, measures, measureLengths, cursorFn);
+	const startCursors = placeSystemSignatures(systemSignatures, lineHeights);
+	const cursors = placeTimes(timeContexts, measures, measureLengths, cursorFn, startCursors);
 
 	// Render stems, beams, tuplets, articulations, and ledger lines.
 	////////////////////////
@@ -133,126 +164,115 @@ System.renderTimeContexts = function ({system, lines, measures, voices, timeCont
 	return systemGroup;
 };
 
-/*
- * Adds Clef, Key, and TimeSignature objects to the given timeContexts so they are
- * rendered at the beginning of the System.
- *
- * @param timeContexts TimeContext[] - Time contexts that are rendered on this system.
- */
 System.createSystemSignatures = function ({timeContexts, measures, lines}) {
-	const firstTime = _.first(timeContexts);
+	const firstContext = _.first(timeContexts);
 	const startTime = getTime(measures, {time: measures[0].startsAt});
-	const startContext = getStartContext(lines, startTime);
-	if (firstTime) {
-		const time = firstTime.time
-		if (startTime.time < time.time) {
-			// Add a new TimeContext for the startTime of the system.
-			const systemTimeContext = _.map(startContext, _.partial(createLineTimeContext, startTime));
-			systemTimeContexts[index] = [new TimeContext(systemTimeContext), ...systemContext];
-		} else {
-			_.each(firstTime.lines, (timeContext, i) => {
-				if (timeContext) { // there are items at the time.
-					// add markings to the items list if they don't exist.
-					const {context, items} = timeContext;
-					if (!_.find(timeContext.items, isClef)) items.push(clone(context.clef));
-					if (!_.find(timeContext.items, isKey)) items.push(clone(context.key));
-					if (!_.find(timeContext.items, isTimeSignature)) items.push(clone(context.timeSig));
-				} else { // create a context and marking items for the line
-					firstTime.lines[i] = createLineTimeContext(startTime, startContext[i]);
-				}
-			});
-		}
-	} else {
-		// create a timeContext with the cloned startContext markings
-		const systemTimeContext = _.map(startContext, _.partial(createLineTimeContext, startTime));
-		timeContexts.push(new TimeContext(systemTimeContext));
-	}
+	return getStartContexts(lines, startTime);
 }
 
 System.createGroups = function ({timeContexts, lines, voices, measures}) {
-	const startTime = _.first(timeContexts).time;
-	const endTime = _.last(timeContexts).time;
+	if (timeContexts.length) {
+		const startTime = _.first(timeContexts).time;
+		const endTime = _.last(timeContexts).time;
 
-	return lines.reduce((acc, line) => {
-		const lineItems = getLineItems(line, voices, startTime.time, endTime.time);
+		return lines.reduce((acc, line) => {
+			const lineItems = getLineItems(line, voices, startTime.time, endTime.time);
 
-		acc.beamings = acc.beamings.concat(lineItems.map((voice, i) => {
-			return Beaming.groupItems(voice, {measures}).map(beaming => {
-				const stemDirection = getStemDirection(lineItems, i);
-				return Beaming.of({line, stemDirection}, beaming);
-			});
-		}));
+			acc.beamings = acc.beamings.concat(lineItems.map((voice, i) => {
+				return Beaming.groupItems(voice, {measures}).map(beaming => {
+					const stemDirection = getStemDirection(lineItems, i);
+					return Beaming.of({line, stemDirection}, beaming);
+				});
+			}));
 
-		acc.tuplets = acc.tuplets.concat(lineItems.map(voice => {
-			return Tuplet.groupItems(voice, {measures}).map(tuplet => {
-				return Tuplet.of({line}, tuplet);
-			});
-		}));
+			acc.tuplets = acc.tuplets.concat(lineItems.map(voice => {
+				return Tuplet.groupItems(voice, {measures}).map(tuplet => {
+					return Tuplet.of({line}, tuplet);
+				});
+			}));
 
-		return acc;
-	}, {beamings: [], tuplets: []});
+			return acc;
+		}, {beamings: [], tuplets: []});
+	} else {
+		return {beamings: [], tuplets: []};
+	}
 }
 
 System.renderDecorations = function ({timeContexts, lines, lineGroups, lineCenters, voices, measures, groupings}) {
-	const startTime = _.first(timeContexts).time;
-	const endTime = _.last(timeContexts).time;
+	if (timeContexts.length) {
+		const startTime = _.first(timeContexts).time;
+		const endTime = _.last(timeContexts).time;
 
-	const { beamings, tuplets } = groupings;
+		const { beamings, tuplets } = groupings;
 
-	_.each(_.flatten(beamings), (beaming) => {
-		const centerLineValues = _.map(beaming.children, item => {
-			const contextTime = getTime(measures, item);
-			const context = beaming.props.line.contextAt(contextTime);
-			return getCenterLineValue(context.clef);
+		_.each(_.flatten(beamings), (beaming) => {
+			const centerLineValues = _.map(beaming.children, item => {
+				const contextTime = getTime(measures, item);
+				const context = beaming.props.line.contextAt(contextTime);
+				return getCenterLineValue(context.clef);
+			});
+
+			const stemDirections = beaming.props.stemDirection
+				? _.fill(new Array(beaming.children.length), beaming.props.stemDirection)
+				: Beaming.getAllStemDirections(beaming.children, centerLineValues);
+
+			const beam = beaming.render(centerLineValues, stemDirections);
+			beaming.props.line.group.addChild(beam);
 		});
 
-		const stemDirections = beaming.props.stemDirection
-			? _.fill(new Array(beaming.children.length), beaming.props.stemDirection)
-			: Beaming.getAllStemDirections(beaming.children, centerLineValues);
-
-		const beam = beaming.render(centerLineValues, stemDirections);
-		beaming.props.line.group.addChild(beam);
-	});
-
-	_.each(_.flatten(tuplets), tuplet => {
-		const lineCenter = b(tuplet.props.line.group);
-		const group = tuplet.render(lineCenter);
-		tuplet.props.line.group.addChild(group);
-	});
-
-	map((line, lineGroup, lineCenter) => {
-		const lineItems = getLineItems(line, voices, startTime.time, endTime.time);
-		// render decorations that only require knowledge of the line.
-		_.each(lineItems, voiceItems => {
-			renderLedgerLines(voiceItems, lineCenter);
-			Voice.renderArticulations(voiceItems); // items must have stem direction already
+		_.each(_.flatten(tuplets), tuplet => {
+			const lineCenter = b(tuplet.props.line.group);
+			const group = tuplet.render(lineCenter);
+			tuplet.props.line.group.addChild(group);
 		});
 
-	}, lines, lineGroups, lineCenters);
+		map((line, lineGroup, lineCenter) => {
+			const lineItems = getLineItems(line, voices, startTime.time, endTime.time);
+			// render decorations that only require knowledge of the line.
+			_.each(lineItems, voiceItems => {
+				renderLedgerLines(voiceItems, lineCenter);
+				Voice.renderArticulations(voiceItems); // items must have stem direction already
+			});
+
+		}, lines, lineGroups, lineCenters);
+	}
 }
 
-/*
- * @param timeContexts - array of lineContexts.
- * @param shortestDuration - float representation of shortest duration in the measure.
- * @return {time: Time, [markingLength, durationedLength]}
- */
 function calculateTimeLengths (timeContexts, shortestDuration) {
     return _.map(timeContexts, (timeContext) => {
 		// get all items at the time
-		const allItems = timeContext.lines.reduce((acc, line) => {
-			return line ? acc.concat(line.items) : acc;
-		}, []);
+		// const allItems = timeContext.lines.reduce((acc, line) => {
+		// 	return line ? acc.concat(line.items) : acc;
+		// }, []);
 
-		const timeLength = placement.calculateTimeLength(allItems, shortestDuration);
+		const timeLength = placement.calculateTimeLength(_.compact(timeContext.items), shortestDuration);
 
 		return {time: timeContext.time, length: timeLength};
 	});
 }
 
-function placeTimes (timeContexts, measures, measureLengths, cursorFn) {
+function calculateSystemSignaturesLength (signatures) {
+	const allItems = signatures.reduce((acc, {clef, key, timeSig}) => {
+		return acc.concat(clef, key, timeSig);
+	}, []);
+	return placement.calculateTimeLength(allItems, 0);
+}
+
+function placeSystemSignatures (systemSignatures, lineHeights) {
+	const leftMargin = Scored.config.note.head.width;
+	return systemSignatures.map(({clef, key, timeSig}, i) => {
+		const rootY = new paper.Point(0, lineHeights[i]);
+		const cursor = positionMarkings(rootY, leftMargin, [clef, key, timeSig]);
+		const time = clef.time;
+		return {time, cursor};
+	});
+}
+
+function placeTimes (timeContexts, measures, measureLengths, cursorFn, startCursors) {
 	return _.reduce(timeContexts, (cursors, timeContext, i) => {
-		const lineIndices = _.filter(_.map(timeContext.lines, (ctx, i) => ctx ? i : undefined), _.isNumber);
-		const previousTime = _.last(cursors) ? _.last(cursors).time : 0;
+		// const lineIndices = _.filter(_.map(timeContext.lines, (ctx, i) => ctx ? i : undefined), _.isNumber);
+		// const previousTime = _.last(cursors) ? _.last(cursors).time : 0;
+		const previousTime = _.last(cursors).time || {measure: 0};
 		const currentTime = timeContext.time;
 		let cursor = _.last(cursors) ? _.last(cursors).cursor : Scored.config.note.head.width;
 		// update cursor if it's a new measure
@@ -266,7 +286,7 @@ function placeTimes (timeContexts, measures, measureLengths, cursorFn) {
 		const possibleNextPositions = timeContext.calculateCursor();
 
 		return cursors.concat({time: currentTime, cursor: cursorFn(possibleNextPositions, cursor)});
-	}, []);
+	}, startCursors);
 }
 
 /*
@@ -321,9 +341,9 @@ System.prototype.renderLines = function (lines, length) {
 	return lineGroups;
 };
 
-System.prototype.renderMeasures = function (measures, lengths, systemGroup) {
+System.prototype.renderMeasures = function (measures, lengths, systemGroup, offset=0) {
 	const measureGroups = _.reduce(measures, (groups, measure, i) => {
-		const measureLength = lengths[i];
+		const measureLength = i === 0 ? lengths[i] + offset : lengths[i];
 		const previousGroup = _.last(groups);
 
 		const leftBarline = previousGroup ? _.last(previousGroup.children) : null;
@@ -336,7 +356,7 @@ System.prototype.renderMeasures = function (measures, lengths, systemGroup) {
 	return measureGroups;
 };
 
-function getStartContext (lines, time) {
+function getStartContexts (lines, time) {
     return lines.map(line => line.contextAt(time));
 }
 

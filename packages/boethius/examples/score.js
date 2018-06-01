@@ -503,7 +503,8 @@ const examples = {
 
         // create voices
         var soprano = scored.voice({name: "treble"}, [
-            n({value:2, pitch: "c4"}), r({value:2, pitch: "d#4"}), n({value:2, pitch: "d#4"}), n({value:2, pitch: "e4"}), n({value:2, pitch: "f4"}),
+            n({value:2, pitch: "c4"}), r({value:2, pitch: "d#4"}), n({value:2, pitch: "d#4"}),
+            n({value:2, pitch: "e4"}), n({value:2, pitch: "f4"}),
     		n({value:2, pitch: "g4"}), n({value:2, pitch: "a4"}), n({value:2, pitch: "b4"}), r({value:2, pitch: "c#5"}),
     		n({value:2, pitch: "d5"}), n({value:2, pitch: "e5"}), n({value:2, pitch: "f5"}), n({value:2, pitch: "g5"}),
 
@@ -1037,10 +1038,10 @@ const examples = {
         // create voices
         var soprano = scored.voice({name: "treble"}, [
             // stems up
-            n({value: 4, tuplet: "3/2"}), n({value: 4, tuplet: "3/2"}), n({value: 4, tuplet: "3/2"}),
-            n({value: 8, tuplet: "3/2"}), n({value: 8, tuplet: "3/2"}), n({value: 8, tuplet: "3/2"}),
-            n({value: 16, tuplet: "3/2"}), n({value: 16, tuplet: "3/2"}), n({value: 16, tuplet: "3/2"}),
-            n({value: 16, tuplet: "3/2"}), n({value: 16, tuplet: "3/2"}), n({value: 16, tuplet: "3/2"}),
+            n({value: 4, pitch: 'g4', tuplet: "3/2"}), n({value: 4, pitch: 'g4', tuplet: "3/2"}), n({value: 4, pitch: 'g4', tuplet: "3/2"}),
+            n({value: 8, pitch: 'g4', tuplet: "3/2"}), n({value: 8, pitch: 'g4', tuplet: "3/2"}), n({value: 8, pitch: 'g4', tuplet: "3/2"}),
+            n({value: 16, pitch: 'g4', tuplet: "3/2"}), n({value: 16, pitch: 'a4', tuplet: "3/2"}), n({value: 16, pitch: 'g4', tuplet: "3/2"}),
+            n({value: 16, pitch: 'a4', tuplet: "3/2"}), n({value: 16, pitch: 'g4', tuplet: "3/2"}), n({value: 16, pitch: 'a4', tuplet: "3/2"}),
             // stems down
             n({value: 4, pitch: 'c5', tuplet: "3/2"}), n({value: 4, pitch: 'c5', tuplet: "3/2"}), n({value: 4, pitch: 'c5', tuplet: "3/2"}),
             n({value: 8, pitch: 'c5', tuplet: "3/2"}), n({value: 8, pitch: 'c5', tuplet: "3/2"}), n({value: 8, pitch: 'c5', tuplet: "3/2"}),

@@ -116,9 +116,11 @@ Note.prototype.needsFlag = function () {
 };
 
 Note.prototype.drawLegerLines = function (centerLine, lineSpacing) {
-	const legerLines = engraver.drawLegerLines(this.noteHead, centerLine, lineSpacing);
-	if (legerLines){
-		this.group.addChild(legerLines);
+	if (this.noteHead) {
+		const legerLines = engraver.drawLegerLines(this.noteHead, centerLine, lineSpacing);
+		if (legerLines){
+			this.group.addChild(legerLines);
+		}
 	}
 };
 

@@ -3,7 +3,8 @@ import _ from "lodash";
 import {partitionBy} from "./common";
 
 /*
- * Given lines and voices, returns an array of item arrays. The first array is all items to be rendered on the first line, and so on.
+ * Given lines and voices, returns an array of item arrays.
+ * The first array is all items to be rendered on the first line, and so on.
  * @param lines - Line[]
  * @param voices- Voice[]
  * @return Items[][]
@@ -63,56 +64,8 @@ function addDefaultMeasureLengths (numMeasures, measureLengths) {
     return defaultMeasureLengths;
 }
 
-/*
- * @param time context object
- * @return Number or undefined if there is no context
- */
-function getTimeFromContext (ctx) {
-    return ctx && ctx.time ? ctx.time.time : undefined;
-}
-
-/*
- * @param times context[][]
- */
-function nextTimes (times) {
-    const ctxs = _.map(times, _.first);
-
-    if (!_.compact(ctxs).length) return []; // return nothing if there are no more contexts
-
-    const nextTime = _.minBy(ctxs, getTimeFromContext).time.time;
-    const nexts = [];
-    const rests = [];
-    for (let i = 0; i < ctxs.length; i++) {
-        if (getTimeFromContext(ctxs[i]) === nextTime) {
-            nexts.push(ctxs[i]);
-            rests.push(_.tail(times[i]));
-        } else {
-            nexts.push(null);
-            rests.push(times[i]);
-        }
-    }
-    return [nexts, rests];
-}
-
-/*
- * @param fn - function to apply to the time context
- * @param times context[][]
- */
-function iterateByTime (fn, times) {
-    let [nexts, rests] = nextTimes(times);
-    const ret = [];
-    while (_.compact(nexts).length) {
-        ret.push(fn(nexts));
-        [nexts, rests] = nextTimes(rests);
-    }
-
-    return ret;
-}
-
 export {
     getStaffItems,
     calculateMeasureLengths,
-    addDefaultMeasureLengths,
-    nextTimes,
-    iterateByTime
+    addDefaultMeasureLengths
 };

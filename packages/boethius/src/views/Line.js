@@ -1,5 +1,5 @@
 import constants from "../constants";
-import {mapDeep} from "../utils/common";
+import {mapDeep, clone} from "../utils/common";
 import {drawLine} from "../engraver";
 import {getMeasureNumber, getTime, getTimeFromSignatures} from "../utils/timeUtils";
 import {isPitched} from "../types";
@@ -15,6 +15,9 @@ function Line ({voices={}}, children=[]) {
 	const types = _.groupBy(children, child => child.type);
 
 	this.children = children;
+
+	// Create link from children back to the line they are on.
+	this.children.map(child => child.line = this);
 
 	this.timeSignatures = types[constants.type.timeSig];
 
@@ -77,7 +80,7 @@ Line.prototype.contextAt = function (time) {
 	const timeSig = getMarkingAtTime(this.markings, constants.type.timeSig, time) || {};
 	const key = getMarkingAtTime(this.markings, constants.type.key, time) || {};
 
-	return {clef, timeSig, key};
+	return {clef: clone(clef), timeSig: clone(timeSig), key: clone(key)};
 };
 
 export default Line;

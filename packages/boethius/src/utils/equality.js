@@ -1,7 +1,7 @@
 import {curry} from "lodash";
 
 // Object mapping types to equality functions
-const types = {note, rest, clef, dynamic};
+const types = {note, rest, clef, dynamic, timeSig, key};
 
 /*
  * Compare pojos according to Boethius equality semantics.
@@ -53,6 +53,21 @@ function rest (item1, item2) {
 }
 
 function clef (item1, item2) {
+    return (
+		item1.value === item2.value &&
+		item1.measure === item2.measure &&
+		item1.beat === item2.beat
+	);
+}
+
+function timeSig (item1, item2) {
+    return (
+        item1.value === item2.value &&
+        item1.measure === item2.measure
+    );
+}
+
+function key (item1, item2) {
     return (
 		item1.value === item2.value &&
 		item1.measure === item2.measure &&

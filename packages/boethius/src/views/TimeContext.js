@@ -3,10 +3,10 @@ import _ from "lodash";
 
 import Note from "./Note";
 import Chord from "./Chord";
-import {getStaffItems, iterateByTime} from "../utils/system";
-import {positionMarkings, getTimeContexts} from "../utils/line";
+import {getStaffItems} from "../utils/system";
+import {positionMarkings} from "../utils/line";
 import {getAccidentalContexts} from "../utils/accidental";
-import {equals, getTimeFromSignatures} from "../utils/timeUtils";
+import {equals, getTimeFromSignatures, iterateByTime} from "../utils/timeUtils";
 import {isNote, isChord, isRest, isDynamic, isPitched, isMarking, hasDuration} from "../types";
 import {calculateNoteYpos, getClefBase, alignNoteHeads, getYOffset, calculateCursor, placeAt} from "../utils/placement";
 import {map} from '../utils/common';
@@ -17,35 +17,48 @@ import {map} from '../utils/common';
  * @param timeContext - array of lineTimeContexts.
  * @param symbols - array of symbols.
  */
-function TimeContext (timeContext = [], symbols = []) {
-    this.lines = timeContext;
-    this.time = _.find(timeContext, line => !!line).time;
+function TimeContext ({time=mustProvideTime(), lines = [], voices = [], items = [], symbols = []}) {
+    this.lines = lines;
+    // this.time = _.find(timeContext, line => !!line).time;
+    this.time = time;
+    this.voices = voices;
+    this.items = items;
     this.symbols = symbols;
 }
 
-TimeContext.prototype.render = function (lineHeights) {
+TimeContext.prototype.render = function ({lineHeights, disableMarkingRendering}) {
     const group = this.group = new paper.Group();
 
 	const cursors = _.map(this.lines, (line, i) => {
 		if (line) {
-			const itemGroups = renderTime(line);
+            // Get items on the line.
+            const items = this.items.filter(item => {
+                if (disableMarkingRendering && isMarking(item)) {
+                    return false;
+                } else {
+                    return (item && item.line === line);
+                }
+            });
 
-            const markings = _.filter(line.items, isMarking);
-            const pitchedItems = _.filter(line.items, isPitched);
-            const rests = _.filter(line.items, isRest);
-            const dynamics = _.filter(line.items, isDynamic);
+			const itemGroups = renderTime(this.time, items);
+
+            const markings = _.filter(items, isMarking);
+            const pitchedItems = _.filter(items, isPitched);
+            const rests = _.filter(items, isRest);
+            const dynamics = _.filter(items, isDynamic);
 
             const rootY = new paper.Point(0, lineHeights[i]);
 
-            const cursor = positionMarkings(rootY, 0, line);
+            // const cursor = positionMarkings(rootY, 0, line);
+            const cursor = positionMarkings(rootY, 0, markings);
 
             if (pitchedItems.length) {
                 const widestItem = _.maxBy(pitchedItems, item => item.group.bounds.width);
-                placeY(rootY, line.context, widestItem);
+                placeY(rootY, line.contextAt(this.time), widestItem);
                 placeAt(cursor, widestItem);
                 // mutation of notes array
                 _.remove(pitchedItems, item => item === widestItem);
-                _.each(pitchedItems, _.partial(placeY, rootY, line.context));
+                _.each(pitchedItems, _.partial(placeY, rootY, line.contextAt(this.time)));
 
                 const alignToNoteHead = isNote(widestItem) ? widestItem.noteHead : widestItem.children[0].noteHead;
         		alignNoteHeads(alignToNoteHead.bounds.center.x, pitchedItems);
@@ -83,11 +96,11 @@ TimeContext.prototype.render = function (lineHeights) {
 
 TimeContext.prototype.calculateCursor = function () {
     return this.lines.map((line) => {
-        if (line) {
-            const markingCursor = _.filter(line.items, isMarking).reduce((acc, marking) => calculateCursor(marking) + acc, 0);
-            const durationedCursor = _.min(_.filter(line.items, hasDuration).map(calculateCursor));
-            return markingCursor + durationedCursor;
-        }
+        // find items on the line that have been rendered.
+        const items = this.items.filter(item => item.line === line && item.group);
+        const markingCursor = _.filter(items, isMarking).reduce((acc, marking) => calculateCursor(marking) + acc, 0);
+        const durationedCursor = _.min(_.filter(items, hasDuration).map(calculateCursor));
+        return markingCursor + durationedCursor;
     });
 };
 
@@ -97,9 +110,12 @@ function placeY (rootY, context, item) {
 	item.group.translate(rootY.add([0, yPos]));
 };
 
-function renderTime ({items, context}) {
-	return _.map(items, item => renderItem(item, context));
-};
+function renderTime (time, items) {
+    return items.map(item => {
+        const context = item.line.contextAt(time);
+        return renderItem(item, context);
+    });
+}
 
 function renderItem (item, context) {
 	if (isNote(item)) {
@@ -134,11 +150,64 @@ function renderChord (chord, context) {
 	return group;
 };
 
+function setLineOnItems (lines, voices) {
+    return _.forEach(lines, (line) => {
+        return _.reduce(line.voices, (acc, voiceConfig) => {
+            if (_.isString(voiceConfig)) {
+                const voice = _.find(voices, voice => voice.name === voiceConfig);
+                // return voice ? acc.concat(voice.children) : acc;
+                if (voice) {
+                    voice.children.forEach(child => child.line = line);
+                }
+            } else {
+                return acc;
+            }
+        }, []);
+    });
+}
+
+/*
+ * @param line - Line
+ * @param voices - Item[]
+ * @return [...{time, items, context}] Array ordered by time
+ */
+function getTimeContexts (line, items) {
+	const allItems = line.markings.concat(items);
+
+	const times = _.map(_.groupBy(allItems, (item) => {
+		return getTimeFromSignatures(line.timeSignatures, item).time;
+	}), (v) => {
+		const time = getTimeFromSignatures(line.timeSignatures, v[0]);
+		return {time, items: v, context: line.contextAt(time)};
+	});
+
+	const sortedTimes = _.sortBy(times, ({time}) => time.time);
+
+	return sortedTimes;
+}
+
+// function getTimeContexts (voice) {
+// 	const allItems = line.markings.concat(items);
+//
+// 	const times = _.map(_.groupBy(allItems, (item) => {
+// 		return getTimeFromSignatures(line.timeSignatures, item).time;
+// 	}), (v) => {
+// 		const time = getTimeFromSignatures(line.timeSignatures, v[0]);
+// 		return {time, items: v, context: line.contextAt(time)};
+// 	});
+//
+// 	const sortedTimes = _.sortBy(times, ({time}) => time.time);
+//
+// 	return sortedTimes;
+// }
+
+// TODO: Handle accidentals context.
 TimeContext.createTimeContexts = function createTimeContexts (timeSignaures, lines, voices, chordSymbols) {
     // get the time contexts
+    setLineOnItems(lines, voices);
 	const lineItems = getStaffItems(lines, voices);
-    // FIXME: returned contexts are incorrect when clef starts on beat other than 0.
 	const lineTimes = map((line, items) => getTimeContexts(line, items), lines, lineItems);
+    // const timeContexts = voices.map(getTimeContexts);
 
     // calculate the accidentals for each line.
 	_.each(lineTimes, (times) => {
@@ -147,15 +216,21 @@ TimeContext.createTimeContexts = function createTimeContexts (timeSignaures, lin
 		_.each(times, (time, i) => time.context.accidentals = accidentals[i]);
 	});
 
-    return iterateByTime(timeContext => {
+    const timeFn = (item) => {
+        return getTimeFromSignatures(timeSignaures, item);
+    }
+    return iterateByTime(timeFn, (time, items) => {
         let [symbols, ] = _.partition(chordSymbols, (sym) => {
             const symbolTime = getTimeFromSignatures(timeSignaures, sym);
-            const contextTime = _.find(timeContext, line => !!line).time;
-            return equals(contextTime, symbolTime);
+            return equals(time, symbolTime);
         });
 
-        return new TimeContext(timeContext, symbols);
-    }, lineTimes);
+        return new TimeContext({time, lines, voices, items: _.compact(items), symbols});
+    }, [...voices, ...lines].map(voice => voice.children));
+}
+
+function mustProvideTime () {
+    throw new Error('TimeContext must be provided a time');
 }
 
 export default TimeContext;

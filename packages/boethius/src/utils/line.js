@@ -51,26 +51,6 @@ function getLineItems (line, voices, start, end) {
     }, []);
 }
 
-/*
- * @param line - Line
- * @param voices - Item[]
- * @return [...{time, items, context}] Array ordered by time
- */
-function getTimeContexts (line, items) {
-	const allItems = line.markings.concat(items);
-
-	const times = _.map(_.groupBy(allItems, (item) => {
-		return getTimeFromSignatures(line.timeSignatures, item).time;
-	}), (v) => {
-		const time = getTimeFromSignatures(line.timeSignatures, v[0]);
-		return {time, items: v, context: line.contextAt(time)};
-	});
-
-	const sortedTimes = _.sortBy(times, ({time}) => time.time);
-
-	return sortedTimes;
-}
-
 function calculateMeasureLengths (measures, times, noteHeadWidth, shortestDuration) {
 	// group items by measure.
 	const itemsInMeasure = _.groupBy(times, (item) => {
@@ -92,7 +72,7 @@ function calculateMeasureLengths (measures, times, noteHeadWidth, shortestDurati
 	return measureLengths;
 }
 
-function positionMarkings (lineCenter, cursor, {items}) {
+function positionMarkings (lineCenter, cursor, items) {
     const {
 		clef: clefs,
 		key: keys,
@@ -117,7 +97,6 @@ export {
 	e,
 	getMeasure,
 	getLineItems,
-	getTimeContexts,
 	calculateMeasureLengths,
 	positionMarkings
 };

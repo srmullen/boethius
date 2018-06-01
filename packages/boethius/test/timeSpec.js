@@ -4,13 +4,14 @@ import _ from "lodash";
 import {
     getBeat, getTime, getTimeFromSignatures, getMeasureNumber, getMeasureByTime,
     calculateDuration, calculateTupletDuration, equals,
-    gt, lt, gte, lte, absoluteToRelativeDuration
+    gt, lt, gte, lte, absoluteToRelativeDuration, iterateByTime
 } from "../src/utils/timeUtils";
 import {createMeasures} from "../src/views/Measure";
 import Scored from "../src/Scored";
 
 describe("timeUtils", () => {
     const scored = new Scored();
+    const note = scored.note;
 
     describe("equals", () => {
         it("should use absolute time if present", () => {
@@ -343,6 +344,23 @@ describe("timeUtils", () => {
             expect(absoluteToRelativeDuration(1/16 + 1/32 + 1/64)).to.eql({value: 16, dots: 2});
             expect(absoluteToRelativeDuration(1/32 + 1/64 + 1/128)).to.eql({value: 32, dots: 2});
             expect(absoluteToRelativeDuration(1/64 + 1/128 + 1/256)).to.eql({value: 64, dots: 2});
+        });
+    });
+
+    describe('iterateByTime', () => {
+        it('should pass a time object as the first param to the iterator.', () => {
+            const timeSig = scored.timeSig({value: '4/4', measure: 0});
+            const children = [note({value: 4}), note({value: 8}), note({value: 2})];
+            const v1 = scored.voice({}, children);
+            const times = iterateByTime(
+                _.partial(getTimeFromSignatures, [timeSig]),
+                time => time,
+                [v1.children]
+            );
+            expect(times.length).to.equal(3);
+            expect(times[0]).to.eql({time: 0, measure: 0, beat:0});
+            expect(times[1]).to.eql({time: 0.25, measure: 0, beat:1});
+            expect(times[2]).to.eql({time: 0.375, measure: 0, beat:1.5});
         });
     });
 });

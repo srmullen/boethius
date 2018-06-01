@@ -355,6 +355,7 @@ const drawAccidental = function (accidental) {
 			"n": constants.font.accidentals.natural,
 		}[accidental];
 	return new paper.PointText({
+		name: 'accidental',
 		content: content,
 		fontFamily: 'gonville',
 		fontSize: Scored.config.fontSize,

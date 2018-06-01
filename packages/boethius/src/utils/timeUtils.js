@@ -385,6 +385,67 @@ export function absoluteToRelativeDuration (abs) {
 	return durationTable[F(abs).toFraction()];
 }
 
+/*
+ * @param time context object
+ * @return Number or undefined if there is no context
+ */
+function getTimeFromContext (ctx) {
+    return ctx && ctx.time ? ctx.time.time : undefined;
+}
+
+/*
+ * @param timeFn - Function that returns a time object.
+ * @param times context[][]
+ */
+function nextTimes (timeFn, times) {
+	const nextTime = _.minBy(
+		times.map(items => {
+			if (items.length) {
+				return timeFn(_.first(items));
+			} else {
+				return {time: Infinity};
+			}
+		}),
+		(time) => time.time
+	);
+    const ctxs = _.compact(_.map(times, (items) => {
+		const [nexts, rests] = _.partition(items, item => timeFn(item).time === nextTime.time);
+		return {
+			time: nextTime,
+			nexts,
+			rests
+		};
+	}));
+
+	return ctxs.reduce((acc, ctx) => {
+		return {
+			time: ctx.time,
+			nexts: acc.nexts.concat(ctx.nexts),
+			rests: acc.rests.concat([ctx.rests])
+		};
+	}, {nexts: [], rests: []});
+}
+
+/*
+ * @param timeFn - Function to get the time from items.
+ * @param fn - function to apply to the time context
+ * @param times context[][]
+ */
+export function iterateByTime (timeFn, fn, times) {
+    let {time, nexts, rests} = nextTimes(timeFn, times);
+    const ret = [];
+    while (_.compact(nexts).length) {
+        ret.push(fn(time, nexts));
+        // [time, nexts, rests] = nextTimes(timeFn, rests);
+		const obj = nextTimes(timeFn, rests);
+		time = obj.time;
+		nexts = obj.nexts;
+		rests = obj.rests;
+    }
+
+    return ret;
+}
+
 export {
 	getTime,
 	getTimeFromSignatures,
