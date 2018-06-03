@@ -112,11 +112,29 @@ Score.render = function (score, {voices=[], chordSymbols=[], repeats=[]}, {pages
             const systemMeasures = _.slice(measures, startMeasures[index], endMeasure);
             const timeContexts = systemTimeContexts[index];
 
-            const systemGroup = System.renderTimeContexts({
-                system, voices, timeContexts, chordSymbols,
+            // const systemGroup = System.renderSystemAndContexts({
+            //     system, voices, timeContexts, chordSymbols,
+            //     lines: score.lines,
+            //     measures: systemMeasures,
+            //     length: system.props.length || score.length
+            // });
+
+            const systemLength = system.props.length || score.length || 1000;
+
+            const systemGroup = System.render({
+                system,
                 lines: score.lines,
                 measures: systemMeasures,
-                length: system.props.length || score.length
+                length: systemLength
+            });
+
+            System.renderTimeContexts({
+                system,
+                timeContexts,
+                voices,
+                lines: score.lines,
+                measures: systemMeasures,
+                length: systemLength
             });
 
             const systemTranslation = (!_.includes(pages, system.props.page)) ?

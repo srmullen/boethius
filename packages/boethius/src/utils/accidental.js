@@ -101,6 +101,10 @@ function createAccidentalContext (c1, c2) {
 		c2);
 }
 
+/*
+ * @param times - Array of contexts ordered by time for which all later items should
+ * consider earlier items in determining its accidental, generally items on a line within a measure.
+ */
 function createAccidentalContexts (times) {
 	const contexts = new Array(times.length);
 	contexts[0] = [];

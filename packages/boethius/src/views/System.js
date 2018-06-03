@@ -39,10 +39,124 @@ function System (props = {}, children = []) {
 	// this.markings = _.filter(children, isMarking);
 }
 
+System.render = function ({system, lines, measures, length}) {
+	const group = system.render();
+
+	const lineHeights = system.getLineHeights(lines);
+
+	const systemStartTime = getTime(measures, {time: measures[0].startsAt});
+
+	system.signatures = System.createSystemSignatures({measures, lines});
+	const systemSignatureGroups = system.signatures.map(({clef, key, timeSig}, i) => {
+		const context = lines[i].contextAt(systemStartTime);
+		clef.time = systemStartTime;
+		key.time = systemStartTime;
+		timeSig.time = systemStartTime;
+		return {
+			clef: clef.render(context),
+			key: key.render(context),
+			timeSig: timeSig.render(context)
+		};
+	});
+
+	let lineGroups;
+
+	if (!length) {
+		throw new Error('No length provided.');
+	} else {
+		lineGroups = system.renderLines(lines, length);
+	}
+
+	systemSignatureGroups.forEach(({clef, key, timeSig}, i) => {
+		group.addChildren([clef, key, timeSig]);
+	});
+
+	group.addChildren(lineGroups);
+
+	group.addChild(drawSystemBar(lineGroups));
+
+	system.startCursors = placeSystemSignatures(system.signatures, lineHeights);
+
+	return group;
+}
+
+System.renderTimeContexts = function ({system, lines, measures, voices, timeContexts, length}) {
+
+	const lineHeights = system.getLineHeights(lines);
+
+	// Create the timeContexts groups so their widths can be determined.
+	const timeContextGroups = _.map(timeContexts, (timeContext, i) => {
+		return timeContext.render({lineHeights, disableMarkingRendering: i === 0});
+	});
+
+	const shortestDuration = Scored.config.shortestDuration; // need function to calculate this.
+
+	// signatureLengths is the amount of horizontal space the system signature take up on a line.
+	const [signatureLength] = calculateSystemSignaturesLength(system.signatures);
+
+	const timeLengths = calculateTimeLengths(timeContexts, shortestDuration);
+
+	// Add signatureLength to the first measure.
+	const measureLengths = addDefaultMeasureLengths(system.props.measures, calculateMeasureLengths(timeLengths));
+
+	// get the minimum length of the line
+	const minLineLength = _.sum(measureLengths) + signatureLength;
+
+	const totalMarkingLength = _.sumBy(timeLengths, ({length}) => length[0]) + signatureLength;
+
+	const measureScale = (length - signatureLength) / (minLineLength - signatureLength);
+
+	// noteScale = (length - totalMarkingLength) / (minLineLength - totalMarkingLength);
+
+	const scaledMeasureLengths = _.map(measureLengths, measureLength => measureLength * measureScale);
+
+	const measureGroups = system.renderMeasures(
+		measures,
+		scaledMeasureLengths,
+		// lineGroups,
+		lines.map(line => line.group),
+		signatureLength
+	);
+
+	system.group.addChildren(measureGroups);
+
+	const cursorFn = (possibleNextPositions, cursor) => {
+		return placement.scaleCursor(measureScale, cursor, _.min(possibleNextPositions) + cursor);
+	};
+
+	const lineCenters = _.map(lines, line => b(line.group));
+	const cursors = placeTimes(timeContexts, measures, measureLengths, cursorFn, system.startCursors);
+
+	// add the items to the system group
+	system.group.addChildren(timeContextGroups);
+
+	// Render stems, beams, tuplets, articulations, and ledger lines.
+	////////////////////////
+	// Render Decorations // FIXME: Should be handled at the Score level?
+	////////////////////////
+	if (timeContexts) {
+		const groupings = System.createGroups({timeContexts, lines, voices, measures});
+		System.renderDecorations({
+			timeContexts,
+			lines,
+			voices,
+			lineCenters,
+			voices,
+			measures,
+			groupings
+		});
+	}
+
+	// FIXME: Should this be part of renderDecorations?
+	const measureNumber = renderMeasureNumber(measures[0].value);
+	measureNumber.translate(0, -20);
+	system.group.addChild(measureNumber);
+}
+
 // measures only contains the MeasureViews that are being rendered on this system.
 // Perhaps it should get all the measures and start and end times. That way Rendering
 // on a system doesn't have to begin and end at measure boundaries.
-System.renderTimeContexts = function ({system, lines, measures, voices, timeContexts, length}) {
+System.renderSystemAndContexts = function ({system, lines, measures, voices, timeContexts, length}) {
 	// create the system group that all items will be added to.
 	const systemGroup = system.render();
 
@@ -51,7 +165,7 @@ System.renderTimeContexts = function ({system, lines, measures, voices, timeCont
 	const systemStartTime = getTime(measures, {time: measures[0].startsAt});
 
 	// Create the context marking for the beginning of each system.
-	const systemSignatures = System.createSystemSignatures({timeContexts, measures, lines});
+	const systemSignatures = System.createSystemSignatures({measures, lines});
 	const systemSignatureGroups = systemSignatures.map(({clef, key, timeSig}, i) => {
 		const context = lines[i].contextAt(systemStartTime);
 		clef.time = systemStartTime;
@@ -164,8 +278,7 @@ System.renderTimeContexts = function ({system, lines, measures, voices, timeCont
 	return systemGroup;
 };
 
-System.createSystemSignatures = function ({timeContexts, measures, lines}) {
-	const firstContext = _.first(timeContexts);
+System.createSystemSignatures = function ({measures, lines}) {
 	const startTime = getTime(measures, {time: measures[0].startsAt});
 	return getStartContexts(lines, startTime);
 }
@@ -198,7 +311,7 @@ System.createGroups = function ({timeContexts, lines, voices, measures}) {
 	}
 }
 
-System.renderDecorations = function ({timeContexts, lines, lineGroups, lineCenters, voices, measures, groupings}) {
+System.renderDecorations = function ({timeContexts, lines, lineCenters, voices, measures, groupings}) {
 	if (timeContexts.length) {
 		const startTime = _.first(timeContexts).time;
 		const endTime = _.last(timeContexts).time;
@@ -226,15 +339,15 @@ System.renderDecorations = function ({timeContexts, lines, lineGroups, lineCente
 			tuplet.props.line.group.addChild(group);
 		});
 
-		map((line, lineGroup, lineCenter) => {
+		lines.forEach(line => {
+			const lineCenter = b(line.group);
 			const lineItems = getLineItems(line, voices, startTime.time, endTime.time);
 			// render decorations that only require knowledge of the line.
 			_.each(lineItems, voiceItems => {
 				renderLedgerLines(voiceItems, lineCenter);
 				Voice.renderArticulations(voiceItems); // items must have stem direction already
 			});
-
-		}, lines, lineGroups, lineCenters);
+		});
 	}
 }
 
@@ -315,7 +428,7 @@ function renderMeasureNumber (measureNumber) {
 System.prototype.type = TYPE;
 
 System.prototype.render = function () {
-	const group = new paper.Group({
+	const group = this.group = new paper.Group({
 		name: TYPE
 	});
 
