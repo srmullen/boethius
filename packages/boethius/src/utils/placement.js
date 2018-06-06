@@ -266,7 +266,7 @@ function calculateTimeLength (items, shortestDuration) {
 			? item.group.bounds.width + (noteHeadWidth * getStaffSpace(shortestDuration, item))
 			: undefined;
 	});
-	
+
 	const totalVoiceItemsLength = voiceItemLengths.length ? _.min(voiceItemLengths) : 0;
 
 	return [markingsLength, totalVoiceItemsLength];
@@ -282,8 +282,9 @@ function calculateCursor (item) {
 		// FIXME: needs a little work for perfect positioning
 		cursor = item.group.children.length ? item.group.bounds.width + noteHeadWidth : 0;
 	} else if (item.type === constants.type.measure) {
-		const leftBarline = item.barlines[0];
-		cursor = leftBarline.position.x + noteHeadWidth;
+		// const leftBarline = item.barlines[0];
+		// cursor = leftBarline.position.x + noteHeadWidth;
+		cursor = item.startPos + noteHeadWidth;
 	} else {
 		cursor = item.group.bounds.width + (noteHeadWidth * getStaffSpace(shortestDuration, item));
 	}

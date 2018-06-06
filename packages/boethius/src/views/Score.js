@@ -104,56 +104,135 @@ Score.render = function (score, {voices=[], chordSymbols=[], repeats=[]}, {pages
         }
 
         // Render the Systems
-        // This also includes rendering the music (ie. notes/rests etc.) onto the
-        // system. It should be possible to hook into rendering the system and Rendering
-        // the music seperately.
-        const systemGroups = _.map(systemsToRender, ({system, index}, i) => {
-            const endMeasure = startMeasures[index] + system.props.measures;
-            const systemMeasures = _.slice(measures, startMeasures[index], endMeasure);
-            const timeContexts = systemTimeContexts[index];
-
-            // const systemGroup = System.renderSystemAndContexts({
-            //     system, voices, timeContexts, chordSymbols,
-            //     lines: score.lines,
-            //     measures: systemMeasures,
-            //     length: system.props.length || score.length
-            // });
-
-            const systemLength = system.props.length || score.length || 1000;
-
-            const systemGroup = System.render({
-                system,
-                lines: score.lines,
-                measures: systemMeasures,
-                length: systemLength
-            });
-
-            System.renderTimeContexts({
-                system,
-                timeContexts,
-                voices,
-                lines: score.lines,
-                measures: systemMeasures,
-                length: systemLength
-            });
-
-            const systemTranslation = (!_.includes(pages, system.props.page)) ?
-                score.pages[system.props.page].staffSpacing[i] || i * 250 :
-                score.pages[system.props.page].staffSpacing[i] || i * 250 + _.indexOf(pages, system.props.page) * score.pageHeight;
-
-            systemGroup.translate(system.props.indentation, systemTranslation + systemOffset);
-
-            return systemGroup;
+        const systemGroups = Score.renderSystems({
+            score,
+            systemsToRender,
+            startMeasures,
+            measures
         });
+
+        const translations = Score.placeSystems({
+            score,
+            systemsToRender,
+            pages,
+            systemOffset
+        });
+
+        Score.renderTimeContexts({
+            score,
+            systemsToRender,
+            measures,
+            startMeasures,
+            systemTimeContexts,
+            voices
+        });
+
+        // const systemGroups = _.map(systemsToRender, ({system, index}, i) => {
+        //     const endMeasure = startMeasures[index] + system.props.measures;
+        //     const systemMeasures = _.slice(measures, startMeasures[index], endMeasure);
+        //     const timeContexts = systemTimeContexts[index];
+        //
+        //     const systemLength = system.props.length || score.length || 1000;
+        //
+        //     const systemGroup = System.render({
+        //         system,
+        //         lines: score.lines,
+        //         measures: systemMeasures,
+        //         length: systemLength
+        //     });
+        //
+        //     System.renderTimeContexts({
+        //         system,
+        //         timeContexts,
+        //         voices,
+        //         lines: score.lines,
+        //         measures: systemMeasures,
+        //         length: systemLength
+        //     });
+        //
+        //     const systemTranslation = (!_.includes(pages, system.props.page)) ?
+        //         score.pages[system.props.page].staffSpacing[i] || i * 250 :
+        //         score.pages[system.props.page].staffSpacing[i] || i * 250 + _.indexOf(pages, system.props.page) * score.pageHeight;
+        //
+        //     systemGroup.translate(system.props.indentation, systemTranslation + systemOffset);
+        //
+        //     return systemGroup;
+        // });
 
         scoreGroup.addChildren(systemGroups);
 
         scoreGroup.addChildren(Score.renderDecorations({groupings}));
 
+        window.systems = score.systems;
     }
 
     return scoreGroup;
 };
+
+Score.renderSystems = function ({score, systemsToRender, startMeasures, measures, pages, systemOffset}) {
+    return _.map(systemsToRender, ({system, index}, i) => {
+        const endMeasure = startMeasures[index] + system.props.measures;
+        const systemMeasures = _.slice(measures, startMeasures[index], endMeasure);
+        // const timeContexts = systemTimeContexts[index];
+
+        const systemLength = system.props.length || score.length || 1000;
+
+        const systemGroup = System.render({
+            system,
+            lines: score.lines,
+            measures: systemMeasures,
+            length: systemLength
+        });
+
+        return systemGroup;
+    });
+}
+
+Score.renderTimeContexts = function (
+    {score, systemsToRender, measures, startMeasures, systemTimeContexts, voices, translations}
+) {
+    // Needs to do a reduction over the timeContexts.
+    // Functionallity hooks.
+    // - beforeMeasure, afterMeasure
+    // - beforeSystem, afterSystem
+    // ...
+
+    return _.map(systemsToRender, ({system, index}, i) => {
+        const endMeasure = startMeasures[index] + system.props.measures;
+        const systemMeasures = _.slice(measures, startMeasures[index], endMeasure);
+        const timeContexts = systemTimeContexts[index];
+
+        const systemLength = system.props.length || score.length || 1000;
+
+        System.renderTimeContexts({
+            system,
+            timeContexts,
+            voices,
+            lines: score.lines,
+            measures: systemMeasures,
+            length: systemLength
+        });
+
+        // console.log(translations[i]);
+
+        // timeContexts.forEach((timeContext) => {
+        //     timeContext.group.translate(translations[i]);
+        // });
+    });
+}
+
+Score.placeSystems = function ({score, systemsToRender, pages, systemOffset}) {
+    return _.map(systemsToRender, ({system, index}, i) => {
+        const yTranslation = (!_.includes(pages, system.props.page)) ?
+            score.pages[system.props.page].staffSpacing[i] || i * 250 :
+            score.pages[system.props.page].staffSpacing[i] || i * 250 + _.indexOf(pages, system.props.page) * score.pageHeight;
+
+        const translation = [system.props.indentation, yTranslation + systemOffset];
+        system.group.translate(translation);
+
+        return translation;
+    });
+}
 
 Score.prototype.render = function () {
     const group = new paper.Group({

@@ -36,7 +36,7 @@ Measure.prototype.type = TYPE;
  */
  //FIXME: Need to take width of barlines into account when calculating measure lengths.
  // ex. repeat barlines are wider than regular barlines.
-Measure.prototype.render = function (lines, leftBarline, width) {
+Measure.prototype.render = function (lines, leftBarline, startPos, width) {
 	const group = new paper.Group({
 		name: TYPE
 	});
@@ -46,12 +46,12 @@ Measure.prototype.render = function (lines, leftBarline, width) {
 		barType = REPEATBAR;
 	}
 
-	leftBarline = leftBarline || drawBarline(lines);
-	const previousBarlinePosition = leftBarline.bounds.right;
-	const rightBarline = drawBarline(lines, previousBarlinePosition + width, barType);
-	const bounds = this.drawGroupBounds(previousBarlinePosition, rightBarline);
+	// Used for calculating the cursor.
+	this.startPos = startPos;
 
-	group.addChildren([bounds, leftBarline, rightBarline]);
+	const rightBarline = drawBarline(lines, startPos + width, barType);
+
+	group.addChildren([leftBarline, rightBarline]);
 
 	this.barlines = [leftBarline, rightBarline];
 

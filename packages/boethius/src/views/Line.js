@@ -54,6 +54,7 @@ function renderLedgerLines (items, centerLine) {
 }
 
 Line.prototype.render = function (length) {
+	// FIXME: A line gets rendered multiple times, so not safe to use this.group.
 	const group = this.group = drawLine(length);
 	group.name = TYPE;
 	group.strokeColor = "black";

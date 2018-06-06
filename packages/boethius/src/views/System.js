@@ -64,16 +64,16 @@ System.render = function ({system, lines, measures, length}) {
 	if (!length) {
 		throw new Error('No length provided.');
 	} else {
-		lineGroups = system.renderLines(lines, length);
+		system.lineGroups = system.renderLines(lines, length);
 	}
 
 	systemSignatureGroups.forEach(({clef, key, timeSig}, i) => {
 		group.addChildren([clef, key, timeSig]);
 	});
 
-	group.addChildren(lineGroups);
+	group.addChildren(system.lineGroups);
 
-	group.addChild(drawSystemBar(lineGroups));
+	group.addChild(drawSystemBar(system.lineGroups));
 
 	system.startCursors = placeSystemSignatures(system.signatures, lineHeights);
 
@@ -86,7 +86,11 @@ System.renderTimeContexts = function ({system, lines, measures, voices, timeCont
 
 	// Create the timeContexts groups so their widths can be determined.
 	const timeContextGroups = _.map(timeContexts, (timeContext, i) => {
-		return timeContext.render({lineHeights, disableMarkingRendering: i === 0});
+		return timeContext.render({
+			system,
+			lineHeights,
+			disableMarkingRendering: i === 0
+		});
 	});
 
 	const shortestDuration = Scored.config.shortestDuration; // need function to calculate this.
@@ -105,6 +109,7 @@ System.renderTimeContexts = function ({system, lines, measures, voices, timeCont
 	const totalMarkingLength = _.sumBy(timeLengths, ({length}) => length[0]) + signatureLength;
 
 	const measureScale = (length - signatureLength) / (minLineLength - signatureLength);
+	// console.log(measureScale);
 
 	// noteScale = (length - totalMarkingLength) / (minLineLength - totalMarkingLength);
 
@@ -113,9 +118,8 @@ System.renderTimeContexts = function ({system, lines, measures, voices, timeCont
 	const measureGroups = system.renderMeasures(
 		measures,
 		scaledMeasureLengths,
-		// lineGroups,
-		lines.map(line => line.group),
-		signatureLength
+		system.lineGroups,
+		signatureLength // + system.props.indentation
 	);
 
 	system.group.addChildren(measureGroups);
@@ -124,9 +128,9 @@ System.renderTimeContexts = function ({system, lines, measures, voices, timeCont
 		return placement.scaleCursor(measureScale, cursor, _.min(possibleNextPositions) + cursor);
 	};
 
-	const lineCenters = _.map(lines, line => b(line.group));
+	// const lineCenters = _.map(lines, line => b(line.group));
+	const lineCenters = system.lineGroups.map(b);
 	const cursors = placeTimes(timeContexts, measures, measureLengths, cursorFn, system.startCursors);
-
 	// add the items to the system group
 	system.group.addChildren(timeContextGroups);
 
@@ -137,6 +141,7 @@ System.renderTimeContexts = function ({system, lines, measures, voices, timeCont
 	if (timeContexts) {
 		const groupings = System.createGroups({timeContexts, lines, voices, measures});
 		System.renderDecorations({
+			system,
 			timeContexts,
 			lines,
 			voices,
@@ -311,7 +316,7 @@ System.createGroups = function ({timeContexts, lines, voices, measures}) {
 	}
 }
 
-System.renderDecorations = function ({timeContexts, lines, lineCenters, voices, measures, groupings}) {
+System.renderDecorations = function ({system, timeContexts, lines, lineCenters, voices, measures, groupings}) {
 	if (timeContexts.length) {
 		const startTime = _.first(timeContexts).time;
 		const endTime = _.last(timeContexts).time;
@@ -339,8 +344,8 @@ System.renderDecorations = function ({timeContexts, lines, lineCenters, voices, 
 			tuplet.props.line.group.addChild(group);
 		});
 
-		lines.forEach(line => {
-			const lineCenter = b(line.group);
+		lines.forEach((line, i) => {
+			const lineCenter = b(system.lineGroups[i]);
 			const lineItems = getLineItems(line, voices, startTime.time, endTime.time);
 			// render decorations that only require knowledge of the line.
 			_.each(lineItems, voiceItems => {
@@ -391,6 +396,7 @@ function placeTimes (timeContexts, measures, measureLengths, cursorFn, startCurs
 		// update cursor if it's a new measure
 		if (currentTime.measure !== previousTime.measure) {
 			const measure = _.find(measures, measure => measure.value === currentTime.measure);
+			// cursor = placement.calculateCursor(measure);
 			cursor = placement.calculateCursor(measure);
 			// cursor = _.sum(measureLengths.slice(0, measure.value)) + Scored.config.note.head.width;
 		}
@@ -455,12 +461,15 @@ System.prototype.renderLines = function (lines, length) {
 };
 
 System.prototype.renderMeasures = function (measures, lengths, systemGroup, offset=0) {
+	let xPos = 0;
 	const measureGroups = _.reduce(measures, (groups, measure, i) => {
 		const measureLength = i === 0 ? lengths[i] + offset : lengths[i];
 		const previousGroup = _.last(groups);
 
 		const leftBarline = previousGroup ? _.last(previousGroup.children) : null;
-		const measureGroup = measure.render(systemGroup, leftBarline, measureLength);
+		const measureGroup = measure.render(systemGroup, leftBarline, xPos, measureLength);
+
+		xPos += measureLength;
 
 		groups.push(measureGroup);
 		return groups;

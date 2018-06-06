@@ -4,7 +4,7 @@ import _ from "lodash";
 import Note from "./Note";
 import Chord from "./Chord";
 import {getStaffItems} from "../utils/system";
-import {positionMarkings} from "../utils/line";
+import {positionMarkings, b, f} from "../utils/line";
 import {getAccidentalContexts} from "../utils/accidental";
 import {equals, getTimeFromSignatures, iterateByTime} from "../utils/timeUtils";
 import {isNote, isChord, isRest, isDynamic, isPitched, isMarking, hasDuration} from "../types";
@@ -26,7 +26,7 @@ function TimeContext ({time=mustProvideTime(), lines = [], voices = [], items = 
     this.symbols = symbols;
 }
 
-TimeContext.prototype.render = function ({lineHeights, disableMarkingRendering}) {
+TimeContext.prototype.render = function ({system, lineHeights, disableMarkingRendering}) {
     const group = this.group = new paper.Group();
 
 	const cursors = _.map(this.lines, (line, i) => {
@@ -47,10 +47,12 @@ TimeContext.prototype.render = function ({lineHeights, disableMarkingRendering})
             const rests = _.filter(items, isRest);
             const dynamics = _.filter(items, isDynamic);
 
-            const rootY = new paper.Point(0, lineHeights[i]);
+            // const rootY = new paper.Point(0, lineHeights[i]);
+            const rootY = new paper.Point(f(system.lineGroups[i]));
 
             // const cursor = positionMarkings(rootY, 0, line);
-            const cursor = positionMarkings(rootY, 0, markings);
+            // const cursor = positionMarkings(rootY, 0, markings);
+            const cursor = positionMarkings(rootY, rootY.x, markings);
 
             if (pitchedItems.length) {
                 const widestItem = _.maxBy(pitchedItems, item => item.group.bounds.width);
