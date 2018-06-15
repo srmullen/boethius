@@ -77,6 +77,11 @@ System.render = function ({system, lines, measures, length}) {
 
 	system.startCursors = placeSystemSignatures(system.signatures, lineHeights);
 
+	// FIXME: Should this be part of renderDecorations?
+	const measureNumber = renderMeasureNumber(measures[0].value);
+	measureNumber.translate(0, -20);
+	system.group.addChild(measureNumber);
+
 	return group;
 }
 
@@ -151,11 +156,6 @@ System.renderTimeContexts = function ({system, lines, measures, voices, timeCont
 			groupings
 		});
 	}
-
-	// FIXME: Should this be part of renderDecorations?
-	const measureNumber = renderMeasureNumber(measures[0].value);
-	measureNumber.translate(0, -20);
-	system.group.addChild(measureNumber);
 }
 
 // measures only contains the MeasureViews that are being rendered on this system.
@@ -316,6 +316,10 @@ System.createGroups = function ({timeContexts, lines, voices, measures}) {
 	}
 }
 
+System.prototype.getLineGroup = _.memoize(function (lineID) {
+	return this.lineGroups.find(group => group.name === lineID);
+});
+
 System.renderDecorations = function ({system, timeContexts, lines, lineCenters, voices, measures, groupings}) {
 	if (timeContexts.length) {
 		const startTime = _.first(timeContexts).time;
@@ -334,12 +338,15 @@ System.renderDecorations = function ({system, timeContexts, lines, lineCenters, 
 				? _.fill(new Array(beaming.children.length), beaming.props.stemDirection)
 				: Beaming.getAllStemDirections(beaming.children, centerLineValues);
 
+
 			const beam = beaming.render(centerLineValues, stemDirections);
-			beaming.props.line.group.addChild(beam);
+			const lineGroup = system.getLineGroup(beaming.props.line.id);
+			lineGroup.addChild(beam);
 		});
 
 		_.each(_.flatten(tuplets), tuplet => {
-			const lineCenter = b(tuplet.props.line.group);
+			const lineGroup = system.getLineGroup(tuplet.props.line.id);
+			const lineCenter = b(lineGroup);
 			const group = tuplet.render(lineCenter);
 			tuplet.props.line.group.addChild(group);
 		});

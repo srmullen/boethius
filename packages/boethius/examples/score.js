@@ -1136,7 +1136,10 @@ function createSelect () {
 export function run (scored) {
     var select = createSelect();
     var example = window.location.hash.slice(1) ? window.location.hash.slice(1) : Object.keys(examples)[0];
-    var score = examples[example](scored).translate(25, 50);
+    var score = examples[example](scored)
+    if (score) {
+        score.translate(25, 50);
+    }
 
     select.onchange = function (e) {
         var example = e.target.value;

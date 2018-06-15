@@ -162,8 +162,6 @@ Score.render = function (score, {voices=[], chordSymbols=[], repeats=[]}, {pages
         scoreGroup.addChildren(systemGroups);
 
         scoreGroup.addChildren(Score.renderDecorations({groupings}));
-
-        window.systems = score.systems;
     }
 
     return scoreGroup;
@@ -173,7 +171,6 @@ Score.renderSystems = function ({score, systemsToRender, startMeasures, measures
     return _.map(systemsToRender, ({system, index}, i) => {
         const endMeasure = startMeasures[index] + system.props.measures;
         const systemMeasures = _.slice(measures, startMeasures[index], endMeasure);
-        // const timeContexts = systemTimeContexts[index];
 
         const systemLength = system.props.length || score.length || 1000;
 

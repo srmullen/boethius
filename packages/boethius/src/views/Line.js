@@ -7,10 +7,20 @@ import _ from "lodash";
 
 const TYPE = constants.type.line;
 
+// Generate an id for a line.
+let idNum = 0;
+function genID () {
+	const id = `line_${idNum}`;
+	idNum++;
+	return id;
+}
+
 /*
  * @param voices - Object mapping voice names to an array describing when they are to be rendered on the line.
  */
 function Line ({voices={}}, children=[]) {
+
+	this.id = genID();
 
 	const types = _.groupBy(children, child => child.type);
 
@@ -56,7 +66,8 @@ function renderLedgerLines (items, centerLine) {
 Line.prototype.render = function (length) {
 	// FIXME: A line gets rendered multiple times, so not safe to use this.group.
 	const group = this.group = drawLine(length);
-	group.name = TYPE;
+	// group.name = TYPE;
+	group.name = this.id;
 	group.strokeColor = "black";
 	return group;
 };

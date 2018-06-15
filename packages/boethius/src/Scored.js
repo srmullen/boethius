@@ -79,6 +79,15 @@ Scored.prototype.render = function (layout, music, options={}) {
 	return view;
 };
 
+// Name of method will change to just render.
+Scored.prototype.pluginRender = function (layout, music, options={}) {
+	console.log(layout);
+	console.log(music);
+	layout = parseLayout(layout);
+	music = parseMusic(music);
+
+}
+
 Scored.prototype.serialize = function (item) {
 	return common.serialize(item);
 };

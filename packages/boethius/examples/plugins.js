@@ -1,17 +1,34 @@
 import "styles/index.css";
 import Scored from "../src/Scored";
-import loadFonts from '../src/utils/fonts';
+import {start} from "./loader";
 
-function createCanvas (el) {
-    el.innerHTML = '<canvas class="scored-canvas parnassus"><canvas>';
+const plugins = {
+    'render-note-plugin': {
+        render: function () {
 
-    return document.getElementsByClassName("scored-canvas");
-}
+        }
+    },
+    'render-beamings-plugin': {
+        onCreateNode: function () {
 
+        },
+        render: function () {
 
-loadFonts().then(() => {
-    const canvas = createCanvas(document.getElementById("music"));
-    
-}).catch(error => {
-    console.error(error);
-})
+        }
+    },
+    // 'render-slurs-plugin': {}
+};
+
+const config = {
+    plugins: [
+        'render-note-plugin',
+        'render-beamings-plugin',
+        'render-slurs-plugin'
+    ]
+};
+
+start((scored) => {
+    config.plugins.map(plugin => {
+        console.log(plugin);
+    });
+});
