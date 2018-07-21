@@ -1,6 +1,6 @@
 import "styles/index.css";
 import {start} from "./loader";
-import {legato, staccato} from './helpers';
+import {legato, staccato, createLayout, createNote} from './helpers';
 
 const examples = {
     testDoubleStaffScore: function (scored) {
@@ -37,7 +37,8 @@ const examples = {
         var score = scored.score({length: 1000, systemHeights: [0, 350]}, [fourfour, system1, system2, trebleLine, bassLine, page0]);
 
         // render it all as a score.
-        return scored.render(score, {voices: [soprano, bass]});
+        // return scored.render(score, {voices: [soprano, bass]});
+        return scored.pluginRender(score, {voices: [soprano, bass]});
     },
 
     testVoicePastEndOfScore: function (scored) {
@@ -62,7 +63,7 @@ const examples = {
 
         var score = scored.score({}, [timeSig, system, line, page0]);
 
-        return scored.render(score, {voices: [voice]});
+        return scored.pluginRender(score, {voices: [voice]});
     },
 
     testNoStemsOnSecondStave: function (scored) {
@@ -88,7 +89,7 @@ const examples = {
             n()
         ]);
 
-        return scored.render(score, {voices: [voice]});
+        return scored.pluginRender(score, {voices: [voice]});
     },
 
     testPages: function (scored) {
@@ -135,7 +136,7 @@ const examples = {
         }, [fourfour, system1, system2, system3, system4, trebleLine, bassLine, page0, page1, page2]);
 
         // render it all as a score.
-        return scored.render(score, {voices: [soprano, bass]}, {pages: [1]});
+        return scored.pluginRender(score, {voices: [soprano, bass]}, {pages: [1]});
     },
 
     testChords: function (scored) {
@@ -175,7 +176,7 @@ const examples = {
         var score = scored.score({length: 1000, systemHeights: [0, 350]}, [fourfour, system1, system2, trebleLine, bassLine, page0]);
 
         // render it all as a score.
-        return scored.render(score, {voices: [soprano, bass]});
+        return scored.pluginRender(score, {voices: [soprano, bass]});
     },
 
     testSlurs: function (scored) {
@@ -224,7 +225,7 @@ const examples = {
         }, [fourfour, system1, system2, system3, system4, trebleLine, bassLine, page0, page1]);
 
         // render it all as a score.
-        return scored.render(score, {voices: [soprano, bass], pages: [0]});
+        return scored.pluginRender(score, {voices: [soprano, bass], pages: [0]});
     },
 
     testLegato: function (scored) {
@@ -277,7 +278,7 @@ const examples = {
         }, [fourfour, system1, system2, system3, system4, trebleLine, bassLine, page0, page1]);
 
         // render it all as a score.
-        return scored.render(score, {voices: [soprano, bass], pages: [0]});
+        return scored.pluginRender(score, {voices: [soprano, bass], pages: [0]});
     },
 
     testLegatoSystemBreaks: function (scored) {
@@ -332,7 +333,7 @@ const examples = {
         }, [fourfour, system1, system2, system3, system4, trebleLine, bassLine, page0, page1]);
 
         // render it all as a score.
-        return scored.render(score, {voices: [soprano, bass], pages: [0]});
+        return scored.pluginRender(score, {voices: [soprano, bass], pages: [0]});
     },
 
     testLegatoHeight: function (scored) {
@@ -398,7 +399,7 @@ const examples = {
         }, [fourfour, system1, system2, trebleLine, page0]);
 
         // render it all as a score.
-        return scored.render(score, {voices: [soprano], pages: [0]});
+        return scored.pluginRender(score, {voices: [soprano], pages: [0]});
     },
 
     testChordTies: function (scored) {
@@ -451,7 +452,7 @@ const examples = {
         }, [fourfour, system1, system2, trebleLine, page0]);
 
         // render it all as a score.
-        return scored.render(score, {voices: [soprano], pages: [0]});
+        return scored.pluginRender(score, {voices: [soprano], pages: [0]});
     },
 
     testStemHeights: function (scored) {
@@ -486,7 +487,7 @@ const examples = {
         }, [fourfour, system1, system2, trebleLine, page0]);
 
         // render it all as a score.
-        return scored.render(score, {voices: [soprano], pages: [0]});
+        return scored.pluginRender(score, {voices: [soprano], pages: [0]});
     },
 
     testClefChange: function (scored) {
@@ -527,7 +528,7 @@ const examples = {
         var score = scored.score({length: 1000, systemHeights: [0, 150]}, [fourfour, page0, system1, system2, trebleLine]);
 
         // render it all as a score.
-        return scored.render(score, {voices: [soprano, bass], pages: [0]});
+        return scored.pluginRender(score, {voices: [soprano, bass], pages: [0]});
     },
 
     testTimeSigChange: function (scored) {
@@ -570,7 +571,7 @@ const examples = {
         var score = scored.score({length: 1000, systemHeights: [0, 150]}, [fourfour, threefour, page0, system1, system2, trebleLine]);
 
         // render it all as a score.
-        return scored.render(score, {voices: [soprano, bass], pages: [0]});
+        return scored.pluginRender(score, {voices: [soprano, bass], pages: [0]});
     },
 
     testChordSymbols: function (scored) {
@@ -621,7 +622,7 @@ const examples = {
         var score = scored.score({length: 1000, systemHeights: [0, 150]}, [fourfour, page0, system1, system2, trebleLine, bassLine]);
 
         // render it all as a score.
-        return scored.render(score, {
+        return scored.pluginRender(score, {
             voices: [soprano, alto, bass],
             pages: [0],
             chordSymbols: [cmaj1, fmaj1]
@@ -665,7 +666,7 @@ const examples = {
         var score = scored.score({length: 1000, systemHeights: [0, 150]}, [fourfour, page0, system1, system2, trebleLine, bassLine]);
 
         // render it all as a score.
-        return scored.render(score, {
+        return scored.pluginRender(score, {
             voices: [soprano, bass],
             repeats: [repeatM4],
             pages: [0]
@@ -698,7 +699,7 @@ const examples = {
         var score = scored.score({length: 1000}, [fourfour, page0, system1, trebleLine]);
 
         // render it all as a score.
-        return scored.render(score, {
+        return scored.pluginRender(score, {
             voices: [soprano],
             pages: [0]
         });
@@ -734,7 +735,7 @@ const examples = {
         var score = scored.score({length: 1000}, [fourfour, page0, system1, trebleLine]);
 
         // render it all as a score.
-        return scored.render(score, {
+        return scored.pluginRender(score, {
             voices: [unused, soprano],
             pages: [0]
         });
@@ -804,7 +805,7 @@ const examples = {
         // var score = scored.score({}, [fourfour, page0, system1, l1, l2, l3, l4]);
 
         // render it all as a score.
-        return scored.render(score, {
+        return scored.pluginRender(score, {
             voices: [v1, v2, v3, v4, v5],
             pages: [0]
         });
@@ -873,7 +874,7 @@ const examples = {
         // var score = scored.score({}, [fourfour, page0, system1, l1]);
 
         // render it all as a score.
-        return scored.render(score, {
+        return scored.pluginRender(score, {
             voices: [v1, v2, v3, v4, v5],
             pages: [0]
         });
@@ -942,7 +943,7 @@ const examples = {
         // var score = scored.score({}, [fourfour, page0, system1, l1]);
 
         // render it all as a score.
-        return scored.render(score, {
+        return scored.pluginRender(score, {
             voices: [v1, v2, v3, v4, v5],
             pages: [0]
         });
@@ -979,7 +980,7 @@ const examples = {
         // var score = scored.score({}, [fourfour, page0, system1, system2, l1, l2]);
 
         // render it all as a score.
-        return scored.render(score, {
+        return scored.pluginRender(score, {
             voices: [v1, v2],
             pages: [0]
         });
@@ -1021,7 +1022,7 @@ const examples = {
         }, [fourfour, system1, system2, trebleLine, bassLine, page0]);
 
         // render it all as a score.
-        return scored.render(score, {voices: [soprano, bass]});
+        return scored.pluginRender(score, {voices: [soprano, bass]});
     },
 
     testTuplets (scored) {
@@ -1068,7 +1069,7 @@ const examples = {
         }, [fourfour, system1, system2, trebleLine, bassLine, page0]);
 
         // render it all as a score.
-        return scored.render(score, {voices: [soprano, bass]});
+        return scored.pluginRender(score, {voices: [soprano, bass]});
     },
 
     testParsing (scored) {
@@ -1079,7 +1080,7 @@ const examples = {
                 mel: [['a4'], ['b4'], ['c5']].map(note => createNote.apply(null, note))
             }
         };
-        return scored.render(layout, music, {parse: true});
+        return scored.pluginRender(layout, music, {parse: true});
     },
 
     testForceAccidental (scored) {
@@ -1114,7 +1115,7 @@ const examples = {
         }, [fourfour, system, line, page0]);
 
         // render it all as a score.
-        return scored.render(score, {voices: [soprano]});
+        return scored.pluginRender(score, {voices: [soprano]});
     }
 };
 
@@ -1136,81 +1137,20 @@ function createSelect () {
 export function run (scored) {
     var select = createSelect();
     var example = window.location.hash.slice(1) ? window.location.hash.slice(1) : Object.keys(examples)[0];
-    var score = examples[example](scored)
-    if (score) {
-        score.translate(25, 50);
-    }
+    var score;
+    examples[example](scored).then(acc => {
+        score = acc.score
+    });
 
     select.onchange = function (e) {
         var example = e.target.value;
         window.location.hash = example;
-        if (score) score.remove();
-        score = examples[example](scored).translate(25, 50);
-    };
-}
-
-function createNote (pitch, value=4) {
-    return {
-        type: 'note',
-        props: {
-            pitch,
-            value
+        if (score && score.group) {
+            score.group.remove();
         }
-    };
-}
-
-function createLayout () {
-    return {
-        "type": "score",
-        "timeSignatures": [
-          {
-            "value": [
-              4,
-              4
-            ],
-            "measure": 0,
-            "beat": 0
-          }
-        ],
-        "currentPage": 0,
-        "pages": [
-          {
-            "systems": 4,
-            "staffSpacing": []
-          }
-        ],
-        "lines": [
-          {
-            "name": "",
-            "clefs": [
-              {
-                "value": "treble",
-                "measure": 0,
-                "beat": 0
-              }
-            ],
-            "keys": [
-              {
-                "root": "C",
-                "mode": "major",
-                "measure": 0,
-                "beat": 0
-              }
-            ],
-            "voices": [
-              "mel"
-            ]
-          }
-        ],
-        "systems": [
-          {
-            "measures": 3,
-            "lineSpacing": [
-              0
-            ],
-            "length": 800
-          }
-        ]
+        examples[example](scored).then((acc) => {
+            score = acc.score
+        });
     };
 }
 

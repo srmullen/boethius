@@ -8,9 +8,9 @@ function createCanvas (el) {
 }
 
 
-export function start (cb) {
+export function start (cb, config) {
     var canvas = createCanvas(document.getElementById("music"));
-    var scored = new Scored();
+    var scored = new Scored(config);
     scored.setup(canvas[0]);
     loadFonts().then(() => {
         cb(scored)

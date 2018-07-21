@@ -42,7 +42,144 @@ function Score ({pageWidth=595, pageHeight=842, length, title}, children=[]) {
 
 Score.prototype.type = TYPE;
 
-Score.render = function (score, {voices=[], chordSymbols=[], repeats=[]}, {pages=[0]} = {}) {
+Score.render = function (score, {music}, {pages=[0]} = {}) {
+    const {voices=[], chordSymbols=[], repeats=[]} = music;
+    // Create the Score Group.
+    const scoreGroup = score.render();
+
+    // Optimize here. Measures shouldn't need to be recreated every time the score is re-rendered.
+    // measures = measures || scoreToMeasures(score, repeats);
+    const measures = scoreToMeasures(score, repeats);
+
+    {
+        const times = measures.map(measure => measure.startsAt);
+        voices.map(voice => {
+            voice.breakDurations(times);
+        });
+    }
+
+    // Get the systems that need to be rendered. The rest are ignored. This
+    // is based on the page.
+    const systemsToRender = _.reduce(score.systems, (acc, system, index) => {
+        return _.includes(pages, system.props.page) ? concat(acc, {system, index}) : acc;
+    }, []);
+
+    // When no systems are on the page nothing further is done.
+    if (systemsToRender.length) {
+        // get the start measure for each System.
+        const startMeasures = reductions((acc, system) => acc + system.props.measures, score.systems, 0);
+        const startTimes = startMeasures.map((measure) => getTime(measures, {measure}));
+
+        // [startTime inclusive, endTime exclusive]
+        const timeFrame = [startTimes[_.first(systemsToRender).index], startTimes[_.last(systemsToRender).index + 1]];
+
+        // voiceTimeFrames is an array of only the items that are being rendered
+        // for each voice.
+        const voiceTimeFrames = _.compact(voices.map(voice => {
+            if (isVoiceUsed(voice, score.lines)) {
+                return voice.getTimeFrame(timeFrame[0].time, timeFrame[1].time);
+            } else {
+                return null;
+            }
+        }));
+
+        const groupings = Score.createGroups({voiceTimeFrames, startTimes});
+
+        const timeContexts = TimeContext.createTimeContexts(score.timeSigs, score.lines, voices, chordSymbols);
+        const systemTimeContexts = partitionBySystem(timeContexts, startMeasures);
+
+        /////////////////////
+        // Rendering Phase //
+        /////////////////////
+
+        // systemOffset is used to help calculate the vertical placement of systems.
+        let systemOffset = 0;
+
+        // Render the page title if required.
+        if (score.title && _.includes(pages, 0)) {
+            const titleGroup = score.title.render();
+            const xTranslate = (score.length || score.pageWidth)/2;
+            titleGroup.translate(xTranslate, 0);
+            systemOffset = titleGroup.bounds.height;
+            scoreGroup.addChild(titleGroup);
+        }
+
+        // Render the Systems
+        const systemGroups = Score.renderSystems({
+            score,
+            systemsToRender,
+            startMeasures,
+            measures
+        });
+
+        const translations = Score.placeSystems({
+            score,
+            systemsToRender,
+            pages,
+            systemOffset
+        });
+
+        // Score.renderTimeContexts({
+        //     score,
+        //     systemsToRender,
+        //     measures,
+        //     startMeasures,
+        //     systemTimeContexts,
+        //     voices
+        // });
+
+        // const systemGroups = _.map(systemsToRender, ({system, index}, i) => {
+        //     const endMeasure = startMeasures[index] + system.props.measures;
+        //     const systemMeasures = _.slice(measures, startMeasures[index], endMeasure);
+        //     const timeContexts = systemTimeContexts[index];
+        //
+        //     const systemLength = system.props.length || score.length || 1000;
+        //
+        //     const systemGroup = System.render({
+        //         system,
+        //         lines: score.lines,
+        //         measures: systemMeasures,
+        //         length: systemLength
+        //     });
+        //
+        //     System.renderTimeContexts({
+        //         system,
+        //         timeContexts,
+        //         voices,
+        //         lines: score.lines,
+        //         measures: systemMeasures,
+        //         length: systemLength
+        //     });
+        //
+        //     const systemTranslation = (!_.includes(pages, system.props.page)) ?
+        //         score.pages[system.props.page].staffSpacing[i] || i * 250 :
+        //         score.pages[system.props.page].staffSpacing[i] || i * 250 + _.indexOf(pages, system.props.page) * score.pageHeight;
+        //
+        //     systemGroup.translate(system.props.indentation, systemTranslation + systemOffset);
+        //
+        //     return systemGroup;
+        // });
+
+        scoreGroup.addChildren(systemGroups);
+
+        // scoreGroup.addChildren(Score.renderDecorations({groupings}));
+
+        return {
+            score,
+            scoreGroup,
+            systemsToRender,
+            measures,
+            startMeasures,
+            systemTimeContexts,
+            voices,
+            groupings
+        }
+    }
+
+    return {score};
+};
+
+Score.renderV1 = function (score, {voices=[], chordSymbols=[], repeats=[]}, {pages=[0]} = {}) {
     // Create the Score Group.
     const scoreGroup = score.render();
 
@@ -232,7 +369,7 @@ Score.placeSystems = function ({score, systemsToRender, pages, systemOffset}) {
 }
 
 Score.prototype.render = function () {
-    const group = new paper.Group({
+    const group = this.group = new paper.Group({
         name: TYPE
     });
 

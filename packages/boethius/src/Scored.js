@@ -79,13 +79,110 @@ Scored.prototype.render = function (layout, music, options={}) {
 	return view;
 };
 
+// The colorPlugin is being used to help develop how plugins will be executed.
+// Its goal is to allow object to be rendered in any color.
+const colorPlugin = {
+	collect: function (acc, item) {
+		if (item.color) {
+			console.log(`Item of color ${item.color}!`)
+			return acc.concat([item]);
+		}
+		return acc;
+	},
+
+	apply: function (item) {
+		console.log(`Rendering Item: ${item}`);
+	}
+}
+
 // Name of method will change to just render.
 Scored.prototype.pluginRender = function (layout, music, options={}) {
-	console.log(layout);
-	console.log(music);
-	layout = parseLayout(layout);
-	music = parseMusic(music);
+	this.project.activate();
 
+	const accumulation = {
+		layout,
+		music,
+		options
+	};
+
+	const aggregate = beforeMusicRender(accumulation)
+		.then(renderScore)
+		.then(renderTimes)
+		.then(afterRenderTimes)
+		.then(afterRender)
+		.catch((error) => {
+			console.log(error);
+		});
+
+	paper.view.update();
+	return aggregate;
+}
+
+function beforeMusicRender (acc) {
+	return new Promise((resolve, reject) => {
+		if (acc.options.parse) {
+			resolve({
+				layout: parseLayout(acc.layout),
+				music: parseMusic(acc.music)
+			});
+		} else {
+			resolve(acc);
+		}
+	});
+}
+
+function renderScore (acc) {
+	return new Promise((resolve, reject) => {
+		const {
+            score,
+            systemsToRender,
+            measures,
+            startMeasures,
+            systemTimeContexts,
+            voices,
+			groupings
+        } = Score.render(acc.layout, acc);
+
+		resolve(Object.assign({}, acc, {
+			score,
+			systemsToRender,
+            measures,
+            startMeasures,
+            systemTimeContexts,
+            voices,
+			groupings
+		}));
+	});
+}
+
+function renderTimes (acc) {
+	return new Promise((resolve, reject) => {
+		Score.renderTimeContexts({
+            score: acc.score,
+            systemsToRender: acc.systemsToRender,
+            measures: acc.measures,
+            startMeasures: acc.startMeasures,
+            systemTimeContexts: acc.systemTimeContexts,
+            voices: acc.voices
+        });
+		resolve(acc);
+	});
+}
+
+function afterRenderTimes (acc) {
+	return new Promise((resolve, reject) => {
+		acc.score.group.addChildren(Score.renderDecorations({
+			groupings: acc.groupings,
+		}));
+		resolve(acc);
+	});
+}
+
+function afterRender (acc) {
+	return new Promise((resolve, rejet) => {
+		acc.score.group.translate(25, 50);
+		resolve(acc);
+	});
 }
 
 Scored.prototype.serialize = function (item) {
