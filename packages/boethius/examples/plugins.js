@@ -4,12 +4,12 @@ import {start} from "./loader";
 import {legato, staccato, createLayout, createNote} from './helpers';
 
 const plugins = {
-    'render-note-plugin': {
-        render: function () {
+    'tie-plugin': {
+        beforeRender: function () {
 
         }
     },
-    'render-beamings-plugin': {
+    'beamings-plugin': {
         onCreateNode: function () {
 
         },
@@ -17,14 +17,13 @@ const plugins = {
 
         }
     },
-    // 'render-slurs-plugin': {}
 };
 
 const config = {
     plugins: [
         'render-note-plugin',
-        'render-beamings-plugin',
-        'render-slurs-plugin'
+        'beamings-plugin',
+        'tie-plugin'
     ]
 };
 

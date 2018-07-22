@@ -1,4 +1,5 @@
 import paper from "paper";
+import {isString} from 'lodash';
 
 import Config from "./config";
 
@@ -81,57 +82,93 @@ Scored.prototype.render = function (layout, music, options={}) {
 
 // The colorPlugin is being used to help develop how plugins will be executed.
 // Its goal is to allow object to be rendered in any color.
-const colorPlugin = {
-	collect: function (acc, item) {
-		if (item.color) {
-			console.log(`Item of color ${item.color}!`)
-			return acc.concat([item]);
+const plugins = {
+	parserPlugin: {
+		name: 'parserPlugin',
+		beforeRender: function (acc) {
+			if (acc.options.parse) {
+				return {
+					layout: parseLayout(acc.layout),
+					music: parseMusic(acc.music)
+				};
+			}
 		}
-		return acc;
 	},
+	colorPlugin: {
+		name: 'colorPlugin',
+		collect: function (acc, item) {
+			if (item.color) {
+				console.log(`Item of color ${item.color}!`);
+				return acc.concat([item]);
+			}
+			return acc;
+		},
 
-	apply: function (item) {
-		console.log(`Rendering Item: ${item}`);
+		apply: function (item) {
+			console.log(`Rendering Item: ${item}`);
+		}
+	},
+	tiePlugin: {
+		name: 'tiePlugin',
+		beforeRender: function ({voiceTimeFrames, startTimes}) {
+			return Score.createGroups({voiceTimeFrames, startTimes});
+		}
+	},
+	loggingPlugin: {
+		name: 'loggingPlugin',
+		beforeRender: function (acc) {
+			console.log(acc);
+		}
 	}
-}
+};
 
 // Name of method will change to just render.
 Scored.prototype.pluginRender = function (layout, music, options={}) {
 	this.project.activate();
 
-	const accumulation = {
+	const config = ['loggingPlugin', 'parserPlugin', 'loggingPlugin'];
+
+	const aggregate = beforeRender(config, {
 		layout,
 		music,
 		options
-	};
-
-	const aggregate = beforeMusicRender(accumulation)
-		.then(renderScore)
-		.then(renderTimes)
-		.then(afterRenderTimes)
-		.then(afterRender)
-		.catch((error) => {
-			console.log(error);
-		});
+	})
+	.then(render)
+	.then(renderTimes)
+	.then(afterRenderTimes)
+	.then(afterRender)
+	.catch((error) => {
+		console.log(error);
+	});
 
 	paper.view.update();
 	return aggregate;
 }
 
-function beforeMusicRender (acc) {
-	return new Promise((resolve, reject) => {
-		if (acc.options.parse) {
-			resolve({
-				layout: parseLayout(acc.layout),
-				music: parseMusic(acc.music)
+function beforeRender (config, aggregate) {
+	return config.reduce((promise, plugin) => {
+		if (isString(plugin)) {
+			plugin = plugins[plugin] || {};
+		}
+
+		if (plugin.beforeRender) {
+			return promise.then((agg) => {
+				const val = plugin.beforeRender(agg);
+				if (val instanceof Promise) {
+					return val;
+				} else {
+					return new Promise((resolve, reject) => {
+						resolve(Object.assign({}, agg, val));
+					});
+				}
 			});
 		} else {
-			resolve(acc);
+			return promise;
 		}
-	});
+	}, Promise.resolve(aggregate));
 }
 
-function renderScore (acc) {
+function render (acc) {
 	return new Promise((resolve, reject) => {
 		const {
             score,
