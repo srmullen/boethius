@@ -42,11 +42,9 @@ function Score ({pageWidth=595, pageHeight=842, length, title}, children=[]) {
 
 Score.prototype.type = TYPE;
 
-Score.render = function (score, {music}, {pages=[0]} = {}) {
+Score.beforeRender = function ({score, music}, options={}) {
     const {voices=[], chordSymbols=[], repeats=[]} = music;
-    // Create the Score Group.
-    const scoreGroup = score.render();
-
+    const pages = options.pages || [0];
     // Optimize here. Measures shouldn't need to be recreated every time the score is re-rendered.
     // measures = measures || scoreToMeasures(score, repeats);
     const measures = scoreToMeasures(score, repeats);
@@ -64,7 +62,6 @@ Score.render = function (score, {music}, {pages=[0]} = {}) {
         return _.includes(pages, system.props.page) ? concat(acc, {system, index}) : acc;
     }, []);
 
-    // When no systems are on the page nothing further is done.
     if (systemsToRender.length) {
         // get the start measure for each System.
         const startMeasures = reductions((acc, system) => acc + system.props.measures, score.systems, 0);
@@ -83,14 +80,35 @@ Score.render = function (score, {music}, {pages=[0]} = {}) {
             }
         }));
 
-        const groupings = Score.createGroups({voiceTimeFrames, startTimes});
+        return {
+            measures,
+            startMeasures,
+            startTimes,
+            voiceTimeFrames,
+            systemsToRender,
+            voiceTimeFrames
+        };
+    }
+
+    return { measures, systemsToRender };
+}
+
+Score.render = function (
+    {score, music, measures, systemsToRender, startMeasures, startTimes, voiceTimeFrames},
+    options = {}
+) {
+    const {voices=[], chordSymbols=[], repeats=[]} = music;
+    const {pages=[0]} = options;
+    // Create the Score Group.
+    const scoreGroup = score.render();
+
+    // When no systems are on the page nothing further is done.
+    if (systemsToRender.length) {
+        // [startTime inclusive, endTime exclusive]
+        const timeFrame = [startTimes[_.first(systemsToRender).index], startTimes[_.last(systemsToRender).index + 1]];
 
         const timeContexts = TimeContext.createTimeContexts(score.timeSigs, score.lines, voices, chordSymbols);
         const systemTimeContexts = partitionBySystem(timeContexts, startMeasures);
-
-        /////////////////////
-        // Rendering Phase //
-        /////////////////////
 
         // systemOffset is used to help calculate the vertical placement of systems.
         let systemOffset = 0;
@@ -119,28 +137,12 @@ Score.render = function (score, {music}, {pages=[0]} = {}) {
             systemOffset
         });
 
-        // Score.renderTimeContexts({
-        //     score,
-        //     systemsToRender,
-        //     measures,
-        //     startMeasures,
-        //     systemTimeContexts,
-        //     voices
-        // });
-
         scoreGroup.addChildren(systemGroups);
-
-        // scoreGroup.addChildren(Score.renderDecorations({groupings}));
 
         return {
             score,
-            scoreGroup,
-            systemsToRender,
-            measures,
-            startMeasures,
             systemTimeContexts,
-            voices,
-            groupings
+            voices
         }
     }
 

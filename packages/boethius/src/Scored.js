@@ -83,12 +83,15 @@ Scored.prototype.render = function (layout, music, options={}) {
 // The colorPlugin is being used to help develop how plugins will be executed.
 // Its goal is to allow object to be rendered in any color.
 const plugins = {
+	score: {
+		beforeRender: Score.beforeRender
+	},
 	parserPlugin: {
 		name: 'parserPlugin',
 		beforeRender: function (acc) {
 			if (acc.options.parse) {
 				return {
-					layout: parseLayout(acc.layout),
+					score: parseLayout(acc.score),
 					music: parseMusic(acc.music)
 				};
 			}
@@ -111,7 +114,8 @@ const plugins = {
 	tiePlugin: {
 		name: 'tiePlugin',
 		beforeRender: function ({voiceTimeFrames, startTimes}) {
-			return Score.createGroups({voiceTimeFrames, startTimes});
+			const groupings = Score.createGroups({voiceTimeFrames, startTimes});
+			return { groupings };
 		}
 	},
 	loggingPlugin: {
@@ -122,14 +126,21 @@ const plugins = {
 	}
 };
 
+const config = [
+	'parserPlugin',
+	'loggingPlugin',
+	'score',
+	'tiePlugin',
+	'loggingPlugin',
+	'tiePlugin'
+];
+
 // Name of method will change to just render.
-Scored.prototype.pluginRender = function (layout, music, options={}) {
+Scored.prototype.pluginRender = function (score, music, options={}) {
 	this.project.activate();
 
-	const config = ['loggingPlugin', 'parserPlugin', 'loggingPlugin'];
-
 	const aggregate = beforeRender(config, {
-		layout,
+		score,
 		music,
 		options
 	})
@@ -172,22 +183,14 @@ function render (acc) {
 	return new Promise((resolve, reject) => {
 		const {
             score,
-            systemsToRender,
-            measures,
-            startMeasures,
             systemTimeContexts,
             voices,
-			groupings
-        } = Score.render(acc.layout, acc);
+        } = Score.render(acc, acc.options);
 
 		resolve(Object.assign({}, acc, {
 			score,
-			systemsToRender,
-            measures,
-            startMeasures,
             systemTimeContexts,
             voices,
-			groupings
 		}));
 	});
 }
