@@ -131,8 +131,7 @@ const config = [
 	'loggingPlugin',
 	'score',
 	'tiePlugin',
-	'loggingPlugin',
-	'tiePlugin'
+	'loggingPlugin'
 ];
 
 // Name of method will change to just render.
@@ -164,7 +163,7 @@ function beforeRender (config, aggregate) {
 
 		if (plugin.beforeRender) {
 			return promise.then((agg) => {
-				const val = plugin.beforeRender(agg);
+				const val = plugin.beforeRender(agg, agg.options);
 				if (val instanceof Promise) {
 					return val;
 				} else {
@@ -182,29 +181,37 @@ function beforeRender (config, aggregate) {
 function render (acc) {
 	return new Promise((resolve, reject) => {
 		const {
-            score,
-            systemTimeContexts,
-            voices,
-        } = Score.render(acc, acc.options);
+      score,
+      systemTimeContexts,
+      voices,
+    } = Score.render(acc, acc.options);
 
 		resolve(Object.assign({}, acc, {
 			score,
-            systemTimeContexts,
-            voices,
+      systemTimeContexts,
+      voices,
 		}));
 	});
 }
 
+/*
+ * Acc should by default have...
+ * 1. All TimeContexts.
+ * 2. Rendering time frame.
+ * 3. All Measures.
+ * 4. All Systems.
+ * 5. Functions for navigating through time contexts.
+ */
 function renderTimes (acc) {
 	return new Promise((resolve, reject) => {
 		Score.renderTimeContexts({
-            score: acc.score,
-            systemsToRender: acc.systemsToRender,
-            measures: acc.measures,
-            startMeasures: acc.startMeasures,
-            systemTimeContexts: acc.systemTimeContexts,
-            voices: acc.voices
-        });
+      score: acc.score,
+      systemsToRender: acc.systemsToRender,
+      measures: acc.measures,
+      startMeasures: acc.startMeasures,
+      systemTimeContexts: acc.systemTimeContexts,
+      voices: acc.voices
+    });
 		resolve(acc);
 	});
 }

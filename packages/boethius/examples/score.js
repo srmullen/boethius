@@ -1119,7 +1119,7 @@ const examples = {
     }
 };
 
-function createSelect () {
+function createSelect (value) {
     var select = document.createElement("select");
 
     for (let k in examples) {
@@ -1129,29 +1129,30 @@ function createSelect () {
         select.appendChild(option);
     }
 
+    select.value = value;
     document.getElementById("exampleList").appendChild(select);
 
     return select;
 }
 
 export function run (scored) {
-    var select = createSelect();
-    var example = window.location.hash.slice(1) ? window.location.hash.slice(1) : Object.keys(examples)[0];
-    var score;
-    examples[example](scored).then(acc => {
+  var example = window.location.hash.slice(1) ? window.location.hash.slice(1) : Object.keys(examples)[0];
+  var select = createSelect(example);
+  var score;
+  examples[example](scored).then(acc => {
+    score = acc.score
+  });
+
+  select.onchange = function (e) {
+    var example = e.target.value;
+    window.location.hash = example;
+    if (score && score.group) {
+        score.group.remove();
+    }
+    examples[example](scored).then((acc) => {
         score = acc.score
     });
-
-    select.onchange = function (e) {
-        var example = e.target.value;
-        window.location.hash = example;
-        if (score && score.group) {
-            score.group.remove();
-        }
-        examples[example](scored).then((acc) => {
-            score = acc.score
-        });
-    };
+  };
 }
 
 start(run);

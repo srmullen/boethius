@@ -168,7 +168,7 @@ Score.renderSystems = function ({score, systemsToRender, startMeasures, measures
 }
 
 Score.renderTimeContexts = function (
-    {score, systemsToRender, measures, startMeasures, systemTimeContexts, voices, translations}
+    {score, systemsToRender, measures, startMeasures, systemTimeContexts, voices}
 ) {
     // Needs to do a reduction over the timeContexts.
     // Functionallity hooks.
@@ -191,12 +191,6 @@ Score.renderTimeContexts = function (
             measures: systemMeasures,
             length: systemLength
         });
-
-        // console.log(translations[i]);
-
-        // timeContexts.forEach((timeContext) => {
-        //     timeContext.group.translate(translations[i]);
-        // });
     });
 }
 

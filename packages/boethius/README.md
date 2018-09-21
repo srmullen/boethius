@@ -16,7 +16,8 @@ Should view render methods return a paper group, or should they return themselve
 - Rendering ofter requires multiple render methods for various parts intertwined with render method calls on other "templates".
 - subsequent render method calls require both the view and the group. Hard to keep explicit reference between view and group without group property on the view.
 
-TODOS:
+TODOS
+-----
     # High priority
     - Voices crossing lines.
     - placement.commonShortestDuration implementation.
@@ -29,6 +30,13 @@ TODOS:
     - Fermata
     - Fingerings
     - Ghost notes
+    - Plugin system for rendering 'time' nodes.
+    - How to catch plugin system errors.
+    - Plugin options
+
+    # Plugins
+    - Page plugin
+    - Plugin for displaying a cursor when playing music to score. (Cursor Plugin)
 
     # Lower priority
     - SMuFL
@@ -52,4 +60,9 @@ TODOS:
     - Ability to specify horizontal position of systems.
     - How to handle non-standard note durations? ex. a4/6
 
-ISSUES:
+ISSUES
+------
+
+Plugin System
+-------------
+Plugins are objects that have certain functions that will be envoked in the boethius lifecycle. The functions are passed an object that is an accumulation of all previous executed functions. The functions can return either an object or a Promise. If an object is returned it will be merged into the accumulation. If a promise is returned the object passed to resolve will be merged into the accumulation.
