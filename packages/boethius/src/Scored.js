@@ -1,7 +1,7 @@
 import paper from "paper";
-import {isString} from 'lodash';
 
 import Config from "./config";
+import { mergePlugins, runPlugins } from './plugins';
 
 import Voice from "./views/Voice";
 import Note from "./views/Note";
@@ -32,6 +32,7 @@ import vScore from "./virtual-score";
 
 const Scored = function (options={}) {
 	Scored.config = new Config(options.config);
+	this.plugins = mergePlugins(options.plugins);
 };
 
 Scored.loadFonts = loadFonts;
@@ -80,156 +81,28 @@ Scored.prototype.render = function (layout, music, options={}) {
 	return view;
 };
 
-// The colorPlugin is being used to help develop how plugins will be executed.
-// Its goal is to allow object to be rendered in any color.
-const plugins = {
-	score: {
-		beforeRender: Score.beforeRender
-	},
-	parserPlugin: {
-		name: 'parserPlugin',
-		beforeRender: function (acc) {
-			if (acc.options.parse) {
-				return {
-					score: parseLayout(acc.score),
-					music: parseMusic(acc.music)
-				};
-			}
-		}
-	},
-	colorPlugin: {
-		name: 'colorPlugin',
-		collect: function (acc, item) {
-			if (item.color) {
-				console.log(`Item of color ${item.color}!`);
-				return acc.concat([item]);
-			}
-			return acc;
-		},
-
-		apply: function (item) {
-			console.log(`Rendering Item: ${item}`);
-		}
-	},
-	tiePlugin: {
-		name: 'tiePlugin',
-		beforeRender: function ({voiceTimeFrames, startTimes}) {
-			const groupings = Score.createGroups({voiceTimeFrames, startTimes});
-			return { groupings };
-		}
-	},
-	loggingPlugin: {
-		name: 'loggingPlugin',
-		beforeRender: function (acc) {
-			console.log(acc);
-		}
-	}
-};
-
-const config = [
-	'parserPlugin',
-	'loggingPlugin',
-	'score',
-	'tiePlugin',
-	'loggingPlugin'
-];
-
 // Name of method will change to just render.
 Scored.prototype.pluginRender = function (score, music, options={}) {
 	this.project.activate();
-
-	const aggregate = beforeRender(config, {
+	const init = {
 		score,
 		music,
 		options
-	})
-	.then(render)
-	.then(renderTimes)
-	.then(afterRenderTimes)
-	.then(afterRender)
-	.catch((error) => {
-		console.log(error);
-	});
+	};
+
+	const runner = runPlugins.bind(this, this.plugins);
+
+	const aggregate = runner('beforeRender')(init)
+		.then(runner('render'))
+		.then(runner('renderTimes'))
+		.then(runner('afterRenderTimes'))
+		.then(runner('afterRender'))
+		.catch((error) => {
+			console.log(error);
+		});
 
 	paper.view.update();
 	return aggregate;
-}
-
-function beforeRender (config, aggregate) {
-	return config.reduce((promise, plugin) => {
-		if (isString(plugin)) {
-			plugin = plugins[plugin] || {};
-		}
-
-		if (plugin.beforeRender) {
-			return promise.then((agg) => {
-				const val = plugin.beforeRender(agg, agg.options);
-				if (val instanceof Promise) {
-					return val;
-				} else {
-					return new Promise((resolve, reject) => {
-						resolve(Object.assign({}, agg, val));
-					});
-				}
-			});
-		} else {
-			return promise;
-		}
-	}, Promise.resolve(aggregate));
-}
-
-function render (acc) {
-	return new Promise((resolve, reject) => {
-		const {
-      score,
-      systemTimeContexts,
-      voices,
-    } = Score.render(acc, acc.options);
-
-		resolve(Object.assign({}, acc, {
-			score,
-      systemTimeContexts,
-      voices,
-		}));
-	});
-}
-
-/*
- * Acc should by default have...
- * 1. All TimeContexts.
- * 2. Rendering time frame.
- * 3. All Measures.
- * 4. All Systems.
- * 5. Functions for navigating through time contexts.
- */
-function renderTimes (acc) {
-	return new Promise((resolve, reject) => {
-		Score.renderTimeContexts({
-      score: acc.score,
-      systemsToRender: acc.systemsToRender,
-      measures: acc.measures,
-      startMeasures: acc.startMeasures,
-      systemTimeContexts: acc.systemTimeContexts,
-      voices: acc.voices
-    });
-		resolve(acc);
-	});
-}
-
-function afterRenderTimes (acc) {
-	return new Promise((resolve, reject) => {
-		acc.score.group.addChildren(Score.renderDecorations({
-			groupings: acc.groupings,
-		}));
-		resolve(acc);
-	});
-}
-
-function afterRender (acc) {
-	return new Promise((resolve, rejet) => {
-		acc.score.group.translate(25, 50);
-		resolve(acc);
-	});
 }
 
 Scored.prototype.serialize = function (item) {
