@@ -1,3 +1,5 @@
+import { isArray } from 'lodash';
+
 let legatoId = 1;
 
 export function legato (items) {
@@ -16,6 +18,14 @@ export function staccato (items) {
 }
 
 export function createNote (pitch, value=4, props) {
+  if (pitch === 'r') {
+    return {
+        type: 'rest',
+        props: Object.assign({
+            value
+        }, props)
+    };
+  } else {
     return {
         type: 'note',
         props: Object.assign({
@@ -23,6 +33,17 @@ export function createNote (pitch, value=4, props) {
             value
         }, props)
     };
+  }
+}
+
+export function createVoice (voice) {
+  return voice.map(note => {
+    if (isArray(note)) {
+      return createNote.apply(null, note);
+    } else {
+      return createNote(note);
+    }
+  });
 }
 
 export function createLayout () {

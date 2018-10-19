@@ -1,4 +1,4 @@
-import {map} from "lodash";
+import {map, isArray} from "lodash";
 
 import {clone} from "./common";
 import Voice from "../views/Voice";
@@ -115,8 +115,12 @@ function makeLine (timeSigs, line) {
  * @param denominator - the bottom time signature number.
  * @return String representation of the time signature.
  */
-function convertTimeSig ([numerator, denominator]) {
-    return `${numerator}/${denominator}`;
+function convertTimeSig (timeSig) {
+  if (isArray(timeSig)) {
+    return `${timeSig[0]}/${timeSig[1]}`;
+  } else {
+    return timeSig;
+  }
 }
 
 /*
