@@ -1116,6 +1116,54 @@ const examples = {
 
         // render it all as a score.
         return scored.pluginRender(score, {voices: [soprano]});
+    },
+
+    testBunchedClefChange (scored) {
+      var n = scored.note;
+      var r = scored.rest;
+      // create lines
+      var rh = scored.line({voices: ["treble"]}, [
+          scored.clef({value: "treble", measure: 0}),
+          scored.key({value: "c", measure: 0}),
+          scored.timeSig({value: "c", measure: 0})
+      ]);
+
+      var lh = scored.line({voices: ["bass"]}, [
+          scored.clef({value: "bass", measure: 0}),
+          scored.key({value: "c", measure: 0}),
+          scored.timeSig({value: "c", measure: 0})
+      ]);
+
+      // create voices
+      var soprano = scored.voice({name: "treble"}, [
+          n({pitch: 'eb5'}),
+          n({pitch: 'c#5'}),
+          n({pitch: 'c#5'}),
+          n({pitch: 'g4'}),
+      ]);
+
+      var bass = scored.voice({name: "bass"}, [
+          n({pitch: 'eb3'}),
+          n({pitch: 'c#3'}),
+          n({pitch: 'c#3'}),
+          n({pitch: 'g2'}),
+      ]);
+
+      var fourfour = scored.timeSig({value: "4/4", measure: 0});
+
+      // create staves
+      var system = scored.system({measures: 6, indentation: 100, length: 900});
+
+      var page0 = scored.page();
+
+      var score = scored.score({
+          length: 1000,
+          systemHeights: [0, 350],
+          title: {value: "From Invention #2", fontSize: 50}
+      }, [fourfour, system, rh, lh, page0]);
+
+      // render it all as a score.
+      return scored.pluginRender(score, {voices: [soprano, bass]});
     }
 };
 

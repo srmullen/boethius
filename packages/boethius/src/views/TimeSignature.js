@@ -40,6 +40,9 @@ TimeSignature.prototype.render = function () {
 
 	group.addChild(drawTimeSig(this.value, margin));
 	group.position = [0, 0];
+	if (this.value === "c" || this.value === "h") {
+		group.translate(0, Scored.config.stepSpacing * 4);
+	}
 
 	return group;
 };
