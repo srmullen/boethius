@@ -130,7 +130,16 @@ System.renderTimeContexts = function ({system, lines, measures, voices, timeCont
 	system.group.addChildren(measureGroups);
 
 	const cursorFn = (possibleNextPositions, cursor) => {
-		return placement.scaleCursor(measureScale, cursor, _.min(possibleNextPositions) + cursor);
+		const [maxMarkingSize, minDurationSize] = _.reduce(possibleNextPositions,
+			([prevMarkingSize, prevDurSize],[markingSize = -Infinity, durSize = Infinity]) => {
+				return [
+					Math.max(prevMarkingSize, markingSize),
+					Math.min(prevDurSize, durSize)
+				];
+			},
+			[-Infinity, Infinity]
+		);
+		return placement.scaleCursor(measureScale, cursor, maxMarkingSize + minDurationSize + cursor);
 	};
 
 	// const lineCenters = _.map(lines, line => b(line.group));
@@ -395,17 +404,13 @@ function placeSystemSignatures (systemSignatures, lineHeights) {
 
 function placeTimes (timeContexts, measures, measureLengths, cursorFn, startCursors) {
 	return _.reduce(timeContexts, (cursors, timeContext, i) => {
-		// const lineIndices = _.filter(_.map(timeContext.lines, (ctx, i) => ctx ? i : undefined), _.isNumber);
-		// const previousTime = _.last(cursors) ? _.last(cursors).time : 0;
 		const previousTime = _.last(cursors).time || {measure: 0};
 		const currentTime = timeContext.time;
 		let cursor = _.last(cursors) ? _.last(cursors).cursor : Scored.config.note.head.width;
 		// update cursor if it's a new measure
 		if (currentTime.measure !== previousTime.measure) {
 			const measure = _.find(measures, measure => measure.value === currentTime.measure);
-			// cursor = placement.calculateCursor(measure);
 			cursor = placement.calculateCursor(measure);
-			// cursor = _.sum(measureLengths.slice(0, measure.value)) + Scored.config.note.head.width;
 		}
 
 		timeContext.group.translate(cursor, 0);

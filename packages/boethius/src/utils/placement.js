@@ -37,7 +37,7 @@ function getClefBase (clef) {
 	return clefBases[clef];
 }
 
-/*
+/**
  * @return {Array}
    treble:
  	f---
@@ -54,14 +54,14 @@ function getLineNames (clef) {
 	return lineNamesObj[clef];
 }
 
-/*
+/**
  * @param note {String}
  */
 function calculateAccidentalYpos (degree, step) {
 	return degree * step;
 }
 
-/*
+/**
  * @param note {Note}
  * @param set {Number} - distance between each note
  */
@@ -74,14 +74,14 @@ function calculateNoteYpos (note, step, clefBase, offset=0) {
 	return (diffY + offset) * step;
 }
 
-/*
+/**
  * @return {Point} the position to draw the font so the center of the noteHead is at the given position.
  */
 function getNoteHeadOffset (position) {
 	return new paper.Point(position).subtract(0, Scored.config.note.head.yOffset);
 }
 
-/*
+/**
  * @param position {Point} - the center of the PointText
  * @return {Point} The position of the center of the noteHead.
  */
@@ -89,7 +89,7 @@ function getNoteHeadCenter (position) {
 	return position.add(0, Scored.config.note.head.yOffset);
 }
 
-/*
+/**
  * @param note - Note
  * @return Point
  */
@@ -98,7 +98,7 @@ function getArticulationPoint (note, stemDirection) {
 	return note.noteHead.bounds.center.add(0, Scored.config.note.head.yOffset + offset);
 }
 
-/*
+/**
  * Could probably use a better name.
  * takes an array of items and translates them so the right bound of the left item lines up with the
  * left bound of the right item.
@@ -114,7 +114,7 @@ function lineup (items) {
 	}
 }
 
-/*
+/**
  * Places the left bound of the item at cursor.
  * @param cursor - Number
  * @param item - Scored item.
@@ -175,7 +175,7 @@ function getYOffset (item) {
 	return offsetFn(item);
 }
 
-/*
+/**
  * Aligns the notes so they are all at the same x position.
  * @param xPos - Number
  * @param notes - <Note, Chord>[]
@@ -199,7 +199,7 @@ function commonShortestDuration () {
 
 }
 
-/*
+/**
  * returns the amount to multiply note head width by. Doubles
  * @param shortestDuration - Number representing
  */
@@ -240,10 +240,10 @@ function calculateDefaultAccidentalPosition (note) {
 	return getNoteHeadCenter(note.noteHead.bounds.center).add(-Scored.config.note.accidental.xOffset, Scored.config.note.accidental.yOffset);
 }
 
-/*
+/**
  * @param items - RenderedItem[]
  * @param shortestDuration - Number
- * @return - pixel length of the time frame.
+ * @return {Array} - [marking length in px, duration events in px].
  */
 function calculateTimeLength (items, shortestDuration) {
 	const noteHeadWidth = Scored.config.note.head.width;

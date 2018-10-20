@@ -36,12 +36,12 @@ export function createNote (pitch, value=4, props) {
   }
 }
 
-export function createVoice (voice) {
+export function createVoice (voice, defaults={}) {
   return voice.map(note => {
     if (isArray(note)) {
       return createNote.apply(null, note);
     } else {
-      return createNote(note);
+      return createNote(note, defaults.value);
     }
   });
 }

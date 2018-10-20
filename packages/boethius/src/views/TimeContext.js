@@ -27,83 +27,96 @@ function TimeContext ({time=mustProvideTime(), lines = [], voices = [], items = 
 }
 
 TimeContext.prototype.render = function ({system, lineHeights, disableMarkingRendering}) {
-    const group = this.group = new paper.Group();
+  const group = this.group = new paper.Group();
 
-	const cursors = _.map(this.lines, (line, i) => {
+  // create the groups for each line.
+  const lineItems = _.map(this.lines, (line, i) => {
 		if (line) {
-            // Get items on the line.
-            const items = this.items.filter(item => {
-                if (disableMarkingRendering && isMarking(item)) {
-                    return false;
-                } else {
-                    return (item && item.line === line);
-                }
-            });
+      // Get items on the line.
+      const items = this.items.filter(item => {
+        if (disableMarkingRendering && isMarking(item)) {
+          return false;
+        } else {
+          return (item && item.line === line);
+        }
+      });
 
 			const itemGroups = renderTime(this.time, items);
 
-            const markings = _.filter(items, isMarking);
-            const pitchedItems = _.filter(items, isPitched);
-            const rests = _.filter(items, isRest);
-            const dynamics = _.filter(items, isDynamic);
+      const markings = _.filter(items, isMarking);
+      const pitchedItems = _.filter(items, isPitched);
+      const rests = _.filter(items, isRest);
+      const dynamics = _.filter(items, isDynamic);
 
-            // const rootY = new paper.Point(0, lineHeights[i]);
-            const rootY = new paper.Point(f(system.lineGroups[i]));
-
-            // const cursor = positionMarkings(rootY, 0, line);
-            // const cursor = positionMarkings(rootY, 0, markings);
-            const cursor = positionMarkings(rootY, rootY.x, markings);
-
-            if (pitchedItems.length) {
-                const widestItem = _.maxBy(pitchedItems, item => item.group.bounds.width);
-                placeY(rootY, line.contextAt(this.time), widestItem);
-                placeAt(cursor, widestItem);
-                // mutation of notes array
-                _.remove(pitchedItems, item => item === widestItem);
-                _.each(pitchedItems, _.partial(placeY, rootY, line.contextAt(this.time)));
-
-                const alignToNoteHead = isNote(widestItem) ? widestItem.noteHead : widestItem.children[0].noteHead;
-        		alignNoteHeads(alignToNoteHead.bounds.center.x, pitchedItems);
-            }
-
-            rests.map(rest => {
-        		rest.group.translate(rootY.add(0, getYOffset(rest)));
-                placeAt(cursor, rest);
-            });
-
-            dynamics.map((dynamic) => {
-        		dynamic.group.translate(rootY.add(0, Scored.config.layout.lineSpacing * 7.5));
-        		placeAt(cursor, dynamic);
-        	});
-
-            group.addChildren(itemGroups);
-
-            return cursor;
+      return {markings, pitchedItems, rests, dynamics, itemGroups};
 		}
 	});
 
-    // render symbols
-    const minCursor = Math.min.apply(null, _.compact(cursors));
-    const symbolCursor = _.isFinite(minCursor) ? minCursor : 0;
-    const symbolGroups = this.symbols.map(symbol => {
-        const symbolGroup = symbol.render();
-        symbolGroup.translate(symbolCursor, getYOffset(symbol));
-        return symbolGroup;
-    });
+  // Place the markings.
+  const markingCursors = lineItems.map((items, i) => {
+    if (items) {
+      const rootY = new paper.Point(f(system.lineGroups[i]));
+      return positionMarkings(rootY, rootY.x, items.markings);
+    }
+  });
 
-    group.addChildren(symbolGroups);
+  // Place durationed items.
+  const durationCursors = this.lines.map((line, i) => {
+    if (line) {
+      const {pitchedItems, rests, dynamics, itemGroups} = lineItems[i];
+      const cursor = _.max(markingCursors);
+      const rootY = new paper.Point(f(system.lineGroups[i]));
 
-    return group;
+      if (pitchedItems.length) {
+        const widestItem = _.maxBy(pitchedItems, item => item.group.bounds.width);
+        placeY(rootY, line.contextAt(this.time), widestItem);
+        placeAt(cursor, widestItem);
+        // mutation of notes array
+        _.remove(pitchedItems, item => item === widestItem);
+        _.each(pitchedItems, _.partial(placeY, rootY, line.contextAt(this.time)));
+
+        const alignToNoteHead = isNote(widestItem) ? widestItem.noteHead : widestItem.children[0].noteHead;
+        alignNoteHeads(alignToNoteHead.bounds.center.x, pitchedItems);
+      }
+
+      rests.map(rest => {
+        rest.group.translate(rootY.add(0, getYOffset(rest)));
+        placeAt(cursor, rest);
+      });
+
+      dynamics.map((dynamic) => {
+        dynamic.group.translate(rootY.add(0, Scored.config.layout.lineSpacing * 7.5));
+        placeAt(cursor, dynamic);
+      });
+
+      group.addChildren(itemGroups);
+    }
+  });
+
+  const cursors = markingCursors;
+
+  // render symbols
+  const minCursor = Math.min.apply(null, _.compact(cursors));
+  const symbolCursor = _.isFinite(minCursor) ? minCursor : 0;
+  const symbolGroups = this.symbols.map(symbol => {
+    const symbolGroup = symbol.render();
+    symbolGroup.translate(symbolCursor, getYOffset(symbol));
+    return symbolGroup;
+  });
+
+  group.addChildren(symbolGroups);
+
+  return group;
 }
 
 TimeContext.prototype.calculateCursor = function () {
-    return this.lines.map((line) => {
-        // find items on the line that have been rendered.
-        const items = this.items.filter(item => item.line === line && item.group);
-        const markingCursor = _.filter(items, isMarking).reduce((acc, marking) => calculateCursor(marking) + acc, 0);
-        const durationedCursor = _.min(_.filter(items, hasDuration).map(calculateCursor));
-        return markingCursor + durationedCursor;
-    });
+  return this.lines.map((line) => {
+    // find items on the line that have been rendered.
+    const items = this.items.filter(item => item.line === line && item.group);
+    const markingCursor = _.filter(items, isMarking).reduce((acc, marking) => calculateCursor(marking) + acc, 0);
+    const durationedCursor = _.min(_.filter(items, hasDuration).map(calculateCursor));
+    return [markingCursor, durationedCursor];
+  });
 };
 
 function placeY (rootY, context, item) {
