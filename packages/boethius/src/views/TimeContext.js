@@ -129,12 +129,17 @@ TimeContext.prototype.renderArticulations = function ({system}) {
           } else {
             point = getArticulationPoint(widestItem.getBaseNote(stemDirection), stemDirection);
           }
-        } else if (widestItem.getStemDirection() === 'up') {
-          const y = (itemTop ? Math.min(itemTop.group.bounds.top, rootY.y) : rootY.y) - Scored.config.layout.lineSpacing;
-          point = new paper.Point(widestItem.noteHead.bounds.center.x, y);
+        } else if (isNote(widestItem)) {
+          if (widestItem.getStemDirection() === 'up') {
+            const y = (itemTop ? Math.min(itemTop.group.bounds.top, rootY.y) : rootY.y) - Scored.config.layout.lineSpacing;
+            point = new paper.Point(widestItem.noteHead.bounds.center.x, y);
+          } else {
+            const y = itemTop ? Math.min(itemTop.group.bounds.top, rootY.y) : rootY.y;
+            point = new paper.Point(widestItem.noteHead.bounds.center.x, y);
+          }
         } else {
-          const y = itemTop ? Math.min(itemTop.group.bounds.top, rootY.y) : rootY.y;
-          point = new paper.Point(widestItem.noteHead.bounds.center.x, y);
+          const y = (itemTop ? Math.min(itemTop.group.bounds.top, rootY.y) : rootY.y) - Scored.config.layout.lineSpacing;
+          point = new paper.Point(itemTop.group.bounds.center.x, y);
         }
         const fermata = drawFermata(point);
         this.group.addChild(fermata);
