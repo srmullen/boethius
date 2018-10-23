@@ -369,6 +369,10 @@ System.renderDecorations = function ({system, timeContexts, lines, lineCenters, 
 				Voice.renderArticulations(voiceItems); // items must have stem direction already
 			});
 		});
+
+		timeContexts.map(timeContext => {
+			timeContext.renderArticulations({system});
+		});
 	}
 }
 

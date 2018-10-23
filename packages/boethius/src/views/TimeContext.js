@@ -9,7 +9,9 @@ import {positionMarkings, b, f} from "../utils/line";
 import {getAccidentalContexts} from "../utils/accidental";
 import {equals, getTimeFromSignatures, iterateByTime} from "../utils/timeUtils";
 import {isNote, isChord, isRest, isDynamic, isPitched, isMarking, hasDuration} from "../types";
-import {calculateNoteYpos, getClefBase, alignNoteHeads, getYOffset, calculateCursor, placeAt} from "../utils/placement";
+import {
+  calculateNoteYpos, getClefBase, alignNoteHeads, getYOffset, calculateCursor, placeAt, getArticulationPoint
+} from "../utils/placement";
 import {map} from '../utils/common';
 
 /*
@@ -68,9 +70,9 @@ TimeContext.prototype.render = function ({system, lineHeights, disableMarkingRen
       const cursor = _.max(markingCursors);
       const rootY = new paper.Point(f(system.lineGroups[i]));
 
-      let widestItem = null;
+      // let widestItem = null;
       if (pitchedItems.length) {
-        widestItem = _.maxBy(pitchedItems, item => item.group.bounds.width);
+        const widestItem = _.maxBy(pitchedItems, item => item.group.bounds.width);
         placeY(rootY, line.contextAt(this.time), widestItem);
         placeAt(cursor, widestItem);
         const notWidestItems = _.filter(pitchedItems, item => item !== widestItem);
@@ -90,30 +92,12 @@ TimeContext.prototype.render = function ({system, lineHeights, disableMarkingRen
         placeAt(cursor, dynamic);
       });
 
-      // Determine if there is a fermata at this time.
-      const isFermata = [...pitchedItems, ...rests].some(item => item.fermata);
-    	if (isFermata) {
-        const itemTop = _.minBy(itemGroups, item => item.bounds.top)
-
-        let y = 0;
-        if (widestItem.getStemDirection() === 'up') {
-          y = (itemTop ? Math.min(itemTop.bounds.top, rootY.y) : rootY.y) - Scored.config.layout.lineSpacing;
-        } else {
-          y = itemTop ? Math.min(itemTop.bounds.top, rootY.y) : rootY.y;
-        }
-        const point = new paper.Point(widestItem.noteHead.bounds.center.x, y);
-    		const fermata = drawFermata(point);
-    		this.group.addChild(fermata);
-    	}
-
       group.addChildren(itemGroups);
     }
   });
 
-  const cursors = markingCursors;
-
   // render symbols
-  const minCursor = Math.min.apply(null, _.compact(cursors));
+  const minCursor = Math.min.apply(null, _.compact(markingCursors));
   const symbolCursor = _.isFinite(minCursor) ? minCursor : 0;
   const symbolGroups = this.symbols.map(symbol => {
     const symbolGroup = symbol.render();
@@ -124,6 +108,39 @@ TimeContext.prototype.render = function ({system, lineHeights, disableMarkingRen
   group.addChildren(symbolGroups);
 
   return group;
+}
+
+TimeContext.prototype.renderArticulations = function ({system}) {
+  this.lines.forEach((line, i) => {
+    if (line) {
+      const lineItems = this.items.filter(item => item.line === line);
+      // Determine if there is a fermata at this time.
+      const hasFermata = lineItems.some(item => item.fermata && item.line === line);
+      if (hasFermata) {
+        const widestItem = _.maxBy(lineItems, item => hasDuration(item) ? item.group.bounds.width : -Infinity);
+        const itemTop = _.minBy(lineItems, item => item.group.bounds.top)
+        const rootY = new paper.Point(f(system.lineGroups[i]));
+        let point = null;
+        if (isChord(widestItem)) {
+          const stemDirection = widestItem.getStemDirection();
+          if (stemDirection === 'up') {
+            const y = (itemTop ? Math.min(itemTop.group.bounds.top, rootY.y) : rootY.y) - Scored.config.layout.lineSpacing;
+            point = new paper.Point(widestItem.getBaseNote(stemDirection).noteHead.bounds.center.x, y);
+          } else {
+            point = getArticulationPoint(widestItem.getBaseNote(stemDirection), stemDirection);
+          }
+        } else if (widestItem.getStemDirection() === 'up') {
+          const y = (itemTop ? Math.min(itemTop.group.bounds.top, rootY.y) : rootY.y) - Scored.config.layout.lineSpacing;
+          point = new paper.Point(widestItem.noteHead.bounds.center.x, y);
+        } else {
+          const y = itemTop ? Math.min(itemTop.group.bounds.top, rootY.y) : rootY.y;
+          point = new paper.Point(widestItem.noteHead.bounds.center.x, y);
+        }
+        const fermata = drawFermata(point);
+        this.group.addChild(fermata);
+      }
+    }
+  });
 }
 
 TimeContext.prototype.calculateCursor = function () {

@@ -75,11 +75,13 @@ export default function testNoteArticulations (scored) {
     voices: {
       rh: createVoice([
         ['a4', 4, {staccato: true}], ['a4', 4, {tenuto: true}], ['a4', 4, {tenuto: true, staccato: true}],
-        ['a4', 4, {accent: true}], ['a4', 4, {fermata: true}],
+        ['a4', 4, {accent: true}], ['a4', 4, {fermata: true}], [['a4', 'bb4'], 4, {accent: true}],
+        [['a4', 'bb4'], 4, {fermata: true}],
       ]),
       lh: createVoice([
         ['e3', 4, {staccato: true}], ['e3', 4, {tenuto: true}], ['e3', 4, {tenuto: true, staccato: true}],
-        ['e3', 4, {accent: true}], ['e3', 4, {fermata: true}],
+        ['e3', 4, {accent: true}], ['e3', 4, {fermata: true}], [['e3', 'g3'], 4, {accent: true}],
+        [['e3', 'g3'], 4, {fermata: true}],
       ])
     }
   };

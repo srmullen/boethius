@@ -1,7 +1,7 @@
 import paper from "paper";
 import _ from "lodash";
 
-import {drawFlag, getFlagOffset, drawStaccato, drawTenuto} from "../engraver";
+import {drawFlag, getFlagOffset, drawStaccato, drawTenuto, drawAccent} from "../engraver";
 import {getSteps, parsePitch} from "../utils/note";
 import {defaultStemPoint, getStemLength, getOverlappingNotes, getAccidentalOrdering} from "../utils/chord";
 import {map, isEven} from "../utils/common";
@@ -18,7 +18,12 @@ const DOWN = "down";
 /*
  * @param children - Array of notes. Can take several representations. String, Object, or Note.
  */
-function Chord ({value=4, dots=0, tuplet, time, root, name, inversion, staccato, legato, tenuto, portato, slur, stemDirection}, children=[]) {
+function Chord (
+	{
+		value=4, dots=0, tuplet, time, root, name, inversion, staccato, legato, tenuto, accent, fermata, slur, stemDirection
+	},
+	children=[]
+) {
 	this.value = value;
 	this.dots = dots;
 	this.tuplet = tuplet;
@@ -31,7 +36,8 @@ function Chord ({value=4, dots=0, tuplet, time, root, name, inversion, staccato,
 	this.staccato = staccato;
 	this.legato = legato;
 	this.tenuto = tenuto;
-	this.portato = portato;
+	this.accent = accent;
+	this.fermata = fermata;
 	this.slur = slur;
 
 	this.stemDirection = stemDirection;
@@ -263,7 +269,7 @@ Chord.prototype.getStemDirection = function (centerLineValue) {
 };
 
 Chord.prototype.drawArticulations = function () {
-	const point = (this.staccato || this.tenuto || this.portato) ?
+	const point = (this.staccato || this.tenuto || this.accent) ?
 		getArticulationPoint(this.getBaseNote(this.stemDirection), this.stemDirection)
 		: null;
 
@@ -277,16 +283,13 @@ Chord.prototype.drawArticulations = function () {
 		this.group.addChild(legato);
 	}
 
-	if (this.portato) {
-		const stacato = drawStaccato(point);
-		this.group.addChild(stacato);
-		if (!this.slur) {
-			// draw tenuto
-		}
+	if (this.accent) {
+		const accent = drawAccent(point);
+		this.group.addChild(accent);
 	}
 };
 
-/*
+/**
  * @param children - Array<Note representations>
  * @return Note[]
  */
@@ -355,7 +358,6 @@ Chord.prototype.equals = function (chord) {
 		this.time === chord.time &&
 		this.staccato === chord.staccato &&
 		this.tenuto === chord.tenuto &&
-		this.portato === chord.portato &&
 		this.slur === chord.slur &&
 		this.stemDirection === chord.stemDirection &&
 		this.children.length === chord.children.length &&

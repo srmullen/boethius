@@ -26,13 +26,25 @@ export function createItem (pitch, value=4, props) {
         }, props)
     };
   } else {
-    return {
-        type: 'note',
-        props: Object.assign({
-            pitch,
-            value
-        }, props)
-    };
+    if (isArray(pitch)) {
+      // Item is a chord
+      return {
+          type: 'chord',
+          children: pitch.map(p => createItem(p)),
+          props: Object.assign({
+              value
+          }, props)
+      };
+    } else {
+      // Item is a note.
+      return {
+          type: 'note',
+          props: Object.assign({
+              pitch,
+              value
+          }, props)
+      };
+    }
   }
 }
 

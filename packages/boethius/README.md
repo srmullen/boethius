@@ -37,6 +37,7 @@ TODOS
     # Plugins
     - Page plugin
     - Plugin for displaying a cursor when playing music to score. (Cursor Plugin)
+    - Plugin for configuring decorations.
 
     # Lower priority
     - SMuFL
