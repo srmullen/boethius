@@ -27,6 +27,7 @@ import testTuplets from './tests/testTuplets';
 import testParsing from './tests/testParsing';
 import testForceAccidental from './tests/testForceAccidental';
 import testBunchedClefChange from './tests/testBunchedClefChange';
+import testNoteArticulations from './tests/testNoteArticulations';
 
 const examples = {
     testDoubleStaffScore,
@@ -54,7 +55,8 @@ const examples = {
     testTuplets,
     testParsing,
     testForceAccidental,
-    testBunchedClefChange
+    testBunchedClefChange,
+    testNoteArticulations
 };
 
 function createSelect (value) {

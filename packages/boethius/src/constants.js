@@ -77,6 +77,11 @@ const constants = {
 			32: '\u2657',
 			64: '\u2658',
 			128: '\u2659'
+		},
+		articulations: {
+			accent: '\u0021',
+			fermataUp: 'C',
+			fermataDown: 'G'
 		}
 	},
 	clefs: {

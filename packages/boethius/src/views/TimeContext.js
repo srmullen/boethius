@@ -1,6 +1,7 @@
 import paper from "paper";
 import _ from "lodash";
 
+import { drawFermata } from '../engraver';
 import Note from "./Note";
 import Chord from "./Chord";
 import {getStaffItems} from "../utils/system";
@@ -67,13 +68,13 @@ TimeContext.prototype.render = function ({system, lineHeights, disableMarkingRen
       const cursor = _.max(markingCursors);
       const rootY = new paper.Point(f(system.lineGroups[i]));
 
+      let widestItem = null;
       if (pitchedItems.length) {
-        const widestItem = _.maxBy(pitchedItems, item => item.group.bounds.width);
+        widestItem = _.maxBy(pitchedItems, item => item.group.bounds.width);
         placeY(rootY, line.contextAt(this.time), widestItem);
         placeAt(cursor, widestItem);
-        // mutation of notes array
-        _.remove(pitchedItems, item => item === widestItem);
-        _.each(pitchedItems, _.partial(placeY, rootY, line.contextAt(this.time)));
+        const notWidestItems = _.filter(pitchedItems, item => item !== widestItem);
+        _.each(notWidestItems, _.partial(placeY, rootY, line.contextAt(this.time)));
 
         const alignToNoteHead = isNote(widestItem) ? widestItem.noteHead : widestItem.children[0].noteHead;
         alignNoteHeads(alignToNoteHead.bounds.center.x, pitchedItems);
@@ -88,6 +89,22 @@ TimeContext.prototype.render = function ({system, lineHeights, disableMarkingRen
         dynamic.group.translate(rootY.add(0, Scored.config.layout.lineSpacing * 7.5));
         placeAt(cursor, dynamic);
       });
+
+      // Determine if there is a fermata at this time.
+      const isFermata = [...pitchedItems, ...rests].some(item => item.fermata);
+    	if (isFermata) {
+        const itemTop = _.minBy(itemGroups, item => item.bounds.top)
+
+        let y = 0;
+        if (widestItem.getStemDirection() === 'up') {
+          y = (itemTop ? Math.min(itemTop.bounds.top, rootY.y) : rootY.y) - Scored.config.layout.lineSpacing;
+        } else {
+          y = itemTop ? Math.min(itemTop.bounds.top, rootY.y) : rootY.y;
+        }
+        const point = new paper.Point(widestItem.noteHead.bounds.center.x, y);
+    		const fermata = drawFermata(point);
+    		this.group.addChild(fermata);
+    	}
 
       group.addChildren(itemGroups);
     }

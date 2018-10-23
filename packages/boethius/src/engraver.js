@@ -335,7 +335,7 @@ function drawStaccato (point) {
 	return staccato;
 }
 
-/*
+/**
  * @param point - center of the tenuto dot.
  * @return Path
  */
@@ -344,6 +344,36 @@ function drawTenuto (point) {
 	const tenuto = new paper.Path.Line(point.subtract(halfWidth, 0), point.add(halfWidth, 0));
 	tenuto.strokeColor = "black";
 	return tenuto;
+}
+
+/**
+ * @param point - center of the accent.
+ * @return {paper.PointText}
+ */
+function drawAccent (point) {
+	return new paper.PointText({
+		point,
+		name: 'accent',
+		content: constants.font.articulations.accent,
+		fontFamily: 'gonville',
+		fontSize: Scored.config.fontSize,
+		fillColor: 'black'
+	});
+}
+
+/**
+ * @param point - center of the accent.
+ * @return {paper.PointText}
+ */
+function drawFermata (point) {
+	return new paper.PointText({
+		point,
+		name: 'fermata',
+		content: constants.font.articulations.fermataUp,
+		fontFamily: 'gonville',
+		fontSize: Scored.config.fontSize,
+		fillColor: 'black'
+	});
 }
 
 const drawAccidental = function (accidental) {
@@ -686,6 +716,8 @@ export {
 	drawRepeat,
 	drawStaccato,
 	drawTenuto,
+	drawAccent,
+	drawFermata,
 	drawAccidental,
 	drawFlag,
 	getFlagOffset,

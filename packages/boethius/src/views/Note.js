@@ -22,7 +22,7 @@ const TYPE = constants.type.note;
 function Note (props) {
 	const {
 		pitch, pitchClass="a", octave=4, value=4, dots=0, slur, tuplet, time,
-		legato, staccato, tenuto, portato, voice, forceAccidental
+		legato, staccato, tenuto, accent, fermata, voice, forceAccidental
 	} = props;
 
 	this.pitch = pitch || (pitchClass + octave);
@@ -42,7 +42,8 @@ function Note (props) {
 	// articulations
 	this.staccato = staccato;
 	this.tenuto = tenuto;
-	this.portato = portato;
+	this.accent = accent;
+	this.fermata = fermata;
 }
 
 Note.prototype.type = TYPE;
@@ -217,7 +218,9 @@ Note.prototype.drawDots = function (dots, clef, xPos) {
 };
 
 Note.prototype.drawArticulations = function () {
-	const point = (this.staccato || this.tenuto || this.portato) ? placement.getArticulationPoint(this, this.stemDirection) : null;
+	const point = (this.staccato || this.tenuto || this.accent || this.fermata)
+		? placement.getArticulationPoint(this, this.stemDirection)
+		: null;
 
 	if (this.staccato) {
 		const stacato = engraver.drawStaccato(point);
@@ -229,12 +232,9 @@ Note.prototype.drawArticulations = function () {
 		this.group.addChild(legato);
 	}
 
-	if (this.portato) {
-		const stacato = engraver.drawStaccato(point);
-		this.group.addChild(stacato);
-		if (!this.slur) {
-			// draw tenuto
-		}
+	if (this.accent) {
+		const accent = engraver.drawAccent(point);
+		this.group.addChild(accent);
 	}
 };
 

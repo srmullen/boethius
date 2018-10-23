@@ -1,6 +1,6 @@
 import {createVoice} from '../helpers';
 
-export default function testBunchedClefChange (scored) {
+export default function testNoteArticulations (scored) {
   const layout = {
     "type": "score",
     "timeSignatures": [
@@ -30,7 +30,7 @@ export default function testBunchedClefChange (scored) {
         "keys": [
           {
             "root": "C",
-            "mode": "minor",
+            "mode": "major",
             "measure": 0,
             "beat": 0
           }
@@ -46,17 +46,12 @@ export default function testBunchedClefChange (scored) {
             "value": "bass",
             "measure": 0,
             "beat": 0
-          },
-          {
-            "value": "treble",
-            "measure": 0,
-            "beat": 3
           }
         ],
         "keys": [
           {
             "root": "C",
-            "mode": "minor",
+            "mode": "major",
             "measure": 0,
             "beat": 0
           }
@@ -79,14 +74,13 @@ export default function testBunchedClefChange (scored) {
   const music = {
     voices: {
       rh: createVoice([
-        'eb5', 'd5', 'c5', 'd5', 'eb5', 'f5', ['g5', 8], ['f5', 8], ['r', 8], ['f5', 8],
-        ['f5', 8], ['eb5', 8], ['r', 8], ['d5', 8], ['eb5', 8], ['ab4', 8], 'ab4', 'f4', 'bb5', 'f4'
-      ], {value: 16}),
+        ['a4', 4, {staccato: true}], ['a4', 4, {tenuto: true}], ['a4', 4, {tenuto: true, staccato: true}],
+        ['a4', 4, {accent: true}], ['a4', 4, {fermata: true}],
+      ]),
       lh: createVoice([
-        ['r', 8], 'c4', 'bb3', 'c4', 'd4', 'eb4', 'g3', 'ab3', 'bb3', 'ab3', 'f3', 'eb4', 'f4', 'd4', 'c4',
-        'bb3', 'ab4', 'g4', 'f4', 'eb4', 'd4', 'c4', 'bb3', 'c4', 'd4', 'c4', 'd4',
-        ['d4', 8, {dots: 1}], ['c4', 32], ['c4', 32]
-      ], {value: 16})
+        ['e3', 4, {staccato: true}], ['e3', 4, {tenuto: true}], ['e3', 4, {tenuto: true, staccato: true}],
+        ['e3', 4, {accent: true}], ['e3', 4, {fermata: true}],
+      ])
     }
   };
   return scored.pluginRender(layout, music, {parse: true});

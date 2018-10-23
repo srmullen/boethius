@@ -17,7 +17,7 @@ export function staccato (items) {
     });
 }
 
-export function createNote (pitch, value=4, props) {
+export function createItem (pitch, value=4, props) {
   if (pitch === 'r') {
     return {
         type: 'rest',
@@ -39,9 +39,9 @@ export function createNote (pitch, value=4, props) {
 export function createVoice (voice, defaults={}) {
   return voice.map(note => {
     if (isArray(note)) {
-      return createNote.apply(null, note);
+      return createItem.apply(null, note);
     } else {
-      return createNote(note, defaults.value);
+      return createItem(note, defaults.value);
     }
   });
 }

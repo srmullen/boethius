@@ -27,12 +27,12 @@ TODOS
     - Minimum stem heights.
     - Tie inflection points.
     - Clef change markings at end of system.
-    - Fermata
     - Fingerings
     - Ghost notes
     - Plugin system for rendering 'time' nodes.
     - How to catch plugin system errors.
     - Plugin options
+    - Whole measure rests when measure is not 4/4
 
     # Plugins
     - Page plugin
