@@ -1,16 +1,15 @@
-import {createVoice} from '../helpers';
+import { createVoice } from '../helpers';
 
-export default function testNoteArticulations (scored) {
+export default function testFreeTimeSignature (scored) {
+  // FIXME: Throw error here until implemented.
+  throw new Error("Not working yet!");
   const layout = {
     "type": "score",
-    score: {
-      title: 'Note Articulations'
-    },
     "timeSignatures": [
       {
-        "value": [4, 4],
-        "measure": 0,
-        "beat": 0
+        value: 'FREE',
+        measure: 0,
+        beat: 0
       }
     ],
     "currentPage": 0,
@@ -77,14 +76,10 @@ export default function testNoteArticulations (scored) {
   const music = {
     voices: {
       rh: createVoice([
-        ['a4', 4, {staccato: true}], ['a4', 4, {tenuto: true}], ['a4', 4, {tenuto: true, staccato: true}],
-        ['a4', 4, {accent: true}], ['a4', 4, {fermata: true}], [['a4', 'bb4'], 4, {accent: true}],
-        [['a4', 'bb4'], 4, {fermata: true}], ['r', 4, {fermata: true}]
+        ['r', 8, {anacrusis: true}], ['a4', 8, {anacrusis: true}], ['b4', 4, {anacrusis: true}], 'c5', 'd5', ['c5', 2]
       ]),
       lh: createVoice([
-        ['e3', 4, {staccato: true}], ['e3', 4, {tenuto: true}], ['e3', 4, {tenuto: true, staccato: true}],
-        ['e3', 4, {accent: true}], ['e3', 4, {fermata: true}], [['e3', 'g3'], 4, {accent: true}],
-        [['e3', 'g3'], 4, {fermata: true}], ['r', 4, {fermata: true}]
+        ['e3', 4, {anacrusis: true}], [['d3', 'f3'], 4, {anacrusis: true}], 'c3', 'b2', ['a2', 2]
       ])
     }
   };

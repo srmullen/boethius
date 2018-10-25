@@ -20,13 +20,15 @@ import {map} from '../utils/common';
  * @param timeContext - array of lineTimeContexts.
  * @param symbols - array of symbols.
  */
-function TimeContext ({time=mustProvideTime(), lines = [], voices = [], items = [], symbols = []}) {
+function TimeContext (
+  {time=mustProvideTime(), lines = [], voices = [], items = [], symbols = [], anacrusis = false}
+) {
     this.lines = lines;
-    // this.time = _.find(timeContext, line => !!line).time;
     this.time = time;
     this.voices = voices;
     this.items = items;
     this.symbols = symbols;
+    this.anacrusis = anacrusis;
 }
 
 TimeContext.prototype.render = function ({system, lineHeights, disableMarkingRendering}) {
@@ -240,47 +242,41 @@ function getTimeContexts (line, items) {
 	return sortedTimes;
 }
 
-// function getTimeContexts (voice) {
-// 	const allItems = line.markings.concat(items);
-//
-// 	const times = _.map(_.groupBy(allItems, (item) => {
-// 		return getTimeFromSignatures(line.timeSignatures, item).time;
-// 	}), (v) => {
-// 		const time = getTimeFromSignatures(line.timeSignatures, v[0]);
-// 		return {time, items: v, context: line.contextAt(time)};
-// 	});
-//
-// 	const sortedTimes = _.sortBy(times, ({time}) => time.time);
-//
-// 	return sortedTimes;
-// }
-
-// TODO: Handle accidentals context.
 TimeContext.createTimeContexts = function createTimeContexts (timeSignaures, lines, voices, chordSymbols) {
-    // get the time contexts
-    setLineOnItems(lines, voices);
+  // get the time contexts
+  setLineOnItems(lines, voices);
 	const lineItems = getStaffItems(lines, voices);
 	const lineTimes = map((line, items) => getTimeContexts(line, items), lines, lineItems);
-    // const timeContexts = voices.map(getTimeContexts);
 
-    // calculate the accidentals for each line.
+  // calculate the accidentals for each line.
 	_.each(lineTimes, (times) => {
 		const accidentals = getAccidentalContexts(times);
 		// add accidentals to times
 		_.each(times, (time, i) => time.context.accidentals = accidentals[i]);
 	});
 
-    const timeFn = (item) => {
-        return getTimeFromSignatures(timeSignaures, item);
-    }
-    return iterateByTime(timeFn, (time, items) => {
-        let [symbols, ] = _.partition(chordSymbols, (sym) => {
-            const symbolTime = getTimeFromSignatures(timeSignaures, sym);
-            return equals(time, symbolTime);
-        });
+  const timeFn = (item) => {
+    return getTimeFromSignatures(timeSignaures, item);
+  }
 
-        return new TimeContext({time, lines, voices, items: _.compact(items), symbols});
-    }, [...voices, ...lines].map(voice => voice.children));
+  return iterateByTime(timeFn, (time, items) => {
+    let [symbols, ] = _.partition(chordSymbols, (sym) => {
+      const symbolTime = getTimeFromSignatures(timeSignaures, sym);
+      return equals(time, symbolTime);
+    });
+
+    const compactedItems = _.compact(items);
+    const anacrusis = compactedItems.some(item => item.anacrusis);
+
+    return new TimeContext({
+      time,
+      lines,
+      voices,
+      items: compactedItems,
+      symbols,
+      anacrusis
+    });
+  }, [...voices, ...lines].map(voice => voice.children));
 }
 
 function mustProvideTime () {

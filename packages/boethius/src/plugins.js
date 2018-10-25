@@ -2,10 +2,12 @@ import { isString, first, last } from 'lodash';
 import Score from "./views/Score";
 import TimeContext from './views/TimeContext';
 import { parseLayout, parseMusic } from "./utils/parser";
+import { createMeasures } from "./views/Measure";
 
 const defaultConfig = [
 	'parserPlugin',
 	'loggingPlugin',
+	'measures',
 	'score',
 	'tiePlugin',
 	'loggingPlugin'
@@ -14,6 +16,13 @@ const defaultConfig = [
 // The colorPlugin is being used to help develop how plugins will be executed.
 // Its goal is to allow object to be rendered in any color.
 const pluginCollection = {
+	measures: {
+		name: 'measures',
+		beforeRender: function ({measures, score, music}) {
+			const repeats = music.repeats || [];
+			return { measures: expandMeasures(measures, score, repeats) };
+		}
+	},
 	score: {
 		name: 'score',
 		beforeRender: Score.beforeRender,
@@ -35,8 +44,10 @@ const pluginCollection = {
 		name: 'parserPlugin',
 		beforeRender: function (acc) {
 			if (acc.options.parse) {
+				const { score, measures } = parseLayout(acc.score);
 				return {
-					score: parseLayout(acc.score),
+					score,
+					measures,
 					music: parseMusic(acc.music)
 				};
 			}
@@ -158,5 +169,17 @@ export function runPlugins(plugins, functionName) {
 				return promise;
 			}
 		}, Promise.resolve(aggregate));
+	}
+}
+
+/**
+ * Given a sparse array of Measures, returns a full Measure array.
+ */
+function expandMeasures (sparse=[], score, repeats) {
+	if (score.measureCount) {
+		return createMeasures(score.measureCount, [...sparse, ...score.timeSigs, ...repeats]);
+	} else {
+		const numMeasures = _.sumBy(score.systems, system => system.props.measures);
+	  return createMeasures(numMeasures, [...sparse, ...score.timeSigs, ...repeats]);
 	}
 }

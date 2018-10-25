@@ -6,7 +6,7 @@ import {restEquals} from "../utils/equality";
 
 const TYPE = constants.type.rest;
 
-function Rest ({voice=0, value=4, dots=0, tuplet, time, slur, fermata}) {
+function Rest ({voice=0, value=4, dots=0, tuplet, time, slur, fermata, anacrusis}) {
 	this.voice = voice;
 	this.value = value;
 	this.dots = dots;
@@ -14,6 +14,7 @@ function Rest ({voice=0, value=4, dots=0, tuplet, time, slur, fermata}) {
 	this.time = time;
 	this.slur = slur;
 	this.fermata = fermata;
+	this.anacrusis = anacrusis;
 }
 
 Rest.render = function (rest, context={}) {

@@ -28,6 +28,9 @@ import testParsing from './tests/testParsing';
 import testForceAccidental from './tests/testForceAccidental';
 import testBunchedClefChange from './tests/testBunchedClefChange';
 import testNoteArticulations from './tests/testNoteArticulations';
+import testAnacrusis from './tests/testAnacrusis';
+import testFreeTimeSignature from './tests/testFreeTimeSignature';
+import testMeasureAcrossSystems from './tests/testMeasureAcrossSystems';
 
 const examples = {
     testDoubleStaffScore,
@@ -56,7 +59,10 @@ const examples = {
     testParsing,
     testForceAccidental,
     testBunchedClefChange,
-    testNoteArticulations
+    testNoteArticulations,
+    testAnacrusis,
+    testFreeTimeSignature,
+    testMeasureAcrossSystems
 };
 
 function createSelect (value) {

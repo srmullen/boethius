@@ -50,7 +50,10 @@ export function parseLayout (layout) {
 
     const lines = layout.lines.map(makeLine.bind(null, timeSigs));
 
-    return new Score({title: layout.title}, [...timeSigs, ...pages, ...systems, ...lines]);
+    return {
+      score: new Score(layout.score, [...timeSigs, ...pages, ...systems, ...lines]),
+      measures: makeMeasures(layout.measures)
+    };
 }
 
 const roots = [
@@ -68,7 +71,19 @@ const keys = roots.reduce((acc, root) => {
     return acc;
 }, {});
 
-/*
+/**
+ * Create a list of measures from measure config objects.
+ * @param { {type: 'measure'}[] } measures
+ */
+function makeMeasures (measures = []) {
+  let n = 0;
+  return measures.map(measure => {
+    const timeSig = new TimeSignature({value: measure.timeSig});
+    return new Measure(Object.assign({}, measure, {timeSig}));
+  });
+}
+
+/**
  * @param pages - {List}
  * @param systems - {List}
  */

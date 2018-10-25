@@ -2,7 +2,7 @@ import _ from "lodash";
 
 import {partitionBy} from "./common";
 
-/*
+/**
  * Given lines and voices, returns an array of item arrays.
  * The first array is all items to be rendered on the first line, and so on.
  * @param lines - Line[]
@@ -24,8 +24,8 @@ function getStaffItems (lines, voices) {
     });
 }
 
-/*
- * @param timeLengths - {time, length[]}[]
+/**
+ * @param {{time, length[]}[]} timeLengths
  * @return length[]
  */
 function calculateMeasureLengths (timeLengths) {

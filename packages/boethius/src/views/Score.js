@@ -8,7 +8,6 @@ import Tuplet from './Tuplet';
 import Legato from "./Legato";
 import Slur from './Slur';
 import Text from "./Text";
-import {createMeasures} from "./Measure";
 import constants from "../constants";
 import {map, reductions, clone, concat} from "../utils/common";
 import {getTime, equals} from "../utils/timeUtils";
@@ -16,13 +15,17 @@ import {isText} from "../types";
 
 const TYPE = constants.type.score;
 
-/*
+/**
  * Class for managing Systems and Lines.
  * Meta data such as title/composer could also be attached here.
  * @param pageWidth - pixels given 72 dpi
  * @param pageHeight - pixels given 72 dpi
+ * @param {Number} measureCount - The number of measures in the score.
  */
-function Score ({pageWidth=595, pageHeight=842, length, title}, children=[]) {
+function Score (
+  {pageWidth=595, pageHeight=842, length, title, measureCount}={},
+  children=[]
+) {
     /*
      * A score should have both systems and lines.
      * A line represents all measures from 0 to the end of the score. It is one-dimentional.
@@ -38,16 +41,14 @@ function Score ({pageWidth=595, pageHeight=842, length, title}, children=[]) {
     this.pageWidth = pageWidth;
     this.pageHeight = pageHeight;
     this.title = parseTitle(title);
+    this.measureCount = measureCount;
 }
 
 Score.prototype.type = TYPE;
 
-Score.beforeRender = function ({score, music}, options={}) {
+Score.beforeRender = function ({score, music, measures}, options={}) {
     const {voices=[], chordSymbols=[], repeats=[]} = music;
     const pages = options.pages || [0];
-    // Optimize here. Measures shouldn't need to be recreated every time the score is re-rendered.
-    // measures = measures || scoreToMeasures(score, repeats);
-    const measures = scoreToMeasures(score, repeats);
 
     {
         const times = measures.map(measure => measure.startsAt);
@@ -81,7 +82,6 @@ Score.beforeRender = function ({score, music}, options={}) {
         }));
 
         return {
-            measures,
             startMeasures,
             startTimes,
             voiceTimeFrames,
@@ -90,7 +90,7 @@ Score.beforeRender = function ({score, music}, options={}) {
         };
     }
 
-    return { measures, systemsToRender };
+    return { systemsToRender };
 }
 
 Score.render = function (
@@ -151,6 +151,7 @@ Score.render = function (
 
 Score.renderSystems = function ({score, systemsToRender, startMeasures, measures, pages, systemOffset}) {
     return _.map(systemsToRender, ({system, index}, i) => {
+      // FIXME: Systems are no longer required to start at the beginning of a specific measure.
         const endMeasure = startMeasures[index] + system.props.measures;
         const systemMeasures = _.slice(measures, startMeasures[index], endMeasure);
 
@@ -158,9 +159,17 @@ Score.renderSystems = function ({score, systemsToRender, startMeasures, measures
 
         const systemGroup = System.render({
             system,
+            measures,
             lines: score.lines,
-            measures: systemMeasures,
+            systemMeasures: systemMeasures,
             length: systemLength
+        });
+
+        System.renderSystemMarkings({
+          system,
+          measures,
+          systemMeasures,
+          lines: score.lines
         });
 
         return systemGroup;
@@ -289,11 +298,6 @@ Score.renderDecorations = function ({groupings}) {
 
 function isVoiceUsed (voice, lines) {
     return _.some(lines, line => _.some(line.voices, linesVoice => linesVoice === voice.name));
-}
-
-export function scoreToMeasures (score, repeats) {
-    const numMeasures = _.sumBy(score.systems, system => system.props.measures);
-    return createMeasures(numMeasures, [...score.timeSigs, ...repeats]);
 }
 
 /*

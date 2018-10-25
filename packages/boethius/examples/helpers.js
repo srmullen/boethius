@@ -61,6 +61,7 @@ export function createVoice (voice, defaults={}) {
 export function createLayout () {
     return {
         "type": "score",
+        score: {},
         "timeSignatures": [
           {
             "value": [

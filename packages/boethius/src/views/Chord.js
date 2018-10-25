@@ -20,7 +20,8 @@ const DOWN = "down";
  */
 function Chord (
 	{
-		value=4, dots=0, tuplet, time, root, name, inversion, staccato, legato, tenuto, accent, fermata, slur, stemDirection
+		value=4, dots=0, tuplet, time, root, name, inversion, staccato, legato,
+		tenuto, accent, fermata, slur, stemDirection, anacrusis
 	},
 	children=[]
 ) {
@@ -31,6 +32,7 @@ function Chord (
 	this.root = root;
 	this.name = name;
 	this.inversion = inversion;
+	this.anacrusis = anacrusis;
 
 	// articulations
 	this.staccato = staccato;

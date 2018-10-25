@@ -3,6 +3,9 @@ import {createVoice} from '../helpers';
 export default function testBunchedClefChange (scored) {
   const layout = {
     "type": "score",
+    score: {
+      title: "Bunched clefs"
+    },
     "timeSignatures": [
       {
         "value": [4, 4],

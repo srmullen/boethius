@@ -39,14 +39,68 @@ function System (props = {}, children = []) {
 	// this.markings = _.filter(children, isMarking);
 }
 
-System.render = function ({system, lines, measures, length}) {
+/**
+ * @param {System} system
+ * @param {Line[]} lines
+ * @param {Measure[]} systemMeasures - The measures that are rendered on the system.
+ * @param {Measure[]} measures - All measures of the score.
+ * @param {Number} length - The length of the system in pixels.
+ */
+System.render = function ({system, lines, systemMeasures, measures, length}) {
 	const group = system.render();
 
+	// const lineHeights = system.getLineHeights(lines);
+
+	// const systemStartTime = _.isNumber(system.props.startsAt)
+	// 	? getTime(measures, {time: system.props.startsAt})
+	// 	: getTime(measures, {time: systemMeasures[0].startsAt});
+	//
+	//
+	// // system.signatures = System.createSystemSignatures({measures, startsAt, lines});
+	// system.signatures = System.createSystemSignatures(systemStartTime, lines);
+	// const systemSignatureGroups = system.signatures.map(({clef, key, timeSig}, i) => {
+	// 	const context = lines[i].contextAt(systemStartTime);
+	// 	clef.time = systemStartTime;
+	// 	key.time = systemStartTime;
+	// 	timeSig.time = systemStartTime;
+	// 	return {
+	// 		clef: clef.render(context),
+	// 		key: key.render(context),
+	// 		timeSig: timeSig.render(context)
+	// 	};
+	// });
+
+	let lineGroups;
+
+	if (!length) {
+		throw new Error('No length provided.');
+	} else {
+		system.lineGroups = system.renderLines(lines, length);
+	}
+
+	// systemSignatureGroups.forEach(({clef, key, timeSig}, i) => {
+	// 	group.addChildren([clef, key, timeSig]);
+	// });
+
+	group.addChildren(system.lineGroups);
+
+	group.addChild(drawSystemBar(system.lineGroups));
+
+	// system.startCursors = placeSystemSignatures(system.signatures, lineHeights);
+
+	return group;
+}
+
+System.renderSystemMarkings = function ({system, systemMeasures, measures, lines}) {
 	const lineHeights = system.getLineHeights(lines);
+	
+	const systemStartTime = _.isNumber(system.props.startsAt)
+		? getTime(measures, {time: system.props.startsAt})
+		: getTime(measures, {time: systemMeasures[0].startsAt});
 
-	const systemStartTime = getTime(measures, {time: measures[0].startsAt});
 
-	system.signatures = System.createSystemSignatures({measures, lines});
+	// system.signatures = System.createSystemSignatures({measures, startsAt, lines});
+	system.signatures = System.createSystemSignatures(systemStartTime, lines);
 	const systemSignatureGroups = system.signatures.map(({clef, key, timeSig}, i) => {
 		const context = lines[i].contextAt(systemStartTime);
 		clef.time = systemStartTime;
@@ -59,30 +113,11 @@ System.render = function ({system, lines, measures, length}) {
 		};
 	});
 
-	let lineGroups;
-
-	if (!length) {
-		throw new Error('No length provided.');
-	} else {
-		system.lineGroups = system.renderLines(lines, length);
-	}
-
 	systemSignatureGroups.forEach(({clef, key, timeSig}, i) => {
-		group.addChildren([clef, key, timeSig]);
+		system.group.addChildren([clef, key, timeSig]);
 	});
 
-	group.addChildren(system.lineGroups);
-
-	group.addChild(drawSystemBar(system.lineGroups));
-
 	system.startCursors = placeSystemSignatures(system.signatures, lineHeights);
-
-	// FIXME: Should this be part of renderDecorations?
-	const measureNumber = renderMeasureNumber(measures[0].value);
-	measureNumber.translate(0, -20);
-	system.group.addChild(measureNumber);
-
-	return group;
 }
 
 System.renderTimeContexts = function ({system, lines, measures, voices, timeContexts, length}) {
@@ -167,133 +202,12 @@ System.renderTimeContexts = function ({system, lines, measures, voices, timeCont
 	}
 }
 
-// measures only contains the MeasureViews that are being rendered on this system.
-// Perhaps it should get all the measures and start and end times. That way Rendering
-// on a system doesn't have to begin and end at measure boundaries.
-System.renderSystemAndContexts = function ({system, lines, measures, voices, timeContexts, length}) {
-	// create the system group that all items will be added to.
-	const systemGroup = system.render();
+// System.createSystemSignatures = function ({measures, lines, startsAt}) {
+// 	const startTime = getTime(measures, {time: measures[0].startsAt});
+// 	return getStartContexts(lines, startTime);
+// }
 
-	const lineHeights = system.getLineHeights(lines);
-
-	const systemStartTime = getTime(measures, {time: measures[0].startsAt});
-
-	// Create the context marking for the beginning of each system.
-	const systemSignatures = System.createSystemSignatures({measures, lines});
-	const systemSignatureGroups = systemSignatures.map(({clef, key, timeSig}, i) => {
-		const context = lines[i].contextAt(systemStartTime);
-		clef.time = systemStartTime;
-		key.time = systemStartTime;
-		timeSig.time = systemStartTime;
-		return {
-			clef: clef.render(context),
-			key: key.render(context),
-			timeSig: timeSig.render(context)
-		};
-	});
-
-	// Create the timeContexts groups so their widths can be determined.
-	const timeContextGroups = _.map(timeContexts, (timeContext, i) => {
-		return timeContext.render({lineHeights, disableMarkingRendering: i === 0});
-	});
-
-	const shortestDuration = Scored.config.shortestDuration; // need function to calculate this.
-
-	// signatureLengths is the amount of horizontal space the system signature take up on a line.
-	const [signatureLength] = calculateSystemSignaturesLength(systemSignatures);
-
-	const timeLengths = calculateTimeLengths(timeContexts, shortestDuration);
-
-	// Add signatureLength to the first measure.
-	const measureLengths = addDefaultMeasureLengths(system.props.measures, calculateMeasureLengths(timeLengths));
-
-	// get the minimum length of the line
-	const minLineLength = _.sum(measureLengths) + signatureLength;
-
-	let lineGroups, noteScale, cursorFn;
-
-	if (!length) {
-		lineGroups = system.renderLines(lines, minLineLength);
-
-		const measureGroups = system.renderMeasures(measures, measureLengths, lineGroups, signatureLength);
-
-		systemGroup.addChildren(measureGroups);
-
-		cursorFn = (possibleNextPositions, cursor) => {
-			return _.min(possibleNextPositions) + cursor;
-		};
-
-	} else {
-		lineGroups = system.renderLines(lines, length);
-
-		const totalMarkingLength = _.sumBy(timeLengths, ({length}) => length[0]) + signatureLength;
-
-		const measureScale = (length - signatureLength) / (minLineLength - signatureLength);
-
-		// noteScale = (length - totalMarkingLength) / (minLineLength - totalMarkingLength);
-
-		const scaledMeasureLengths = _.map(measureLengths, measureLength => measureLength * measureScale);
-
-		const measureGroups = system.renderMeasures(
-			measures,
-			scaledMeasureLengths,
-			lineGroups,
-			signatureLength
-		);
-
-		systemGroup.addChildren(measureGroups);
-
-		cursorFn = (possibleNextPositions, cursor) => {
-			return placement.scaleCursor(measureScale, cursor, _.min(possibleNextPositions) + cursor);
-		};
-	}
-
-	systemSignatureGroups.forEach(({clef, key, timeSig}, i) => {
-		systemGroup.addChildren([clef, key, timeSig]);
-	});
-
-	// add the items to the system group
-	systemGroup.addChildren(timeContextGroups);
-
-	systemGroup.addChildren(lineGroups);
-
-	systemGroup.addChild(drawSystemBar(lineGroups));
-
-	/////////////////////
-	// Placement Phase //
-	/////////////////////
-	const lineCenters = _.map(lineGroups, b);
-	const startCursors = placeSystemSignatures(systemSignatures, lineHeights);
-	const cursors = placeTimes(timeContexts, measures, measureLengths, cursorFn, startCursors);
-
-	// Render stems, beams, tuplets, articulations, and ledger lines.
-	////////////////////////
-	// Render Decorations // FIXME: Should be handled at the Score level?
-	////////////////////////
-	if (timeContexts) {
-		const groupings = System.createGroups({timeContexts, lines, voices, measures});
-		System.renderDecorations({
-			timeContexts,
-			lines,
-			voices,
-			lineGroups,
-			lineCenters,
-			voices,
-			measures,
-			groupings
-		});
-	}
-
-	// FIXME: Should this be part of renderDecorations?
-	const measureNumber = renderMeasureNumber(measures[0].value);
-	measureNumber.translate(0, -20);
-	systemGroup.addChild(measureNumber);
-
-	return systemGroup;
-};
-
-System.createSystemSignatures = function ({measures, lines}) {
-	const startTime = getTime(measures, {time: measures[0].startsAt});
+System.createSystemSignatures = function (startTime, lines) {
 	return getStartContexts(lines, startTime);
 }
 
@@ -374,6 +288,14 @@ System.renderDecorations = function ({system, timeContexts, lines, lineCenters, 
 			timeContext.renderArticulations({system});
 		});
 	}
+
+	// FIXME: Should this be part of Measure rendering? Reimplement for startsAt property.
+	// if (system.props.startsAt) {
+	// 	const time = getTime(measures, {time: system.props.startsAt});
+	// 	const measureNumber = renderMeasureNumber(time.measure);
+	// 	measureNumber.translate(0, -20);
+	// 	system.group.addChild(measureNumber);
+	// }
 }
 
 function calculateTimeLengths (timeContexts, shortestDuration) {

@@ -17,7 +17,10 @@ const REPEATBAR = "repeat";
  * @param timeSig - TimeSignature. Required.
  * @param startsAt - Time the measure starts at.
  */
-function Measure ({value, timeSig, startsAt=0, barType=DEFAULTBAR}, children=[]) {
+function Measure (
+	{value, timeSig, startsAt=0, barType=DEFAULTBAR, anacrusis=false},
+	children=[]
+) {
 	if (!timeSig) {
 		throw new Error("Time Signature is required when initializing Measure");
 	}
@@ -27,6 +30,7 @@ function Measure ({value, timeSig, startsAt=0, barType=DEFAULTBAR}, children=[])
 	this.startsAt = startsAt;
 	this.barType = barType;
 	this.children = children;
+	this.anacrusis = anacrusis;
 }
 
 Measure.prototype.type = TYPE;
@@ -69,8 +73,8 @@ Measure.prototype.drawGroupBounds = function (previousBarlinePosition, barline) 
 	return rectangle;
 };
 
-/*
- * @param numMeasures - the number of measures to create.
+/**
+ * @param {Number} numMeasures - the number of measures to create.
  * @param children - Measures or Markings
  */
 export function createMeasures (numMeasures, children) {

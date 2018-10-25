@@ -22,7 +22,7 @@ const TYPE = constants.type.note;
 function Note (props) {
 	const {
 		pitch, pitchClass="a", octave=4, value=4, dots=0, slur, tuplet, time,
-		legato, staccato, tenuto, accent, fermata, voice, forceAccidental
+		legato, staccato, tenuto, accent, fermata, voice, forceAccidental, anacrusis
 	} = props;
 
 	this.pitch = pitch || (pitchClass + octave);
@@ -38,6 +38,7 @@ function Note (props) {
 	this.slur = slur;
 	this.legato = legato;
 	this.forceAccidental = forceAccidental;
+	this.anacrusis = anacrusis;
 
 	// articulations
 	this.staccato = staccato;
