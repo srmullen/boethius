@@ -8,7 +8,7 @@ import {getLineItems, b, positionMarkings} from "../utils/line";
 import {getStaffItems, calculateMeasureLengths, addDefaultMeasureLengths} from "../utils/system";
 import {map, mapDeep, clone} from "../utils/common";
 import * as placement from "../utils/placement";
-import {getMeasureNumber, getTime} from "../utils/timeUtils";
+import {getMeasureNumber, getTime, addTimes} from "../utils/timeUtils";
 import Voice from "./Voice";
 import {getCenterLineValue} from "./Clef";
 import Line from "./Line";
@@ -20,23 +20,44 @@ const TYPE = constants.type.system;
 
 const SYSTEM_DEFAULTS = {
 	page: 0,
-	measures: 4,
+	duration: {measure: 4},
 	lineHeights: [],
 	indentation: 0
 };
 
-/*
- * @measures - the number of measures on the system.
- * @startMeasure - the index of the first measure on the stave.
- * @page - The page the system is rendered on.
+function processProps (props) {
+	if (_.isNumber(props.endsAt)) {
+		return Object.assign({}, {
+			page: 0,
+			lineHeights: [],
+			indentation: 0
+		}, props);
+	} else {
+		return Object.assign({}, SYSTEM_DEFAULTS, props);
+	}
+}
+
+/**
+ * @param measures - the number of measures on the system.
+ * @param {Time} startsAt - the time the system begins rendering. (inclusive)
+ * @param {Time} endsAt - the time system ends rendering. (exclusive)
+ * @param {Number} page - The page the system is rendered on.
  */
- // TODO: What are the children of a system now? It's more of a view onto the lines, rather than something with children in it's own right.
- // @param children <Line, Measure, Marking>[] - A marking that is given to the system will be rendered on all lines. If it is
- // 	given to a line it will only affect that line.
 function System (props = {}, children = []) {
-	this.props = Object.assign({}, SYSTEM_DEFAULTS, props);
+	this.props = processProps(props);
 	this.children = children;
-	// this.markings = _.filter(children, isMarking);
+}
+
+/**
+ * @param {Measure[]} - Array of measure for calculating the time.
+ * @return {Time}
+ */
+System.prototype.getEndTime = function (measures) {
+	if (_.isNumber(this.props.endsAt)) {
+		return getTime(measures, this.props.endsAt);
+	} else {
+		return addTimes(measures, this.props.startsAt, this.props.duration);
+	}
 }
 
 /**
@@ -46,29 +67,8 @@ function System (props = {}, children = []) {
  * @param {Measure[]} measures - All measures of the score.
  * @param {Number} length - The length of the system in pixels.
  */
-System.render = function ({system, lines, systemMeasures, measures, length}) {
+System.render = function ({system, lines, length}) {
 	const group = system.render();
-
-	// const lineHeights = system.getLineHeights(lines);
-
-	// const systemStartTime = _.isNumber(system.props.startsAt)
-	// 	? getTime(measures, {time: system.props.startsAt})
-	// 	: getTime(measures, {time: systemMeasures[0].startsAt});
-	//
-	//
-	// // system.signatures = System.createSystemSignatures({measures, startsAt, lines});
-	// system.signatures = System.createSystemSignatures(systemStartTime, lines);
-	// const systemSignatureGroups = system.signatures.map(({clef, key, timeSig}, i) => {
-	// 	const context = lines[i].contextAt(systemStartTime);
-	// 	clef.time = systemStartTime;
-	// 	key.time = systemStartTime;
-	// 	timeSig.time = systemStartTime;
-	// 	return {
-	// 		clef: clef.render(context),
-	// 		key: key.render(context),
-	// 		timeSig: timeSig.render(context)
-	// 	};
-	// });
 
 	let lineGroups;
 
@@ -78,25 +78,20 @@ System.render = function ({system, lines, systemMeasures, measures, length}) {
 		system.lineGroups = system.renderLines(lines, length);
 	}
 
-	// systemSignatureGroups.forEach(({clef, key, timeSig}, i) => {
-	// 	group.addChildren([clef, key, timeSig]);
-	// });
-
 	group.addChildren(system.lineGroups);
 
 	group.addChild(drawSystemBar(system.lineGroups));
 
-	// system.startCursors = placeSystemSignatures(system.signatures, lineHeights);
-
 	return group;
 }
 
-System.renderSystemMarkings = function ({system, systemMeasures, measures, lines}) {
+System.renderSystemMarkings = function ({system, measures, lines}) {
 	const lineHeights = system.getLineHeights(lines);
-	
-	const systemStartTime = _.isNumber(system.props.startsAt)
-		? getTime(measures, {time: system.props.startsAt})
-		: getTime(measures, {time: systemMeasures[0].startsAt});
+
+	// const systemStartTime = _.isNumber(system.props.startsAt)
+	// 	? getTime(measures, {time: system.props.startsAt})
+	// 	: getTime(measures, {time: systemMeasures[0].startsAt});
+	const systemStartTime = getTime(measures, {time: system.props.startsAt});
 
 
 	// system.signatures = System.createSystemSignatures({measures, startsAt, lines});
@@ -120,6 +115,8 @@ System.renderSystemMarkings = function ({system, systemMeasures, measures, lines
 	system.startCursors = placeSystemSignatures(system.signatures, lineHeights);
 }
 
+// FIXME: Measures was origianally just the measure on this system. Now it is all measures.
+// Will affect measure length calculations.
 System.renderTimeContexts = function ({system, lines, measures, voices, timeContexts, length}) {
 
 	const lineHeights = system.getLineHeights(lines);
@@ -141,7 +138,12 @@ System.renderTimeContexts = function ({system, lines, measures, voices, timeCont
 	const timeLengths = calculateTimeLengths(timeContexts, shortestDuration);
 
 	// Add signatureLength to the first measure.
-	const measureLengths = addDefaultMeasureLengths(system.props.measures, calculateMeasureLengths(timeLengths));
+	// const mLengths = calculateMeasureLengths(timeLengths);
+	// const measureLengths = addDefaultMeasureLengths(system.props.measures, mLengths);
+
+	// Get the total num of measures the system spans, even if it's only partial measures.
+	const numMeasures = (_.last(timeContexts).time.measure - _.first(timeContexts).time.measure) + 1;
+	const measureLengths = addDefaultMeasureLengths(numMeasures, calculateMeasureLengths(timeLengths));
 
 	// get the minimum length of the line
 	const minLineLength = _.sum(measureLengths) + signatureLength;

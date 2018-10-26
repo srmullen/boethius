@@ -2,7 +2,7 @@ import {expect} from "chai";
 import _ from "lodash";
 
 import {
-    getBeat, getTime, getTimeFromSignatures, getMeasureNumber, getMeasureByTime,
+    addTimes, getBeat, getTime, getTimeFromSignatures, getMeasureNumber, getMeasureByTime,
     calculateDuration, calculateTupletDuration, equals,
     gt, lt, gte, lte, absoluteToRelativeDuration, iterateByTime
 } from "../src/utils/timeUtils";
@@ -92,10 +92,6 @@ describe("timeUtils", () => {
             expect(getTime(measures, {measure: 4})).to.be.ok;
         });
 
-        it("should always return beat as zero and time as the startTime of the measure", () => {
-
-        });
-
         it("not report these as the same time", () => {
             const timeSig = scored.timeSig({value: "4/4", measure: 0});
             const measures = createMeasures(12, [timeSig]);
@@ -104,6 +100,73 @@ describe("timeUtils", () => {
 
             expect(getTime(measures, clef)).not.to.eql(getTime(measures, note));
         });
+
+        it('should handle time as a number rather than object', () => {
+          const timeSig = scored.timeSig({value: "4/4", measure: 0});
+          const measures = createMeasures(12, [timeSig]);
+          // const clef = scored.clef({value: "bass", measure: 8, beat: 2});
+          const time = 8;
+          const note = scored.note({value: 2, time: 8});
+
+          expect(getTime(measures, time)).to.eql(getTime(measures, note));
+        });
+
+        it('should increment the measure when the number of beats is greater than a measure', () => {
+          const timeSig = scored.timeSig({value: "4/4", measure: 0});
+          const measures = createMeasures(4, [timeSig]);
+          expect(getTime(measures, {measure: 0, beat: 5})).to.eql({time: 1.25, measure: 1, beat: 1});
+          expect(getTime(measures, {measure: 1, beat: 5})).to.eql({time: 2.25, measure: 2, beat: 1});
+          expect(getTime(measures, {measure: 2, beat: 8})).to.eql({time: 4, measure: 4, beat: 0});
+        });
+    });
+
+    describe('addTimes', () => {
+      it('should add when both times are numbers', () => {
+        const timeSig = scored.timeSig({value: "4/4", measure: 0});
+        const measures = createMeasures(12, [timeSig]);
+        expect(addTimes(measures, 1, 2)).to.eql({time: 3, measure: 3, beat: 0});
+        expect(addTimes(measures, 0.25, 2)).to.eql({time: 2.25, measure: 2, beat: 1});
+        expect(addTimes(measures, 3.75, 2.50)).to.eql({time: 6.25, measure: 6, beat: 1});
+      });
+
+      it('should use the time property when on an object', () => {
+        const fourfour = scored.timeSig({value: "4/4", measure: 0});
+        const threefour = scored.timeSig({value: "3/4", measure: 2});
+        const measures = createMeasures(12, [fourfour, threefour]);
+        expect(addTimes(measures, {time: 1}, 1)).to.eql({time: 2, measure: 2, beat: 0});
+        expect(addTimes(measures, 2, {time: 1})).to.eql({time: 3, measure: 3, beat: 1});
+        expect(addTimes(measures, {time: 3}, {time: 2})).to.eql({time: 5, measure: 6, beat: 0});
+      });
+
+      it('should add time to measure/beat object', () => {
+        const fourfour = scored.timeSig({value: "4/4", measure: 0});
+        const threefour = scored.timeSig({value: "3/4", measure: 1});
+        const measures = createMeasures(12, [fourfour, threefour]);
+        expect(addTimes(measures, 1, {measure: 2})).to.eql({time: 2.50, measure: 3, beat: 0});
+        expect(addTimes(measures, {measure: 2}, 1)).to.eql({time: 2.75, measure: 3, beat: 1});
+      });
+
+      it('should add when objects with only measure and beat are provided', () => {
+        const timeSig = scored.timeSig({value: "3/4", measure: 0});
+        const measures = createMeasures(12, [timeSig]);
+        expect(addTimes(measures, {measure: 1}, {measure: 2})).to.eql({time: 2.25, measure: 3, beat: 0});
+      });
+
+      it('should make sure the second time is added to the first', () => {
+        // Order matters because measures/beats can be different values depending
+        // on where the counting starts from.
+        const fourfour = scored.timeSig({value: "4/4", measure: 0});
+        const threefour = scored.timeSig({value: "3/4", measure: 1});
+        const measures = createMeasures(12, [fourfour, threefour]);
+        expect(addTimes(measures, 1, {measure: 1})).to.eql({time: 1.75, measure: 2, beat: 0});
+      });
+
+      it('should add beats correctly', () => {
+        const timeSig = scored.timeSig({value: "4/4", measure: 0});
+        const measures = createMeasures(12, [timeSig]);
+        expect(addTimes(measures, {measure: 0, beat: 3}, {measure: 0, beat: 3})).to.eql({time: 1.5, measure: 1, beat: 2});
+        expect(addTimes(measures, {measure: 1}, {measure: 0, beat: 1})).to.eql({time: 1.25, measure: 1, beat: 1});
+      });
     });
 
     describe('getTimeFromSignatures', () => {

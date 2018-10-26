@@ -71,7 +71,10 @@ export default function testBunchedClefChange (scored) {
     ],
     "systems": [
       {
-        "measures": 2,
+        startsAt: 0,
+        duration: {
+          measure: 2
+        },
         "lineSpacing": [
           0
         ],

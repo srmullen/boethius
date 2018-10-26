@@ -2,9 +2,9 @@ import _ from "lodash";
 import F from "fraction.js";
 import {isNote, isChord, isRest, isTimeSignature, isRepeat} from "../types";
 
-/*
+/**
  * @param signature - TimeSignaure or time signature value or tuplet represented as a String. ex. TimeSig({value: "4/4"}) or "4/4", "h"
- * @return Number[]
+ * @return {Number[]}
  */
 function parseSignature (signature) {
 	const sig = isTimeSignature(signature) ? signature.value : signature;
@@ -17,19 +17,19 @@ function parseSignature (signature) {
 	}
 }
 
-/*
- * @return {number} - the measure number as an integer
+/**
+ * @return {Number} - the measure number as an integer
  */
 function getMeasure (time=0, [beats, value]) {
 	const measureDuration = beats * (1/value);
 	return Math.floor(time/measureDuration);
 }
 
-/*
- * @param time - number
- * @param timesig - string or arrary representation of timeSig value.
- * @param offset - number representing point in time from which to calculate the beat from.
- * @return {number} - float representation
+/**
+ * @param {Number} time - number
+ * @param {String | []} timesig - string or arrary representation of timeSig value.
+ * @param {Number} offset - number representing point in time from which to calculate the beat from.
+ * @return {Number} - float representation
  */
 function getBeat (time, timeSig, offset=0) {
 	let [beats, value] = _.isArray(timeSig) ? timeSig : parseSignature(timeSig),
@@ -39,48 +39,90 @@ function getBeat (time, timeSig, offset=0) {
 	return beatTime/(1/value);
 }
 
-/*
- * @param measures Measure[]
- * @param item - Any object with a time or measure property.
- * @return time object - object with time, measure, and beat.
+/**
+ * @param {Measure[]} measures
+ * @param {Number | {?time, ?measure}} item - Any object with a time or measure property.
+ * @return {{time, measure, beat}} - object with time, measure, and beat.
  */
 function getTime (measures, item) {
-	let beat,
-		measure = item.measure,
-		time = item.time;
+	// Make sure item is an object;
+	item = _.isNumber(item) ? {time: item} : item;
 
-	if (!_.isNumber(item.measure)) {
-		measure = getMeasureNumber(measures, item.time);
+	if (_.isNumber(item.time)) {
+		const measure = getMeasureNumber(measures, item.time);
+		const measureView = measures.find(view => view.value === measure);
+		const beat = item.beat || getBeat(item.time, measureView.timeSig, measureView.startsAt);
+		return {time: item.time, measure, beat};
+	} else {
+
+		const ret = {
+			beat: item.beat,
+			measure: item.measure,
+			time: item.time
+		};
+
+		if (!_.isNumber(item.measure)) {
+			ret.measure = getMeasureNumber(measures, item.time);
+		}
+
+		const lastMeasure = _.last(measures);
+		if (ret.measure > lastMeasure.value) {
+			ret.time = getMeasureDuration(lastMeasure) + lastMeasure.startsAt;
+		}
+
+		const measureView = measures.find(view => view.value === ret.measure);
+
+		// time signatures are always at the beginning of a measure.
+		if (isTimeSignature(item)) {
+			ret.time = measureView.startsAt;
+			ret.beat = 0;
+		}
+
+		if (!_.isNumber(item.time) && !_.isNumber(ret.time)) {
+			const baseTime = measureView.startsAt;
+			if (_.isNumber(item.beat)) {
+				ret.time = baseTime + getBeatTime(measureView.timeSig, item.beat);
+			} else {
+				ret.time = baseTime;
+			}
+		}
+
+		if (measureView) {
+			const timeSig = measureView.timeSig;
+			const [beats, value] = _.isArray(timeSig) ? timeSig : parseSignature(timeSig);
+			// If beat is greater than the number of beats in a measure then they need to be adjusted.
+			if (_.isNumber(ret.beat) && ret.beat >= beats) {
+				const extraMeasures = Math.floor(ret.beat / beats);
+				ret.measure = ret.measure + extraMeasures;
+				ret.beat = ret.beat % beats;
+			} else {
+				ret.beat = item.beat || getBeat(ret.time, timeSig, measureView.startsAt);
+			}
+		}
+
+		return ret;
 	}
+}
 
-	const lastMeasure = _.last(measures);
-	if (measure > lastMeasure.value) {
-		time = getMeasureDuration(lastMeasure) + lastMeasure.startsAt;
-	}
-
-	const measureView = measures.find(view => view.value === measure);
-
-	// time signatures are always at the beginning of a measure.
-	if (isTimeSignature(item)) {
-		time = measureView.startsAt;
-		beat = 0;
-	}
-
-	if (!_.isNumber(item.time) && !_.isNumber(time)) {
-		// const baseTime = getTimeNumber(measure, measureView.timeSig);
-		const baseTime = measureView.startsAt;
-		if (_.isNumber(item.beat)) {
-			time = baseTime + getBeatTime(measureView.timeSig, item.beat);
+/**
+ * @param {Measure[]} measures
+ * @param {Number | {time | measure, ?beat}} t1 - Any object with a time or measure property.
+ * @param {Number | {time | measure, ?beat}} t2 - Any object with a time or measure property.
+ * @return {{time, measure, beat}} - object with time, measure, and beat.
+ */
+function addTimes (measures, t1, t2) {
+	const time1 = getTime(measures, t1);
+	if (_.isNumber(t2)) {
+		return getTime(measures, time1.time + t2);
+	} else {
+		if (_.isNumber(t2.time)) {
+			return getTime(measures, time1.time + t2.time);
 		} else {
-			time = baseTime;
+			const measure = time1.measure + (t2.measure || 0);
+			const beat = time1.beat + (t2.beat || 0);
+			return getTime(measures, {measure, beat});
 		}
 	}
-
-	if (measureView) {
-		beat = item.beat || getBeat(time, measureView.timeSig, measureView.startsAt);
-	}
-
-	return {time, measure, beat};
 }
 
 /*
@@ -447,6 +489,7 @@ export function iterateByTime (timeFn, fn, times) {
 }
 
 export {
+	addTimes,
 	getTime,
 	getTimeFromSignatures,
 	getMeasure,

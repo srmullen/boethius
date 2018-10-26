@@ -2,6 +2,7 @@ import paper from "paper";
 import {isEqual} from "lodash";
 import {drawTimeSig} from "../engraver";
 import constants from "../constants";
+import { parseSignature } from '../utils/timeUtils';
 
 const TYPE = constants.type.timeSig;
 
@@ -49,11 +50,23 @@ TimeSignature.prototype.render = function () {
 
 TimeSignature.prototype.equals = function (timeSig) {
 	return (
-        this.type === timeSig.type &&
+    this.type === timeSig.type &&
 		this.value === timeSig.value &&
-        this.measure === timeSig.measure &&
-        isEqual(this.beatStructure, timeSig.beatStructure)
+    this.measure === timeSig.measure &&
+    isEqual(this.beatStructure, timeSig.beatStructure)
 	);
 };
+
+/**
+ * Calculates the duration of measures and beats with the time signature.
+ * @param {?RelativeTime} - Object with measure/beat properties.
+ * @return {Time}
+ */
+TimeSignature.prototype.getDurationTime = function (dur) {
+	const [beats, value] = parseSignature(this);
+	const measures = dur.measure || 0;
+	const totalBeats = (dur.beat || 0) + (measures * beats);
+	return totalBeats * (1/value);
+}
 
 export default TimeSignature;

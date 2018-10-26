@@ -186,13 +186,5 @@ describe("Note", () => {
             expect(n1.equals(n2)).to.be.false;
             expect(n1.equals(n3)).to.be.true;
         });
-
-        it("should compare portato", () => {
-            const n1 = new Note({portato: true});
-            const n2 = new Note({});
-            const n3 = new Note({portato: true});
-            expect(n1.equals(n2)).to.be.false;
-            expect(n1.equals(n3)).to.be.true;
-        });
     });
 });

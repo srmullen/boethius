@@ -65,8 +65,14 @@ Score.beforeRender = function ({score, music, measures}, options={}) {
 
     if (systemsToRender.length) {
         // get the start measure for each System.
-        const startMeasures = reductions((acc, system) => acc + system.props.measures, score.systems, 0);
-        const startTimes = startMeasures.map((measure) => getTime(measures, {measure}));
+        // const startMeasures = reductions((acc, system) => acc + system.props.measures, score.systems, 0);
+        // const startTimes = startMeasures.map((measure) => getTime(measures, {measure}));
+        const startTimes = score.systems.map(s => {
+          return getTime(measures, s.props.startsAt);
+        });
+
+        const endTime = _.last(systemsToRender).system.getEndTime(measures);
+        startTimes.push(endTime);
 
         // [startTime inclusive, endTime exclusive]
         const timeFrame = [startTimes[_.first(systemsToRender).index], startTimes[_.last(systemsToRender).index + 1]];
@@ -82,7 +88,7 @@ Score.beforeRender = function ({score, music, measures}, options={}) {
         }));
 
         return {
-            startMeasures,
+            // startMeasures,
             startTimes,
             voiceTimeFrames,
             systemsToRender,
@@ -108,7 +114,8 @@ Score.render = function (
         const timeFrame = [startTimes[_.first(systemsToRender).index], startTimes[_.last(systemsToRender).index + 1]];
 
         const timeContexts = TimeContext.createTimeContexts(score.timeSigs, score.lines, voices, chordSymbols);
-        const systemTimeContexts = partitionBySystem(timeContexts, startMeasures);
+        // const systemTimeContexts = partitionBySystem(timeContexts, startMeasures);
+        const systemTimeContexts = partitionBySystem(timeContexts, startTimes);
 
         // systemOffset is used to help calculate the vertical placement of systems.
         let systemOffset = 0;
@@ -126,7 +133,7 @@ Score.render = function (
         const systemGroups = Score.renderSystems({
             score,
             systemsToRender,
-            startMeasures,
+            // startMeasures,
             measures
         });
 
@@ -149,26 +156,24 @@ Score.render = function (
     return {score};
 };
 
-Score.renderSystems = function ({score, systemsToRender, startMeasures, measures, pages, systemOffset}) {
+Score.renderSystems = function ({score, systemsToRender, measures, pages, systemOffset}) {
     return _.map(systemsToRender, ({system, index}, i) => {
       // FIXME: Systems are no longer required to start at the beginning of a specific measure.
-        const endMeasure = startMeasures[index] + system.props.measures;
-        const systemMeasures = _.slice(measures, startMeasures[index], endMeasure);
+        // const endMeasure = startMeasures[index] + system.props.measures;
+        // const systemMeasures = _.slice(measures, startMeasures[index], endMeasure);
 
         const systemLength = system.props.length || score.length || 1000;
 
         const systemGroup = System.render({
             system,
-            measures,
             lines: score.lines,
-            systemMeasures: systemMeasures,
             length: systemLength
         });
 
         System.renderSystemMarkings({
           system,
           measures,
-          systemMeasures,
+          // systemMeasures,
           lines: score.lines
         });
 
@@ -177,7 +182,7 @@ Score.renderSystems = function ({score, systemsToRender, startMeasures, measures
 }
 
 Score.renderTimeContexts = function (
-    {score, systemsToRender, measures, startMeasures, systemTimeContexts, voices}
+    {score, systemsToRender, measures, systemTimeContexts, voices}
 ) {
     // Needs to do a reduction over the timeContexts.
     // Functionallity hooks.
@@ -186,8 +191,8 @@ Score.renderTimeContexts = function (
     // ...
 
     return _.map(systemsToRender, ({system, index}, i) => {
-        const endMeasure = startMeasures[index] + system.props.measures;
-        const systemMeasures = _.slice(measures, startMeasures[index], endMeasure);
+        // const endMeasure = startMeasures[index] + system.props.measures;
+        // const systemMeasures = _.slice(measures, startMeasures[index], endMeasure);
         const timeContexts = systemTimeContexts[index];
 
         const systemLength = system.props.length || score.length || 1000;
@@ -196,8 +201,9 @@ Score.renderTimeContexts = function (
             system,
             timeContexts,
             voices,
+            measures,
             lines: score.lines,
-            measures: systemMeasures,
+            // measures: systemMeasures,
             length: systemLength
         });
     });
@@ -300,38 +306,71 @@ function isVoiceUsed (voice, lines) {
     return _.some(lines, line => _.some(line.voices, linesVoice => linesVoice === voice.name));
 }
 
-/*
- * @return [TimeContext[]]
+/**
+ * @return {[TimeContext[]]}
  */
-export function partitionBySystem (timeContexts, startMeasures) {
+// FIXME: startMeasures should instead be startTimes.
+// export function partitionBySystem (timeContexts, startMeasures) {
+//     // split staffTimes and measures
+//     let systemIdx = 0;
+//
+//   const systemTimeContexts =  _.reduce(timeContexts, (acc, timeContext) => {
+//     const measure = timeContext.time.measure;
+//     const shouldPartition = measure >= startMeasures[systemIdx + 1];
+// 		if (shouldPartition) {
+//       systemIdx++;
+//       while (measure >= startMeasures[systemIdx + 1]) {
+//         acc.push([]);
+//         systemIdx++;
+//       }
+// 			let partition = [timeContext];
+// 			acc.push(partition);
+// 		} else {
+//       if (!acc[acc.length-1]) {
+//         acc.push([timeContext]);
+//       } else {
+//         acc[acc.length-1].push(timeContext);
+//       }
+// 		}
+// 		return acc;
+// 	}, []);
+//
+//   // add empty contexts for any remaining systemIdxs'
+//   _.each(_.drop(startMeasures, systemIdx + 2), () => systemTimeContexts.push([]));
+//
+//   return systemTimeContexts;
+// }
+
+export function partitionBySystem (timeContexts, startTimes) {
     // split staffTimes and measures
     let systemIdx = 0;
 
-    const systemTimeContexts =  _.reduce(timeContexts, (acc, timeContext) => {
-        const measure = timeContext.time.measure;
-        const shouldPartition = measure >= startMeasures[systemIdx + 1];
+  const systemTimeContexts =  _.reduce(timeContexts, (acc, timeContext) => {
+    const time = timeContext.time.time;
+    // const shouldPartition = measure >= startMeasures[systemIdx + 1];
+    const shouldPartition = time >= startTimes[systemIdx + 1].time;
 		if (shouldPartition) {
-            systemIdx++;
-            while (measure >= startMeasures[systemIdx + 1]) {
-                acc.push([]);
-                systemIdx++;
-            }
+      systemIdx++;
+      while (time >= startTimes[systemIdx + 1].time) {
+        acc.push([]);
+        systemIdx++;
+      }
 			let partition = [timeContext];
 			acc.push(partition);
 		} else {
-            if (!acc[acc.length-1]) {
-                acc.push([timeContext]);
-            } else {
-                acc[acc.length-1].push(timeContext);
-            }
+      if (!acc[acc.length-1]) {
+        acc.push([timeContext]);
+      } else {
+        acc[acc.length-1].push(timeContext);
+      }
 		}
 		return acc;
 	}, []);
 
-    // add empty contexts for any remaining systemIdxs'
-    _.each(_.drop(startMeasures, systemIdx + 2), () => systemTimeContexts.push([]));
+  // add empty contexts for any remaining systemIdxs'
+  _.each(_.drop(startTimes, systemIdx + 2), () => systemTimeContexts.push([]));
 
-    return systemTimeContexts;
+  return systemTimeContexts;
 }
 
 function getLineByVoice (voice, lines) {

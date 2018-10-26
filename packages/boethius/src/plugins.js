@@ -179,7 +179,7 @@ function expandMeasures (sparse=[], score, repeats) {
 	if (score.measureCount) {
 		return createMeasures(score.measureCount, [...sparse, ...score.timeSigs, ...repeats]);
 	} else {
-		const numMeasures = _.sumBy(score.systems, system => system.props.measures);
+		const numMeasures = _.sumBy(score.systems, system => system.props.duration.measure);
 	  return createMeasures(numMeasures, [...sparse, ...score.timeSigs, ...repeats]);
 	}
 }

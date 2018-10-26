@@ -104,7 +104,10 @@ export function createLayout () {
         ],
         "systems": [
           {
-            "measures": 3,
+            startsAt: 0,
+            duration: {
+              "measure": 3,
+            },
             "lineSpacing": [
               0
             ],

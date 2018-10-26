@@ -29,23 +29,21 @@ function getStaffItems (lines, voices) {
  * @return length[]
  */
 function calculateMeasureLengths (timeLengths) {
-    const noteHeadWidth = Scored.config.note.head.width;
-    return _.map(partitionBy(timeLengths, ({time}) => time.measure), (measureTimes) => {
-		const [markingsLength, durationedLength] = _.reduce(measureTimes, (acc, {length}) => {
-			// sum the marking and duration item lengths
-			return [acc[0] + length[0], acc[1] + length[1]];
-		}, [0, 0]);
-
-        const measureLength = markingsLength + (durationedLength ? durationedLength : Scored.config.measure.length) + noteHeadWidth;
-
-        return measureLength;
+  const noteHeadWidth = Scored.config.note.head.width;
+  return _.map(partitionBy(timeLengths, ({time}) => time.measure), (measureTimes) => {
+	const [markingsLength, durationedLength] = _.reduce(measureTimes, (acc, {length}) => {
+		// sum the marking and duration item lengths
+		return [acc[0] + length[0], acc[1] + length[1]];
+	}, [0, 0]);
+    const measureLength = markingsLength + (durationedLength ? durationedLength : Scored.config.measure.length) + noteHeadWidth;
+    return measureLength;
 	});
 }
 
-/*
- * @param numMeasures - The number of measure lengths to return.
- * @param measureLengths Number[] - The measure lengths that have been calculated already.
- * @return Number[]
+/**
+ * @param {Number} numMeasures - The number of measure lengths to return.
+ * @param {Number[]} measureLengths Number[] - The measure lengths that have been calculated already.
+ * @return {Number[]}
  */
 function addDefaultMeasureLengths (numMeasures, measureLengths) {
     const defaultMeasureLengths = [];
