@@ -284,7 +284,8 @@ function calculateCursor (item) {
 	} else if (item.type === constants.type.measure) {
 		// const leftBarline = item.barlines[0];
 		// cursor = leftBarline.position.x + noteHeadWidth;
-		cursor = item.startPos + noteHeadWidth;
+		// cursor = item.startPos + noteHeadWidth;
+		cursor = item.endPos + noteHeadWidth;
 	} else {
 		cursor = item.group.bounds.width + (noteHeadWidth * getStaffSpace(shortestDuration, item));
 	}

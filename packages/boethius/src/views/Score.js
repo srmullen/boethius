@@ -51,7 +51,9 @@ Score.beforeRender = function ({score, music, measures}, options={}) {
     const pages = options.pages || [0];
 
     {
-        const times = measures.map(measure => measure.startsAt);
+        const measureTimes = measures.map(measure => measure.startsAt);
+        const systemTimes = score.systems.map(system => system.getEndTime(measures).time);
+        const times = _.uniq([...measureTimes, ...systemTimes]).sort();
         voices.map(voice => {
             voice.breakDurations(times);
         });
@@ -306,52 +308,16 @@ function isVoiceUsed (voice, lines) {
     return _.some(lines, line => _.some(line.voices, linesVoice => linesVoice === voice.name));
 }
 
-/**
- * @return {[TimeContext[]]}
- */
-// FIXME: startMeasures should instead be startTimes.
-// export function partitionBySystem (timeContexts, startMeasures) {
-//     // split staffTimes and measures
-//     let systemIdx = 0;
-//
-//   const systemTimeContexts =  _.reduce(timeContexts, (acc, timeContext) => {
-//     const measure = timeContext.time.measure;
-//     const shouldPartition = measure >= startMeasures[systemIdx + 1];
-// 		if (shouldPartition) {
-//       systemIdx++;
-//       while (measure >= startMeasures[systemIdx + 1]) {
-//         acc.push([]);
-//         systemIdx++;
-//       }
-// 			let partition = [timeContext];
-// 			acc.push(partition);
-// 		} else {
-//       if (!acc[acc.length-1]) {
-//         acc.push([timeContext]);
-//       } else {
-//         acc[acc.length-1].push(timeContext);
-//       }
-// 		}
-// 		return acc;
-// 	}, []);
-//
-//   // add empty contexts for any remaining systemIdxs'
-//   _.each(_.drop(startMeasures, systemIdx + 2), () => systemTimeContexts.push([]));
-//
-//   return systemTimeContexts;
-// }
-
 export function partitionBySystem (timeContexts, startTimes) {
-    // split staffTimes and measures
-    let systemIdx = 0;
+  // split staffTimes and measures
+  let systemIdx = 0;
 
   const systemTimeContexts =  _.reduce(timeContexts, (acc, timeContext) => {
     const time = timeContext.time.time;
-    // const shouldPartition = measure >= startMeasures[systemIdx + 1];
-    const shouldPartition = time >= startTimes[systemIdx + 1].time;
+    const shouldPartition = (startTimes[systemIdx + 1] && time >= startTimes[systemIdx + 1].time);
 		if (shouldPartition) {
       systemIdx++;
-      while (time >= startTimes[systemIdx + 1].time) {
+      while (startTimes[systemIdx + 1] && time >= startTimes[systemIdx + 1].time) {
         acc.push([]);
         systemIdx++;
       }

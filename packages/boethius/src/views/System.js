@@ -5,7 +5,11 @@ import {isMarking, isPitched, isNote, isClef, isKey, isTimeSignature} from "../t
 import {drawSystemBar} from "../engraver";
 import constants from "../constants";
 import {getLineItems, b, positionMarkings} from "../utils/line";
-import {getStaffItems, calculateMeasureLengths, addDefaultMeasureLengths} from "../utils/system";
+import {
+	calculateMeasureLengths,
+	calculateSystemLength,
+	addDefaultMeasureLengths
+} from "../utils/system";
 import {map, mapDeep, clone} from "../utils/common";
 import * as placement from "../utils/placement";
 import {getMeasureNumber, getTime, addTimes} from "../utils/timeUtils";
@@ -49,6 +53,15 @@ function System (props = {}, children = []) {
 }
 
 /**
+ * Get the time as a Time object rather than just a number.
+ * @param {Measure[]} - Array of measure for calculating the time.
+ * @return {Time}
+ */
+System.prototype.getStartTime = function (measures) {
+	return getTime(measures, this.props.startsAt);
+}
+
+/**
  * @param {Measure[]} - Array of measure for calculating the time.
  * @return {Time}
  */
@@ -58,6 +71,10 @@ System.prototype.getEndTime = function (measures) {
 	} else {
 		return addTimes(measures, this.props.startsAt, this.props.duration);
 	}
+}
+
+System.prototype.getDuration = function (measures) {
+	return this.getEndTime(measures).time - this.getStartTime(measures).time;
 }
 
 /**
@@ -88,13 +105,8 @@ System.render = function ({system, lines, length}) {
 System.renderSystemMarkings = function ({system, measures, lines}) {
 	const lineHeights = system.getLineHeights(lines);
 
-	// const systemStartTime = _.isNumber(system.props.startsAt)
-	// 	? getTime(measures, {time: system.props.startsAt})
-	// 	: getTime(measures, {time: systemMeasures[0].startsAt});
-	const systemStartTime = getTime(measures, {time: system.props.startsAt});
+	const systemStartTime = system.getStartTime(measures);
 
-
-	// system.signatures = System.createSystemSignatures({measures, startsAt, lines});
 	system.signatures = System.createSystemSignatures(systemStartTime, lines);
 	const systemSignatureGroups = system.signatures.map(({clef, key, timeSig}, i) => {
 		const context = lines[i].contextAt(systemStartTime);
@@ -115,8 +127,6 @@ System.renderSystemMarkings = function ({system, measures, lines}) {
 	system.startCursors = placeSystemSignatures(system.signatures, lineHeights);
 }
 
-// FIXME: Measures was origianally just the measure on this system. Now it is all measures.
-// Will affect measure length calculations.
 System.renderTimeContexts = function ({system, lines, measures, voices, timeContexts, length}) {
 
 	const lineHeights = system.getLineHeights(lines);
@@ -137,12 +147,8 @@ System.renderTimeContexts = function ({system, lines, measures, voices, timeCont
 
 	const timeLengths = calculateTimeLengths(timeContexts, shortestDuration);
 
-	// Add signatureLength to the first measure.
-	// const mLengths = calculateMeasureLengths(timeLengths);
-	// const measureLengths = addDefaultMeasureLengths(system.props.measures, mLengths);
-
 	// Get the total num of measures the system spans, even if it's only partial measures.
-	const numMeasures = (_.last(timeContexts).time.measure - _.first(timeContexts).time.measure) + 1;
+	const numMeasures = systemMeasureCount(system, measures);
 	const measureLengths = addDefaultMeasureLengths(numMeasures, calculateMeasureLengths(timeLengths));
 
 	// get the minimum length of the line
@@ -151,17 +157,19 @@ System.renderTimeContexts = function ({system, lines, measures, voices, timeCont
 	const totalMarkingLength = _.sumBy(timeLengths, ({length}) => length[0]) + signatureLength;
 
 	const measureScale = (length - signatureLength) / (minLineLength - signatureLength);
-	// console.log(measureScale);
-
-	// noteScale = (length - totalMarkingLength) / (minLineLength - totalMarkingLength);
+	// const systemDuration = system.getDuration(measures);
+	// const baseSystemLength = calculateSystemLength(timeLengths);
+	// const scale = (length - signatureLength) / (systemDuration / shortestDuration);
 
 	const scaledMeasureLengths = _.map(measureLengths, measureLength => measureLength * measureScale);
 
+	const measuresToRender = getMeasuresToRender(system, measures);
+
 	const measureGroups = system.renderMeasures(
-		measures,
+		measuresToRender,
 		scaledMeasureLengths,
 		system.lineGroups,
-		signatureLength // + system.props.indentation
+		signatureLength
 	);
 
 	system.group.addChildren(measureGroups);
@@ -179,15 +187,14 @@ System.renderTimeContexts = function ({system, lines, measures, voices, timeCont
 		return placement.scaleCursor(measureScale, cursor, maxMarkingSize + minDurationSize + cursor);
 	};
 
-	// const lineCenters = _.map(lines, line => b(line.group));
 	const lineCenters = system.lineGroups.map(b);
-	const cursors = placeTimes(timeContexts, measures, measureLengths, cursorFn, system.startCursors);
+	const cursors = placeTimes(timeContexts, measures, cursorFn, system.startCursors);
 	// add the items to the system group
 	system.group.addChildren(timeContextGroups);
 
 	// Render stems, beams, tuplets, articulations, and ledger lines.
 	////////////////////////
-	// Render Decorations // FIXME: Should be handled at the Score level?
+	// Render Decorations // FIXME: Should be handled at the Plugin level?
 	////////////////////////
 	if (timeContexts) {
 		const groupings = System.createGroups({timeContexts, lines, voices, measures});
@@ -204,10 +211,49 @@ System.renderTimeContexts = function ({system, lines, measures, voices, timeCont
 	}
 }
 
-// System.createSystemSignatures = function ({measures, lines, startsAt}) {
-// 	const startTime = getTime(measures, {time: measures[0].startsAt});
-// 	return getStartContexts(lines, startTime);
-// }
+/**
+ * @param {System} system - The system on which measure bars are to be rendered.
+ * @param {Measure[]} measures - All measure in the score.
+ */
+function getMeasuresToRender (system, measures) {
+	const startsAt = system.getStartTime(measures);
+	const endsAt = system.getEndTime(measures);
+	const startIndex = measures.findIndex(measure => {
+		return (
+			startsAt.time >= measure.startsAt &&
+			startsAt.time < measure.getEndTime()
+		);
+	});
+	let endIndex = -1;
+	for (let i = 0; i < measures.length; i++) {
+		const endTime = measures[i].getEndTime();
+		if (endTime === endsAt.time) {
+			endIndex = i;
+			break;
+		}
+		if (endTime > endsAt.time) {
+			endIndex = i - 1;
+			break;
+		}
+	}
+	return measures.slice(startIndex, endIndex + 1);
+}
+
+/**
+ * Return the number of measures rendered on the system, Even if they aren't
+ * complete measures.
+ * @param {System} system
+ * @param {Measure[]} measures
+ * @return {Number}
+ */
+function systemMeasureCount (system, measures) {
+	const endTime = system.getEndTime(measures);
+	if (endTime.beat === 0) {
+		return (endTime.measure - system.getStartTime(measures).measure);
+	} else {
+		return (endTime.measure - system.getStartTime(measures).measure) + 1;
+	}
+}
 
 System.createSystemSignatures = function (startTime, lines) {
 	return getStartContexts(lines, startTime);
@@ -330,14 +376,15 @@ function placeSystemSignatures (systemSignatures, lineHeights) {
 	});
 }
 
-function placeTimes (timeContexts, measures, measureLengths, cursorFn, startCursors) {
+function placeTimes (timeContexts, measures, cursorFn, startCursors) {
 	return _.reduce(timeContexts, (cursors, timeContext, i) => {
 		const previousTime = _.last(cursors).time || {measure: 0};
 		const currentTime = timeContext.time;
 		let cursor = _.last(cursors) ? _.last(cursors).cursor : Scored.config.note.head.width;
 		// update cursor if it's a new measure
 		if (currentTime.measure !== previousTime.measure) {
-			const measure = _.find(measures, measure => measure.value === currentTime.measure);
+			// const measure = _.find(measures, measure => measure.value === currentTime.measure);
+			const measure = _.find(measures, measure => measure.value === previousTime.measure);
 			cursor = placement.calculateCursor(measure);
 		}
 

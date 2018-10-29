@@ -5,7 +5,7 @@ import {drawBarline} from "../engraver";
 import _ from "lodash";
 
 import {isMeasure, isTimeSignature, isRepeat} from "../types";
-import {getMeasureDuration} from "../utils/timeUtils";
+import { getMeasureDuration } from "../utils/timeUtils";
 
 const TYPE = constants.type.measure;
 
@@ -52,8 +52,9 @@ Measure.prototype.render = function (lines, leftBarline, startPos, width) {
 
 	// Used for calculating the cursor.
 	this.startPos = startPos;
+	this.endPos = startPos + width;
 
-	const rightBarline = drawBarline(lines, startPos + width, barType);
+	const rightBarline = drawBarline(lines, this.endPos, barType);
 
 	group.addChildren([leftBarline, rightBarline]);
 
@@ -62,16 +63,12 @@ Measure.prototype.render = function (lines, leftBarline, startPos, width) {
 	return group;
 };
 
-Measure.prototype.drawGroupBounds = function (previousBarlinePosition, barline) {
-	const rectangle = new paper.Path.Rectangle({
-		name: "bounds",
-		from: new paper.Point(previousBarlinePosition, barline.bounds.top),
-		to: barline.bounds.bottomRight
-	});
-	rectangle.fillColor = "#FFF";
-	rectangle.opacity = 0.0;
-	return rectangle;
-};
+/**
+ * @return {Number} - The time the measure ends.
+ */
+Measure.prototype.getEndTime = function () {
+	return this.startsAt + getMeasureDuration(this);
+}
 
 /**
  * @param {Number} numMeasures - the number of measures to create.

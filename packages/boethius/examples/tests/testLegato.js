@@ -37,10 +37,10 @@ export default function testLegato (scored) {
   var fourfour = scored.timeSig({value: "4/4", measure: 0});
 
   // create staves
-  var system1 = scored.system({measures: 3, page: 0, length: 1000});
-  var system2 = scored.system({measures: 3, page: 0});
-  var system3 = scored.system({measures: 3, page: 0});
-  var system4 = scored.system({measures: 3, page: 1});
+  var system1 = scored.system({duration: {measure: 3}, startsAt: 0, page: 0, length: 1000});
+  var system2 = scored.system({duration: {measure: 3}, startsAt: 3, page: 0});
+  var system3 = scored.system({duration: {measure: 3}, startsAt: 6, page: 0});
+  var system4 = scored.system({duration: {measure: 3}, startsAt: 9, page: 1});
 
   var page0 = scored.page();
   var page1 = scored.page();

@@ -46,16 +46,18 @@ export default function testMeasureAcrossSystems (scored) {
     "systems": [
       {
         startsAt: 0,
-        // duration: {
-        //   measure: 2
-        // },
+        duration: {
+          measure: 1,
+          beat: 2
+        },
         "lineSpacing": [
           0
         ],
         "length": 1000
       },
       {
-        startsAt: 2,
+        startsAt: 1.5,
+        duration: {measure: 1},
         "lineSpacing": [
           -100
         ],
@@ -64,7 +66,10 @@ export default function testMeasureAcrossSystems (scored) {
       {
         // The last note on the previous system should cross time 2.5 to
         // test breaking the note aross system, similar to measures.
-        startsAt: 4,
+        startsAt: 2.5,
+        duration: {
+          measure: 1
+        },
         "lineSpacing": [
           -200
         ],
@@ -75,8 +80,8 @@ export default function testMeasureAcrossSystems (scored) {
   const music = {
     voices: {
       rh: createVoice([
-        ['r', 8, {anacrusis: true}], ['a4', 8, {anacrusis: true}], ['b4', 4, {anacrusis: true}], 'c5', 'd5', ['c5', 2],
-        ['c5', 2], ['c5', 1]
+        ['r', 8, {anacrusis: true}], ['a4', 8, {anacrusis: true}], ['b4', 4, {anacrusis: true}], 'c5', 'd5', 'b4' ['c5', 2],
+        ['d5', 2], 'f5', ['e5', 1]
       ]),
       lh: createVoice([
         ['e3', 4, {anacrusis: true}], [['d3', 'f3'], 4, {anacrusis: true}], 'c3', 'b2', ['a2', 2]

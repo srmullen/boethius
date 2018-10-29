@@ -31,13 +31,22 @@ function getStaffItems (lines, voices) {
 function calculateMeasureLengths (timeLengths) {
   const noteHeadWidth = Scored.config.note.head.width;
   return _.map(partitionBy(timeLengths, ({time}) => time.measure), (measureTimes) => {
-	const [markingsLength, durationedLength] = _.reduce(measureTimes, (acc, {length}) => {
-		// sum the marking and duration item lengths
-		return [acc[0] + length[0], acc[1] + length[1]];
-	}, [0, 0]);
+  	const [markingsLength, durationedLength] = _.reduce(measureTimes, (acc, {length}) => {
+  		// sum the marking and duration item lengths
+  		return [acc[0] + length[0], acc[1] + length[1]];
+  	}, [0, 0]);
     const measureLength = markingsLength + (durationedLength ? durationedLength : Scored.config.measure.length) + noteHeadWidth;
     return measureLength;
 	});
+}
+
+function calculateSystemLength (timeLengths) {
+  const noteHeadWidth = Scored.config.note.head.width;
+  const [markingsLength, durationedLength] = timeLengths.reduce((acc, {length}) => {
+    return [acc[0] + length[0], acc[1] + length[1]];
+  }, [0, 0]);
+  const length = markingsLength + (durationedLength || 0) + noteHeadWidth;
+  return length;
 }
 
 /**
@@ -65,5 +74,6 @@ function addDefaultMeasureLengths (numMeasures, measureLengths) {
 export {
     getStaffItems,
     calculateMeasureLengths,
+    calculateSystemLength,
     addDefaultMeasureLengths
 };

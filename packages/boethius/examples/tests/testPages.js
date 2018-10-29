@@ -11,25 +11,25 @@ export default function testPages (scored) {
 
     // create voices
     var soprano = scored.voice({name: "treble"}, [
-        n({value:1, pitch: "c4"}), r({value:2, pitch: "d#4"}), n({value:2, pitch: "d#4"}), n({value:1, pitch: "e4"}), n({value:1, pitch: "f4"}),
-    n({value:1, pitch: "g4"}), n({value:1, pitch: "a4"}), n({value:1, pitch: "b4"}), n({value:1, pitch: "c5"}),
-    n({value:1, pitch: "d5"}), n({value:1, pitch: "e5"}), n({value:1, pitch: "f5"}), n({value:1, pitch: "g5"}),
-        r({value:1}), r({value:1}), r({value:1}), r({value:1})
+      n({value:1, pitch: "c4"}), r({value:2, pitch: "d#4"}), n({value:2, pitch: "d#4"}), n({value:1, pitch: "e4"}), n({value:1, pitch: "f4"}),
+      n({value:1, pitch: "g4"}), n({value:1, pitch: "a4"}), n({value:1, pitch: "b4"}), n({value:1, pitch: "c5"}),
+      n({value:1, pitch: "d5"}), n({value:1, pitch: "e5"}), n({value:1, pitch: "f5"}), n({value:1, pitch: "g5"}),
+      r({value:1}), r({value:1}), r({value:1}), r({value:1})
     ]);
     var bass = scored.voice({name: "bass"}, [
-        n({value:1, pitch: "c4"}), n({value:1, pitch: "b3"}), n({value:1, pitch: "a3"}), n({value:1, pitch: "g3"}),
-    n({value:1, pitch: "f3"}), r({value:1, pitch: "e3"}), n({value:1, pitch: "d3"}), n({value:1, pitch: "c3"}),
-    n({value:1, pitch: "b2"}), n({value:1, pitch: "a2"}), n({value:1, pitch: "g2"}), n({value:1, pitch: "f2"}),
-        r({value:1}), r({value:1}), r({value:1}), r({value:1})
+      n({value:1, pitch: "c4"}), n({value:1, pitch: "b3"}), n({value:1, pitch: "a3"}), n({value:1, pitch: "g3"}),
+      n({value:1, pitch: "f3"}), r({value:1, pitch: "e3"}), n({value:1, pitch: "d3"}), n({value:1, pitch: "c3"}),
+      n({value:1, pitch: "b2"}), n({value:1, pitch: "a2"}), n({value:1, pitch: "g2"}), n({value:1, pitch: "f2"}),
+      r({value:1}), r({value:1}), r({value:1}), r({value:1})
     ]);
 
     var fourfour = scored.timeSig({value: "4/4", measure: 0});
 
     // create staves
-    var system1 = scored.system({measures: 4, lineHeights: [0, 200], page: 0});
-    var system2 = scored.system({measures: 4, page: 0});
-    var system3 = scored.system({measures: 4, page: 1});
-    var system4 = scored.system({measures: 4, page: 2});
+    var system1 = scored.system({duration: {measure: 4}, startsAt: 0, lineHeights: [0, 200], page: 0});
+    var system2 = scored.system({duration: {measure: 4}, startsAt: 4, page: 0});
+    var system3 = scored.system({duration: {measure: 4}, startsAt: 8, page: 1});
+    var system4 = scored.system({duration: {measure: 4}, startsAt: 12, page: 2});
 
     var page0 = scored.page();
     var page1 = scored.page();

@@ -66,7 +66,8 @@ export default function testNoteArticulations (scored) {
     ],
     "systems": [
       {
-        "measures": 2,
+        duration: {"measure": 2},
+        startsAt: 0,
         "lineSpacing": [
           0
         ],

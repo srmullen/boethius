@@ -8,7 +8,7 @@ export default function testVoicePastEndOfScore (scored) {
     scored.timeSig({value: "4/4", measure: 0})
   ]);
 
-  var system = scored.system({measures: 2, startMeasure: 0});
+  var system = scored.system({duration: {measure: 2}, startsAt: 0});
 
   var voice = scored.voice({name: "v"}, [
     scored.note({pitch: "a4", value: 1}),
