@@ -14,7 +14,7 @@ import Dynamic from "../src/views/Dynamic";
 import ChordSymbol from "../src/views/ChordSymbol";
 import Score from "../src/views/Score";
 
-import {parse} from "../src/utils/parser";
+import { parse, parseLayout } from "../src/utils/parser";
 
 describe("parser", () => {
     describe("parse", () => {
@@ -71,4 +71,140 @@ describe("parser", () => {
             });
         });
     });
+
+    describe('parseLayout', () => {
+      it('should add startsAt to systems if it doesnt exist', () => {
+        const layout = Object.assign({}, defaultLayout(), {
+          systems: [
+            {
+              duration: {measure: 2}
+            }
+          ]
+        });
+        const v = parseLayout(layout);
+        expect(v.score.systems[0].props).to.be.ok;
+        expect(v.score.systems[0].props.startsAt).to.eql({measure: 0, beat: 0});
+      });
+
+      it('should default the adding system to the type of an initial given startsAt value.', () => {
+        const layout = Object.assign({}, defaultLayout(), {
+          systems: [
+            {
+              duration: {measure: 2, beat: 1}
+            },
+            {
+              duration: {measure: 3}
+            },
+            {
+              duration: {measure: 3}
+            }
+          ]
+        });
+        const v = parseLayout(layout);
+        expect(v.score.systems[1].props.startsAt).to.eql({measure: 2, beat: 1});
+        expect(v.score.systems[2].props.startsAt).to.eql({measure: 5, beat: 1});
+      });
+    });
+
+    it('should use hard time adding if original startsAt is a number', () => {
+      const layout = Object.assign({}, defaultLayout(), {
+        systems: [
+          {
+            startsAt: 0,
+            duration: {time: 2.5}
+          },
+          {
+            duration: {time: 3}
+          },
+          {
+            duration: {time: 3}
+          }
+        ]
+      });
+      const v = parseLayout(layout);
+      expect(v.score.systems[1].props.startsAt).to.eql(2.5);
+      expect(v.score.systems[2].props.startsAt).to.eql(5.5);
+    });
 });
+
+function defaultLayout () {
+  return {
+    "type": "score",
+    score: {},
+    "timeSignatures": [
+      {
+        "value": [4, 4],
+        "measure": 0,
+        "beat": 0
+      }
+    ],
+    "currentPage": 0,
+    "pages": [
+      {
+        "systems": 4,
+        "staffSpacing": []
+      }
+    ],
+    "lines": [
+      {
+        "name": "",
+        "clefs": [
+          {
+            "value": "treble",
+            "measure": 0,
+            "beat": 0
+          }
+        ],
+        "keys": [
+          {
+            "root": "C",
+            "mode": "minor",
+            "measure": 0,
+            "beat": 0
+          }
+        ],
+        "voices": [
+          "rh"
+        ]
+      },
+      {
+        "name": "",
+        "clefs": [
+          {
+            "value": "bass",
+            "measure": 0,
+            "beat": 0
+          },
+          {
+            "value": "treble",
+            "measure": 0,
+            "beat": 3
+          }
+        ],
+        "keys": [
+          {
+            "root": "C",
+            "mode": "minor",
+            "measure": 0,
+            "beat": 0
+          }
+        ],
+        "voices": [
+          "lh"
+        ]
+      }
+    ],
+    "systems": [
+      {
+        startsAt: 0,
+        duration: {
+          measure: 2
+        },
+        "lineSpacing": [
+          0
+        ],
+        "length": 1000
+      }
+    ]
+  };
+}

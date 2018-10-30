@@ -84,24 +84,35 @@ function makeMeasures (measures = []) {
 }
 
 /**
- * @param pages - {List}
- * @param systems - {List}
+ * @param {[{}]} pages
+ * @param {[{}]} systems
  */
 function makeSystems (pages, systems) {
-    let page = 0;
-    let count = 1;
-    return systems.map((s) => {
-        const system = new System(Object.assign({}, s, {lineHeights: s.lineSpacing, page}));
-        if (!pages[page]) {
-            page++;
-        } else if (count === pages[page].systems) {
-            page++;
-            count = 1;
-        } else {
-            count++;
-        }
-        return system;
+  let page = 0;
+  let count = 1;
+  let startsAt = _.isNumber(systems[0].startsAt)
+    ? systems[0].startsAt
+    : {measure: 0, beat: 0};
+  const add = _.isNumber(systems[0].startsAt)
+    ? (t1, t2) => (t1 + t2.time)
+    : (t1, t2) => ({
+      measure: t1.measure + (t2.measure || 0),
+      beat: t1.beat + (t2.beat || 0)
     });
+  return systems.map((s) => {
+    const props = {lineHeights: s.lineSpacing, page, startsAt};
+    const system = new System(Object.assign({}, props, s));
+    startsAt = add(system.props.startsAt, system.props.duration);
+    if (!pages[page]) {
+      page++;
+    } else if (count === pages[page].systems) {
+      page++;
+      count = 1;
+    } else {
+      count++;
+    }
+    return system;
+  });
 }
 
 function makePages (pages) {

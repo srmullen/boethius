@@ -45,7 +45,6 @@ export default function testMeasureAcrossSystems (scored) {
     ],
     "systems": [
       {
-        startsAt: 0,
         duration: {
           measure: 1,
           beat: 2
@@ -56,7 +55,6 @@ export default function testMeasureAcrossSystems (scored) {
         "length": 1000
       },
       {
-        startsAt: 1.5,
         duration: {measure: 1},
         "lineSpacing": [
           -100
@@ -66,7 +64,6 @@ export default function testMeasureAcrossSystems (scored) {
       {
         // The last note on the previous system should cross time 2.5 to
         // test breaking the note aross system, similar to measures.
-        startsAt: 2.5,
         duration: {
           measure: 1
         },
