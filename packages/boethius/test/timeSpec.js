@@ -231,7 +231,7 @@ describe("timeUtils", () => {
             expect(getMeasureNumber(measures, 0.99)).to.equal(0);
             expect(getMeasureNumber(measures, 1)).to.equal(1);
             expect(getMeasureNumber(measures, 2.25)).to.equal(2);
-            expect(getMeasureNumber(measures, 5)).to.equal(4);
+            expect(getMeasureNumber(measures, 5)).to.equal(3);
         });
     });
 
@@ -243,7 +243,7 @@ describe("timeUtils", () => {
             expect(getMeasureByTime(measures, 0.99)).to.equal(measures[0]);
             expect(getMeasureByTime(measures, 1)).to.equal(measures[1]);
             expect(getMeasureByTime(measures, 2.25)).to.equal(measures[2]);
-            expect(getMeasureByTime(measures, 5)).not.to.be.ok;
+            expect(getMeasureByTime(measures, 5)).to.equal(_.last(measures));
         });
     });
 

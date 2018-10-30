@@ -5,7 +5,7 @@ import {drawBarline} from "../engraver";
 import _ from "lodash";
 
 import {isMeasure, isTimeSignature, isRepeat} from "../types";
-import { getMeasureDuration } from "../utils/timeUtils";
+import { getMeasureDuration, getTimeSigDuration } from "../utils/timeUtils";
 
 const TYPE = constants.type.measure;
 
@@ -18,22 +18,40 @@ const REPEATBAR = "repeat";
  * @param startsAt - Time the measure starts at.
  */
 function Measure (
-	{value, timeSig, startsAt=0, barType=DEFAULTBAR, anacrusis=false},
+	{value, timeSig, startsAt=0, endsAt, barType=DEFAULTBAR, anacrusis=false},
 	children=[]
 ) {
 	if (!timeSig) {
 		throw new Error("Time Signature is required when initializing Measure");
+	} else if (timeSig.value === 'FREE' && !_.isNumber(endsAt)) {
+		console.warn('A Measure with a FREE TimeSignature should be given an endsAt value.');
 	}
 
 	this.value = value;
 	this.timeSig = timeSig;
 	this.startsAt = startsAt;
+	this._endsAt = endsAt;
 	this.barType = barType;
 	this.children = children;
 	this.anacrusis = anacrusis;
 }
 
 Measure.prototype.type = TYPE;
+
+Measure.prototype.getStartTime = function () {
+	return this.startsAt;
+}
+
+/**
+ * @return {Number} - The time the measure ends.
+ */
+Measure.prototype.getEndTime = function () {
+	if (this._endsAt) {
+		return this._endsAt;
+	} else {
+		return this.getStartTime() + getTimeSigDuration(this.timeSig);
+	}
+}
 
 /*
  * @param lines Group<Line>[]
@@ -62,13 +80,6 @@ Measure.prototype.render = function (lines, leftBarline, startPos, width) {
 
 	return group;
 };
-
-/**
- * @return {Number} - The time the measure ends.
- */
-Measure.prototype.getEndTime = function () {
-	return this.startsAt + getMeasureDuration(this);
-}
 
 /**
  * @param {Number} numMeasures - the number of measures to create.

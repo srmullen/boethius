@@ -15,7 +15,8 @@ const beatStructures = {
 	"12/8": [3, 3, 3, 3],
 	"9/8": [3, 3, 3],
 	"6/8": [3, 3],
-	"3/8": [3]
+	"3/8": [3],
+	"FREE": [4, 4]
 };
 
 function TimeSignature ({value="4/4", measure, beatStructure}) {
@@ -39,10 +40,12 @@ TimeSignature.prototype.render = function () {
 		name: TYPE
 	});
 
-	group.addChild(drawTimeSig(this.value, margin));
-	group.position = [0, 0];
-	if (this.value === "c" || this.value === "h") {
-		group.translate(0, Scored.config.stepSpacing * 4);
+	if (this.value !== 'FREE') {
+		group.addChild(drawTimeSig(this.value, margin));
+		group.position = [0, 0];
+		if (this.value === "c" || this.value === "h") {
+			group.translate(0, Scored.config.stepSpacing * 4);
+		}
 	}
 
 	return group;

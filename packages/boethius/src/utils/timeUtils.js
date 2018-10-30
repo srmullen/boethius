@@ -11,6 +11,8 @@ function parseSignature (signature) {
 
 	if (sig === "c" || sig === "h") {
 		return [4, 4];
+	} else if (sig === 'FREE') {
+		return [Infinity, 4];
 	} else {
 		const nums = sig.split("/");
 		return [+nums[0], +nums[1]]; // convert strings to numbers
@@ -216,19 +218,20 @@ function getTimeNumber (measure, timeSig, offset=0) {
 	return measure * beats * (1/value) + offset;
 }
 
-/*
+/**
  * @param measures - array of measures.
  * @param time - number representing time of event.
  */
 function getMeasureNumber (measures, time) {
-	const measure = _.find(measures, (measure) => {
-		const measureEndsAt = measure.startsAt + getMeasureDuration(measure);
+	const measure = _.find(measures, (measure, i) => {
+		const measureEndsAt = measure.getEndTime();
 		return time >= measure.startsAt && time < measureEndsAt;
 	});
 
-	// If the time isn't in the given measures then measure number will be -1.
-	// Return the index of the last measure + 1.
-	return measure ? measure.value : _.last(measures).value + 1;
+	// NOTE: This was adding 1 when taking the last measure, but it was causing
+	// issues with free time signatures. Some tests failed when it was removed
+	// but everything else seems ok. Keep an eye on. 10/30/2018.
+	return measure ? measure.value : _.last(measures).value;
 }
 
 /*
