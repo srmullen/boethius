@@ -340,8 +340,8 @@ describe("boethius compilation", () => {
                     (system 3)
                 `);
 
-                expect(layout.systems[0].measures).toBe(4);
-                expect(layout.systems[1].measures).toBe(3);
+                expect(layout.systems[0].duration.measure).toBe(4);
+                expect(layout.systems[1].duration.measure).toBe(3);
             });
 
             test('should take lineSpacing list', () => {

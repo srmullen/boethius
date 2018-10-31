@@ -61,7 +61,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 24);
+/******/ 	return __webpack_require__(__webpack_require__.s = 25);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -17378,7 +17378,7 @@ module.exports = function(module) {
 /***/ (function(module, exports, __webpack_require__) {
 
 var knowledge = __webpack_require__(3);
-var vector = __webpack_require__(15);
+var vector = __webpack_require__(16);
 var toCoord = __webpack_require__(47);
 
 function Interval(coord) {
@@ -18360,7 +18360,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/**
 /***/ (function(module, exports, __webpack_require__) {
 
 /* MIT license */
-var cssKeywords = __webpack_require__(29);
+var cssKeywords = __webpack_require__(30);
 
 // NOTE: conversions should only return primitive values (i.e. arrays, or
 //       values that give correct `typeof` results).
@@ -19226,11 +19226,97 @@ convert.rgb.gray = function (rgb) {
 /* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
+var Note = __webpack_require__(13);
+var Interval = __webpack_require__(6);
+var Chord = __webpack_require__(48);
+var Scale = __webpack_require__(50);
+
+var teoria;
+
+// never thought I would write this, but: Legacy support
+function intervalConstructor(from, to) {
+  // Construct a Interval object from string representation
+  if (typeof from === 'string')
+    return Interval.toCoord(from);
+
+  if (typeof to === 'string' && from instanceof Note)
+    return Interval.from(from, Interval.toCoord(to));
+
+  if (to instanceof Interval && from instanceof Note)
+    return Interval.from(from, to);
+
+  if (to instanceof Note && from instanceof Note)
+    return Interval.between(from, to);
+
+  throw new Error('Invalid parameters');
+}
+
+intervalConstructor.toCoord = Interval.toCoord;
+intervalConstructor.from = Interval.from;
+intervalConstructor.between = Interval.between;
+intervalConstructor.invert = Interval.invert;
+
+function noteConstructor(name, duration) {
+  if (typeof name === 'string')
+    return Note.fromString(name, duration);
+  else
+    return new Note(name, duration);
+}
+
+noteConstructor.fromString = Note.fromString;
+noteConstructor.fromKey = Note.fromKey;
+noteConstructor.fromFrequency = Note.fromFrequency;
+noteConstructor.fromMIDI = Note.fromMIDI;
+
+function chordConstructor(name, symbol) {
+  if (typeof name === 'string') {
+    var root, octave;
+    root = name.match(/^([a-h])(x|#|bb|b?)/i);
+    if (root && root[0]) {
+      octave = typeof symbol === 'number' ? symbol.toString(10) : '4';
+      return new Chord(Note.fromString(root[0].toLowerCase() + octave),
+                            name.substr(root[0].length));
+    }
+  } else if (name instanceof Note)
+    return new Chord(name, symbol);
+
+  throw new Error('Invalid Chord. Couldn\'t find note name');
+}
+
+function scaleConstructor(tonic, scale) {
+  tonic = (tonic instanceof Note) ? tonic : teoria.note(tonic);
+  return new Scale(tonic, scale);
+}
+
+teoria = {
+  note: noteConstructor,
+
+  chord: chordConstructor,
+
+  interval: intervalConstructor,
+
+  scale: scaleConstructor,
+
+  Note: Note,
+  Chord: Chord,
+  Scale: Scale,
+  Interval: Interval
+};
+
+
+__webpack_require__(51)(teoria);
+exports = module.exports = teoria;
+
+
+/***/ }),
+/* 13 */
+/***/ (function(module, exports, __webpack_require__) {
+
 var scientific = __webpack_require__(44);
 var helmholtz = __webpack_require__(45);
 var pitchFq = __webpack_require__(46);
 var knowledge = __webpack_require__(3);
-var vector = __webpack_require__(15);
+var vector = __webpack_require__(16);
 var Interval = __webpack_require__(6);
 
 function pad(str, ch, len) {
@@ -19455,7 +19541,7 @@ module.exports = Note;
 
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports) {
 
 // First coord is octaves, second is fifths. Distances are relative to c
@@ -19480,7 +19566,7 @@ module.exports.sharp = [-4, 7];
 
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports) {
 
 var accidentalValues = {
@@ -19502,7 +19588,7 @@ module.exports.interval = function accidentalInterval(acc) {
 
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -19528,7 +19614,7 @@ module.exports = {
 
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -19673,7 +19759,7 @@ exports.lower = lower;
 exports.raise = raise;
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -19708,7 +19794,7 @@ var NumberNode = function () {
 exports.default = NumberNode;
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -19753,7 +19839,7 @@ var NoteNode = function () {
 exports.default = NoteNode;
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -19814,7 +19900,7 @@ var ScopeNode = function () {
 exports.default = ScopeNode;
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -19828,7 +19914,7 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 var _Serializable = __webpack_require__(1);
 
-var _Stringable = __webpack_require__(21);
+var _Stringable = __webpack_require__(22);
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -19857,14 +19943,14 @@ var Keyword = function () {
 exports.default = Keyword;
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 /***/ }),
-/* 22 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -19924,7 +20010,7 @@ var Layout = function () {
 exports.default = Layout;
 
 /***/ }),
-/* 23 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -19977,7 +20063,7 @@ function isMusic(item) {
 }
 
 /***/ }),
-/* 24 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -19991,15 +20077,15 @@ var _path = __webpack_require__(8);
 
 var _path2 = _interopRequireDefault(_path);
 
-var _chalk = __webpack_require__(25);
+var _chalk = __webpack_require__(26);
 
 var _chalk2 = _interopRequireDefault(_chalk);
 
-var _commander = __webpack_require__(35);
+var _commander = __webpack_require__(36);
 
 var _commander2 = _interopRequireDefault(_commander);
 
-var _main = __webpack_require__(38);
+var _main = __webpack_require__(39);
 
 var _main2 = _interopRequireDefault(_main);
 
@@ -20046,16 +20132,16 @@ if (_commander2.default.file) {
 }
 
 /***/ }),
-/* 25 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-const escapeStringRegexp = __webpack_require__(26);
-const ansiStyles = __webpack_require__(27);
-const supportsColor = __webpack_require__(31);
+const escapeStringRegexp = __webpack_require__(27);
+const ansiStyles = __webpack_require__(28);
+const supportsColor = __webpack_require__(32);
 
-const template = __webpack_require__(34);
+const template = __webpack_require__(35);
 
 const isSimpleWindowsTerm = process.platform === 'win32' && !(process.env.TERM || '').toLowerCase().startsWith('xterm');
 
@@ -20281,7 +20367,7 @@ module.exports.default = module.exports; // For TypeScript
 
 
 /***/ }),
-/* 26 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -20299,12 +20385,12 @@ module.exports = function (str) {
 
 
 /***/ }),
-/* 27 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 /* WEBPACK VAR INJECTION */(function(module) {
-const colorConvert = __webpack_require__(28);
+const colorConvert = __webpack_require__(29);
 
 const wrapAnsi16 = (fn, offset) => function () {
 	const code = fn.apply(colorConvert, arguments);
@@ -20459,11 +20545,11 @@ Object.defineProperty(module, 'exports', {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)(module)))
 
 /***/ }),
-/* 28 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var conversions = __webpack_require__(11);
-var route = __webpack_require__(30);
+var route = __webpack_require__(31);
 
 var convert = {};
 
@@ -20543,7 +20629,7 @@ module.exports = convert;
 
 
 /***/ }),
-/* 29 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -20702,7 +20788,7 @@ module.exports = {
 
 
 /***/ }),
-/* 30 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var conversions = __webpack_require__(11);
@@ -20805,13 +20891,13 @@ module.exports = function (fromModel) {
 
 
 /***/ }),
-/* 31 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-const os = __webpack_require__(32);
-const hasFlag = __webpack_require__(33);
+const os = __webpack_require__(33);
+const hasFlag = __webpack_require__(34);
 
 const env = process.env;
 
@@ -20927,13 +21013,13 @@ module.exports = process && support(supportLevel);
 
 
 /***/ }),
-/* 32 */
+/* 33 */
 /***/ (function(module, exports) {
 
 module.exports = require("os");
 
 /***/ }),
-/* 33 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -20950,7 +21036,7 @@ module.exports = function (flag, argv) {
 
 
 /***/ }),
-/* 34 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -21085,15 +21171,15 @@ module.exports = (chalk, tmp) => {
 
 
 /***/ }),
-/* 35 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /**
  * Module dependencies.
  */
 
-var EventEmitter = __webpack_require__(36).EventEmitter;
-var spawn = __webpack_require__(37).spawn;
+var EventEmitter = __webpack_require__(37).EventEmitter;
+var spawn = __webpack_require__(38).spawn;
 var path = __webpack_require__(8);
 var dirname = path.dirname;
 var basename = path.basename;
@@ -22249,19 +22335,19 @@ function exists(file) {
 
 
 /***/ }),
-/* 36 */
+/* 37 */
 /***/ (function(module, exports) {
 
 module.exports = require("events");
 
 /***/ }),
-/* 37 */
+/* 38 */
 /***/ (function(module, exports) {
 
 module.exports = require("child_process");
 
 /***/ }),
-/* 38 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -22272,17 +22358,17 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.TYPES = undefined;
 
-var _lang = __webpack_require__(39);
+var _lang = __webpack_require__(40);
 
-var _processing = __webpack_require__(40);
+var _processing = __webpack_require__(41);
 
 var _palestrina = __webpack_require__(52);
 
-var _NumberNode = __webpack_require__(17);
+var _NumberNode = __webpack_require__(18);
 
 var _NumberNode2 = _interopRequireDefault(_NumberNode);
 
-var _NoteNode = __webpack_require__(18);
+var _NoteNode = __webpack_require__(19);
 
 var _NoteNode2 = _interopRequireDefault(_NoteNode);
 
@@ -22290,7 +22376,7 @@ var _RestNode = __webpack_require__(57);
 
 var _RestNode2 = _interopRequireDefault(_RestNode);
 
-var _ScopeNode = __webpack_require__(19);
+var _ScopeNode = __webpack_require__(20);
 
 var _ScopeNode2 = _interopRequireDefault(_ScopeNode);
 
@@ -22298,11 +22384,11 @@ var _ChordNode = __webpack_require__(58);
 
 var _ChordNode2 = _interopRequireDefault(_ChordNode);
 
-var _Keyword = __webpack_require__(20);
+var _Keyword = __webpack_require__(21);
 
 var _Keyword2 = _interopRequireDefault(_Keyword);
 
-var _Layout = __webpack_require__(22);
+var _Layout = __webpack_require__(23);
 
 var _Layout2 = _interopRequireDefault(_Layout);
 
@@ -22337,7 +22423,20 @@ function compile(program, opts) {
     _lang.parser.yy.ChordNode = _ChordNode2.default;
     _lang.parser.yy.Keyword = _Keyword2.default;
     _lang.parser.yy.Voice = _Voice2.default;
-    _lang.parser.yy.parsePitch = _palestrina.pitch.parsePitch;
+    _lang.parser.yy.parsePitch = function (pitchStr, key) {
+        var pitchObj = _palestrina.pitch.parsePitch(pitchStr);
+        // pitchClass does not have an accidental set if length is one.
+        if (key && pitchObj.pitchClass.length === 1 && !key.hasPitch(pitchObj.pitchClass)) {
+            pitchObj.pitchClass = key.getEnharmonic(pitchObj.pitchClass);
+        }
+
+        // Remove the natural accidental if it exists.
+        if (pitchObj.pitchClass[1] === 'n') {
+            pitchObj.pitchClass = pitchObj.pitchClass[0];
+        }
+
+        return pitchObj;
+    };
 
     var parsed = _lang.parser.parse(program);
 
@@ -22362,7 +22461,7 @@ var TYPES = exports.TYPES = { NOTE: _constants.NOTE, REST: _constants.REST, CHOR
 exports.default = compile;
 
 /***/ }),
-/* 39 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(module) {/* parser generated by jison 0.4.17 */
@@ -22471,7 +22570,7 @@ case 7:
 this.$ = {value: Number($$[$0-1]), dots: $$[$0].length}
 break;
 case 8:
-this.$ = yy.parsePitch($$[$0]);
+this.$ = yy.parsePitch($$[$0], yy.currentKey);
 break;
 case 9: case 10:
 this.$ = new yy.Keyword($$[$0])
@@ -23179,7 +23278,7 @@ case 24:return 'INVALID'
 break;
 }
 },
-rules: [/^(?:\s+)/,/^(?:;.*)/,/^(?:\|)/,/^(?:\/\*([^*]|[\r\n]|(\*+([^*\/]|[\r\n])))*\*+\/)/,/^(?:\()/,/^(?:\))/,/^(?:\[)/,/^(?:\])/,/^(?:\{)/,/^(?:\})/,/^(?:<)/,/^(?:>)/,/^(?:\/)/,/^(?:=)/,/^(?::)/,/^(?:r\b)/,/^(?:\.+)/,/^(?:"(.*?)")/,/^(?:true|false\b)/,/^(?:[0-9]+)/,/^(?:[a-gA-G][b|#]{0,2}(?![a-zA-Z])([0-9]+)?)/,/^(?:~[a-zA-Z][a-zA-Z0-9\-]*)/,/^(?:[a-zA-Z][a-zA-Z0-9]*)/,/^(?:$)/,/^(?:.)/],
+rules: [/^(?:\s+)/,/^(?:;.*)/,/^(?:\|)/,/^(?:\/\*([^*]|[\r\n]|(\*+([^*\/]|[\r\n])))*\*+\/)/,/^(?:\()/,/^(?:\))/,/^(?:\[)/,/^(?:\])/,/^(?:\{)/,/^(?:\})/,/^(?:<)/,/^(?:>)/,/^(?:\/)/,/^(?:=)/,/^(?::)/,/^(?:r\b)/,/^(?:\.+)/,/^(?:"(.*?)")/,/^(?:true|false\b)/,/^(?:[0-9]+)/,/^(?:[a-gA-G][b|#|n]{0,2}(?![a-zA-Z])([0-9]+)?)/,/^(?:~[a-zA-Z][a-zA-Z0-9\-]*)/,/^(?:[a-zA-Z][a-zA-Z0-9\-\!]*)/,/^(?:$)/,/^(?:.)/],
 conditions: {"INITIAL":{"rules":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24],"inclusive":true}}
 });
 return lexer;
@@ -23212,7 +23311,7 @@ if (typeof module !== 'undefined' && __webpack_require__.c[__webpack_require__.s
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)(module)))
 
 /***/ }),
-/* 40 */
+/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -23225,15 +23324,15 @@ exports.easyOctave = easyOctave;
 
 var _constants = __webpack_require__(0);
 
-var _lodash = __webpack_require__(41);
+var _lodash = __webpack_require__(42);
 
 var _lodash2 = _interopRequireDefault(_lodash);
 
-var _lodash3 = __webpack_require__(42);
+var _lodash3 = __webpack_require__(43);
 
 var _lodash4 = _interopRequireDefault(_lodash3);
 
-var _teoria = __webpack_require__(43);
+var _teoria = __webpack_require__(12);
 
 var _teoria2 = _interopRequireDefault(_teoria);
 
@@ -23288,7 +23387,7 @@ function easyOctave(voice) {
 }
 
 /***/ }),
-/* 41 */
+/* 42 */
 /***/ (function(module, exports) {
 
 /**
@@ -23970,7 +24069,7 @@ module.exports = memoize;
 
 
 /***/ }),
-/* 42 */
+/* 43 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(module) {/**
@@ -26241,97 +26340,11 @@ module.exports = minBy;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)(module)))
 
 /***/ }),
-/* 43 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var Note = __webpack_require__(12);
-var Interval = __webpack_require__(6);
-var Chord = __webpack_require__(48);
-var Scale = __webpack_require__(50);
-
-var teoria;
-
-// never thought I would write this, but: Legacy support
-function intervalConstructor(from, to) {
-  // Construct a Interval object from string representation
-  if (typeof from === 'string')
-    return Interval.toCoord(from);
-
-  if (typeof to === 'string' && from instanceof Note)
-    return Interval.from(from, Interval.toCoord(to));
-
-  if (to instanceof Interval && from instanceof Note)
-    return Interval.from(from, to);
-
-  if (to instanceof Note && from instanceof Note)
-    return Interval.between(from, to);
-
-  throw new Error('Invalid parameters');
-}
-
-intervalConstructor.toCoord = Interval.toCoord;
-intervalConstructor.from = Interval.from;
-intervalConstructor.between = Interval.between;
-intervalConstructor.invert = Interval.invert;
-
-function noteConstructor(name, duration) {
-  if (typeof name === 'string')
-    return Note.fromString(name, duration);
-  else
-    return new Note(name, duration);
-}
-
-noteConstructor.fromString = Note.fromString;
-noteConstructor.fromKey = Note.fromKey;
-noteConstructor.fromFrequency = Note.fromFrequency;
-noteConstructor.fromMIDI = Note.fromMIDI;
-
-function chordConstructor(name, symbol) {
-  if (typeof name === 'string') {
-    var root, octave;
-    root = name.match(/^([a-h])(x|#|bb|b?)/i);
-    if (root && root[0]) {
-      octave = typeof symbol === 'number' ? symbol.toString(10) : '4';
-      return new Chord(Note.fromString(root[0].toLowerCase() + octave),
-                            name.substr(root[0].length));
-    }
-  } else if (name instanceof Note)
-    return new Chord(name, symbol);
-
-  throw new Error('Invalid Chord. Couldn\'t find note name');
-}
-
-function scaleConstructor(tonic, scale) {
-  tonic = (tonic instanceof Note) ? tonic : teoria.note(tonic);
-  return new Scale(tonic, scale);
-}
-
-teoria = {
-  note: noteConstructor,
-
-  chord: chordConstructor,
-
-  interval: intervalConstructor,
-
-  scale: scaleConstructor,
-
-  Note: Note,
-  Chord: Chord,
-  Scale: Scale,
-  Interval: Interval
-};
-
-
-__webpack_require__(51)(teoria);
-exports = module.exports = teoria;
-
-
-/***/ }),
 /* 44 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var coords = __webpack_require__(13);
-var accval = __webpack_require__(14);
+var coords = __webpack_require__(14);
+var accval = __webpack_require__(15);
 
 module.exports = function scientific(name) {
   var format = /^([a-h])(x|#|bb|b?)(-?\d*)/i;
@@ -26358,8 +26371,8 @@ module.exports = function scientific(name) {
 /* 45 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var coords = __webpack_require__(13);
-var accval = __webpack_require__(14);
+var coords = __webpack_require__(14);
+var accval = __webpack_require__(15);
 
 module.exports = function helmholtz(name) {
   var name = name.replace(/\u2032/g, "'").replace(/\u0375/g, ',');
@@ -26478,7 +26491,7 @@ module.exports.coords = baseIntervals.slice(0);
 
 var daccord = __webpack_require__(49);
 var knowledge = __webpack_require__(3);
-var Note = __webpack_require__(12);
+var Note = __webpack_require__(13);
 var Interval = __webpack_require__(6);
 
 function Chord(root, name) {
@@ -27064,7 +27077,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.pitch = exports.live = exports.chord = exports.melody = exports.scale = undefined;
 
-var _scale = __webpack_require__(16);
+var _scale = __webpack_require__(17);
 
 var scale = _interopRequireWildcard(_scale);
 
@@ -27354,7 +27367,7 @@ var _lodash = __webpack_require__(4);
 
 var _ = _interopRequireWildcard(_lodash);
 
-var _scale = __webpack_require__(16);
+var _scale = __webpack_require__(17);
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
@@ -27428,7 +27441,7 @@ var NOTES = (_NOTES = {
     "E": 4, "e": 4, "d##": 4, "D##": 4, "fb": 4, "Fb": 4 }, _defineProperty(_NOTES, "Fb", 4), _defineProperty(_NOTES, "FB", 4), _defineProperty(_NOTES, "E#", 5), _defineProperty(_NOTES, "e#", 5), _defineProperty(_NOTES, "F", 5), _defineProperty(_NOTES, "f", 5), _defineProperty(_NOTES, "gbb", 5), _defineProperty(_NOTES, "Gbb", 5), _defineProperty(_NOTES, "gBB", 5), _defineProperty(_NOTES, "GBB", 5), _defineProperty(_NOTES, "F#", 6), _defineProperty(_NOTES, "f#", 6), _defineProperty(_NOTES, "Gb", 6), _defineProperty(_NOTES, "gb", 6), _defineProperty(_NOTES, "GB", 6), _defineProperty(_NOTES, "gB", 6), _defineProperty(_NOTES, "G", 7), _defineProperty(_NOTES, "g", 7), _defineProperty(_NOTES, "f##", 7), _defineProperty(_NOTES, "F##", 7), _defineProperty(_NOTES, "abb", 7), _defineProperty(_NOTES, "Abb", 7), _defineProperty(_NOTES, "aBB", 7), _defineProperty(_NOTES, "ABB", 7), _defineProperty(_NOTES, "G#", 8), _defineProperty(_NOTES, "g#", 8), _defineProperty(_NOTES, "Ab", 8), _defineProperty(_NOTES, "ab", 8), _defineProperty(_NOTES, "AB", 8), _defineProperty(_NOTES, "aB", 8), _defineProperty(_NOTES, "A", 9), _defineProperty(_NOTES, "a", 9), _defineProperty(_NOTES, "g##", 9), _defineProperty(_NOTES, "G##", 9), _defineProperty(_NOTES, "bbb", 9), _defineProperty(_NOTES, "Bbb", 9), _defineProperty(_NOTES, "Bbb", 9), _defineProperty(_NOTES, "BBB", 9), _defineProperty(_NOTES, "A#", 10), _defineProperty(_NOTES, "a#", 10), _defineProperty(_NOTES, "Bb", 10), _defineProperty(_NOTES, "bb", 10), _defineProperty(_NOTES, "BB", 10), _defineProperty(_NOTES, "bB", 10), _defineProperty(_NOTES, "B", 11), _defineProperty(_NOTES, "b", 11), _defineProperty(_NOTES, "a##", 11), _defineProperty(_NOTES, "A##", 11), _defineProperty(_NOTES, "Cb", 11), _defineProperty(_NOTES, "cb", 11), _defineProperty(_NOTES, "CB", 11), _defineProperty(_NOTES, "cB", 11), _NOTES);
 
 function parsePitch(pitch) {
-    var pitchClass = pitch.match(/[a-gA-G][b|#]{0,2}(?![a-zA-Z])/)[0];
+    var pitchClass = pitch.match(/[a-gA-G][b|#|n]{0,2}(?![a-zA-Z])/)[0];
     var octave = pitch.match(/[0-9]+/);
     if (octave && octave[0].length) {
         return { pitchClass: pitchClass, octave: Number(octave) };
@@ -27575,7 +27588,7 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 var _constants = __webpack_require__(0);
 
-var _NoteNode = __webpack_require__(18);
+var _NoteNode = __webpack_require__(19);
 
 var _NoteNode2 = _interopRequireDefault(_NoteNode);
 
@@ -27641,7 +27654,7 @@ var _fraction2 = _interopRequireDefault(_fraction);
 
 var _lodash = __webpack_require__(4);
 
-var _Layout = __webpack_require__(22);
+var _Layout = __webpack_require__(23);
 
 var _Layout2 = _interopRequireDefault(_Layout);
 
@@ -27655,7 +27668,7 @@ var _Node = __webpack_require__(10);
 
 var _time = __webpack_require__(60);
 
-var _utils = __webpack_require__(23);
+var _utils = __webpack_require__(24);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -27785,7 +27798,7 @@ var _fraction = __webpack_require__(9);
 
 var _fraction2 = _interopRequireDefault(_fraction);
 
-var _utils = __webpack_require__(23);
+var _utils = __webpack_require__(24);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -27871,7 +27884,7 @@ var _v = __webpack_require__(62);
 
 var _v2 = _interopRequireDefault(_v);
 
-var _Keyword = __webpack_require__(20);
+var _Keyword = __webpack_require__(21);
 
 var _Keyword2 = _interopRequireDefault(_Keyword);
 
@@ -27903,15 +27916,15 @@ var _Key = __webpack_require__(72);
 
 var _Key2 = _interopRequireDefault(_Key);
 
-var _NumberNode = __webpack_require__(17);
+var _NumberNode = __webpack_require__(18);
 
 var _NumberNode2 = _interopRequireDefault(_NumberNode);
 
-var _ScopeNode = __webpack_require__(19);
+var _ScopeNode = __webpack_require__(20);
 
 var _ScopeNode2 = _interopRequireDefault(_ScopeNode);
 
-var _Stringable = __webpack_require__(21);
+var _Stringable = __webpack_require__(22);
 
 var _Serializable = __webpack_require__(1);
 
@@ -27974,7 +27987,10 @@ var BUILTINS = {
         var lineSpacing = lineSpacings.length ? lineSpacings.map(function (num) {
             return num.value;
         }) : [0];
-        var system = new _SystemNode2.default({ measures: measures.value, lineSpacing: lineSpacing });
+        var system = new _SystemNode2.default({
+            duration: { measure: measures.value },
+            lineSpacing: lineSpacing
+        });
 
         return system;
     },
@@ -28020,6 +28036,25 @@ var BUILTINS = {
             repeated = repeated.concat(items.map(clone));
         }
         return new _ScopeNode2.default({}, repeated);
+    },
+
+
+    /*
+     * in-key! causes any notes coming after it to have accidentals applied
+     * to automatically. Returns a Key, so if called mid-voice will also
+     * add key to the layout.
+     */
+    'in-key!': function inKey(yy, args) {
+        var key = args[0];
+        if (key instanceof _Key2.default) {
+            yy.currentKey = key;
+            return new _ScopeNode2.default({}, [key]);
+        } else if (key instanceof _Keyword2.default && key.toString() === 'none') {
+            yy.currentKey = null;
+            return new _ScopeNode2.default({}, []);
+        } else {
+            throw new Error('Unexpected arguments to in-key! : ' + args[0].toString());
+        }
     }
 };
 
@@ -28486,11 +28521,17 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+var _teoria = __webpack_require__(12);
+
+var _teoria2 = _interopRequireDefault(_teoria);
+
 var _constants = __webpack_require__(0);
 
 var _Executable = __webpack_require__(2);
 
 var _Serializable = __webpack_require__(1);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -28501,12 +28542,41 @@ var Key = function () {
         this.type = _constants.KEY;
 
         this.props = props;
+        this.scale = _teoria2.default.scale(props.root, props.mode);
     }
 
     _createClass(Key, [{
         key: 'serialize',
         value: function serialize() {
             return Object.assign({}, this.props, { type: _constants.KEY });
+        }
+    }, {
+        key: 'execute',
+        value: function execute() {}
+
+        /*
+         * True if the given pitch class belongs to the key's scale, false otherwise.
+         */
+
+    }, {
+        key: 'hasPitch',
+        value: function hasPitch(pitch) {
+            return this.scale.simple().find(function (n) {
+                return n === pitch;
+            });
+        }
+
+        /*
+         * Not sure if this methods name is the best.
+         * Given a pitch class returns a pitch class with the accidental from the key.
+         */
+
+    }, {
+        key: 'getEnharmonic',
+        value: function getEnharmonic(pitch) {
+            return this.scale.simple().find(function (n) {
+                return n[0] === pitch;
+            });
         }
     }]);
 

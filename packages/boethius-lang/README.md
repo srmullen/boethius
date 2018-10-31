@@ -12,6 +12,7 @@ TODO
 - Scales
 - Transposition
 - Immutable data structures?
+- Allow keywords as voice names.
 
 Ideas
 -----

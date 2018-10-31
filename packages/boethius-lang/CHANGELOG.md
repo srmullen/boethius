@@ -1,3 +1,7 @@
+v0.7.1
+------
+- System measures now set on duration object.
+- 
 v0.7.0
 ------
 - Curly bracket enclosed properties lists.

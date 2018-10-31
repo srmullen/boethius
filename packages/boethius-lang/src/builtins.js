@@ -66,7 +66,10 @@ const BUILTINS = {
     system (yy: YY, args: Array<NumberNode>) {
         const [measures, ...lineSpacings] = args;
         const lineSpacing = lineSpacings.length ? lineSpacings.map(num => num.value) : [0];
-        const system = new SystemNode({measures: measures.value, lineSpacing});
+        const system = new SystemNode({
+          duration: {measure: measures.value},
+          lineSpacing
+        });
 
         return system;
     },
