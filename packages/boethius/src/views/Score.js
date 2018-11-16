@@ -102,9 +102,10 @@ Score.beforeRender = function ({score, music, measures}, options={}) {
 }
 
 Score.render = function (
-    {score, music, measures, systemsToRender, startMeasures, startTimes, voiceTimeFrames},
+    {project, score, music, measures, systemsToRender, startMeasures, startTimes, voiceTimeFrames},
     options = {}
 ) {
+    project.activate()
     const {voices=[], chordSymbols=[], repeats=[]} = music;
     const {pages=[0]} = options;
     // Create the Score Group.

@@ -43,14 +43,12 @@ const pluginCollection = {
 	parserPlugin: {
 		name: 'parserPlugin',
 		beforeRender: function (acc) {
-			if (acc.options.parse) {
-				const { score, measures } = parseLayout(acc.score);
-				return {
-					score,
-					measures,
-					music: parseMusic(acc.music)
-				};
-			}
+			const { score, measures } = parseLayout(acc.score);
+			return {
+				score,
+				measures,
+				music: parseMusic(acc.music)
+			};
 		}
 	},
 	colorPlugin: {

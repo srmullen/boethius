@@ -39,6 +39,7 @@ Scored.loadFonts = loadFonts;
 
 Scored.prototype.setup = function (canvas) {
 	this.project = paper.setup(canvas).project;
+	this.project.activate;
 };
 
 Scored.prototype.render = function (layout, music, options={}) {
@@ -85,6 +86,7 @@ Scored.prototype.render = function (layout, music, options={}) {
 Scored.prototype.pluginRender = function (score, music, options={}) {
 	this.project.activate();
 	const init = {
+		project: this.project,
 		score,
 		music,
 		options
@@ -92,16 +94,13 @@ Scored.prototype.pluginRender = function (score, music, options={}) {
 
 	const runner = runPlugins.bind(this, this.plugins);
 
-	const aggregate = runner('beforeRender')(init)
-		.then(runner('render'))
-		.then(runner('renderTimes'))
-		.then(runner('afterRenderTimes'))
-		.then(runner('afterRender'))
-		.catch((error) => {
-			console.log(error);
-		});
+	const fns = ['beforeRender', 'render', 'renderTimes', 'afterRenderTimes', 'afterRender'];
 
-	paper.view.update();
+	const aggregate = fns.reduce((agg, fnName) => {
+		return agg.then(runner(fnName));
+	}, Promise.resolve(init));
+
+	this.project.view.update();
 	return aggregate;
 }
 
