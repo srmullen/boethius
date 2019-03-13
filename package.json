@@ -4,11 +4,16 @@
   "description": "Create music and scores.",
   "main": "index.js",
   "scripts": {
+    "docz:dev": "docz dev",
+    "docz:build": "docz build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Sean Mullen",
   "license": "ISC",
   "devDependencies": {
-    "lerna": "^3.13.1"
+    "docz": "^0.13.7",
+    "docz-theme-default": "^0.13.7",
+    "lerna": "^3.13.1",
+    "webpack": "^4.29.6"
   }
 }
