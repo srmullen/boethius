@@ -1,5 +1,5 @@
 {
-  "name": "boethius-lang",
+  "name": "@boethius/lang",
   "version": "0.7.1",
   "description": "Music description language",
   "main": "./src/main.js",
