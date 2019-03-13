@@ -43,12 +43,15 @@ const pluginCollection = {
 	parserPlugin: {
 		name: 'parserPlugin',
 		beforeRender: function (acc) {
-			const { score, measures } = parseLayout(acc.score);
-			return {
-				score,
-				measures,
-				music: parseMusic(acc.music)
-			};
+			if (acc.score && !(acc.score instanceof Score)) {
+				const { score, measures } = parseLayout(acc.score);
+				const music = parseMusic(acc.music);
+				return {
+					score,
+					measures,
+					music
+				};
+			}
 		}
 	},
 	colorPlugin: {

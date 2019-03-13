@@ -7,7 +7,6 @@ function createCanvas (el) {
     return document.getElementsByClassName("scored-canvas");
 }
 
-
 export function start (cb, config) {
     var canvas = createCanvas(document.getElementById("music"));
     var scored = new Scored(config);
