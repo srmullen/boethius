@@ -13,6 +13,7 @@ TODO
 - Transposition
 - Immutable data structures?
 - Allow keywords as voice names.
+- Beaming control.
 
 Ideas
 -----
