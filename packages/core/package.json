@@ -1,5 +1,5 @@
 {
-  "name": "boethius",
+  "name": "@boethius/core",
   "version": "1.0.0",
   "description": "Music Notation",
   "main": "src/Scored.js",
@@ -52,8 +52,5 @@
     "teoria": "^1.12.0",
     "webfontloader": "^1.6.20"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/srmullen/boethius.git"
-  }
+  "repository": "git+https://github.com/srmullen/boethius/packages/core"
 }
