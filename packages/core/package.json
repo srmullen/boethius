@@ -18,6 +18,9 @@
   ],
   "author": "Sean Mullen <srmullen13@gmail.com> (http://seanmullen.me/)",
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "devDependencies": {
     "babel-core": "^6.3.26",
     "babel-loader": "^6.4.1",
@@ -53,5 +56,5 @@
     "webfontloader": "^1.6.20"
   },
   "repository": "git+https://github.com/srmullen/boethius/packages/core",
-  "gitHead": "b9391e70fde25d11be166ee99388fca8ca6e0442"
+  "gitHead": "29492f96ab4e780db242cf4e8fbc94929241e422"
 }

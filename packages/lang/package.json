@@ -1,6 +1,6 @@
 {
   "name": "@boethius/lang",
-  "version": "0.2.1",
+  "version": "0.2.0",
   "description": "Music description language",
   "main": "./src/main.js",
   "bin": {
@@ -16,6 +16,9 @@
   },
   "author": "Sean Mullen <srmullen13@gmail.com> (http://seanmullen.me/)",
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "devDependencies": {
     "babel-core": "^6.9.0",
     "babel-loader": "^7.1.4",
