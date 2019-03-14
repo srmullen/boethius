@@ -1,6 +1,6 @@
 {
   "name": "@boethius/lang",
-  "version": "0.2.0",
+  "version": "0.2.2",
   "description": "Music description language",
   "main": "./src/main.js",
   "bin": {
