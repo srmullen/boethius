@@ -1,7 +1,7 @@
 // @flow
 import {parser} from "../lang/lang";
 import {easyOctave} from './processing';
-import {scale, pitch} from "./palestrina/src/palestrina";
+// import {scale, pitch} from "./palestrina/src/palestrina";
 import NumberNode from './NumberNode';
 import NoteNode from "./NoteNode";
 import RestNode from "./RestNode";
@@ -12,6 +12,16 @@ import Layout from './Layout';
 import Voice from './Voice';
 import BUILTINS from './builtins';
 import { NOTE, REST, CHORD, CHORDSYMBOL } from './constants';
+
+function parsePitch (pitch) {
+    const pitchClass = pitch.match(/[a-gA-G][b|#|n]{0,2}(?![a-zA-Z])/)[0];
+    const octave = pitch.match(/[0-9]+/);
+    if (octave && octave[0].length) {
+        return {pitchClass: pitchClass, octave: Number(octave)};
+    } else {
+        return {pitchClass: pitchClass};
+    }
+}
 
 function compile (program: string, opts: {}) {
     const defaults = {
@@ -33,7 +43,8 @@ function compile (program: string, opts: {}) {
     parser.yy.Keyword = Keyword;
     parser.yy.Voice = Voice;
     parser.yy.parsePitch = (pitchStr, key) => {
-        const pitchObj = pitch.parsePitch(pitchStr);
+        // const pitchObj = pitch.parsePitch(pitchStr);
+        const pitchObj = parsePitch(pitchStr);
         // pitchClass does not have an accidental set if length is one.
         if (key && pitchObj.pitchClass.length === 1 && !key.hasPitch(pitchObj.pitchClass)) {
             pitchObj.pitchClass = key.getEnharmonic(pitchObj.pitchClass);

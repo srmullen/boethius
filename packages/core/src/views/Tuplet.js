@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import constants from '../constants';
 import {drawTuplets} from "../engraver";
 import {calculateTupletDuration, sumDurations} from "../utils/timeUtils";
