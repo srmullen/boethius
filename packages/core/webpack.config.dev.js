@@ -48,7 +48,7 @@ module.exports = {
         {
             test: /\.js$/,
             // use: ["babel-loader"],
-            loader: "babel-loader",
+            use: "babel-loader",
             include: [path.join(__dirname, "src"), path.join(__dirname, "examples")]
         }, {
             test: /\.html/,

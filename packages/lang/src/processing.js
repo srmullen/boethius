@@ -5,7 +5,6 @@ import memoize from 'lodash.memoize';
 import minBy from 'lodash.minby';
 import teoria from 'teoria';
 
-
 /*
  * Given a pitch {p1}, that pitches octave {octave} and a pitch without an octave {p2}
  * returns the octave for pitch p2 which is closest to p1.
